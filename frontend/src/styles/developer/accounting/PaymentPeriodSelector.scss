@@ -1,0 +1,473 @@
+@import '../../../styles/_variables.scss';
+@import '../../../styles/_mixins.scss';
+
+// Variables de color específicas para períodos
+$period-paid-color: #4caf50;
+$period-pending-color: #ff9966;
+$period-upcoming-color: #2979ff;
+
+// Animaciones
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -100% 0;
+  }
+  100% {
+    background-position: 100% 0;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Selector de períodos de pago
+.payment-period-selector {
+  position: relative;
+  
+  // Estilo para el período seleccionado actualmente
+  .selected-period {
+    background: rgba(30, 41, 59, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1rem 1.25rem;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    margin-bottom: 0.75rem;
+    
+    &:hover {
+      background: rgba(30, 41, 59, 0.8);
+      border-color: rgba(255, 255, 255, 0.2);
+      transform: translateY(-3px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.25);
+    }
+    
+    &.expanded {
+      border-color: rgba(0, 229, 255, 0.3);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3), 0 0 15px rgba(0, 229, 255, 0.2);
+    }
+    
+    // Información del período
+    .period-info {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      
+      .period-main {
+        display: flex;
+        align-items: center;
+        flex: 1;
+        
+        .period-status {
+          display: flex;
+          align-items: center;
+          padding: 0.5rem 1rem;
+          border-radius: 50px;
+          margin-right: 1.25rem;
+          font-weight: 500;
+          font-size: 0.9rem;
+          position: relative;
+          overflow: hidden;
+          
+          i {
+            margin-right: 0.5rem;
+          }
+          
+          // Efecto de brillante animado
+          &:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(
+              to right,
+              transparent,
+              rgba(255, 255, 255, 0.2),
+              transparent
+            );
+            background-size: 200% 100%;
+            animation: shimmer 3s infinite;
+          }
+          
+          // Estados de color
+          &.status-paid {
+            background: rgba($period-paid-color, 0.15);
+            color: $period-paid-color;
+          }
+          
+          &.status-pending {
+            background: rgba($period-pending-color, 0.15);
+            color: $period-pending-color;
+          }
+          
+          &.status-upcoming {
+            background: rgba($period-upcoming-color, 0.15);
+            color: $period-upcoming-color;
+          }
+        }
+        
+        .period-dates {
+          display: flex;
+          flex-direction: column;
+          
+          .period-range {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 0.25rem;
+          }
+          
+          .payment-date {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+          }
+        }
+      }
+      
+      .period-arrow {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        color: #ffffff;
+        transition: all 0.3s ease;
+        
+        i {
+          font-size: 0.9rem;
+          transition: transform 0.3s ease;
+        }
+      }
+    }
+    
+    // Estilo cuando no hay período seleccionado
+    .no-period-selected {
+      display: flex;
+      align-items: center;
+      color: rgba(255, 255, 255, 0.7);
+      
+      i {
+        margin-right: 0.75rem;
+        font-size: 1.1rem;
+      }
+    }
+  }
+  
+  // Dropdown con la lista de períodos
+  .period-dropdown {
+    position: absolute;
+    top: calc(100% + 0.5rem);
+    left: 0;
+    width: 100%;
+    background: rgba(30, 41, 59, 0.95);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    z-index: 10;
+    padding: 1.25rem;
+    animation: slideDown 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    
+    // Línea de tiempo de períodos
+    .period-timeline {
+      display: flex;
+      flex-direction: column;
+      
+      // Cada elemento de la línea de tiempo
+      .timeline-item {
+        display: flex;
+        padding: 1rem 0;
+        position: relative;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        animation: fadeIn 0.3s ease-out forwards;
+        animation-delay: calc(var(--animation-order) * 0.05s);
+        opacity: 0;
+        
+        &:not(:last-child):after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          height: 1px;
+          background: rgba(255, 255, 255, 0.1);
+        }
+        
+        &:hover {
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: 8px;
+          transform: translateX(5px);
+        }
+        
+        // Conector visual de la línea de tiempo
+        .timeline-connector {
+          flex: 0 0 30px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          margin-right: 1rem;
+          
+          .connector-line {
+            width: 2px;
+            flex-grow: 1;
+            background-color: rgba(255, 255, 255, 0.2);
+          }
+          
+          .connector-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #ffffff;
+            margin: 0.25rem 0;
+            transition: all 0.3s ease;
+          }
+        }
+        
+        // Contenido principal del período
+        .timeline-content {
+          flex: 1;
+          
+          .timeline-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            
+            .timeline-period {
+              font-weight: 600;
+              font-size: 1rem;
+            }
+            
+            .timeline-status {
+              display: flex;
+              align-items: center;
+              font-size: 0.85rem;
+              padding: 0.3rem 0.75rem;
+              border-radius: 50px;
+              
+              i {
+                margin-right: 0.35rem;
+              }
+              
+              // Estados de color
+              &.status-paid {
+                background: rgba($period-paid-color, 0.15);
+                color: $period-paid-color;
+              }
+              
+              &.status-pending {
+                background: rgba($period-pending-color, 0.15);
+                color: $period-pending-color;
+              }
+              
+              &.status-upcoming {
+                background: rgba($period-upcoming-color, 0.15);
+                color: $period-upcoming-color;
+              }
+            }
+          }
+          
+          .timeline-details {
+            display: flex;
+            gap: 1rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            
+            .payment-info, .paid-info {
+              display: flex;
+              align-items: center;
+              
+              i {
+                margin-right: 0.5rem;
+                opacity: 0.8;
+              }
+            }
+          }
+        }
+        
+        // Indicador de período activo/seleccionado
+        .timeline-active-indicator {
+          width: 24px;
+          height: 24px;
+          border-radius: 50%;
+          background: rgba(0, 229, 255, 0.2);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-left: 1rem;
+          color: #00e5ff;
+          animation: pulse 2s infinite;
+        }
+        
+        // Estilos específicos para cada estado
+        &.status-paid {
+          .connector-dot {
+            background-color: $period-paid-color;
+            box-shadow: 0 0 10px rgba($period-paid-color, 0.5);
+          }
+        }
+        
+        &.status-pending {
+          .connector-dot {
+            background-color: $period-pending-color;
+            box-shadow: 0 0 10px rgba($period-pending-color, 0.5);
+          }
+        }
+        
+        &.status-upcoming {
+          .connector-dot {
+            background-color: $period-upcoming-color;
+            box-shadow: 0 0 10px rgba($period-upcoming-color, 0.5);
+          }
+          
+          .connector-line {
+            background-color: rgba($period-upcoming-color, 0.3);
+            background-image: linear-gradient(
+              to bottom,
+              transparent 0%,
+              transparent 50%,
+              rgba($period-upcoming-color, 0.3) 50%,
+              rgba($period-upcoming-color, 0.3) 100%
+            );
+            background-size: 4px 4px;
+          }
+        }
+        
+        // Estilo cuando está activo/seleccionado
+        &.active {
+          background: rgba(0, 229, 255, 0.1);
+          border-radius: 8px;
+          
+          .timeline-period {
+            color: #00e5ff;
+          }
+        }
+      }
+    }
+    
+    // Leyenda de colores
+    .period-legend {
+      display: flex;
+      justify-content: center;
+      gap: 1.5rem;
+      margin-top: 1.5rem;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      
+      .legend-item {
+        display: flex;
+        align-items: center;
+        font-size: 0.9rem;
+        color: rgba(255, 255, 255, 0.8);
+        
+        .legend-color {
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+          margin-right: 0.5rem;
+          
+          &.status-paid {
+            background-color: $period-paid-color;
+          }
+          
+          &.status-pending {
+            background-color: $period-pending-color;
+          }
+          
+          &.status-upcoming {
+            background-color: $period-upcoming-color;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Estilos responsivos
+@media (max-width: 768px) {
+  .payment-period-selector {
+    .selected-period {
+      padding: 0.75rem 1rem;
+      
+      .period-info {
+        .period-main {
+          .period-status {
+            padding: 0.35rem 0.75rem;
+            font-size: 0.8rem;
+          }
+          
+          .period-dates {
+            .period-range {
+              font-size: 0.95rem;
+            }
+            
+            .payment-date {
+              font-size: 0.8rem;
+            }
+          }
+        }
+      }
+    }
+    
+    .period-dropdown {
+      padding: 1rem;
+      
+      .period-timeline {
+        .timeline-item {
+          padding: 0.8rem 0;
+          
+          .timeline-content {
+            .timeline-header {
+              flex-direction: column;
+              align-items: flex-start;
+              
+              .timeline-period {
+                margin-bottom: 0.25rem;
+              }
+            }
+            
+            .timeline-details {
+              flex-direction: column;
+              gap: 0.5rem;
+            }
+          }
+        }
+      }
+    }
+  }
+}

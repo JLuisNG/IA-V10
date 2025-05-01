@@ -1,0 +1,463 @@
+// Variables
+$primary-color: #4f46e5;
+$primary-light: rgba(79, 70, 229, 0.1);
+$primary-dark: #4338ca;
+$primary-gradient: linear-gradient(135deg, #6366f1, #4338ca);
+$admin-gradient: linear-gradient(135deg, #f97316, #ef4444);
+$success-color: #10b981;
+$danger-color: #ef4444;
+$white: #ffffff;
+$dark-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 5px 10px -5px rgba(0, 0, 0, 0.2);
+$light-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$z-index-button: 999;
+$z-index-tooltip: 1000;
+$ease-out-cubic: cubic-bezier(0.33, 1, 0.68, 1);
+$ease-out-back: cubic-bezier(0.34, 1.56, 0.64, 1);
+$ease-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+// Mixins
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin glass-effect {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+// Keyframes Animations
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba($primary-color, 0.7);
+    transform: scale(0.98);
+  }
+  70% {
+    box-shadow: 0 0 0 15px rgba($primary-color, 0);
+    transform: scale(1.01);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba($primary-color, 0);
+    transform: scale(0.98);
+  }
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 0.5;
+  }
+  100% {
+    transform: scale(4);
+    opacity: 0;
+  }
+}
+
+@keyframes bounce {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes entry {
+  0% {
+    opacity: 0;
+    transform: scale(0.5) translateY(30px);
+  }
+  40% {
+    transform: scale(1.1);
+  }
+  70% {
+    transform: scale(0.95);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInHorizontal {
+  from {
+    opacity: 0;
+    transform: translateX(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes expandWidth {
+  from {
+    width: 60px;
+  }
+  to {
+    width: 140px;
+  }
+}
+
+@keyframes dotPulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+  50% {
+    transform: scale(1.2);
+    opacity: 1;
+  }
+  100% {
+    transform: scale(0.8);
+    opacity: 0.5;
+  }
+}
+
+@keyframes shineSweep {
+  0% {
+    background-position: -100% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+// Button Styles
+.floating-support-button {
+  position: fixed;
+  z-index: $z-index-button;
+  width: 60px;
+  height: 60px;
+  border-radius: 30px;
+  overflow: hidden;
+  cursor: pointer;
+  user-select: none;
+  background: $primary-gradient;
+  box-shadow: $dark-shadow, 0 0 0 1px rgba($primary-color, 0.3);
+  color: $white;
+  transition: 
+    width 0.3s $ease-out-back,
+    transform 0.3s $ease-out-cubic,
+    box-shadow 0.3s $ease-out-cubic,
+    background 0.3s $ease-out-cubic;
+  touch-action: none;
+  
+  // Admin styling
+  &.admin-mode {
+    background: $admin-gradient;
+    
+    &::before {
+      background: $admin-gradient;
+    }
+    
+    .button-icon {
+      color: rgba($white, 0.9);
+    }
+    
+    &::after {
+      box-shadow: inset 0 -4px 6px rgba(0, 0, 0, 0.2);
+    }
+  }
+  
+  // Pseudo-elements for effects
+  &::before {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    border-radius: 28px;
+    background: $primary-gradient;
+    z-index: -1;
+    transition: all 0.3s $ease-out-cubic;
+  }
+  
+  &::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: 30px;
+    box-shadow: inset 0 -3px 6px rgba(0, 0, 0, 0.2), inset 0 3px 6px rgba(255, 255, 255, 0.2);
+    z-index: -1;
+  }
+
+  // Animation states
+  &.hidden {
+    opacity: 0;
+    transform: translateY(30px) scale(0.8);
+  }
+  
+  &.entry {
+    animation: entry 0.6s $ease-out-back forwards;
+  }
+  
+  &.pulse {
+    animation: pulse 2s infinite;
+  }
+  
+  &.settle {
+    animation: bounce 0.5s $ease-out-cubic;
+  }
+  
+  &.lift {
+    transform: scale(1.05);
+    box-shadow: $dark-shadow, 0 0 0 2px rgba($primary-color, 0.4);
+  }
+  
+  // Expanded state
+  &.expanded {
+    width: 140px;
+    border-radius: 30px;
+    
+    .button-text {
+      opacity: 1;
+      transform: translateX(0);
+      pointer-events: none;
+    }
+    
+    .button-icon {
+      font-size: 18px;
+    }
+    
+    .drag-indicator {
+      opacity: 1;
+    }
+  }
+  
+  // Dragging state
+  &.dragging {
+    transform: scale(1.05);
+    box-shadow: $dark-shadow, 0 0 0 3px rgba($primary-color, 0.5);
+    opacity: 0.9;
+    cursor: grabbing;
+    
+    &::before {
+      background: darken($primary-color, 10%);
+    }
+    
+    .premium-tooltip {
+      display: none;
+    }
+  }
+  
+  // Notification indicator
+  &.has-notifications {
+    .notification-badge {
+      display: flex;
+    }
+  }
+  
+  // Button inner container
+  .button-inner {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    height: 100%;
+    padding: 0 14px 0 20px;
+    overflow: hidden;
+  }
+  
+  // Button icon
+  .button-icon {
+    width: 24px;
+    height: 24px;
+    @include flex-center;
+    font-size: 20px;
+    color: $white;
+    transition: all 0.3s $ease-out-cubic;
+    transform-origin: center;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  }
+  
+  // Button text
+  .button-text {
+    opacity: 0;
+    transform: translateX(-10px);
+    transition: all 0.3s $ease-out-cubic;
+    font-weight: 600;
+    font-size: 14px;
+    white-space: nowrap;
+    color: $white;
+    pointer-events: none;
+    letter-spacing: 0.01em;
+    
+    .notification-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background-color: $danger-color;
+      border-radius: 50%;
+      margin-left: 6px;
+      position: relative;
+      top: -1px;
+      animation: dotPulse 1.5s infinite;
+    }
+  }
+  
+  // Notification badge
+  .notification-badge {
+    position: absolute;
+    top: 6px;
+    right: 6px;
+    width: 20px;
+    height: 20px;
+    background-color: $danger-color;
+    border-radius: 50%;
+    display: none;
+    @include flex-center;
+    font-size: 11px;
+    font-weight: 700;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    transform-origin: center;
+    animation: bounce 2s infinite;
+    
+    span {
+      transform: scale(0.8); // Optical adjustment
+    }
+  }
+  
+  // Button ripple effect
+  .ripple-effect {
+    position: absolute;
+    border-radius: 50%;
+    background-color: rgba(255, 255, 255, 0.4);
+    width: 10px;
+    height: 10px;
+    transform: translate(-50%, -50%) scale(0);
+    animation: ripple 0.8s $ease-out-cubic;
+    pointer-events: none;
+  }
+  
+  // Button shine effect
+  .button-shine {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    pointer-events: none;
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.2) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    background-size: 200% 100%;
+    animation: shineSweep 3s linear infinite;
+  }
+  
+  // Drag indicator
+  .drag-indicator {
+    position: absolute;
+    bottom: 6px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.5);
+    opacity: 0;
+    transition: opacity 0.3s $ease-out-cubic;
+    pointer-events: none;
+  }
+  
+  // Tooltip
+  .premium-tooltip {
+    position: absolute;
+    top: -70px;
+    right: 0;
+    z-index: $z-index-tooltip;
+    padding: 8px 12px;
+    border-radius: 8px;
+    background-color: rgba(15, 23, 42, 0.85);
+    backdrop-filter: blur(8px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    width: 220px;
+    pointer-events: none;
+    animation: fadeIn 0.3s $ease-out-cubic;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    
+    .tooltip-content {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      
+      i {
+        color: $primary-color;
+        font-size: 16px;
+        margin-top: 3px;
+      }
+      
+      p {
+        margin: 0;
+        color: $white;
+        font-size: 13px;
+        line-height: 1.4;
+      }
+    }
+    
+    .tooltip-arrow {
+      position: absolute;
+      bottom: -8px;
+      right: 24px;
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+      border-top: 8px solid rgba(15, 23, 42, 0.85);
+    }
+  }
+  
+  // Hover effects
+  &:hover:not(.dragging):not(.has-interactive-tooltip) {
+    transform: translateY(-2px);
+    box-shadow: $dark-shadow, 0 0 0 2px rgba($primary-color, 0.15);
+    
+    &::before {
+      background: linear-gradient(135deg, lighten($primary-color, 5%), $primary-color);
+    }
+  }
+  
+  // Active/click effect
+  &:active:not(.dragging) {
+    transform: scale(0.95);
+  }
+}
+
+// Media Queries
+@media (max-width: 768px) {
+  .floating-support-button {
+    width: 50px;
+    height: 50px;
+    
+    .button-inner {
+      padding: 0 0 0 16px;
+    }
+    
+    .button-icon {
+      font-size: 18px;
+    }
+    
+    &.expanded {
+      width: 50px; // Don't expand on mobile
+      
+      .button-text {
+        display: none;
+      }
+    }
+    
+    .premium-tooltip {
+      display: none;
+    }
+  }
+}

@@ -1,0 +1,173 @@
+// styles/developer/support/FloatingSupportButton.scss
+
+// Variables
+$primary-color: #5856D6;
+$primary-gradient: linear-gradient(45deg, #5856D6, #7F7CE6);
+$hover-gradient: linear-gradient(45deg, #484AD3, #6B69E3);
+$active-gradient: linear-gradient(45deg, #3C3CAD, #5553D5);
+$shadow-color: rgba(88, 86, 214, 0.5);
+$tooltip-bg: #1A1F2E;
+$tooltip-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+$badge-color: #FF3B30;
+$white: #ffffff;
+
+// Animation keyframes
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(88, 86, 214, 0.7);
+  }
+  
+  70% {
+    transform: scale(1.05);
+    box-shadow: 0 0 0 10px rgba(88, 86, 214, 0);
+  }
+  
+  100% {
+    transform: scale(1);
+    box-shadow: 0 0 0 0 rgba(88, 86, 214, 0);
+  }
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-10px);
+  }
+  60% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 10px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+// Floating support button styles
+.floating-support-button {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: $primary-gradient;
+  border: none;
+  color: $white;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 900;
+  box-shadow: 0 4px 20px $shadow-color;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: $hover-gradient;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px $shadow-color;
+    
+    .button-tooltip {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+      visibility: visible;
+    }
+  }
+  
+  &:active {
+    background: $active-gradient;
+    transform: translateY(1px);
+    box-shadow: 0 2px 15px $shadow-color;
+  }
+  
+  &.animate {
+    animation: pulse 1s ease-in-out, bounce 1s ease-in-out;
+  }
+  
+  .button-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    
+    i {
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    }
+  }
+  
+  .unread-badge {
+    position: absolute;
+    top: -5px;
+    right: -5px;
+    background-color: $badge-color;
+    color: $white;
+    font-size: 12px;
+    font-weight: bold;
+    min-width: 20px;
+    height: 20px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 5px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    border: 2px solid $white;
+    animation: fadeInUp 0.3s ease;
+  }
+  
+  .button-tooltip {
+    position: absolute;
+    top: -40px;
+    right: 0;
+    background-color: $tooltip-bg;
+    color: $white;
+    padding: 8px 12px;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: $tooltip-shadow;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(10px) scale(0.95);
+    transition: all 0.2s ease;
+    pointer-events: none;
+    white-space: nowrap;
+    
+    &:after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      right: 24px;
+      width: 12px;
+      height: 12px;
+      background-color: $tooltip-bg;
+      transform: rotate(45deg);
+    }
+  }
+}
+
+// Responsive styles
+@media (max-width: 768px) {
+  .floating-support-button {
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    font-size: 20px;
+    
+    .button-tooltip {
+      display: none;
+    }
+  }
+}

@@ -1,0 +1,2238 @@
+@import '../../../_variables.scss';
+
+.staff-edit-container {
+  width: 100%;
+  animation: fadeIn 0.5s ease;
+  position: relative;
+
+  // Animación de entrada
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  // Pantalla de carga (manteniendo la animación que te gustó)
+  .staff-edit-loading {
+    background: rgba(10, 30, 60, 0.8);
+    border-radius: $border-radius-lg;
+    padding: $spacing-12;
+    margin-bottom: $spacing-8;
+    text-align: center;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba($primary-color, 0.2);
+    position: relative;
+    min-height: 400px;
+    @include flex-center;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3), 
+                inset 0 0 60px rgba($primary-color, 0.1);
+    
+    // Fondo con efecto digital
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        linear-gradient(135deg, rgba(10, 30, 60, 0.2) 0%, transparent 100%),
+        radial-gradient(circle at 20% 30%, rgba($primary-color, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba($accent-color, 0.1) 0%, transparent 50%);
+      z-index: -1;
+      opacity: 0.8;
+    }
+    
+    // Efecto de partículas flotantes
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: 
+        radial-gradient(circle at 10% 10%, rgba(255, 255, 255, 0.1) 0%, transparent 2%),
+        radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.1) 0%, transparent 3%),
+        radial-gradient(circle at 30% 70%, rgba(255, 255, 255, 0.1) 0%, transparent 2%),
+        radial-gradient(circle at 70% 40%, rgba(255, 255, 255, 0.1) 0%, transparent 2%),
+        radial-gradient(circle at 90% 90%, rgba(255, 255, 255, 0.1) 0%, transparent 2%);
+      background-size: 150px 150px;
+      animation: floatingParticles 15s linear infinite;
+      opacity: 0.5;
+      z-index: -1;
+    }
+    
+    .loading-container {
+      position: relative;
+      width: 300px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: $spacing-6;
+      
+      // Efecto de holograma
+      .loading-hologram {
+        position: relative;
+        width: 140px;
+        height: 140px;
+        margin-bottom: $spacing-5;
+        
+        .hologram-ring {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+          border: 2px solid rgba($primary-color, 0.3);
+          box-shadow: 
+            0 0 15px rgba($primary-color, 0.5),
+            inset 0 0 15px rgba($primary-color, 0.5);
+          animation: pulseRing 3s infinite ease-in-out;
+        }
+        
+        .hologram-circle {
+          position: absolute;
+          width: 70%;
+          height: 70%;
+          top: 15%;
+          left: 15%;
+          border-radius: 50%;
+          background: radial-gradient(
+            circle at center,
+            rgba($primary-light, 0.4) 0%,
+            rgba($primary-color, 0.2) 40%,
+            rgba($primary-color, 0.1) 60%,
+            transparent 80%
+          );
+          filter: blur(4px);
+          opacity: 0.8;
+          animation: pulsate 3s infinite ease-in-out;
+          
+          &::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 50%;
+            box-shadow: inset 0 0 20px rgba($primary-color, 0.5);
+            animation: shineEffect 2s infinite;
+          }
+        }
+        
+        .hologram-bars {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          @include flex-center;
+          
+          .bar {
+            position: absolute;
+            width: 3px;
+            background: linear-gradient(to top, transparent, $primary-color, transparent);
+            box-shadow: 0 0 8px rgba($primary-color, 0.8);
+            animation-name: barHeight;
+            animation-duration: 1.5s;
+            animation-iteration-count: infinite;
+            animation-timing-function: ease-in-out;
+            
+            &:nth-child(1) {
+              height: 60%;
+              left: 30%;
+              animation-delay: 0.2s;
+            }
+            
+            &:nth-child(2) {
+              height: 40%;
+              left: 40%;
+              animation-delay: 0.6s;
+            }
+            
+            &:nth-child(3) {
+              height: 70%;
+              left: 50%;
+              animation-delay: 0s;
+            }
+            
+            &:nth-child(4) {
+              height: 50%;
+              left: 60%;
+              animation-delay: 0.8s;
+            }
+            
+            &:nth-child(5) {
+              height: 45%;
+              left: 70%;
+              animation-delay: 0.4s;
+            }
+          }
+        }
+      }
+      
+      // Barra de progreso
+      .loading-progress {
+        width: 100%;
+        margin: $spacing-4 0;
+        
+        .progress-bar {
+          height: 6px;
+          width: 100%;
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 3px;
+          overflow: hidden;
+          position: relative;
+          
+          .progress-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: linear-gradient(90deg, $primary-color, $primary-light);
+            box-shadow: 0 0 10px rgba($primary-color, 0.8);
+            border-radius: 3px;
+            width: 0%;
+            animation: progressFill 4.5s ease-in-out forwards;
+          }
+        }
+      }
+      
+      // Texto de carga
+      .loading-text {
+        font-size: $font-lg;
+        font-weight: $font-semibold;
+        color: $white;
+        text-shadow: 0 0 10px rgba($primary-color, 0.8);
+        width: 100%;
+        min-height: 32px;
+        transition: all 0.3s ease-in-out;
+      }
+      
+      // Estado del sistema
+      .loading-status {
+        margin-top: $spacing-4;
+        font-size: $font-sm;
+        color: rgba($white, 0.7);
+        display: flex;
+        align-items: center;
+        gap: $spacing-2;
+        
+        .status-dot {
+          display: inline-block;
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background-color: $success;
+          box-shadow: 0 0 8px $success;
+          animation: blink 1.2s infinite;
+        }
+      }
+    }
+  }
+  
+  // Cabecera mejorada
+  .staff-edit-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: $spacing-6;
+    padding: $spacing-6;
+    border-radius: $border-radius-lg;
+    background: linear-gradient(135deg, rgba($primary-color, 0.15), rgba(25, 25, 65, 0.3));
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba($primary-color, 0.2);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
+    position: relative;
+    overflow: hidden;
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(ellipse at center, rgba($primary-light, 0.03) 0%, transparent 70%);
+      opacity: 0.7;
+      animation: rotate 30s linear infinite;
+    }
+    
+    @keyframes rotate {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .header-content {
+      display: flex;
+      align-items: center;
+      gap: $spacing-4;
+      z-index: 1;
+      
+      .back-button {
+        display: flex;
+        align-items: center;
+        gap: $spacing-2;
+        padding: $spacing-2 $spacing-4;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: $border-radius-md;
+        color: $white;
+        font-weight: $font-medium;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        
+        i {
+          font-size: $font-md;
+        }
+        
+        &:hover {
+          background: rgba(255, 255, 255, 0.2);
+          transform: translateX(-3px);
+        }
+      }
+      
+      .header-title-container {
+        h2 {
+          font-size: $font-xl;
+          font-weight: $font-bold;
+          color: $white;
+          margin-bottom: $spacing-2;
+          position: relative;
+          display: inline-block;
+          
+          &::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 60px;
+            height: 3px;
+            background: linear-gradient(90deg, $primary-color, $primary-light);
+            border-radius: 3px;
+          }
+        }
+        
+        p {
+          color: rgba(255, 255, 255, 0.8);
+          font-size: $font-md;
+        }
+      }
+    }
+    
+    .header-actions {
+      display: flex;
+      gap: $spacing-3;
+      z-index: 1;
+      
+      button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: $spacing-2;
+        padding: $spacing-3 $spacing-5;
+        border-radius: $border-radius-md;
+        font-weight: $font-medium;
+        font-size: $font-sm;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        
+        i {
+          font-size: $font-md;
+        }
+        
+        &.refresh-btn {
+          background: rgba(255, 255, 255, 0.1);
+          color: $white;
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          
+          &:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-3px);
+          }
+        }
+        
+        &.export-btn {
+          background: linear-gradient(135deg, $success, darken($success, 10%));
+          color: $white;
+          border: none;
+          box-shadow: 0 4px 10px rgba($success, 0.25);
+          
+          &:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba($success, 0.3);
+          }
+        }
+      }
+    }
+  }
+  
+  // Barra de filtros y búsqueda rediseñada
+  .search-filter-container {
+    margin-bottom: $spacing-6;
+    
+    .search-bar {
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-4;
+      padding: $spacing-5;
+      border-radius: $border-radius-lg;
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      
+      .search-input-wrapper {
+        position: relative;
+        width: 100%;
+        
+        i {
+          position: absolute;
+          left: $spacing-4;
+          top: 50%;
+          transform: translateY(-50%);
+          color: rgba(255, 255, 255, 0.6);
+          font-size: $font-md;
+        }
+        
+        input {
+          width: 100%;
+          padding: $spacing-4 $spacing-4 $spacing-4 $spacing-10;
+          background: rgba(255, 255, 255, 0.1);
+          border: 1px solid rgba(255, 255, 255, 0.2);
+          border-radius: $border-radius-lg;
+          color: $white;
+          font-size: $font-md;
+          transition: all 0.3s ease;
+          
+          &:focus {
+            outline: none;
+            border-color: $primary-color;
+            box-shadow: 0 0 0 3px rgba($primary-color, 0.2);
+          }
+          
+          &::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+          }
+        }
+        
+        .clear-search {
+          position: absolute;
+          right: $spacing-4;
+          top: 50%;
+          transform: translateY(-50%);
+          background: none;
+          border: none;
+          color: rgba(255, 255, 255, 0.6);
+          cursor: pointer;
+          
+          &:hover {
+            color: $white;
+          }
+        }
+      }
+      
+      .role-filter {
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-3;
+        
+        .filter-label {
+          color: rgba(255, 255, 255, 0.8);
+          font-size: $font-sm;
+          font-weight: $font-medium;
+        }
+        
+        .role-options {
+          display: flex;
+          flex-wrap: wrap;
+          gap: $spacing-3;
+          
+          .role-option {
+            padding: $spacing-2 $spacing-4;
+            border-radius: $border-radius-full;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: rgba(255, 255, 255, 0.8);
+            font-size: $font-xs;
+            font-weight: $font-medium;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            
+            &:hover {
+              background: rgba(255, 255, 255, 0.15);
+              transform: translateY(-2px);
+            }
+            
+            &.active {
+              background: $primary-color;
+              border-color: $primary-light;
+              color: $white;
+              box-shadow: 0 4px 10px rgba($primary-color, 0.3);
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  // Contenedor de tarjetas de personal
+  .staff-cards-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: $spacing-6;
+    margin-bottom: $spacing-8;
+    
+    // Tarjeta de personal mejorada
+    .staff-card {
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: $border-radius-lg;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      cursor: pointer;
+      transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 80px;
+        height: 80px;
+        background: radial-gradient(circle at 70% 30%, 
+                                    rgba($primary-color, 0.2) 0%, 
+                                    transparent 70%);
+        opacity: 0.5;
+        z-index: 0;
+      }
+      
+      &:hover {
+        transform: translateY(-10px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+        border-color: rgba($primary-color, 0.3);
+        
+        .staff-card-header {
+          .edit-action {
+            .edit-btn {
+              opacity: 1;
+              transform: translateY(0);
+            }
+          }
+        }
+      }
+      
+      &.active {
+        border-left: 3px solid $status-active;
+      }
+      
+      &.inactive {
+        border-left: 3px solid $status-inactive;
+        opacity: 0.7;
+      }
+      
+      // Encabezado de la tarjeta
+      .staff-card-header {
+        padding: $spacing-5;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        position: relative;
+        z-index: 1;
+        
+        .avatar-status {
+          position: relative;
+          margin-right: $spacing-4;
+          
+          .avatar-container {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            position: relative;
+            background: linear-gradient(135deg, rgba($primary-color, 0.7), rgba($primary-light, 0.7));
+            overflow: hidden;
+            
+            // Colores diferentes según el rol
+            &.pt, &.pta {
+              background: linear-gradient(135deg, #0074D9, #39CCCC);
+            }
+            
+            &.ot, &.cota {
+              background: linear-gradient(135deg, #FF851B, #FFDC00);
+            }
+            
+            &.st, &.sta {
+              background: linear-gradient(135deg, #2ECC40, #01FF70);
+            }
+            
+            &.administrator {
+              background: linear-gradient(135deg, #B10DC9, #F012BE);
+            }
+            
+            .avatar-inner {
+              width: 100%;
+              height: 100%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: $font-lg;
+              font-weight: $font-bold;
+              color: $white;
+              text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            }
+            
+            .status-indicator {
+              position: absolute;
+              bottom: 0;
+              right: 0;
+              width: 15px;
+              height: 15px;
+              border-radius: 50%;
+              border: 2px solid rgba(255, 255, 255, 0.9);
+              box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+              
+              &.active {
+                background-color: $status-active;
+              }
+              
+              &.inactive {
+                background-color: $status-inactive;
+              }
+            }
+          }
+        }
+        
+        .staff-identity {
+          flex: 1;
+          
+          h3 {
+            font-size: $font-lg;
+            font-weight: $font-semibold;
+            color: BLACK;
+            margin: 0 0 $spacing-1 0;
+          }
+          
+          .staff-role {
+            display: inline-block;
+            font-size: $font-xs;
+            padding: $spacing-1 $spacing-3;
+            border-radius: $border-radius-full;
+            background: rgba($primary-color, 0.2);
+            color: $primary-light;
+            border: 1px solid rgba($primary-color, 0.3);
+          }
+        }
+        
+        .edit-action {
+          .edit-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: $primary-color;
+            color: $white;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0.7;
+            transform: translateY(5px);
+            
+            &:hover {
+              background: $primary-light;
+              box-shadow: 0 0 15px rgba($primary-color, 0.5);
+            }
+          }
+        }
+      }
+      
+      // Cuerpo de la tarjeta
+      .staff-card-body {
+        padding: $spacing-5;
+        display: flex;
+        flex-direction: column;
+        gap: $spacing-4;
+        flex: 1;
+        z-index: 1;
+        
+        .contact-details {
+          display: flex;
+          flex-direction: column;
+          gap: $spacing-3;
+          
+          .contact-item {
+            display: flex;
+            align-items: center;
+            gap: $spacing-3;
+            
+            i {
+              width: 16px;
+              color: rgba($primary-light, 0.8);
+              font-size: $font-sm;
+            }
+            
+            span {
+              font-size: $font-sm;
+              color: rgba(19, 18, 18, 0.832);
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+          }
+        }
+        
+        .documents-progress {
+          margin-top: $spacing-3;
+          
+          .progress-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: $spacing-2;
+            
+            span {
+              font-size: $font-xs;
+              color: rgba(255, 255, 255, 0.6);
+            }
+            
+            .percentage {
+              font-weight: $font-semibold;
+              color: $white;
+            }
+          }
+          
+          .progress-bar {
+            height: 6px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: $border-radius-full;
+            overflow: hidden;
+            
+            .progress-fill {
+              height: 100%;
+              background: linear-gradient(90deg, $primary-color, $primary-light);
+              border-radius: $border-radius-full;
+              transition: width 0.5s ease;
+            }
+          }
+        }
+      }
+    }
+    
+    // No hay resultados
+    .no-results {
+      grid-column: 1 / -1;
+      background: rgba(255, 255, 255, 0.03);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: $border-radius-lg;
+      padding: $spacing-8 $spacing-4;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      
+      .no-results-icon {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.05);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: $spacing-4;
+        
+        i {
+          font-size: $font-xl;
+          color: rgba(255, 255, 255, 0.3);
+        }
+      }
+      
+      h3 {
+        font-size: $font-lg;
+        font-weight: $font-semibold;
+        color: $white;
+        margin: 0 0 $spacing-2 0;
+      }
+      
+      p {
+        color: rgba(255, 255, 255, 0.6);
+        font-size: $font-sm;
+        margin: 0 0 $spacing-6 0;
+        max-width: 400px;
+      }
+      
+      .reset-filters-btn {
+        padding: $spacing-3 $spacing-6;
+        border-radius: $border-radius-md;
+        background: rgba($primary-color, 0.2);
+        color: $primary-light;
+        border: 1px solid rgba($primary-color, 0.3);
+        display: flex;
+        align-items: center;
+        gap: $spacing-2;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        
+        &:hover {
+          background: rgba($primary-color, 0.3);
+          transform: translateY(-3px);
+        }
+      }
+    }
+  }
+  
+  // Modal de edición de perfil mejorado
+  .profile-modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: $spacing-4;
+    animation: fadeIn 0.3s ease;
+    
+    .profile-modal {
+      width: 100%;
+      max-width: 900px;
+      max-height: 90vh;
+      background: rgba(10, 30, 60, 0.95);
+      border-radius: $border-radius-lg;
+      border: 1px solid rgba($primary-color, 0.3);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+      animation: modalEnter 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+      
+      @keyframes modalEnter {
+        from {
+          opacity: 0;
+          transform: scale(0.9) translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
+      }
+      
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: 
+          radial-gradient(circle at 10% 10%, rgba($primary-light, 0.1) 0%, transparent 60%),
+          radial-gradient(circle at 90% 90%, rgba($primary-light, 0.1) 0%, transparent 60%);
+        pointer-events: none;
+      }
+      
+      // Encabezado del modal
+      .modal-header {
+        padding: $spacing-6;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        position: relative;
+        display: flex;
+        justify-content: space-between;
+        
+        .staff-profile-header {
+          display: flex;
+          gap: $spacing-6;
+          
+          .modal-avatar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba($primary-color, 0.7), rgba($primary-light, 0.7));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            
+            // Colores diferentes según el rol
+            &.pt, &.pta {
+              background: linear-gradient(135deg, #0074D9, #39CCCC);
+            }
+            
+            &.ot, &.cota {
+              background: linear-gradient(135deg, #FF851B, #FFDC00);
+            }
+            
+            &.st, &.sta {
+              background: linear-gradient(135deg, #2ECC40, #01FF70);
+            }
+            
+            &.administrator {
+              background: linear-gradient(135deg, #B10DC9, #F012BE);
+            }
+            
+            .avatar-text {
+              font-size: $font-xl;
+              font-weight: $font-bold;
+              color: $white;
+              text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            }
+            
+            .modal-status {
+              position: absolute;
+              bottom: 0;
+              right: 0;
+              width: 18px;
+              height: 18px;
+              border-radius: 50%;
+              border: 2px solid rgba(10, 30, 60, 0.95);
+              
+              &.active {
+                background-color: $status-active;
+                box-shadow: 0 0 10px rgba($status-active, 0.5);
+              }
+              
+              &.inactive {
+                background-color: $status-inactive;
+                box-shadow: 0 0 10px rgba($status-inactive, 0.5);
+              }
+            }
+          }
+          
+          .staff-details {
+            .name-inputs {
+              display: flex;
+              gap: $spacing-4;
+              margin-bottom: $spacing-4;
+              
+              .input-group {
+                label {
+                  display: block;
+                  font-size: $font-xs;
+                  color: rgba(255, 255, 255, 0.7);
+                  margin-bottom: $spacing-1;
+                }
+                
+                input {
+                  padding: $spacing-2 $spacing-3;
+                  background: rgba(255, 255, 255, 0.1);
+                  border: 1px solid rgba(255, 255, 255, 0.2);
+                  border-radius: $border-radius-md;
+                  color: $white;
+                  font-size: $font-md;
+                  width: 200px;
+                  
+                  &:focus {
+                    outline: none;
+                    border-color: $primary-color;
+                    box-shadow: 0 0 0 3px rgba($primary-color, 0.2);
+                  }
+                }
+              }
+            }
+            
+            .role-status-selects {
+              display: flex;
+              gap: $spacing-4;
+              
+              .input-group {
+                label {
+                  display: block;
+                  font-size: $font-xs;
+                  color: rgba(255, 255, 255, 0.7);
+                  margin-bottom: $spacing-1;
+                }
+                
+                select {
+                  padding: $spacing-2 $spacing-3;
+                  background: rgba(255, 255, 255, 0.1);
+                  border: 1px solid rgba(255, 255, 255, 0.2);
+                  border-radius: $border-radius-md;
+                  color: $white;
+                  font-size: $font-sm;
+                  width: 200px;
+                  appearance: none;
+                  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23FFFFFF' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+                  background-repeat: no-repeat;
+                  background-position: right 0.7rem center;
+                  background-size: 1rem;
+                  
+                  &:focus {
+                    outline: none;
+                    border-color: $primary-color;
+                    box-shadow: 0 0 0 3px rgba($primary-color, 0.2);
+                  }
+                  
+                  &.status-select {
+                    &.active {
+                      border-color: rgba($status-active, 0.5);
+                    }
+                    
+                    &.inactive {
+                      border-color: rgba($status-inactive, 0.5);
+                    }
+                  }
+                  
+                  option {
+                    background: #0a1e3c;
+                    color: $white;
+                  }
+                }
+              }
+            }
+          }
+        }
+        
+        .modal-actions {
+          .close-modal-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.7);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            
+            &:hover {
+              background: rgba(255, 255, 255, 0.2);
+              color: $white;
+              transform: rotate(90deg);
+            }
+          }
+        }
+      }
+      
+      // Pestañas de navegación
+      .modal-tabs {
+        display: flex;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(0, 0, 0, 0.2);
+        
+        .tab-btn {
+          padding: $spacing-4 $spacing-6;
+          background: transparent;
+          border: none;
+          color: rgba(255, 255, 255, 0.6);
+          font-size: $font-sm;
+          font-weight: $font-medium;
+          display: flex;
+          align-items: center;
+          gap: $spacing-2;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          position: relative;
+          
+          i {
+            font-size: $font-md;
+          }
+          
+          &::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            width: 0;
+            height: 3px;
+            background: $primary-color;
+            transition: all 0.3s ease;
+            transform: translateX(-50%);
+          }
+          
+          &:hover {
+            color: rgba(255, 255, 255, 0.9);
+            background: rgba(255, 255, 255, 0.05);
+            
+            &::after {
+              width: 20px;
+            }
+          }
+          
+          &.active {
+            color: $white;
+            
+            &::after {
+              width: 100%;
+            }
+          }
+        }
+      }
+      
+      // Contenido del modal
+      .modal-content {
+        padding: $spacing-6;
+        overflow-y: auto;
+        flex: 1;
+        
+        h3 {
+          font-size: $font-lg;
+          font-weight: $font-semibold;
+          color: $white;
+          margin: 0 0 $spacing-5 0;
+          padding-bottom: $spacing-3;
+          border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+          position: relative;
+          
+          &::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100px;
+            height: 2px;
+            background: linear-gradient(to right, $primary-color, transparent);
+          }
+        }
+        
+        // Pestaña de información personal
+        .info-tab-content {
+          .info-section {
+            margin-bottom: $spacing-6;
+            
+            .contact-form {
+              .form-row {
+                display: flex;
+                gap: $spacing-4;
+                margin-bottom: $spacing-4;
+                
+                .input-group {
+                  flex: 1;
+                  
+                  &.full-width {
+                    grid-column: span 2;
+                  }
+                  
+                  label {
+                    display: block;
+                    font-size: $font-xs;
+                    color: rgba(255, 255, 255, 0.7);
+                    margin-bottom: $spacing-2;
+                  }
+                  
+                  input {
+                    width: 100%;
+                    padding: $spacing-3 $spacing-4;
+                    background: rgba(255, 255, 255, 0.05);
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    border-radius: $border-radius-md;
+                    color: $white;
+                    font-size: $font-sm;
+                    transition: all 0.3s ease;
+                    
+                    &:focus {
+                      outline: none;
+                      border-color: $primary-color;
+                      background: rgba(255, 255, 255, 0.1);
+                      box-shadow: 0 0 0 3px rgba($primary-color, 0.2);
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        
+        // Pestaña de documentos
+        .documents-tab-content {
+          .documents-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: $spacing-6;
+            
+            .documents-summary {
+              .completed-percentage {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: $spacing-2;
+                
+                .circular-progress {
+                  width: 100px;
+                  height: 100px;
+                  position: relative;
+                  
+                  .circular-chart {
+                    width: 100%;
+                    height: 100%;
+                    transform: rotate(-90deg);
+                    
+                    .circle-bg {
+                      fill: none;
+                      stroke: rgba(255, 255, 255, 0.1);
+                      stroke-width: 2.5;
+                    }
+                    
+                    .circle {
+                      fill: none;
+                      stroke: url(#gradient);
+                      stroke-width: 2.5;
+                      stroke-linecap: round;
+                      animation: progress 1s ease-out forwards;
+                    }
+                    
+                    .percentage {
+                      fill: $white;
+                      font-size: 0.6em;
+                      text-anchor: middle;
+                      font-weight: $font-bold;
+                      transform: rotate(90deg);
+                      transform-origin: center;
+                    }
+                    
+                    @keyframes progress {
+                      0% {
+                        stroke-dasharray: 0 100;
+                      }
+                    }
+                  }
+                }
+                
+                .documents-text {
+                  font-size: $font-sm;
+                  color: rgba(255, 255, 255, 0.7);
+                }
+              }
+            }
+          }
+          
+          .documents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: $spacing-5;
+            
+            .document-card {
+              background: rgba(255, 255, 255, 0.03);
+              border-radius: $border-radius-md;
+              border: 1px solid rgba(255, 255, 255, 0.1);
+              overflow: hidden;
+              transition: all 0.3s ease;
+              
+              &:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+                border-color: rgba($primary-color, 0.3);
+              }
+              
+              &.obtained {
+                border-left: 3px solid $status-active;
+                
+                .status-toggle {
+                  .toggle-slider {
+                    background: rgba($status-active, 0.3);
+                    
+                    .toggle-circle {
+                      transform: translateX(16px);
+                      background: $status-active;
+                    }
+                  }
+                }
+              }
+              
+              &.pending {
+                border-left: 3px solid $status-pending;
+                
+                .status-toggle {
+                  .toggle-slider {
+                    background: rgba($status-pending, 0.3);
+                    
+                    .toggle-circle {
+                      background: $status-pending;
+                    }
+                  }
+                }
+              }
+              
+              .document-card-header {
+                display: flex;
+                align-items: flex-start;
+                padding: $spacing-4;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                
+                .document-icon {
+                  width: 40px;
+                  height: 40px;
+                  border-radius: $border-radius-sm;
+                  background: rgba(255, 255, 255, 0.1);
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  margin-right: $spacing-3;
+                  
+                  i {
+                    font-size: $font-md;
+                    color: $white;
+                  }
+                }
+                
+                .document-info {
+                  flex: 1;
+                  
+                  h4 {
+                    font-size: $font-sm;
+                    font-weight: $font-semibold;
+                    color: $white;
+                    margin: 0 0 $spacing-1 0;
+                  }
+                  
+                  p {
+                    font-size: $font-xs;
+                    color: rgba(255, 255, 255, 0.6);
+                    margin: 0;
+                  }
+                }
+                
+                .status-toggle {
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  gap: $spacing-1;
+                  margin-left: $spacing-3;
+                  cursor: pointer;
+                  
+                  .toggle-slider {
+                    width: 36px;
+                    height: 20px;
+                    background: rgba(255, 255, 255, 0.1);
+                    border-radius: 10px;
+                    position: relative;
+                    padding: 2px;
+                    transition: all 0.3s ease;
+                    
+                    .toggle-circle {
+                      width: 16px;
+                      height: 16px;
+                      border-radius: 50%;
+                      background: $white;
+                      position: absolute;
+                      left: 2px;
+                      top: 2px;
+                      transition: all 0.3s ease;
+                    }
+                  }
+                  
+                  .toggle-text {
+                    font-size: $font-xs;
+                    color: rgba(255, 255, 255, 0.7);
+                  }
+                }
+              }
+              
+              .document-card-body {
+                padding: $spacing-4;
+                
+                .file-preview {
+                  .file-info {
+                    display: flex;
+                    align-items: center;
+                    gap: $spacing-3;
+                    padding: $spacing-3;
+                    background: rgba(255, 255, 255, 0.05);
+                    border-radius: $border-radius-sm;
+                    margin-bottom: $spacing-3;
+                    
+                    i {
+                      font-size: $font-md;
+                      color: $primary-color;
+                    }
+                    
+                    .file-name {
+                      font-size: $font-xs;
+                      color: rgba(255, 255, 255, 0.8);
+                      flex: 1;
+                      white-space: nowrap;
+                      overflow: hidden;
+                      text-overflow: ellipsis;
+                    }
+                  }
+                  
+                  .file-actions {
+                    display: flex;
+                    gap: $spacing-3;
+                    
+                    button, label {
+                      flex: 1;
+                      padding: $spacing-2 $spacing-3;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      gap: $spacing-2;
+                      border-radius: $border-radius-sm;
+                      font-size: $font-xs;
+                      cursor: pointer;
+                      transition: all 0.3s ease;
+                    }
+                    
+                    .view-file-btn {
+                      background: rgba(255, 255, 255, 0.1);
+                      color: $white;
+                      border: 1px solid rgba(255, 255, 255, 0.2);
+                      
+                      &:hover {
+                        background: rgba(255, 255, 255, 0.2);
+                      }
+                    }
+                    
+                    .upload-new {
+                      position: relative;
+                      flex: 1;
+                      
+                      label {
+                        background: rgba($primary-color, 0.2);
+                        color: $primary-light;
+                        border: 1px solid rgba($primary-color, 0.3);
+                        
+                        &:hover {
+                          background: rgba($primary-color, 0.3);
+                        }
+                      }
+                      
+                      .file-input {
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 100%;
+                        opacity: 0;
+                        cursor: pointer;
+                      }
+                    }
+                  }
+                }
+                
+                .no-file {
+                  .upload-container {
+                    padding: $spacing-5 $spacing-3;
+                    background: rgba(255, 255, 255, 0.02);
+                    border: 1px dashed rgba(255, 255, 255, 0.2);
+                    border-radius: $border-radius-sm;
+                    display: flex;
+                    flex-direction: column;
+                    align-items: center;
+                    gap: $spacing-3;
+                    transition: all 0.3s ease;
+                    
+                    &:hover {
+                      background: rgba(255, 255, 255, 0.05);
+                      border-color: rgba($primary-color, 0.3);
+                    }
+                    
+                    i {
+                      font-size: $font-xl;
+                      color: rgba(255, 255, 255, 0.3);
+                    }
+                    
+                    p {
+                      font-size: $font-xs;
+                      color: rgba(255, 255, 255, 0.6);
+                      text-align: center;
+                      margin: 0;
+                    }
+                    
+                    .upload-btn {
+                      padding: $spacing-2 $spacing-4;
+                      background: rgba($primary-color, 0.2);
+                      color: $primary-light;
+                      border: 1px solid rgba($primary-color, 0.3);
+                      border-radius: $border-radius-md;
+                      font-size: $font-xs;
+                      display: flex;
+                      align-items: center;
+                      gap: $spacing-2;
+                      cursor: pointer;
+                      transition: all 0.3s ease;
+                      
+                      &:hover {
+                        background: rgba($primary-color, 0.3);
+                        transform: translateY(-2px);
+                      }
+                    }
+                    
+                    .file-input {
+                      position: absolute;
+                      opacity: 0;
+                      height: 0;
+                      width: 0;
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        
+        // Pestaña de seguridad
+        .security-tab-content {
+          .security-section {
+            margin-bottom: $spacing-6;
+            
+            .security-form {
+              .form-row {
+                margin-bottom: $spacing-5;
+                
+                .input-group {
+                  label {
+                    display: block;
+                    font-size: $font-xs;
+                    color: rgba(255, 255, 255, 0.7);
+                    margin-bottom: $spacing-2;
+                  }
+                  
+                  .input-with-icon, .input-with-action {
+                    position: relative;
+                    display: flex;
+                    align-items: center;
+                    gap: $spacing-3;
+                    
+                    input {
+                      flex: 1;
+                      padding: $spacing-3 $spacing-4;
+                      background: rgba(255, 255, 255, 0.05);
+                      border: 1px solid rgba(255, 255, 255, 0.1);
+                      border-radius: $border-radius-md;
+                      color: $white;
+                      font-size: $font-sm;
+                      transition: all 0.3s ease;
+                      
+                      &:focus {
+                        outline: none;
+                        border-color: $primary-color;
+                        background: rgba(255, 255, 255, 0.1);
+                        box-shadow: 0 0 0 3px rgba($primary-color, 0.2);
+                      }
+                      
+                      &:read-only {
+                        background: rgba(0, 0, 0, 0.2);
+                        cursor: not-allowed;
+                      }
+                    }
+                    
+                    .icon-button {
+                      background: rgba(255, 255, 255, 0.1);
+                      border: 1px solid rgba(255, 255, 255, 0.2);
+                      color: $white;
+                      width: 40px;
+                      height: 40px;
+                      border-radius: $border-radius-sm;
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      cursor: pointer;
+                      transition: all 0.3s ease;
+                      
+                      &:hover {
+                        background: rgba(255, 255, 255, 0.2);
+                      }
+                    }
+                    
+                    .reset-password-btn {
+                      background: rgba($warning, 0.2);
+                      color: $warning;
+                      border: 1px solid rgba($warning, 0.3);
+                      border-radius: $border-radius-md;
+                      padding: $spacing-2 $spacing-4;
+                      display: flex;
+                      align-items: center;
+                      gap: $spacing-2;
+                      font-size: $font-xs;
+                      font-weight: $font-medium;
+                      cursor: pointer;
+                      transition: all 0.3s ease;
+                      
+                      &:hover {
+                        background: rgba($warning, 0.3);
+                        transform: translateY(-2px);
+                      }
+                    }
+                  }
+                  
+                  .help-text {
+                    font-size: $font-xs;
+                    color: rgba(255, 255, 255, 0.5);
+                    margin-top: $spacing-2;
+                  }
+                }
+              }
+              
+              // Permisos de usuario
+              .permissions-section {
+                margin-top: $spacing-6;
+                
+                h4 {
+                  font-size: $font-md;
+                  font-weight: $font-semibold;
+                  color: $white;
+                  margin: 0 0 $spacing-4 0;
+                  padding-bottom: $spacing-2;
+                  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                }
+                
+                .permissions-grid {
+                  display: grid;
+                  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+                  gap: $spacing-5;
+                  
+                  .permission-category {
+                    h5 {
+                      font-size: $font-sm;
+                      font-weight: $font-semibold;
+                      color: $primary-light;
+                      margin: 0 0 $spacing-3 0;
+                    }
+                    
+                    .permission-option {
+                      display: flex;
+                      align-items: center;
+                      gap: $spacing-3;
+                      margin-bottom: $spacing-2;
+                      
+                      .toggle-switch {
+                        position: relative;
+                        display: inline-block;
+                        width: 36px;
+                        height: 20px;
+                        
+                        input {
+                          opacity: 0;
+                          width: 0;
+                          height: 0;
+                          
+                          &:checked + .toggle-slider {
+                            background: rgba($primary-color, 0.5);
+                            
+                            &::before {
+                              transform: translateX(16px);
+                              background: $primary-color;
+                            }
+                          }
+                          
+                          &:focus + .toggle-slider {
+                            box-shadow: 0 0 0 2px rgba($primary-color, 0.2);
+                          }
+                        }
+                        
+                        .toggle-slider {
+                          position: absolute;
+                          cursor: pointer;
+                          top: 0;
+                          left: 0;
+                          right: 0;
+                          bottom: 0;
+                          background: rgba(255, 255, 255, 0.1);
+                          border-radius: 10px;
+                          transition: all 0.3s ease;
+                          
+                          &::before {
+                            position: absolute;
+                            content: '';
+                            height: 16px;
+                            width: 16px;
+                            left: 2px;
+                            bottom: 2px;
+                            background: $white;
+                            border-radius: 50%;
+                            transition: all 0.3s ease;
+                          }
+                        }
+                      }
+                      
+                      span {
+                        font-size: $font-xs;
+                        color: rgba(255, 255, 255, 0.8);
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      
+      // Pie del modal
+      .modal-footer {
+        padding: $spacing-4 $spacing-6;
+        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        display: flex;
+        justify-content: flex-end;
+        gap: $spacing-3;
+        background: rgba(0, 0, 0, 0.2);
+        
+        button {
+          padding: $spacing-3 $spacing-5;
+          border-radius: $border-radius-md;
+          font-size: $font-sm;
+          font-weight: $font-medium;
+          display: flex;
+          align-items: center;
+          gap: $spacing-2;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          
+          i {
+            font-size: $font-md;
+          }
+          
+          &.cancel-btn {
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            
+            &:hover {
+              background: rgba(255, 255, 255, 0.1);
+              color: $white;
+            }
+          }
+          
+          &.save-btn {
+            background: linear-gradient(135deg, $primary-color, $primary-light);
+            color: $white;
+            border: none;
+            box-shadow: 0 4px 15px rgba($primary-color, 0.3);
+            
+            &:hover {
+              transform: translateY(-3px);
+              box-shadow: 0 8px 25px rgba($primary-color, 0.4);
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  // Animaciones
+  @keyframes pulseRing {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 0.8;
+    }
+    50% {
+      transform: scale(1.05);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes pulsate {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 0.7;
+    }
+    50% {
+      transform: scale(1.1);
+      opacity: 0.9;
+    }
+  }
+  
+  @keyframes barHeight {
+    0%, 100% {
+      transform: scaleY(0.6);
+    }
+    50% {
+      transform: scaleY(1);
+    }
+  }
+  
+  @keyframes shineEffect {
+    0% {
+      opacity: 0.5;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0.5;
+    }
+  }
+  
+  @keyframes progressFill {
+    0% {
+      width: 0%;
+    }
+    20% {
+      width: 40%;
+    }
+    50% {
+      width: 60%;
+    }
+    80% {
+      width: 85%;
+    }
+    100% {
+      width: 100%;
+    }
+  }
+  
+  @keyframes blink {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.4;
+    }
+  }
+  
+  @keyframes floatingParticles {
+    0% {
+      background-position: 0 0;
+    }
+    100% {
+      background-position: 150px 150px;
+    }
+  }
+  
+  // Responsive
+  @media (max-width: $breakpoint-xl) {
+    .staff-cards-container {
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+    
+    .profile-modal-overlay {
+      .profile-modal {
+        .modal-content {
+          .documents-tab-content {
+            .documents-grid {
+              grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  @media (max-width: $breakpoint-lg) {
+    .staff-edit-header {
+      flex-direction: column;
+      gap: $spacing-4;
+      
+      .header-content {
+        width: 100%;
+      }
+      
+      .header-actions {
+        width: 100%;
+        justify-content: flex-end;
+      }
+    }
+    
+    .search-filter-container {
+      .search-bar {
+        .role-filter {
+          .role-options {
+            flex-wrap: wrap;
+          }
+        }
+      }
+    }
+    
+    .staff-cards-container {
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+    
+    .profile-modal-overlay {
+      .profile-modal {
+        .modal-header {
+          .staff-profile-header {
+            flex-direction: column;
+            align-items: center;
+            gap: $spacing-4;
+            
+            .staff-details {
+              text-align: center;
+              
+              .name-inputs, .role-status-selects {
+                flex-direction: column;
+                gap: $spacing-3;
+                
+                .input-group {
+                  input, select {
+                    width: 100%;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  @media (max-width: $breakpoint-md) {
+    .staff-cards-container {
+      grid-template-columns: 1fr;
+    }
+    
+    .profile-modal-overlay {
+      .profile-modal {
+        .modal-tabs {
+          overflow-x: auto;
+          
+          .tab-btn {
+            padding: $spacing-3 $spacing-4;
+            white-space: nowrap;
+          }
+        }
+        
+        .modal-content {
+          padding: $spacing-4;
+          
+          .documents-tab-content {
+            .documents-grid {
+              grid-template-columns: 1fr;
+            }
+          }
+          
+          .security-tab-content {
+            .security-form {
+              .permissions-section {
+                .permissions-grid {
+                  grid-template-columns: 1fr;
+                }
+              }
+            }
+          }
+          
+          .info-tab-content {
+            .info-section {
+              .contact-form {
+                .form-row {
+                  flex-direction: column;
+                  gap: $spacing-3;
+                }
+              }
+            }
+          }
+        }
+        
+        .modal-footer {
+          flex-direction: column-reverse;
+          gap: $spacing-3;
+          
+          button {
+            width: 100%;
+            justify-content: center;
+          }
+        }
+      }
+    }
+  }
+}
+
+
+/* Estilos para la animación de carga mejorada */
+.staff-edit-loading {
+  background: rgba(10, 30, 60, 0.8);
+  border-radius: $border-radius-lg;
+  padding: $spacing-12;
+  margin-bottom: $spacing-8;
+  text-align: center;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba($primary-color, 0.2);
+  position: relative;
+  min-height: 400px;
+  @include flex-center;
+  overflow: hidden;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3), 
+              inset 0 0 60px rgba($primary-color, 0.1);
+  
+  // Fondo con efecto digital
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      linear-gradient(135deg, rgba(10, 30, 60, 0.2) 0%, transparent 100%),
+      radial-gradient(circle at 20% 30%, rgba($primary-color, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba($accent-color, 0.1) 0%, transparent 50%);
+    z-index: -1;
+    opacity: 0.8;
+  }
+  
+  // Efecto de partículas flotantes
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+      radial-gradient(circle at 10% 10%, rgba(255, 255, 255, 0.1) 0%, transparent 2%),
+      radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.1) 0%, transparent 3%),
+      radial-gradient(circle at 30% 70%, rgba(255, 255, 255, 0.1) 0%, transparent 2%),
+      radial-gradient(circle at 70% 40%, rgba(255, 255, 255, 0.1) 0%, transparent 2%),
+      radial-gradient(circle at 90% 90%, rgba(255, 255, 255, 0.1) 0%, transparent 2%);
+    background-size: 150px 150px;
+    animation: floatingParticles 15s linear infinite;
+    opacity: 0.5;
+    z-index: -1;
+  }
+  
+  .loading-container {
+    position: relative;
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-6;
+    
+    // Efecto de holograma
+    .loading-hologram {
+      position: relative;
+      width: 140px;
+      height: 140px;
+      margin-bottom: $spacing-5;
+      
+      .hologram-ring {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: 2px solid rgba($primary-color, 0.3);
+        box-shadow: 
+          0 0 15px rgba($primary-color, 0.5),
+          inset 0 0 15px rgba($primary-color, 0.5);
+        animation: pulseRing 3s infinite ease-in-out;
+      }
+      
+      .hologram-circle {
+        position: absolute;
+        width: 70%;
+        height: 70%;
+        top: 15%;
+        left: 15%;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle at center,
+          rgba($primary-light, 0.4) 0%,
+          rgba($primary-color, 0.2) 40%,
+          rgba($primary-color, 0.1) 60%,
+          transparent 80%
+        );
+        filter: blur(4px);
+        opacity: 0.8;
+        animation: pulsate 3s infinite ease-in-out;
+        
+        &::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          border-radius: 50%;
+          box-shadow: inset 0 0 20px rgba($primary-color, 0.5);
+          animation: shineEffect 2s infinite;
+        }
+      }
+      
+      .hologram-bars {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        @include flex-center;
+        
+        .bar {
+          position: absolute;
+          width: 3px;
+          background: linear-gradient(to top, transparent, $primary-color, transparent);
+          box-shadow: 0 0 8px rgba($primary-color, 0.8);
+          animation-name: barHeight;
+          animation-duration: 1.5s;
+          animation-iteration-count: infinite;
+          animation-timing-function: ease-in-out;
+          
+          &:nth-child(1) {
+            height: 60%;
+            left: 30%;
+            animation-delay: 0.2s;
+          }
+          
+          &:nth-child(2) {
+            height: 40%;
+            left: 40%;
+            animation-delay: 0.6s;
+          }
+          
+          &:nth-child(3) {
+            height: 70%;
+            left: 50%;
+            animation-delay: 0s;
+          }
+          
+          &:nth-child(4) {
+            height: 50%;
+            left: 60%;
+            animation-delay: 0.8s;
+          }
+          
+          &:nth-child(5) {
+            height: 45%;
+            left: 70%;
+            animation-delay: 0.4s;
+          }
+        }
+      }
+    }
+    
+    // Barra de progreso
+    .loading-progress {
+      width: 100%;
+      margin: $spacing-4 0;
+      
+      .progress-bar {
+        height: 6px;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 3px;
+        overflow: hidden;
+        position: relative;
+        
+        .progress-fill {
+          position: absolute;
+          top: 0;
+          left: 0;
+          height: 100%;
+          background: linear-gradient(90deg, $primary-color, $primary-light);
+          box-shadow: 0 0 10px rgba($primary-color, 0.8);
+          border-radius: 3px;
+          width: 0%;
+          animation: progressFill 4.5s ease-in-out forwards;
+        }
+      }
+    }
+    
+    // Texto de carga
+    .loading-text {
+      font-size: $font-lg;
+      font-weight: $font-semibold;
+      color: $white;
+      text-shadow: 0 0 10px rgba($primary-color, 0.8);
+      width: 100%;
+      min-height: 32px;
+      transition: all 0.3s ease-in-out;
+    }
+    
+    // Estado del sistema
+    .loading-status {
+      margin-top: $spacing-4;
+      font-size: $font-sm;
+      color: rgba($white, 0.7);
+      display: flex;
+      align-items: center;
+      gap: $spacing-2;
+      
+      .status-dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: $success;
+        box-shadow: 0 0 8px $success;
+        animation: blink 1.2s infinite;
+      }
+    }
+  }
+}
+
+/* Animaciones para la pantalla de carga */
+@keyframes pulseRing {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+}
+
+@keyframes pulsate {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 0.9;
+  }
+}
+
+@keyframes barHeight {
+  0%, 100% {
+    transform: scaleY(0.6);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes shineEffect {
+  0% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes progressFill {
+  0% {
+    width: 0%;
+  }
+  20% {
+    width: 40%;
+  }
+  50% {
+    width: 60%;
+  }
+  80% {
+    width: 85%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+@keyframes blink {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
+}
+
+@keyframes floatingParticles {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 150px 150px;
+  }
+}

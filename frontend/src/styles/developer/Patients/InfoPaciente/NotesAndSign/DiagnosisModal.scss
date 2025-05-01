@@ -1,0 +1,872 @@
+// Enhanced DiagnosisModal.scss
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+// Variables
+$primary-color: #4361ee;
+$primary-gradient: linear-gradient(135deg, #4361ee, #3a0ca3);
+$secondary-color: #4cc9f0;
+$accent-color: #f72585;
+$success-color: #10b981;
+$warning-color: #f59e0b;
+$danger-color: #ef4444;
+$light-bg: #f8fafc;
+$white: #ffffff;
+$card-shadow: 0 10px 25px rgba(0, 0, 0, 0.05), 0 5px 10px rgba(0, 0, 0, 0.03);
+$card-shadow-hover: 0 15px 35px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0, 0, 0, 0.05);
+$transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+$border-radius: 16px;
+$border-radius-sm: 12px;
+
+.diagnosis-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  padding: 24px;
+  overflow-y: auto;
+  animation: fadeIn 0.4s ease-out;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  
+  .diagnosis-modal {
+    background: $white;
+    border-radius: $border-radius;
+    box-shadow: 
+      0 25px 50px rgba(0, 0, 0, 0.15),
+      0 10px 30px rgba(0, 0, 0, 0.1),
+      0 5px 15px rgba(67, 97, 238, 0.1);
+    width: 100%;
+    max-width: 900px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    animation: slideUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: $primary-gradient;
+      z-index: 1;
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px;
+      background: $white;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.7);
+      position: relative;
+      
+      h2 {
+        margin: 0;
+        font-size: 20px;
+        font-weight: 700;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        
+        i {
+          font-size: 18px;
+          color: $primary-color;
+          background: rgba(67, 97, 238, 0.1);
+          width: 32px;
+          height: 32px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 8px;
+        }
+      }
+      
+      .close-button {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #f1f5f9;
+        border: 1px solid rgba(226, 232, 240, 0.7);
+        color: #64748b;
+        cursor: pointer;
+        transition: $transition;
+        
+        i {
+          font-size: 16px;
+          transition: $transition;
+        }
+        
+        &:hover {
+          background: #e2e8f0;
+          color: #1e293b;
+          transform: rotate(90deg);
+          
+          i {
+            transform: scale(1.1);
+          }
+        }
+      }
+    }
+    
+    .modal-tabs {
+      display: flex;
+      gap: 4px;
+      background: $light-bg;
+      padding: 8px;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.7);
+      
+      .tab-button {
+        flex: 1;
+        padding: 12px 16px;
+        background: transparent;
+        border: none;
+        color: #64748b;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: $transition;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        
+        i {
+          font-size: 14px;
+          opacity: 0.7;
+          transition: $transition;
+        }
+        
+        &:hover {
+          background: rgba(241, 245, 249, 0.6);
+          color: #334155;
+          
+          i {
+            opacity: 1;
+          }
+        }
+        
+        &.active {
+          background: $white;
+          color: $primary-color;
+          box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+          
+          i {
+            opacity: 1;
+          }
+        }
+      }
+    }
+    
+    .modal-content {
+      padding: 20px;
+      overflow-y: auto;
+      max-height: calc(90vh - 300px); // Header, tabs, footer, selected diagnoses height
+      
+      .search-tab {
+        .search-bar {
+          margin-bottom: 16px;
+          
+          .search-input-wrapper {
+            display: flex;
+            align-items: center;
+            position: relative;
+            
+            .search-icon {
+              position: absolute;
+              left: 16px;
+              color: #94a3b8;
+              font-size: 14px;
+            }
+            
+            input {
+              flex: 1;
+              padding: 12px 16px 12px 42px;
+              border-radius: 12px;
+              border: 1px solid rgba(203, 213, 225, 0.7);
+              background: $white;
+              font-family: 'Plus Jakarta Sans', sans-serif;
+              font-size: 15px;
+              color: #334155;
+              transition: $transition;
+              width: 100%;
+              
+              &:focus {
+                outline: none;
+                border-color: rgba(67, 97, 238, 0.5);
+                box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+              }
+              
+              &::placeholder {
+                color: #94a3b8;
+              }
+            }
+            
+            .clear-btn {
+              position: absolute;
+              right: 16px;
+              background: transparent;
+              border: none;
+              color: #94a3b8;
+              cursor: pointer;
+              font-size: 14px;
+              padding: 4px;
+              border-radius: 50%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              
+              &:hover {
+                background: rgba(226, 232, 240, 0.5);
+                color: #64748b;
+              }
+            }
+          }
+        }
+      }
+      
+      .diagnosis-list {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        max-height: 300px;
+        overflow-y: auto;
+        border-radius: 12px;
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        padding: 4px;
+        
+        &::-webkit-scrollbar {
+          width: 6px;
+        }
+        
+        &::-webkit-scrollbar-track {
+          background: rgba(241, 245, 249, 0.4);
+          border-radius: 10px;
+        }
+        
+        &::-webkit-scrollbar-thumb {
+          background: rgba(148, 163, 184, 0.3);
+          border-radius: 10px;
+          
+          &:hover {
+            background: rgba(148, 163, 184, 0.5);
+          }
+        }
+        
+        .diagnosis-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 12px 16px;
+          background: $white;
+          border-radius: 10px;
+          border: 1px solid rgba(226, 232, 240, 0.7);
+          cursor: pointer;
+          transition: $transition;
+          
+          &:hover {
+            background: $light-bg;
+            border-color: rgba(203, 213, 225, 0.9);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+          }
+          
+          &.selected {
+            background: rgba(224, 231, 255, 0.6);
+            border-color: rgba(67, 97, 238, 0.3);
+            box-shadow: 0 4px 10px rgba(67, 97, 238, 0.1);
+          }
+          
+          .diagnosis-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            
+            .diagnosis-code {
+              font-family: 'Plus Jakarta Sans', sans-serif;
+              font-size: 14px;
+              font-weight: 700;
+              color: $primary-color;
+              display: inline-block;
+              background: rgba(224, 231, 255, 0.5);
+              padding: 2px 8px;
+              border-radius: 6px;
+            }
+            
+            .diagnosis-description {
+              font-family: 'Plus Jakarta Sans', sans-serif;
+              font-size: 14px;
+              color: #475569;
+            }
+          }
+          
+          .diagnosis-actions {
+            .add-secondary-btn {
+              width: 30px;
+              height: 30px;
+              background: rgba(224, 231, 255, 0.5);
+              border: 1px solid rgba(79, 70, 229, 0.2);
+              color: $primary-color;
+              border-radius: 8px;
+              cursor: pointer;
+              transition: $transition;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              
+              &:hover {
+                background: $primary-color;
+                color: $white;
+                transform: scale(1.1);
+                border-color: $primary-color;
+              }
+            }
+          }
+        }
+        
+        .no-results {
+          font-family: 'Plus Jakarta Sans', sans-serif;
+          font-size: 14px;
+          color: #64748b;
+          text-align: center;
+          padding: 24px 16px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 10px;
+          
+          i {
+            font-size: 24px;
+            color: #94a3b8;
+          }
+        }
+      }
+      
+      .custom-tab {
+        .form-row {
+          margin-bottom: 16px;
+          
+          .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            
+            label {
+              font-family: 'Plus Jakarta Sans', sans-serif;
+              font-size: 14px;
+              font-weight: 600;
+              color: #475569;
+              display: flex;
+              align-items: center;
+              gap: 6px;
+              
+              i {
+                color: #94a3b8;
+                font-size: 14px;
+              }
+            }
+            
+            input {
+              padding: 12px 16px;
+              border-radius: 12px;
+              border: 1px solid rgba(203, 213, 225, 0.7);
+              background: $white;
+              font-family: 'Plus Jakarta Sans', sans-serif;
+              font-size: 15px;
+              color: #334155;
+              transition: $transition;
+              
+              &:focus {
+                outline: none;
+                border-color: rgba(67, 97, 238, 0.5);
+                box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.15);
+              }
+              
+              &::placeholder {
+                color: #94a3b8;
+              }
+            }
+          }
+        }
+        
+        .add-custom-btn {
+          padding: 12px 20px;
+          background: $primary-color;
+          color: $white;
+          border: none;
+          border-radius: 12px;
+          font-family: 'Plus Jakarta Sans', sans-serif;
+          font-size: 14px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: $transition;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          box-shadow: 
+            0 4px 12px rgba(67, 97, 238, 0.2),
+            0 2px 6px rgba(67, 97, 238, 0.1);
+          
+          i {
+            font-size: 14px;
+          }
+          
+          &:hover {
+            background: darken($primary-color, 5%);
+            transform: translateY(-2px);
+            box-shadow: 
+              0 6px 15px rgba(67, 97, 238, 0.3),
+              0 3px 8px rgba(67, 97, 238, 0.15);
+          }
+          
+          &:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+          }
+        }
+      }
+    }
+    
+    .selected-diagnoses {
+      padding: 16px 20px;
+      background: $light-bg;
+      border-top: 1px solid rgba(226, 232, 240, 0.7);
+      
+      .primary-diagnosis, .secondary-diagnoses {
+        margin-bottom: 16px;
+        
+        .diagnosis-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 12px;
+          
+          h3 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            margin: 0;
+            font-size: 15px;
+            font-weight: 700;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            
+            i {
+              color: $primary-color;
+              font-size: 14px;
+            }
+          }
+          
+          .count-badge {
+            background: $primary-color;
+            color: $white;
+            font-size: 12px;
+            font-weight: 600;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+        }
+        
+        .selected-diagnosis-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 12px 16px;
+          background: $white;
+          border-radius: 12px;
+          border: 1px solid rgba(226, 232, 240, 0.7);
+          transition: $transition;
+          margin-bottom: 8px;
+          
+          &:hover {
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+          }
+          
+          .diagnosis-info {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            
+            .diagnosis-code {
+              font-family: 'Plus Jakarta Sans', sans-serif;
+              font-size: 14px;
+              font-weight: 700;
+              color: $primary-color;
+              display: inline-block;
+              background: rgba(224, 231, 255, 0.5);
+              padding: 2px 8px;
+              border-radius: 6px;
+            }
+            
+            .diagnosis-description {
+              font-family: 'Plus Jakarta Sans', sans-serif;
+              font-size: 14px;
+              color: #475569;
+            }
+          }
+          
+          .remove-btn {
+            width: 30px;
+            height: 30px;
+            background: rgba(254, 226, 226, 0.3);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+            color: $danger-color;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: $transition;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            
+            &:hover {
+              background: $danger-color;
+              color: $white;
+              transform: scale(1.1);
+              border-color: $danger-color;
+            }
+          }
+        }
+        
+        .no-diagnosis {
+          font-family: 'Plus Jakarta Sans', sans-serif;
+          font-size: 14px;
+          color: #94a3b8;
+          padding: 10px 0;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          
+          i {
+            color: #94a3b8;
+            font-size: 14px;
+          }
+        }
+      }
+    }
+    
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding: 16px 24px;
+      background: $light-bg;
+      border-top: 1px solid rgba(226, 232, 240, 0.7);
+      
+      .cancel-btn {
+        padding: 12px 20px;
+        border-radius: 12px;
+        background: $white;
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        color: #475569;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: $transition;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        
+        i {
+          font-size: 14px;
+        }
+        
+        &:hover {
+          background: #f1f5f9;
+          color: #334155;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+        }
+      }
+      
+      .confirm-btn {
+        padding: 12px 24px;
+        border-radius: 12px;
+        background: $primary-color;
+        border: none;
+        color: $white;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: $transition;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 
+          0 4px 12px rgba(67, 97, 238, 0.2),
+          0 2px 6px rgba(67, 97, 238, 0.1);
+        
+        i {
+          font-size: 14px;
+        }
+        
+        &:hover {
+          background: darken($primary-color, 5%);
+          transform: translateY(-2px);
+          box-shadow: 
+            0 6px 15px rgba(67, 97, 238, 0.3),
+            0 3px 8px rgba(67, 97, 238, 0.15);
+        }
+        
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+          transform: none;
+          box-shadow: none;
+        }
+      }
+    }
+  }
+}
+
+// Animation keyframes
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0; 
+    transform: translateY(30px);
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0);
+  }
+}
+
+// Responsive styles
+@media (max-width: 992px) {
+  .diagnosis-modal-overlay {
+    padding: 20px;
+    
+    .diagnosis-modal {
+      .modal-header {
+        h2 {
+          font-size: 18px;
+        }
+      }
+      
+      .modal-tabs {
+        .tab-button {
+          padding: 10px 14px;
+          font-size: 13px;
+        }
+      }
+      
+      .modal-content {
+        padding: 16px;
+        
+        .diagnosis-list {
+          .diagnosis-item {
+            padding: 10px 14px;
+            
+            .diagnosis-info {
+              .diagnosis-code {
+                font-size: 13px;
+              }
+              
+              .diagnosis-description {
+                font-size: 13px;
+              }
+            }
+          }
+        }
+      }
+      
+      .selected-diagnoses {
+        padding: 14px 16px;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .diagnosis-modal-overlay {
+    padding: 16px;
+    
+    .diagnosis-modal {
+      max-height: 95vh;
+      
+      .modal-header {
+        padding: 16px 20px;
+        
+        h2 {
+          font-size: 16px;
+          
+          i {
+            width: 28px;
+            height: 28px;
+            font-size: 14px;
+          }
+        }
+        
+        .close-button {
+          width: 32px;
+          height: 32px;
+        }
+      }
+      
+      .modal-tabs {
+        padding: 6px;
+        
+        .tab-button {
+          padding: 8px 10px;
+          font-size: 12px;
+          
+          i {
+            font-size: 12px;
+          }
+        }
+      }
+      
+      .modal-content {
+        padding: 12px;
+        max-height: calc(95vh - 280px);
+        
+        .search-tab {
+          .search-bar {
+            .search-input-wrapper {
+              input {
+                padding: 10px 14px 10px 36px;
+                font-size: 14px;
+              }
+              
+              .search-icon {
+                left: 12px;
+                font-size: 12px;
+              }
+            }
+          }
+        }
+        
+        .custom-tab {
+          .form-row {
+            .form-group {
+              label {
+                font-size: 13px;
+              }
+              
+              input {
+                padding: 10px 14px;
+                font-size: 14px;
+              }
+            }
+          }
+          
+          .add-custom-btn {
+            padding: 10px 16px;
+            font-size: 13px;
+          }
+        }
+      }
+      
+      .selected-diagnoses {
+        padding: 12px;
+        
+        .primary-diagnosis, .secondary-diagnoses {
+          margin-bottom: 12px;
+          
+          .diagnosis-header {
+            h3 {
+              font-size: 14px;
+            }
+          }
+          
+          .selected-diagnosis-item {
+            padding: 10px 12px;
+            
+            .diagnosis-info {
+              .diagnosis-code {
+                font-size: 13px;
+              }
+              
+              .diagnosis-description {
+                font-size: 13px;
+              }
+            }
+          }
+        }
+      }
+      
+      .modal-footer {
+        padding: 12px 16px;
+        
+        .cancel-btn, .confirm-btn {
+          padding: 10px 16px;
+          font-size: 13px;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .diagnosis-modal-overlay {
+    padding: 10px;
+    
+    .diagnosis-modal {
+      max-width: 100%;
+      height: 100%;
+      max-height: 100%;
+      border-radius: 0;
+      
+      .modal-content {
+        max-height: calc(100vh - 240px);
+      }
+      
+      .modal-tabs {
+        .tab-button {
+          span {
+            display: none;
+          }
+          
+          i {
+            font-size: 16px;
+          }
+        }
+      }
+      
+      .selected-diagnoses {
+        .selected-diagnosis-item {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 8px;
+          
+          .diagnosis-info {
+            width: 100%;
+          }
+          
+          .remove-btn {
+            align-self: flex-end;
+            margin-top: -30px;
+          }
+        }
+      }
+    }
+  }
+}

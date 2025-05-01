@@ -1,0 +1,2541 @@
+// Enhanced responsive styles for TherapySync
+// New variables and mixins for responsiveness
+$breakpoints: (
+  xs: 375px,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1400px
+);
+
+@mixin responsive($breakpoint) {
+  @if map-has-key($breakpoints, $breakpoint) {
+    @media (max-width: map-get($breakpoints, $breakpoint)) {
+      @content;
+    }
+  } @else {
+    @media (max-width: $breakpoint) {
+      @content;
+    }
+  }
+}
+
+// Premium glass morphism mixins
+@mixin glassmorphism($bg-opacity: 0.1, $blur: 15px, $border-opacity: 0.1) {
+  background: rgba(255, 255, 255, $bg-opacity);
+  backdrop-filter: blur($blur);
+  -webkit-backdrop-filter: blur($blur);
+  border: 1px solid rgba(255, 255, 255, $border-opacity);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+@mixin premium-shadow {
+  box-shadow: 
+    0 10px 30px rgba(0, 0, 0, 0.15),
+    0 5px 15px rgba(0, 0, 0, 0.07),
+    0 1px 5px rgba(0, 0, 0, 0.1);
+}
+
+@mixin premium-text-shadow {
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+
+// Enhanced animations for premium feel
+@keyframes floatElement {
+  0% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-15px);
+  }
+  100% {
+    transform: translateY(0);
+  }
+}
+
+@keyframes subtleRotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+// Dashboard base styles with enhanced responsiveness
+.dashboard {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+  color: white;
+  font-family: 'Poppins', sans-serif;
+  
+  // Responsive height adjustments for mobile
+  @include responsive(md) {
+    height: auto;
+    min-height: 100vh;
+  }
+  
+  // Enhanced parallax background with better performance
+  .parallax-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('../../../assets/tommaso-teloni-Ti5BtG1NSpQ-unsplash.jpg');
+    background-size: cover;
+    background-position: center;
+    z-index: -2;
+    transition: transform 0.8s cubic-bezier(0.22, 1, 0.36, 1);
+    will-change: transform;
+    
+    // Optimize for mobile performance
+    @include responsive(md) {
+      transition: transform 0.4s ease;
+      transform: scale(1.05) !important;
+    }
+    
+    // Enhanced particles with better performance on mobile
+    .particles-container {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      overflow: hidden;
+      
+      // Reduce particles on mobile for better performance
+      @include responsive(md) {
+        opacity: 0.7;
+      }
+      
+      .particle {
+        position: absolute;
+        border-radius: 50%;
+        pointer-events: none;
+        animation: particleFloat infinite linear;
+        filter: blur(1px);
+        
+        // Smaller particles on mobile
+        @include responsive(md) {
+          width: 3px !important;
+          height: 3px !important;
+        }
+      }
+    }
+    
+    // Premium gradient overlay
+    .gradient-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(
+        180deg,
+        rgba(8, 15, 40, 0.8) 0%,
+        rgba(17, 23, 64, 0.6) 30%,
+        rgba(23, 42, 88, 0.5) 60%,
+        rgba(8, 15, 40, 0.7) 100%
+      );
+      background-size: 200% 200%;
+      z-index: -1;
+    }
+  }
+  
+  // Enhanced header with better mobile layout
+  .main-header {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    position: relative;
+    z-index: 100;
+    transition: all 0.5s ease;
+    
+    // Mobile optimizations
+    @include responsive(md) {
+      position: sticky;
+      top: 0;
+    }
+    
+    // Enhanced glow effect
+    &.glow-effect {
+      background: rgba(0, 10, 30, 0.3);
+      box-shadow: 
+        0 4px 30px rgba(0, 0, 0, 0.2),
+        0 0 40px rgba(0, 140, 255, 0.1);
+      border-bottom: 1px solid rgba(0, 140, 255, 0.15);
+    }
+    
+    .header-container {
+      max-width: 1800px;
+      margin: 0 auto;
+      padding: 0.85rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      
+      // Mobile adjustments
+      @include responsive(lg) {
+        padding: 0.75rem 1rem;
+      }
+      
+      @include responsive(md) {
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 1rem;
+        padding: 0.5rem;
+      }
+      
+      // Logo with mobile adjustments
+      .logo-container {
+        flex: 0 0 auto;
+        position: relative;
+        
+        @include responsive(md) {
+          margin-right: auto;
+        }
+        
+        .logo-glow {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          width: 100%;
+          height: 100%;
+          background: radial-gradient(circle, rgba(59, 130, 246, 0.5) 0%, transparent 70%);
+          border-radius: 8px;
+          filter: blur(10px);
+          animation: logoGlow 3s infinite;
+          z-index: 0;
+        }
+        
+        .logo {
+          height: 48px;
+          border-radius: 10px;
+          box-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
+          transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          position: relative;
+          z-index: 1;
+          
+          @include responsive(md) {
+            height: 40px;
+          }
+          
+          @include responsive(sm) {
+            height: 36px;
+          }
+          
+          &:hover {
+            transform: scale(1.1);
+            box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
+          }
+        }
+      }
+      
+      // Enhanced carousel with better mobile view
+      .top-carousel {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        max-width: 900px;
+        margin: 0 2rem;
+        position: relative;
+        
+        @include responsive(xl) {
+          max-width: 700px;
+          margin: 0 1rem;
+        }
+        
+        @include responsive(lg) {
+          max-width: 500px;
+          order: 3;
+          width: 100%;
+          margin: 0.5rem 0;
+        }
+        
+        @include responsive(md) {
+          order: 3;
+          width: 100%;
+          max-width: 100%;
+          margin: 0.5rem 0;
+        }
+        
+        // Improved mobile carousel arrows
+        .carousel-arrow {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          color: white;
+          font-size: 0.8rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          margin: 0;
+          box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+          overflow: hidden;
+          z-index: 10;
+          
+          @include responsive(md) {
+            width: 36px;
+            height: 36px;
+          }
+          
+          @include responsive(sm) {
+            width: 32px;
+            height: 32px;
+          }
+          
+          .arrow-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            position: relative;
+            z-index: 1;
+            transition: all 0.3s ease;
+            
+            &:after {
+              content: '';
+              position: absolute;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              background: radial-gradient(circle, rgba(0, 229, 255, 0.1) 0%, transparent 70%);
+              border-radius: 50%;
+              opacity: 0;
+              transition: opacity 0.3s ease;
+            }
+          }
+          
+          &:hover {
+            background: rgba(255, 255, 255, 0.1);
+            transform: scale(1.15);
+            animation: arrowPulse 2s infinite;
+            box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+            
+            .arrow-icon:after {
+              opacity: 1;
+            }
+          }
+          
+          &:active {
+            transform: scale(0.95);
+          }
+        }
+        
+        // Refined carousel options layout for mobile
+        .carousel-options {
+          display: flex;
+          position: relative;
+          overflow: visible;
+          height: 65px;
+          min-width: 650px;
+          justify-content: center;
+          perspective: 800px;
+          
+          @include responsive(xl) {
+            min-width: 500px;
+          }
+          
+          @include responsive(lg) {
+            min-width: 400px;
+            height: 60px;
+          }
+          
+          @include responsive(md) {
+            min-width: 300px;
+            height: 55px;
+          }
+          
+          @include responsive(sm) {
+            min-width: 250px;
+            height: 50px;
+          }
+          
+          .carousel-option {
+            position: absolute;
+            height: 55px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            width: 200px;
+            text-align: center;
+            opacity: 0.7;
+            
+            @include responsive(lg) {
+              width: 160px;
+              padding: 0.5rem;
+              height: 50px;
+            }
+            
+            @include responsive(md) {
+              width: 120px;
+              padding: 0.25rem;
+              height: 45px;
+            }
+            
+            @include responsive(sm) {
+              width: 100px;
+              padding: 0.15rem;
+            }
+            
+            // Redesigned option content
+            .option-content {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              position: relative;
+              
+              // Improved menu icon
+              .option-icon {
+                width: 40px;
+                height: 40px;
+                border-radius: 102px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 8px;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+                transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+                animation: iconFadeIn 0.5s ease forwards;
+                
+                @include responsive(md) {
+                  width: 32px;
+                  height: 32px;
+                  margin-bottom: 4px;
+                }
+                
+                @include responsive(sm) {
+                  width: 28px;
+                  height: 28px;
+                  margin-bottom: 2px;
+                }
+                
+                i {
+                  color: white;
+                  font-size: 18px;
+                  filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.2));
+                  
+                  @include responsive(md) {
+                    font-size: 14px;
+                  }
+                }
+              }
+            }
+            
+            // Enhanced central option
+            &.center {
+              transform: translateX(0) translateZ(40px) scale(1.1);
+              z-index: 3;
+              opacity: 1;
+              color: #00e5ff;
+              text-shadow: 0 0 12px rgba(0, 229, 255, 0.7);
+              font-weight: 600;
+              
+              .option-icon {
+                opacity: 1;
+                transform: scale(1.1);
+                
+                @include responsive(md) {
+                  transform: scale(1.05);
+                }
+              }
+              
+              span {
+                animation: highlightGlow 3s infinite;
+                
+                @include responsive(md) {
+                  font-size: 0.9rem;
+                }
+                
+                @include responsive(sm) {
+                  font-size: 0.8rem;
+                }
+              }
+              
+              .active-underline {
+                width: 70px;
+                height: 3px;
+                background: linear-gradient(90deg, #00e5ff, #2979ff);
+                border-radius: 3px;
+                position: absolute;
+                bottom: -8px;
+                animation: pulseWidth 2s infinite alternate;
+                box-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+                
+                @include responsive(md) {
+                  width: 50px;
+                  height: 2px;
+                  bottom: -6px;
+                }
+                
+                @include responsive(sm) {
+                  width: 40px;
+                  bottom: -4px;
+                }
+              }
+            }
+            
+            // Improved responsive positioning for side options
+            &.left {
+              transform: translateX(-240px) translateZ(-20px) rotateY(10deg) scale(0.9);
+              
+              @include responsive(xl) {
+                transform: translateX(-180px) translateZ(-20px) rotateY(10deg) scale(0.9);
+              }
+              
+              @include responsive(lg) {
+                transform: translateX(-150px) translateZ(-20px) rotateY(10deg) scale(0.9);
+              }
+              
+              @include responsive(md) {
+                transform: translateX(-120px) translateZ(-20px) rotateY(10deg) scale(0.85);
+              }
+              
+              @include responsive(sm) {
+                transform: translateX(-90px) translateZ(-20px) rotateY(10deg) scale(0.8);
+              }
+            }
+            
+            &.right {
+              transform: translateX(240px) translateZ(-20px) rotateY(-10deg) scale(0.9);
+              
+              @include responsive(xl) {
+                transform: translateX(180px) translateZ(-20px) rotateY(-10deg) scale(0.9);
+              }
+              
+              @include responsive(lg) {
+                transform: translateX(150px) translateZ(-20px) rotateY(-10deg) scale(0.9);
+              }
+              
+              @include responsive(md) {
+                transform: translateX(120px) translateZ(-20px) rotateY(-10deg) scale(0.85);
+              }
+              
+              @include responsive(sm) {
+                transform: translateX(90px) translateZ(-20px) rotateY(-10deg) scale(0.8);
+              }
+            }
+            
+            &.far-left {
+              transform: translateX(-450px) translateZ(-50px) rotateY(25deg) scale(0.7);
+              
+              @include responsive(xl) {
+                transform: translateX(-320px) translateZ(-40px) rotateY(20deg) scale(0.75);
+              }
+              
+              @include responsive(lg) {
+                transform: translateX(-250px) translateZ(-40px) rotateY(15deg) scale(0.7);
+              }
+              
+              @include responsive(md) {
+                display: none;
+              }
+            }
+            
+            &.far-right {
+              transform: translateX(450px) translateZ(-50px) rotateY(-25deg) scale(0.7);
+              
+              @include responsive(xl) {
+                transform: translateX(320px) translateZ(-40px) rotateY(-20deg) scale(0.75);
+              }
+              
+              @include responsive(lg) {
+                transform: translateX(250px) translateZ(-40px) rotateY(-15deg) scale(0.7);
+              }
+              
+              @include responsive(md) {
+                display: none;
+              }
+            }
+            
+            span {
+              font-size: 1.2rem;
+              transition: all 0.3s ease;
+              white-space: nowrap;
+              filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
+              
+              @include responsive(lg) {
+                font-size: 1rem;
+              }
+              
+              @include responsive(md) {
+                font-size: 0.9rem;
+              }
+            }
+            
+            // Enhanced hover effects with mobile optimizations
+            &:hover {
+              &:not(.center) {
+                &.left, &.far-left {
+                  transform: translateX(-240px) translateZ(-15px) rotateY(8deg) scale(0.92) translateY(-5px);
+                  
+                  @include responsive(xl) {
+                    transform: translateX(-180px) translateZ(-15px) rotateY(8deg) scale(0.92) translateY(-5px);
+                  }
+                  
+                  @include responsive(lg) {
+                    transform: translateX(-150px) translateZ(-15px) rotateY(8deg) scale(0.92) translateY(-5px);
+                  }
+                  
+                  @include responsive(md) {
+                    transform: translateX(-120px) translateZ(-15px) rotateY(8deg) scale(0.87) translateY(-3px);
+                  }
+                  
+                  @include responsive(sm) {
+                    transform: translateX(-90px) translateZ(-15px) rotateY(8deg) scale(0.82) translateY(-2px);
+                  }
+                }
+                
+                &.right, &.far-right {
+                  transform: translateX(240px) translateZ(-15px) rotateY(-8deg) scale(0.92) translateY(-5px);
+                  
+                  @include responsive(xl) {
+                    transform: translateX(180px) translateZ(-15px) rotateY(-8deg) scale(0.92) translateY(-5px);
+                  }
+                  
+                  @include responsive(lg) {
+                    transform: translateX(150px) translateZ(-15px) rotateY(-8deg) scale(0.92) translateY(-5px);
+                  }
+                  
+                  @include responsive(md) {
+                    transform: translateX(120px) translateZ(-15px) rotateY(-8deg) scale(0.87) translateY(-3px);
+                  }
+                  
+                  @include responsive(sm) {
+                    transform: translateX(90px) translateZ(-15px) rotateY(-8deg) scale(0.82) translateY(-2px);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      
+      // Enhanced user profile with better responsive layout
+      .support-user-profile {
+        position: relative;
+        z-index: 20;
+        
+        @include responsive(lg) {
+          order: 2;
+          margin-left: auto;
+        }
+        
+        @include responsive(md) {
+          margin-left: auto;
+        }
+        
+        .support-profile-button {
+          display: flex;
+          align-items: center;
+          background: rgba(0, 0, 0, 0.2);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: var(--border-radius-md);
+          padding: 0.5rem 0.75rem 0.5rem 0.5rem;
+          cursor: pointer;
+          transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+          box-shadow: var(--shadow-sm);
+          position: relative;
+          
+          @include responsive(md) {
+            padding: 0.4rem;
+          }
+          
+          @include responsive(sm) {
+            padding: 0.3rem;
+          }
+          
+          .support-profile-info {
+            margin-right: 0.75rem;
+            
+            @include responsive(lg) {
+              display: none;
+            }
+            
+            .support-user-name {
+              font-size: 0.95rem;
+              font-weight: 600;
+              color: white;
+              margin-bottom: 0.1rem;
+            }
+            
+            .support-user-role {
+              font-size: 0.75rem;
+              color: rgba(255, 255, 255, 0.6);
+              display: block;
+              
+              @include responsive(xl) {
+                display: none;
+              }
+            }
+          }
+          
+          // Enhanced avatar with better responsive design
+          .support-avatar {
+            position: relative;
+            width: 38px;
+            height: 38px;
+            border-radius: var(--border-radius-md);
+            background: var(--color-primary-gradient);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.75rem;
+            flex-shrink: 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            
+            @include responsive(md) {
+              width: 34px;
+              height: 34px;
+              margin-right: 0;
+            }
+            
+            @include responsive(sm) {
+              width: 32px;
+              height: 32px;
+            }
+            
+            .support-avatar-text {
+              font-size: 0.95rem;
+              font-weight: 600;
+              color: white;
+              position: relative;
+              z-index: 2;
+              text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+              
+              @include responsive(sm) {
+                font-size: 0.85rem;
+              }
+            }
+            
+            // Enhanced status indicator
+            .support-avatar-status {
+              position: absolute;
+              bottom: -2px;
+              right: -2px;
+              width: 12px;
+              height: 12px;
+              border-radius: 50%;
+              border: 2px solid var(--bg-dark);
+              box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.2);
+              z-index: 3;
+              
+              @include responsive(sm) {
+                width: 10px;
+                height: 10px;
+                bottom: -1px;
+                right: -1px;
+              }
+              
+              &.online {
+                background: var(--color-success);
+                animation: statusPulse 2s infinite;
+              }
+              
+              &.away {
+                background: var(--color-warning);
+              }
+              
+              &.busy {
+                background: var(--color-danger);
+              }
+              
+              &.offline {
+                background: var(--color-muted);
+              }
+            }
+          }
+          
+          i {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.8rem;
+            transition: all 0.3s ease;
+            margin-left: 0.25rem;
+            
+            @include responsive(lg) {
+              display: none;
+            }
+          }
+          
+          &:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+            
+            i {
+              color: white;
+            }
+          }
+          
+          &.active {
+            background: rgba(0, 212, 255, 0.1);
+            border-color: rgba(0, 212, 255, 0.2);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 212, 255, 0.1);
+            
+            i {
+              color: var(--color-primary);
+              transform: rotate(180deg);
+            }
+          }
+        }
+        
+        // Enhanced dropdown menu with better responsive layout
+        .support-user-menu {
+          position: absolute;
+          top: calc(100% + 0.75rem);
+          right: 0;
+          width: 340px;
+          background: rgba(8, 15, 30, 0.97);
+          backdrop-filter: blur(20px);
+          border-radius: var(--border-radius-lg);
+          box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), 0 0 30px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 212, 255, 0.15);
+          border: 1px solid rgba(0, 212, 255, 0.1) !important;
+          overflow: hidden;
+          z-index: 100;
+          animation: dropdownReveal 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+          
+          @include responsive(lg) {
+            width: 320px;
+          }
+          
+          @include responsive(md) {
+            width: 300px;
+          }
+          
+          @include responsive(sm) {
+            width: 280px;
+            right: -10px;
+          }
+          
+          @include responsive(xs) {
+            width: calc(100vw - 30px);
+            right: -15px;
+          }
+          
+          // Enhanced header with better responsive elements
+          .support-menu-header {
+            padding: 1.5rem;
+            background: linear-gradient(to bottom, rgba(10, 20, 40, 0.97), rgba(8, 15, 30, 0.97)) !important;
+            border-bottom: 1px solid rgba(0, 212, 255, 0.1) !important;
+            
+            @include responsive(sm) {
+              padding: 1.2rem;
+            }
+            
+            .support-user-info {
+              display: flex;
+              align-items: center;
+              gap: 1rem;
+              
+              @include responsive(sm) {
+                gap: 0.8rem;
+              }
+              
+              .support-user-avatar {
+                width: 60px;
+                height: 60px;
+                border-radius: var(--border-radius-lg);
+                background: var(--color-primary-gradient);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.4rem;
+                font-weight: 600;
+                color: white;
+                flex-shrink: 0;
+                position: relative;
+                box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.3), 0 10px 20px rgba(0, 0, 0, 0.4) !important;
+                
+                @include responsive(sm) {
+                  width: 50px;
+                  height: 50px;
+                  font-size: 1.2rem;
+                }
+                
+                .avatar-status {
+                  position: absolute;
+                  bottom: -3px;
+                  right: -3px;
+                  width: 14px;
+                  height: 14px;
+                  border-radius: 50%;
+                  border: 2px solid var(--bg-dark);
+                  
+                  @include responsive(sm) {
+                    width: 12px;
+                    height: 12px;
+                    bottom: -2px;
+                    right: -2px;
+                  }
+                  
+                  &.online {
+                    background: var(--color-success);
+                    animation: statusPulse 2s infinite;
+                  }
+                  
+                  &.away {
+                    background: var(--color-warning);
+                  }
+                  
+                  &.busy {
+                    background: var(--color-danger);
+                  }
+
+                  &.offline {
+                    background: var(--color-muted);
+                  }
+                }
+              }
+              
+              .support-user-details {
+                h4 {
+                  margin: 0 0 0.3rem;
+                  font-size: 1.1rem;
+                  font-weight: 600;
+                  color: white;
+                  
+                  @include responsive(sm) {
+                    font-size: 1rem;
+                    margin: 0 0 0.2rem;
+                  }
+                }
+                
+                .support-user-email {
+                  display: block;
+                  font-size: 0.85rem;
+                  color: rgba(255, 255, 255, 0.6);
+                  margin-bottom: 0.5rem;
+                  
+                  @include responsive(sm) {
+                    font-size: 0.75rem;
+                    margin-bottom: 0.4rem;
+                  }
+                }
+                
+                .support-user-status {
+                  display: flex;
+                  align-items: center;
+                  gap: 0.4rem;
+                  font-size: 0.85rem;
+                  
+                  @include responsive(sm) {
+                    font-size: 0.75rem;
+                  }
+                  
+                  &.online {
+                    color: var(--color-success);
+                  }
+                  
+                  &.away {
+                    color: var(--color-warning);
+                  }
+                  
+                  &.busy {
+                    color: var(--color-danger);
+                  }
+                  
+                  &.offline {
+                    color: var(--color-muted);
+                  }
+                  
+                  i {
+                    font-size: 0.6rem;
+                    
+                    @include responsive(sm) {
+                      font-size: 0.55rem;
+                    }
+                  }
+                }
+              }
+            }
+          }
+          
+          // Enhanced menu sections with better responsive design
+          .support-menu-section {
+            background: rgba(10, 20, 40, 0.3) !important;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            
+            &:last-child {
+              border-bottom: none;
+            }
+            
+            .section-title {
+              padding: 0.5rem 1.5rem;
+              font-size: 0.8rem;
+              color: rgba(0, 212, 255, 0.5) !important;
+              text-transform: uppercase;
+              letter-spacing: 1px;
+              font-weight: 700;
+              
+              @include responsive(sm) {
+                padding: 0.4rem 1.2rem;
+                font-size: 0.7rem;
+              }
+            }
+          }
+          
+          .support-menu-items {
+            padding: 0.25rem 0;
+          }
+          
+          // Enhanced menu items with better tap targets for mobile
+          .support-menu-item {
+            padding: 0.75rem 1.5rem;
+            display: flex;
+            align-items: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            
+            @include responsive(sm) {
+              padding: 0.8rem 1.2rem;
+            }
+            
+            &:hover {
+              background: linear-gradient(90deg, rgba(0, 212, 255, 0.05), transparent) !important;
+              
+              i {
+                color: var(--color-primary) !important;
+                text-shadow: 0 0 10px rgba(0, 212, 255, 0.5) !important;
+                transform: translateY(-2px);
+              }
+            }
+            
+            i {
+              width: 20px;
+              height: 20px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              margin-right: 1rem;
+              font-size: 1rem;
+              color: rgba(255, 255, 255, 0.7);
+              transition: all 0.3s ease;
+              
+              @include responsive(sm) {
+                margin-right: 0.8rem;
+                font-size: 0.9rem;
+              }
+            }
+            
+            span {
+              text-shadow: 0 0 5px rgba(255, 255, 255, 0.1) !important;
+              flex: 1;
+              font-size: 0.95rem;
+              color: white;
+              
+              @include responsive(sm) {
+                font-size: 0.85rem;
+              }
+            }
+            
+            .support-notification-badge {
+              min-width: 22px;
+              height: 22px;
+              border-radius: 11px;
+              background: var(--color-danger-gradient);
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              color: white;
+              font-size: 0.75rem;
+              font-weight: 600;
+              padding: 0 6px;
+              animation: badgePulse 2s infinite;
+              
+              @include responsive(sm) {
+                min-width: 20px;
+                height: 20px;
+                font-size: 0.7rem;
+              }
+            }
+            
+            // Enhanced toggle switches with better touch targets
+            &.toggle-item {
+              display: flex;
+              align-items: center;
+              justify-content: space-between;
+              
+              .toggle-item-content {
+                display: flex;
+                align-items: center;
+                
+                i {
+                  margin-right: 1rem;
+                  
+                  @include responsive(sm) {
+                    margin-right: 0.8rem;
+                  }
+                }
+              }
+              
+              .toggle-switch {
+                width: 44px;
+                height: 24px;
+                background: rgba(255, 255, 255, 0.15);
+                border-radius: 12px;
+                position: relative;
+                padding: 2px;
+                transition: all 0.3s ease;
+                
+                @include responsive(sm) {
+                  width: 40px;
+                  height: 22px;
+                }
+                
+                &:hover {
+                  background: rgba(255, 255, 255, 0.2);
+                }
+                
+                .toggle-handle {
+                  width: 20px;
+                  height: 20px;
+                  border-radius: 50%;
+                  background: rgba(255, 255, 255, 0.8);
+                  position: absolute;
+                  left: 2px;
+                  top: 2px;
+                  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                  
+                  @include responsive(sm) {
+                    width: 18px;
+                    height: 18px;
+                  }
+                  
+                  &.active {
+                    left: calc(100% - 22px);
+                    background: var(--color-primary);
+                    box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+                    
+                    @include responsive(sm) {
+                      left: calc(100% - 20px);
+                    }
+                  }
+                }
+              }
+            }
+            
+            &.logout {
+              color: var(--color-danger);
+              
+              i {
+                color: var(--color-danger);
+              }
+              
+              &:hover {
+                background: rgba(244, 67, 54, 0.05);
+              }
+            }
+          }
+          
+          // Enhanced footer with better responsive design
+          .support-menu-footer {
+            background: linear-gradient(to top, rgba(10, 20, 40, 0.97), rgba(8, 15, 30, 0.8)) !important;
+            padding: 0.75rem 0;
+            
+            .version-info {
+              display: flex;
+              justify-content: space-between;
+              padding: 0.5rem 1.5rem;
+              font-size: 0.75rem;
+              color: rgba(0, 212, 255, 0.4) !important;
+              
+              @include responsive(sm) {
+                padding: 0.5rem 1.2rem;
+                font-size: 0.7rem;
+              }
+            }
+          }
+          
+          // Full-width menu on very small screens
+          @include responsive(xs) {
+            width: 100vw;
+            position: fixed;
+            top: 70px;
+            left: 0;
+            right: 0;
+            border-radius: 0;
+          }
+        }
+      }
+    }
+  }
+  
+  // Enhanced main content with better responsive layout
+  .main-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: calc(100vh - 80px);
+    padding: 0 2rem;
+    
+    @include responsive(lg) {
+      height: auto;
+      min-height: calc(100vh - 120px);
+      padding: 3rem 1.5rem;
+    }
+    
+    @include responsive(md) {
+      padding: 2rem 1rem;
+      margin-top: 1rem;
+    }
+    
+    @include responsive(sm) {
+      padding: 1.5rem 0.75rem;
+      overflow-y: auto;
+    }
+    
+    // Enhanced welcome container with better responsive typography
+    .welcome-container {
+      text-align: center;
+      max-width: 800px;
+      
+      @include responsive(md) {
+        max-width: 100%;
+      }
+      
+      .welcome-title {
+        font-size: 4.5rem;
+        margin-bottom: 1.8rem;
+        font-weight: 700;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+        text-shadow: 0 5px 30px rgba(0, 0, 0, 0.3);
+        opacity: 0;
+        transform: translateY(30px);
+        filter: blur(1px);
+        animation: titleFadeIn 1.2s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+        animation-delay: 0.3s;
+        position: relative;
+        
+        @include responsive(lg) {
+          font-size: 3.5rem;
+          margin-bottom: 1.5rem;
+        }
+        
+        @include responsive(md) {
+          font-size: 3rem;
+          margin-bottom: 1.2rem;
+        }
+        
+        @include responsive(sm) {
+          font-size: 2.5rem;
+          margin-bottom: 1rem;
+        }
+        
+        @include responsive(xs) {
+          font-size: 2rem;
+        }
+
+        .highlight {
+          color: #00e5ff;
+          position: relative;
+          display: inline-block;
+          animation: highlightGlow 1s;
+        }
+        
+        // Improved title decoration for responsive design
+        .title-decoration {
+          position: absolute;
+          bottom: -10px;
+          left: 50%;
+          transform: translateX(-50%);
+          height: 3px;
+          background: linear-gradient(90deg, transparent, rgba(0, 229, 255, 0.7), transparent);
+          border-radius: 3px;
+          box-shadow: 0 0 20px rgba(0, 229, 255, 0.4);
+          animation: decorationDraw 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+          animation-delay: 2s;
+          
+          @include responsive(md) {
+            bottom: -8px;
+            height: 2px;
+          }
+          
+          @include responsive(sm) {
+            bottom: -6px;
+          }
+        }
+      }
+      
+      .welcome-subtitle {
+        font-size: 1.6rem;
+        margin-bottom: 2.5rem;
+        animation: subtitleFadeIn 1s ease 0.5s backwards;
+        position: relative;
+        
+        @include responsive(lg) {
+          font-size: 1.4rem;
+          margin-bottom: 2rem;
+        }
+        
+        @include responsive(md) {
+          font-size: 1.2rem;
+          margin-bottom: 1.8rem;
+        }
+        
+        @include responsive(sm) {
+          font-size: 1rem;
+          margin-bottom: 1.5rem;
+        }
+        
+        // Cursor animation maintained across all viewport sizes
+        .cursor-blink {
+          display: inline-block;
+          color: #00e5ff;
+          animation: cursorBlink 1s infinite;
+          font-weight: 700;
+          margin-left: 5px;
+        }
+      }
+    }
+  }
+  
+  // Enhanced transition states with better responsive behavior
+  &.transitioning {
+    .parallax-background {
+      transform: scale(1.05) !important;
+      transition: transform 0.8s ease;
+      
+      @include responsive(md) {
+        transition: transform 0.4s ease;
+      }
+    }
+    
+    .main-content {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.4s ease;
+    }
+  }
+  
+  &.logging-out {
+    .parallax-background {
+      transform: scale(1.2) !important;
+      filter: blur(15px);
+      transition: all 1s ease;
+      
+      @include responsive(md) {
+        transform: scale(1.1) !important;
+        transition: all 0.7s ease;
+      }
+    }
+    
+    .main-header, .main-content {
+      opacity: 0;
+      transform: scale(0.95);
+      transition: all 0.5s ease;
+    }
+  }
+}
+
+// Enhanced InfoWelcome component styles with better responsive design
+.info-welcome-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  position: relative;
+  
+  @include responsive(lg) {
+    padding: 1.5rem 0.5rem;
+  }
+  
+  @include responsive(md) {
+    padding: 1rem 0.5rem;
+  }
+  
+  // Enhanced reset view button with better position on mobile
+  .reset-view-button {
+    position: fixed;
+    bottom: 30px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    backdrop-filter: blur(10px);
+    padding: 12px 20px;
+    border-radius: 30px;
+    color: white;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+    z-index: 100;
+    
+    @include responsive(md) {
+      bottom: 20px;
+      padding: 10px 16px;
+      font-size: 13px;
+    }
+    
+    @include responsive(sm) {
+      bottom: 15px;
+      padding: 8px 14px;
+      font-size: 12px;
+    }
+    
+    i {
+      margin-right: 8px;
+      font-size: 16px;
+      
+      @include responsive(sm) {
+        font-size: 14px;
+      }
+    }
+    
+    &:hover {
+      background: rgba(255, 255, 255, 0.2);
+      transform: translateX(-50%) translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+    }
+  }
+  
+  // Enhanced dashboard cards grid for responsive layouts
+  .dashboard-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2.5rem;
+    perspective: 1000px;
+    
+    @include responsive(lg) {
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 2rem;
+    }
+    
+    @include responsive(md) {
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      perspective: 800px;
+    }
+    
+    @include responsive(sm) {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    
+    // Enhanced dashboard card with better mobile height
+    .dashboard-card {
+      position: relative;
+      background: rgba(255, 255, 255, 0.07);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 20px;
+      padding: 2rem;
+      transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      height: 350px;
+      overflow: hidden;
+      animation: fadeInUp 0.7s ease-out forwards;
+      animation-delay: calc(var(--i, 0) * 0.15s);
+      opacity: 0;
+      transform-style: preserve-3d;
+      transform: translateZ(0);
+      
+      @include responsive(md) {
+        height: auto;
+        min-height: 320px;
+        padding: 1.5rem;
+      }
+      
+      @include responsive(sm) {
+        padding: 1.2rem;
+        min-height: 300px;
+      }
+      
+      &:nth-child(1) {
+        --i: 1;
+      }
+      
+      &:nth-child(2) {
+        --i: 2;
+      }
+      
+      &:nth-child(3) {
+        --i: 3;
+      }
+      
+      // Enhanced hover effects with optimized mobile transitions
+      &.hover {
+        transform: translateY(-15px) scale(1.02) rotateX(2deg) rotateY(-2deg);
+        z-index: 10;
+        box-shadow: 
+          0 30px 60px rgba(0, 0, 0, 0.3),
+          0 0 30px rgba(255, 255, 255, 0.05),
+          0 0 0 1px rgba(255, 255, 255, 0.2);
+        
+        @include responsive(md) {
+          transform: translateY(-10px) scale(1.01) rotateX(1deg) rotateY(-1deg);
+        }
+        
+        @include responsive(sm) {
+          transform: translateY(-8px) scale(1.01);
+        }
+        
+        .card-bg-decoration {
+          opacity: 0.25;
+          transform: scale(1.1) translateX(-5%);
+        }
+        
+        .icon-container {
+          transform: scale(1.15);
+          
+          @include responsive(md) {
+            transform: scale(1.1);
+          }
+          
+          @include responsive(sm) {
+            transform: scale(1.05);
+          }
+          
+          .icon-background {
+            opacity: 1;
+            transform: scale(1.5);
+          }
+        }
+      }
+      
+      // Enhanced focus effect with mobile optimizations
+      &.focus {
+        transform: translateY(-20px) scale(1.05);
+        z-index: 20;
+        box-shadow: 
+          0 40px 80px rgba(0, 0, 0, 0.4),
+          0 0 50px rgba(255, 255, 255, 0.1),
+          0 0 0 1px rgba(255, 255, 255, 0.25);
+        
+        @include responsive(md) {
+          transform: translateY(-15px) scale(1.03);
+        }
+        
+        @include responsive(sm) {
+          transform: translateY(-10px) scale(1.02);
+        }
+      }
+      
+      // Card content with improved responsive layout
+      .card-content {
+        position: relative;
+        z-index: 2;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+      
+      // Enhanced card header with responsive typography
+      .card-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.8rem;
+        
+        @include responsive(md) {
+          margin-bottom: 1.4rem;
+        }
+        
+        @include responsive(sm) {
+          margin-bottom: 1.2rem;
+        }
+        
+        h3 {
+          font-size: 1.4rem;
+          font-weight: 600;
+          color: white;
+          margin: 0;
+          position: relative;
+          
+          @include responsive(md) {
+            font-size: 1.3rem;
+          }
+          
+          @include responsive(sm) {
+            font-size: 1.2rem;
+          }
+        }
+        
+        // Enhanced icon containers with proper mobile scaling
+        .icon-container {
+          width: 56px;
+          height: 56px;
+          border-radius: 15px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-right: 1.2rem;
+          transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          position: relative;
+          
+          @include responsive(md) {
+            width: 48px;
+            height: 48px;
+            margin-right: 1rem;
+          }
+          
+          @include responsive(sm) {
+            width: 42px;
+            height: 42px;
+            margin-right: 0.8rem;
+            border-radius: 12px;
+          }
+          
+          i {
+            color: white;
+            font-size: 1.5rem;
+            position: relative;
+            z-index: 1;
+            filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.3));
+            
+            @include responsive(md) {
+              font-size: 1.3rem;
+            }
+            
+            @include responsive(sm) {
+              font-size: 1.1rem;
+            }
+          }
+        }
+      }
+      
+      // Enhanced counter value with responsive sizing
+      .card-value {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        
+        @include responsive(md) {
+          margin-bottom: 1.2rem;
+        }
+        
+        @include responsive(sm) {
+          margin-bottom: 1rem;
+        }
+        
+        .counter {
+          font-size: 3.8rem;
+          font-weight: 700;
+          color: white;
+          line-height: 1;
+          background: linear-gradient(90deg, #ffffff, #e1e1e1);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          text-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+          font-family: 'Montserrat', sans-serif;
+          letter-spacing: -1px;
+          
+          @include responsive(md) {
+            font-size: 3.2rem;
+          }
+          
+          @include responsive(sm) {
+            font-size: 2.8rem;
+          }
+        }
+      }
+      
+      // Enhanced card stats for better mobile layout
+      .card-stats {
+        display: flex;
+        margin-bottom: 1.5rem;
+        
+        @include responsive(md) {
+          margin-bottom: 1.2rem;
+        }
+        
+        @include responsive(sm) {
+          margin-bottom: 1rem;
+          flex-direction: column;
+        }
+        
+        .stat-item {
+          flex: 1;
+          padding-right: 10px;
+          
+          @include responsive(sm) {
+            padding-right: 0;
+            margin-bottom: 0.8rem;
+          }
+          
+          &:last-child {
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            padding-left: 15px;
+            
+            @include responsive(sm) {
+              border-left: none;
+              padding-left: 0;
+              padding-top: 0.8rem;
+              border-top: 1px solid rgba(255, 255, 255, 0.1);
+            }
+          }
+        }
+      }
+      
+      // Enhanced action buttons with proper mobile sizing
+      .action-button {
+        position: relative;
+        background: rgba(255, 255, 255, 0.1);
+        border: none;
+        border-radius: 12px;
+        color: white;
+        padding: 0.8rem 1.5rem;
+        font-size: 0.95rem;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        
+        @include responsive(md) {
+          padding: 0.7rem 1.2rem;
+          font-size: 0.9rem;
+        }
+        
+        @include responsive(sm) {
+          padding: 0.6rem 1rem;
+          font-size: 0.85rem;
+        }
+        
+        &:hover {
+          transform: translateY(-5px);
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+          
+          @include responsive(md) {
+            transform: translateY(-3px);
+          }
+        }
+      }
+    }
+  }
+}
+
+
+// Variables and Mixins
+$breakpoints: (
+  xs: 375px,
+  sm: 576px,
+  md: 768px,
+  lg: 992px,
+  xl: 1200px,
+  xxl: 1400px
+);
+
+@mixin responsive($breakpoint) {
+  @if map-has-key($breakpoints, $breakpoint) {
+    @media (max-width: map-get($breakpoints, $breakpoint)) {
+      @content;
+    }
+  } @else {
+    @media (max-width: $breakpoint) {
+      @content;
+    }
+  }
+}
+
+// Essential animations
+@keyframes gradientPulse {
+  0% {
+    background-position: 0% 50%;
+    opacity: 0.8;
+  }
+  50% {
+    background-position: 100% 50%;
+    opacity: 1;
+  }
+  100% {
+    background-position: 0% 50%;
+    opacity: 0.8;
+  }
+}
+
+@keyframes titleFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(30px);
+    filter: blur(10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes subtitleFadeIn {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+    filter: blur(5px);
+  }
+  100% {
+    opacity: 0.9;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes cursorBlink {
+  0%, 100% {
+    opacity: 0;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+@keyframes highlightGlow {
+  0% {
+    text-shadow: 0 0 5px rgba(0, 229, 255, 0.5);
+  }
+  50% {
+    text-shadow: 0 0 15px rgba(0, 229, 255, 0.8);
+  }
+  100% {
+    text-shadow: 0 0 5px rgba(0, 229, 255, 0.5);
+  }
+}
+
+@keyframes decorationDraw {
+  0% {
+    width: 0;
+  }
+  100% {
+    width: 120px;
+  }
+}
+
+@keyframes particleFloat {
+  0% {
+    transform: translate(0, 0);
+  }
+  50% {
+    transform: translate(var(--tx, 0), var(--ty, 0));
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+// Main Dashboard Styles
+.dashboard {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  position: relative;
+  color: white;
+  font-family: 'Poppins', sans-serif;
+  
+  @include responsive(md) {
+    height: auto;
+    min-height: 100vh;
+    overflow-y: auto;
+  }
+  
+  // Animation state
+  &.anim-complete {
+    .welcome-title {
+      opacity: 1;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+    
+    .welcome-subtitle {
+      opacity: 0.9;
+      transform: translateY(0);
+      filter: blur(0);
+    }
+  }
+  
+
+  
+  // Header
+  .main-header {
+    width: 100%;
+    background: rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    position: relative;
+    z-index: 100;
+    
+    @include responsive(md) {
+      position: sticky;
+      top: 0;
+    }
+    
+    &.glow-effect {
+      background: rgba(0, 10, 30, 0.3);
+      box-shadow: 0 0 40px rgba(0, 140, 255, 0.1);
+      border-bottom: 1px solid rgba(0, 140, 255, 0.15);
+    }
+    
+    .header-container {
+      max-width: 1800px;
+      margin: 0 auto;
+      padding: 0.85rem 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      
+      @include responsive(lg) {
+        padding: 0.75rem 1rem;
+      }
+      
+      @include responsive(md) {
+        flex-wrap: wrap;
+        justify-content: space-between;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+      }
+      
+      // Logo
+      .logo-container {
+        position: relative;
+        
+        .logo {
+          height: 48px;
+          border-radius: 10px;
+          
+          @include responsive(md) {
+            height: 38px;
+          }
+        }
+      }
+      
+      // Carousel
+      .top-carousel {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        max-width: 900px;
+        margin: 0 2rem;
+        
+        @include responsive(lg) {
+          max-width: 700px;
+          margin: 0 1rem;
+        }
+        
+        @include responsive(md) {
+          order: 3;
+          width: 100%;
+          max-width: 100%;
+          margin: 0.5rem 0 0;
+        }
+        
+        .carousel-arrow {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          
+          @include responsive(md) {
+            width: 36px;
+            height: 36px;
+          }
+        }
+        
+        .carousel-options {
+          display: flex;
+          position: relative;
+          overflow: visible;
+          height: 65px;
+          min-width: 650px;
+          justify-content: center;
+          perspective: 800px;
+          
+          @include responsive(lg) {
+            min-width: 500px;
+            height: 60px;
+          }
+          
+          @include responsive(md) {
+            min-width: 300px;
+            height: 55px;
+          }
+          
+          @include responsive(sm) {
+            min-width: 250px;
+            height: 50px;
+          }
+          
+          .carousel-option {
+            position: absolute;
+            height: 55px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.6s cubic-bezier(0.23, 1, 0.32, 1);
+            cursor: pointer;
+            padding: 0.5rem 1rem;
+            width: 200px;
+            text-align: center;
+            opacity: 0.7;
+            
+            @include responsive(lg) {
+              width: 160px;
+              height: 50px;
+            }
+            
+            @include responsive(md) {
+              width: 120px;
+              height: 45px;
+            }
+            
+            .option-content {
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              position: relative;
+              
+              .option-icon {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-bottom: 8px;
+                
+                @include responsive(md) {
+                  width: 32px;
+                  height: 32px;
+                  margin-bottom: 4px;
+                }
+                
+                i {
+                  color: white;
+                  font-size: 16px;
+                }
+              }
+              
+              span {
+                font-size: 1.1rem;
+                white-space: nowrap;
+                
+                @include responsive(md) {
+                  font-size: 0.9rem;
+                }
+              }
+              
+              .active-underline {
+                width: 60px;
+                height: 2px;
+                background: linear-gradient(90deg, #00e5ff, #2979ff);
+                border-radius: 3px;
+                position: absolute;
+                bottom: -8px;
+                
+                @include responsive(md) {
+                  width: 40px;
+                }
+              }
+            }
+            
+            &.center {
+              transform: translateX(0) translateZ(40px) scale(1.1);
+              z-index: 3;
+              opacity: 1;
+              color: #00e5ff;
+              font-weight: 600;
+              
+              .option-icon {
+                opacity: 1;
+              }
+            }
+            
+            &.left {
+              transform: translateX(-240px) translateZ(-20px) rotateY(10deg) scale(0.9);
+              
+              @include responsive(lg) {
+                transform: translateX(-180px) translateZ(-20px) rotateY(10deg) scale(0.9);
+              }
+              
+              @include responsive(md) {
+                transform: translateX(-120px) translateZ(-20px) rotateY(10deg) scale(0.85);
+              }
+            }
+            
+            &.right {
+              transform: translateX(240px) translateZ(-20px) rotateY(-10deg) scale(0.9);
+              
+              @include responsive(lg) {
+                transform: translateX(180px) translateZ(-20px) rotateY(-10deg) scale(0.9);
+              }
+              
+              @include responsive(md) {
+                transform: translateX(120px) translateZ(-20px) rotateY(-10deg) scale(0.85);
+              }
+            }
+            
+            &.far-left {
+              transform: translateX(-450px) translateZ(-50px) rotateY(25deg) scale(0.7);
+              
+              @include responsive(lg) {
+                transform: translateX(-320px) translateZ(-40px) rotateY(20deg) scale(0.75);
+              }
+              
+              @include responsive(md) {
+                display: none;
+              }
+            }
+            
+            &.far-right {
+              transform: translateX(450px) translateZ(-50px) rotateY(-25deg) scale(0.7);
+              
+              @include responsive(lg) {
+                transform: translateX(320px) translateZ(-40px) rotateY(-20deg) scale(0.75);
+              }
+              
+              @include responsive(md) {
+                display: none;
+              }
+            }
+          }
+        }
+      }
+      
+      // User profile
+      .support-user-profile {
+        position: relative;
+        z-index: 20;
+        
+        @include responsive(md) {
+          margin-left: auto;
+        }
+        
+        .support-profile-button {
+          display: flex;
+          align-items: center;
+          background: rgba(0, 0, 0, 0.2);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 8px;
+          padding: 0.5rem 0.75rem 0.5rem 0.5rem;
+          cursor: pointer;
+          
+          .support-avatar {
+            position: relative;
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, #36D1DC, #5B86E5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.75rem;
+            
+            @include responsive(md) {
+              margin-right: 0;
+            }
+            
+            .support-avatar-text {
+              font-size: 0.95rem;
+              font-weight: 600;
+              color: white;
+            }
+            
+            .support-avatar-status {
+              position: absolute;
+              bottom: -2px;
+              right: -2px;
+              width: 10px;
+              height: 10px;
+              border-radius: 50%;
+              border: 2px solid #080f28;
+              
+              &.online {
+                background: #4CAF50;
+              }
+            }
+          }
+          
+          .support-profile-info {
+            margin-right: 0.5rem;
+            
+            @include responsive(md) {
+              display: none;
+            }
+            
+            .support-user-name {
+              font-size: 0.95rem;
+              font-weight: 600;
+              color: white;
+              margin-bottom: 0.1rem;
+            }
+            
+            .support-user-role {
+              font-size: 0.75rem;
+              color: rgba(255, 255, 255, 0.6);
+            }
+          }
+        }
+        
+        // User dropdown menu
+        .support-user-menu {
+          position: absolute;
+          top: calc(100% + 0.75rem);
+          right: 0;
+          width: 320px;
+          background: rgba(8, 15, 30, 0.97);
+          backdrop-filter: blur(20px);
+          border-radius: 12px;
+          box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          overflow: hidden;
+          z-index: 100;
+          
+          @include responsive(sm) {
+            width: 280px;
+            right: -10px;
+          }
+          
+          @include responsive(xs) {
+            width: calc(100vw - 30px);
+          }
+          
+          .support-menu-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            
+            .support-user-info {
+              display: flex;
+              align-items: center;
+              gap: 1rem;
+              
+              .support-user-avatar {
+                width: 60px;
+                height: 60px;
+                border-radius: 12px;
+                background: linear-gradient(135deg, #36D1DC, #5B86E5);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.4rem;
+                font-weight: 600;
+                color: white;
+                position: relative;
+                
+                .avatar-status {
+                  position: absolute;
+                  bottom: -3px;
+                  right: -3px;
+                  width: 14px;
+                  height: 14px;
+                  border-radius: 50%;
+                  border: 2px solid #080f28;
+                  
+                  &.online {
+                    background: #4CAF50;
+                  }
+                }
+              }
+              
+              .support-user-details {
+                h4 {
+                  margin: 0 0 0.3rem;
+                  font-size: 1.1rem;
+                  font-weight: 600;
+                  color: white;
+                }
+                
+                .support-user-email {
+                  display: block;
+                  font-size: 0.85rem;
+                  color: rgba(255, 255, 255, 0.6);
+                  margin-bottom: 0.5rem;
+                }
+                
+                .support-user-status {
+                  display: flex;
+                  align-items: center;
+                  gap: 0.4rem;
+                  font-size: 0.85rem;
+                  
+                  &.online {
+                    color: #4CAF50;
+                  }
+                  
+                  i {
+                    font-size: 0.6rem;
+                  }
+                }
+              }
+            }
+          }
+          
+          .support-menu-section {
+            padding: 0.75rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            
+            .section-title {
+              padding: 0.5rem 1.5rem;
+              font-size: 0.8rem;
+              color: rgba(0, 229, 255, 0.7);
+              text-transform: uppercase;
+              letter-spacing: 1px;
+              font-weight: 700;
+            }
+            
+            .support-menu-items {
+              padding: 0.25rem 0;
+              
+              .support-menu-item {
+                padding: 0.75rem 1.5rem;
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+                
+                i {
+                  width: 20px;
+                  margin-right: 1rem;
+                  font-size: 1rem;
+                  color: rgba(255, 255, 255, 0.7);
+                }
+                
+                span {
+                  flex: 1;
+                  font-size: 0.95rem;
+                  color: white;
+                }
+                
+                .support-notification-badge {
+                  min-width: 22px;
+                  height: 22px;
+                  border-radius: 11px;
+                  background: linear-gradient(135deg, #FF5E62, #FF9966);
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  color: white;
+                  font-size: 0.75rem;
+                  font-weight: 600;
+                  padding: 0 6px;
+                }
+                
+                &.toggle-item {
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                  
+                  .toggle-item-content {
+                    display: flex;
+                    align-items: center;
+                    
+                    i {
+                      margin-right: 1rem;
+                    }
+                  }
+                  
+                  .toggle-switch {
+                    width: 44px;
+                    height: 24px;
+                    background: rgba(255, 255, 255, 0.15);
+                    border-radius: 12px;
+                    position: relative;
+                    padding: 2px;
+                    
+                    .toggle-handle {
+                      width: 20px;
+                      height: 20px;
+                      border-radius: 50%;
+                      background: rgba(255, 255, 255, 0.8);
+                      position: absolute;
+                      left: 2px;
+                      top: 2px;
+                      
+                      &.active {
+                        left: calc(100% - 22px);
+                        background: #00e5ff;
+                      }
+                    }
+                  }
+                }
+                
+                &.logout {
+                  color: #FF5E62;
+                  
+                  i {
+                    color: #FF5E62;
+                  }
+                }
+              }
+            }
+          }
+          
+          .support-menu-footer {
+            background: rgba(8, 15, 30, 0.5);
+            padding: 0.75rem 0;
+            
+            .version-info {
+              display: flex;
+              justify-content: space-between;
+              padding: 0.5rem 1.5rem;
+              font-size: 0.75rem;
+              color: rgba(255, 255, 255, 0.4);
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  // Main content area with welcome message
+  .main-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 0 2rem;
+    height: calc(100vh - 80px);
+    
+    @include responsive(lg) {
+      height: auto;
+      min-height: calc(100vh - 120px);
+      padding: 2rem 1.5rem;
+    }
+    
+    @include responsive(md) {
+      padding: 1.5rem 1rem;
+    }
+    
+    .welcome-container {
+      text-align: center;
+      max-width: 1200px;
+      margin-bottom: 2rem;
+      
+      .welcome-title {
+        font-size: 4.5rem;
+        margin-bottom: 1.8rem;
+        font-weight: 700;
+        line-height: 1.1;
+        opacity: 0;
+        transform: translateY(30px);
+        filter: blur(10px);
+        animation: titleFadeIn 1.2s cubic-bezier(0.23, 1, 0.32, 1) forwards;
+        animation-delay: 0.3s;
+        position: relative;
+        
+        @include responsive(lg) {
+          font-size: 3.5rem;
+          margin-bottom: 1.5rem;
+        }
+        
+        @include responsive(md) {
+          font-size: 3rem;
+          margin-bottom: 1.2rem;
+        }
+        
+        @include responsive(sm) {
+          font-size: 2.5rem;
+          margin-bottom: 1rem;
+        }
+        
+        .highlight {
+          color: #00e5ff;
+          animation: highlightGlow 3s infinite;
+        }
+        
+        .title-decoration {
+          position: absolute;
+          bottom: -10px;
+          left: 50%;
+          transform: translateX(-50%);
+          height: 3px;
+          background: linear-gradient(90deg, transparent, #00e5ff, transparent);
+          border-radius: 3px;
+          animation: decorationDraw 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+          animation-delay: 1s;
+        }
+      }
+      
+      .welcome-subtitle {
+        font-size: 1.6rem;
+        margin-bottom: 2rem;
+        opacity: 0;
+        transform: translateY(20px);
+        filter: blur(5px);
+        animation: subtitleFadeIn 1s ease forwards;
+        animation-delay: 0.5s;
+        
+        @include responsive(lg) {
+          font-size: 1.4rem;
+          margin-bottom: 1.5rem;
+        }
+        
+        @include responsive(md) {
+          font-size: 1.2rem;
+        }
+        
+        @include responsive(sm) {
+          font-size: 1rem;
+        }
+        
+        .cursor-blink {
+          display: inline-block;
+          color: #00e5ff;
+          animation: cursorBlink 1s infinite;
+          font-weight: 700;
+          margin-left: 5px;
+        }
+      }
+    }
+  }
+  
+  // States for transitions
+  &.transitioning {
+    .parallax-background {
+      transform: scale(1.05) !important;
+    }
+    
+    .main-content {
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.4s ease;
+    }
+  }
+}

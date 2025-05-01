@@ -1,0 +1,347 @@
+// Estilos específicos para la tarjeta de contactos de emergencia
+.emergency-contacts-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    }
+    
+    // Encabezado de la tarjeta
+    .card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      background: linear-gradient(to right, #f7f9fc, #edf2f7);
+      border-bottom: 1px solid #e2e8f0;
+      
+      .header-title {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        
+        i {
+          color: #3b82f6;
+          font-size: 18px;
+          background: rgba(59, 130, 246, 0.1);
+          width: 36px;
+          height: 36px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 8px;
+        }
+        
+        h3 {
+          margin: 0;
+          font-size: 16px;
+          font-weight: 600;
+          color: #1e293b;
+        }
+      }
+      
+      .add-button {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        background: rgba(16, 185, 129, 0.1);
+        border: none;
+        color: #10b981;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        
+        &:hover {
+          background: rgba(16, 185, 129, 0.2);
+          transform: translateY(-2px);
+        }
+        
+        &:active {
+          transform: translateY(0);
+        }
+        
+        i {
+          font-size: 14px;
+        }
+      }
+    }
+    
+    // Cuerpo de la tarjeta
+    .card-body {
+      padding: 20px;
+      
+      // Formulario de contacto
+      .contact-form {
+        background: #f8fafc;
+        border-radius: 8px;
+        padding: 16px;
+        border: 1px solid #e2e8f0;
+        
+        .form-row {
+          margin-bottom: 16px;
+          
+          label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 14px;
+            font-weight: 500;
+            color: #475569;
+          }
+          
+          input, select {
+            width: 100%;
+            padding: 10px 12px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            font-size: 14px;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+            
+            &:focus {
+              outline: none;
+              border-color: #3b82f6;
+              box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+            }
+          }
+        }
+        
+        .form-actions {
+          display: flex;
+          justify-content: flex-end;
+          gap: 12px;
+          margin-top: 20px;
+          
+          button {
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: 500;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            
+            &.cancel-btn {
+              background: white;
+              border: 1px solid #cbd5e1;
+              color: #64748b;
+              
+              &:hover {
+                background: #f1f5f9;
+                color: #334155;
+              }
+            }
+            
+            &.save-btn {
+              background: #3b82f6;
+              border: none;
+              color: white;
+              
+              &:hover:not(:disabled) {
+                background: #2563eb;
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+              }
+              
+              &:active:not(:disabled) {
+                transform: translateY(0);
+              }
+              
+              &:disabled {
+                background: #94a3b8;
+                cursor: not-allowed;
+                opacity: 0.7;
+              }
+            }
+          }
+        }
+      }
+      
+      // Lista de contactos
+      .contacts-list {
+        .contact-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 14px 16px;
+          background: white;
+          border: 1px solid #e2e8f0;
+          border-radius: 8px;
+          margin-bottom: 12px;
+          transition: all 0.2s ease;
+          
+          &:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            transform: translateY(-2px);
+          }
+          
+          .contact-details {
+            flex: 1;
+            
+            .contact-name {
+              font-weight: 600;
+              color: #1e293b;
+              font-size: 15px;
+              margin-bottom: 6px;
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              
+              i {
+                color: #3b82f6;
+                font-size: 14px;
+              }
+            }
+            
+            .contact-info {
+              display: flex;
+              gap: 16px;
+              
+              .contact-phone, .contact-relation {
+                display: flex;
+                align-items: center;
+                gap: 6px;
+                color: #64748b;
+                font-size: 14px;
+                
+                i {
+                  color: #94a3b8;
+                  font-size: 12px;
+                }
+              }
+            }
+          }
+          
+          .contact-actions {
+            display: flex;
+            gap: 8px;
+            
+            button {
+              width: 30px;
+              height: 30px;
+              border-radius: 6px;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              border: none;
+              cursor: pointer;
+              transition: all 0.2s ease;
+              
+              i {
+                font-size: 12px;
+              }
+              
+              &.edit-btn {
+                background: rgba(59, 130, 246, 0.1);
+                color: #3b82f6;
+                
+                &:hover {
+                  background: rgba(59, 130, 246, 0.2);
+                  transform: translateY(-2px);
+                }
+              }
+              
+              &.delete-btn {
+                background: rgba(239, 68, 68, 0.1);
+                color: #ef4444;
+                
+                &:hover {
+                  background: rgba(239, 68, 68, 0.2);
+                  transform: translateY(-2px);
+                }
+              }
+            }
+          }
+        }
+        
+        .add-more-btn {
+          width: 100%;
+          padding: 10px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 8px;
+          background: none;
+          border: 1px dashed #cbd5e1;
+          border-radius: 8px;
+          color: #3b82f6;
+          font-size: 14px;
+          font-weight: 500;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          
+          i {
+            font-size: 16px;
+          }
+          
+          &:hover {
+            background: rgba(59, 130, 246, 0.05);
+            border-color: #3b82f6;
+            transform: translateY(-2px);
+          }
+          
+          &:active {
+            transform: translateY(0);
+          }
+        }
+      }
+      
+      // Estado sin contactos
+      .no-contacts {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 30px 20px;
+        text-align: center;
+        
+        i {
+          font-size: 36px;
+          color: #cbd5e1;
+          margin-bottom: 16px;
+        }
+        
+        p {
+          color: #64748b;
+          margin-bottom: 20px;
+          font-size: 15px;
+        }
+        
+        .add-contact-btn {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 10px 16px;
+          background: #3b82f6;
+          color: white;
+          border: none;
+          border-radius: 8px;
+          font-weight: 500;
+          font-size: 14px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          
+          i {
+            font-size: 14px;
+            color: white;
+            margin: 0;
+          }
+          
+          &:hover {
+            background: #2563eb;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+          }
+          
+          &:active {
+            transform: translateY(0);
+          }
+        }
+      }
+    }
+  }

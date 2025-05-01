@@ -1,0 +1,831 @@
+// Enhanced SignaturePad.scss
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+// Variables
+$primary-color: #4361ee;
+$primary-gradient: linear-gradient(135deg, #4361ee, #3a0ca3);
+$secondary-color: #4cc9f0;
+$accent-color: #f72585;
+$success-color: #10b981;
+$warning-color: #f59e0b;
+$danger-color: #ef4444;
+$light-bg: #f8fafc;
+$white: #ffffff;
+$card-shadow: 0 8px 20px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.02);
+$transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+.signature-pad {
+  width: 100%;
+  margin-bottom: 25px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: $card-shadow;
+  overflow: hidden;
+  border: 1px solid rgba(226, 232, 240, 0.7);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  transition: $transition;
+  
+  &:hover {
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08), 0 6px 16px rgba(0, 0, 0, 0.04);
+  }
+  
+  &.has-content {
+    border-color: rgba(67, 97, 238, 0.4);
+  }
+  
+  .signature-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.7);
+    background: $light-bg;
+    
+    .signature-title {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 700;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      
+      i {
+        color: $primary-color;
+        font-size: 14px;
+      }
+    }
+    
+    .signature-options {
+      .upload-toggle {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+        
+        .toggle-switch {
+          position: relative;
+          display: inline-block;
+          width: 40px;
+          height: 20px;
+          
+          input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+            
+            &:checked + .toggle-slider {
+              background-color: rgba(67, 97, 238, 0.5);
+              
+              &:before {
+                transform: translateX(20px);
+                background-color: $primary-color;
+              }
+            }
+            
+            &:disabled + .toggle-slider {
+              opacity: 0.5;
+              cursor: not-allowed;
+            }
+          }
+          
+          .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #e2e8f0;
+            border-radius: 20px;
+            transition: 0.3s;
+            
+            &:before {
+              position: absolute;
+              content: "";
+              height: 16px;
+              width: 16px;
+              left: 2px;
+              bottom: 2px;
+              background-color: #94a3b8;
+              border-radius: 50%;
+              transition: 0.3s;
+            }
+          }
+        }
+        
+        .toggle-label {
+          font-size: 14px;
+          font-weight: 500;
+          color: #64748b;
+          user-select: none;
+        }
+      }
+    }
+  }
+  
+  .signature-area {
+    position: relative;
+    height: 200px;
+    border-bottom: 1px solid rgba(226, 232, 240, 0.7);
+    background: rgba(248, 250, 252, 0.5);
+    transition: $transition;
+    
+    &.animating {
+      background: rgba(248, 250, 252, 0.8);
+    }
+    
+    .canvas-container {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      
+      .signature-canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        cursor: crosshair;
+        z-index: 2;
+        transition: background-color 0.3s ease;
+        
+        &.has-signature {
+          background-color: rgba(248, 250, 252, 0.2);
+        }
+        
+        &.is-drawing {
+          cursor: crosshair;
+          background-color: rgba(248, 250, 252, 0.8);
+        }
+      }
+      
+      .canvas-placeholder {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 8px;
+        color: #94a3b8;
+        z-index: 1;
+        pointer-events: none;
+        animation: fadeIn 0.5s ease-in-out;
+        
+        i {
+          font-size: 28px;
+          opacity: 0.6;
+        }
+        
+        span {
+          font-size: 15px;
+          font-weight: 500;
+        }
+      }
+    }
+    
+    .signature-guidelines {
+      position: absolute;
+      bottom: 40px;
+      right: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      z-index: 1;
+      
+      .guideline-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        background: rgba(255, 255, 255, 0.8);
+        padding: 6px 10px;
+        border-radius: 6px;
+        font-size: 12px;
+        color: #64748b;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        animation: fadeInRight 0.5s ease-in-out forwards;
+        opacity: 0;
+        transform: translateX(20px);
+        
+        &:nth-child(1) {
+          animation-delay: 0.2s;
+        }
+        
+        &:nth-child(2) {
+          animation-delay: 0.4s;
+        }
+        
+        i {
+          color: $primary-color;
+          font-size: 12px;
+        }
+      }
+    }
+    
+    .upload-area {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100%;
+      gap: 16px;
+      padding: 20px;
+      
+      .upload-icon {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        background: rgba(67, 97, 238, 0.1);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        animation: pulse 2s infinite;
+        
+        i {
+          font-size: 24px;
+          color: $primary-color;
+        }
+      }
+      
+      .upload-text {
+        text-align: center;
+        
+        h4 {
+          margin: 0 0 6px;
+          font-size: 16px;
+          font-weight: 600;
+          color: #334155;
+        }
+        
+        p {
+          margin: 0;
+          font-size: 14px;
+          color: #64748b;
+        }
+      }
+      
+      .upload-btn {
+        padding: 10px 20px;
+        background: $primary-color;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: $transition;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 0 4px 12px rgba(67, 97, 238, 0.25);
+        
+        i {
+          font-size: 14px;
+        }
+        
+        &:hover {
+          background: darken($primary-color, 5%);
+          transform: translateY(-2px);
+          box-shadow: 0 6px 16px rgba(67, 97, 238, 0.35);
+        }
+        
+        &:disabled {
+          background: #94a3b8;
+          cursor: not-allowed;
+          transform: none;
+          box-shadow: none;
+        }
+      }
+      
+      .file-preview {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        background: white;
+        padding: 16px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        width: 90%;
+        max-width: 400px;
+        animation: fadeInUp 0.5s ease-in-out;
+        
+        i {
+          font-size: 28px;
+          color: $primary-color;
+          background: rgba(67, 97, 238, 0.1);
+          width: 50px;
+          height: 50px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 10px;
+        }
+        
+        .file-info {
+          flex: 1;
+          overflow: hidden;
+          
+          .file-name {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 4px;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
+          }
+          
+          .file-status {
+            font-size: 12px;
+            color: $success-color;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            
+            &:before {
+              content: "";
+              display: inline-block;
+              width: 6px;
+              height: 6px;
+              border-radius: 50%;
+              background-color: $success-color;
+            }
+          }
+        }
+        
+        .change-file-btn {
+          width: 32px;
+          height: 32px;
+          border-radius: 6px;
+          background: #f1f5f9;
+          border: none;
+          color: #64748b;
+          cursor: pointer;
+          transition: $transition;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          
+          i {
+            font-size: 14px;
+            color: #64748b;
+            background: transparent;
+            width: auto;
+            height: auto;
+          }
+          
+          &:hover {
+            background: #e2e8f0;
+            color: #334155;
+          }
+          
+          &:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+          }
+        }
+      }
+    }
+    
+    .signature-line {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(to right, rgba(67, 97, 238, 0.4), rgba(67, 97, 238, 0.1));
+      z-index: 3;
+      
+      .signature-label {
+        position: absolute;
+        bottom: 5px;
+        left: 20px;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 12px;
+        font-weight: 600;
+        color: #94a3b8;
+        z-index: 3;
+      }
+    }
+  }
+  
+  .signature-actions {
+    padding: 12px 20px;
+    display: flex;
+    justify-content: flex-end;
+    background: $light-bg;
+    
+    .clear-btn {
+      padding: 8px 16px;
+      background-color: rgba(239, 68, 68, 0.1);
+      color: $danger-color;
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      border-radius: 8px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: $transition;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      
+      i {
+        font-size: 14px;
+      }
+      
+      &:hover {
+        background-color: $danger-color;
+        color: white;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(239, 68, 68, 0.2);
+      }
+      
+      &.disabled {
+        background-color: #f1f5f9;
+        color: #94a3b8;
+        border-color: #e2e8f0;
+        cursor: not-allowed;
+        
+        &:hover {
+          transform: none;
+          box-shadow: none;
+        }
+      }
+    }
+  }
+  
+  &.disabled {
+    opacity: 0.7;
+    pointer-events: none;
+    
+    .signature-area {
+      background-color: rgba(241, 245, 249, 0.3);
+      border: 1px dashed rgba(148, 163, 184, 0.3);
+      
+      .signature-canvas {
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+// Animations
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes fadeInUp {
+  from { 
+    opacity: 0; 
+    transform: translateY(20px);
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeInRight {
+  to { 
+    opacity: 1; 
+    transform: translateX(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(67, 97, 238, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(67, 97, 238, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(67, 97, 238, 0);
+  }
+}
+
+// Responsive styles
+@media (max-width: 992px) {
+  .signature-pad {
+    .signature-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+      
+      .signature-options {
+        width: 100%;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .signature-pad {
+    margin-bottom: 16px;
+    
+    .signature-header {
+      padding: 12px 16px;
+      
+      .signature-title {
+        font-size: 15px;
+      }
+      
+      .signature-options {
+        .upload-toggle {
+          .toggle-label {
+            font-size: 12px;
+          }
+        }
+      }
+    }
+    
+    .signature-area {
+      height: 180px;
+      
+      .upload-area {
+        padding: 16px;
+        gap: 12px;
+        
+        .upload-icon {
+          width: 50px;
+          height: 50px;
+          
+          i {
+            font-size: 20px;
+          }
+        }
+        
+        .upload-text {
+          h4 {
+            font-size: 15px;
+          }
+          
+          p {
+            font-size: 12px;
+          }
+        }
+        
+        .upload-btn {
+          padding: 8px 16px;
+          font-size: 13px;
+        }
+        
+        .file-preview {
+          padding: 12px;
+          gap: 12px;
+          
+          i {
+            font-size: 24px;
+            width: 40px;
+            height: 40px;
+          }
+          
+          .file-info {
+            .file-name {
+              font-size: 13px;
+            }
+            
+            .file-status {
+              font-size: 11px;
+            }
+          }
+        }
+      }
+      
+      .signature-guidelines {
+        bottom: 35px;
+        right: 12px;
+        
+        .guideline-item {
+          padding: 4px 8px;
+          font-size: 11px;
+          
+          i {
+            font-size: 11px;
+          }
+        }
+      }
+    }
+    
+    .signature-actions {
+      padding: 10px 16px;
+      
+      .clear-btn {
+        padding: 6px 12px;
+        font-size: 13px;
+        
+        i {
+          font-size: 12px;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .signature-pad {
+    .signature-header {
+      .signature-options {
+        .upload-toggle {
+          .toggle-label {
+            max-width: 200px;
+            line-height: 1.3;
+          }
+        }
+      }
+    }
+    
+    .signature-area {
+      height: 160px;
+      
+      .upload-area {
+        .upload-text p {
+          display: none;
+        }
+        
+        .file-preview {
+          width: 100%;
+        }
+      }
+      
+      .signature-guidelines {
+        display: none;
+      }
+    }
+  }
+}
+
+// Additional enhancements for better user experience
+.signature-pad {
+  &:focus-within {
+    box-shadow: 0 8px 24px rgba(67, 97, 238, 0.1), 0 4px 12px rgba(67, 97, 238, 0.05);
+    border-color: rgba(67, 97, 238, 0.5);
+  }
+  
+  .signature-area {
+    // Add drawing guidance lines
+    position: relative;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: 80%;
+      left: 20px;
+      right: 20px;
+      height: 1px;
+      background: rgba(226, 232, 240, 0.7);
+      z-index: 1;
+      pointer-events: none;
+    }
+    
+    // Add pen effect for canvas
+    .canvas-container {
+      .signature-canvas {
+        &.is-drawing::after {
+          content: '';
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          top: 0;
+          left: 0;
+          background-image: 
+            radial-gradient(circle at var(--x, 50%) var(--y, 50%), 
+              rgba(67, 97, 238, 0.1) 0%, 
+              rgba(67, 97, 238, 0) 50%);
+          pointer-events: none;
+          z-index: 2;
+          opacity: 0.7;
+          transition: opacity 0.5s ease;
+        }
+      }
+    }
+  }
+  
+  // Enhanced animations for actions
+  .signature-actions {
+    .clear-btn {
+      position: relative;
+      overflow: hidden;
+      
+      &:not(.disabled)::after {
+        content: "";
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 0;
+        height: 0;
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        transition: width 0.6s ease, height 0.6s ease;
+      }
+      
+      &:not(.disabled):active::after {
+        width: 200%;
+        height: 200%;
+      }
+    }
+  }
+  
+  // States for dark mode (as an option)
+  &.dark-mode {
+    background: #1f2937;
+    border-color: rgba(55, 65, 81, 0.7);
+    
+    .signature-header {
+      background: #111827;
+      border-color: rgba(55, 65, 81, 0.7);
+      
+      .signature-title {
+        color: #f1f5f9;
+      }
+      
+      .signature-options {
+        .upload-toggle {
+          .toggle-label {
+            color: #cbd5e1;
+          }
+          
+          .toggle-switch {
+            .toggle-slider {
+              background-color: #4b5563;
+              
+              &:before {
+                background-color: #94a3b8;
+              }
+            }
+            
+            input:checked + .toggle-slider {
+              background-color: rgba(79, 70, 229, 0.5);
+              
+              &:before {
+                background-color: #818cf8;
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    .signature-area {
+      background: rgba(30, 41, 59, 0.5);
+      
+      .canvas-container {
+        .signature-canvas {
+          background-color: transparent;
+          
+          &.has-signature {
+            background-color: rgba(30, 41, 59, 0.2);
+          }
+          
+          &.is-drawing {
+            background-color: rgba(30, 41, 59, 0.8);
+          }
+        }
+        
+        .canvas-placeholder {
+          color: #64748b;
+        }
+      }
+      
+      .upload-area {
+        .upload-text {
+          h4 {
+            color: #e2e8f0;
+          }
+          
+          p {
+            color: #94a3b8;
+          }
+        }
+        
+        .file-preview {
+          background: #1e293b;
+          
+          .file-info {
+            .file-name {
+              color: #e2e8f0;
+            }
+          }
+        }
+      }
+      
+      .signature-guidelines {
+        .guideline-item {
+          background: rgba(30, 41, 59, 0.8);
+          color: #cbd5e1;
+        }
+      }
+    }
+    
+    .signature-actions {
+      background: #111827;
+    }
+  }
+}

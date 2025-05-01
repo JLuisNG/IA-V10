@@ -1,0 +1,250 @@
+// styles/developer/Patients/InfoPaciente/NotesAndSign/MedicationTab.scss
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+.medication-tab {
+  .tab-content {
+    padding: 10px 0;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    
+    .section-title {
+      margin: 0 0 24px;
+      font-size: 18px;
+      font-weight: 700;
+      color: #1e293b;
+      position: relative;
+      
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -6px;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(
+          90deg,
+          #3b82f6,
+          #60a5fa
+        );
+        border-radius: 3px;
+      }
+    }
+    
+    .subsection-title {
+      margin: 0 0 16px;
+      font-size: 16px;
+      font-weight: 600;
+      color: #334155;
+    }
+    
+    .medication-changed-section {
+      margin-bottom: 24px;
+      
+      .radio-options {
+        display: flex;
+        gap: 24px;
+        margin-top: 8px;
+        
+        .radio-option {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          
+          input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            accent-color: #3b82f6;
+            cursor: pointer;
+          }
+          
+          label {
+            font-size: 15px;
+            color: #334155;
+            cursor: pointer;
+          }
+        }
+      }
+    }
+    
+    .additional-info-section {
+      margin-bottom: 28px;
+      
+      textarea {
+        width: 100%;
+        padding: 12px 16px;
+        border-radius: 8px;
+        border: 1px solid rgba(203, 213, 225, 0.7);
+        background: white;
+        font-size: 15px;
+        color: #334155;
+        resize: vertical;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        
+        &::placeholder {
+          color: #94a3b8;
+        }
+        
+        &:focus {
+          outline: none;
+          border-color: rgba(59, 130, 246, 0.5);
+          box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+        }
+      }
+    }
+    
+    .medication-list-btn {
+      margin-bottom: 28px;
+      padding: 12px 24px;
+      background: #3b82f6;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 
+        0 4px 12px rgba(59, 130, 246, 0.2),
+        0 2px 6px rgba(59, 130, 246, 0.1);
+      
+      i {
+        font-size: 16px;
+      }
+      
+      &:hover {
+        background: #2563eb;
+        transform: translateY(-2px);
+        box-shadow: 
+          0 8px 16px rgba(59, 130, 246, 0.3),
+          0 4px 8px rgba(59, 130, 246, 0.15);
+      }
+    }
+    
+    .medication-summary {
+      background: white;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      padding: 20px;
+      border: 1px solid rgba(226, 232, 240, 0.7);
+      border-left: 4px solid #3b82f6;
+      
+      .summary-content {
+        .medications-count {
+          margin-bottom: 16px;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          
+          .count {
+            font-size: 24px;
+            font-weight: 700;
+            color: #3b82f6;
+          }
+          
+          .label {
+            font-size: 15px;
+            color: #64748b;
+          }
+        }
+        
+        .medication-pills {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          margin-bottom: 16px;
+          
+          .medication-pill {
+            padding: 6px 12px;
+            background: rgba(219, 234, 254, 0.5);
+            border: 1px solid rgba(147, 197, 253, 0.3);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            
+            .med-name {
+              font-size: 13px;
+              font-weight: 600;
+              color: #1e40af;
+            }
+            
+            .med-dosage {
+              font-size: 12px;
+              color: #3b82f6;
+            }
+          }
+        }
+        
+        .medication-alerts {
+          .alert-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: rgba(254, 226, 226, 0.5);
+            border: 1px solid rgba(252, 165, 165, 0.3);
+            border-radius: 8px;
+            
+            i {
+              color: #dc2626;
+              font-size: 14px;
+            }
+            
+            span {
+              font-size: 13px;
+              font-weight: 600;
+              color: #b91c1c;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Responsive styles
+@media (max-width: 768px) {
+  .medication-tab {
+    .tab-content {
+      .section-title {
+        font-size: 16px;
+      }
+      
+      .subsection-title {
+        font-size: 15px;
+      }
+      
+      .medication-changed-section {
+        .radio-options {
+          gap: 16px;
+          
+          .radio-option {
+            label {
+              font-size: 14px;
+            }
+          }
+        }
+      }
+      
+      .medication-list-btn {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .medication-tab {
+    .tab-content {
+      .medication-changed-section {
+        .radio-options {
+          flex-direction: column;
+          gap: 8px;
+        }
+      }
+    }
+  }
+}

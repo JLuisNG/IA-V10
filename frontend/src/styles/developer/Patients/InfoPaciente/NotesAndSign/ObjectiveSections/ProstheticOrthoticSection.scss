@@ -1,0 +1,579 @@
+// Enhanced ProstheticOrthoticSection.scss
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+// Variables
+$primary-color: #4361ee;
+$primary-light: rgba(67, 97, 238, 0.1);
+$secondary-color: #f59e0b;
+$secondary-light: rgba(245, 158, 11, 0.1);
+$prosthetic-color: #8b5cf6;
+$prosthetic-light: rgba(139, 92, 246, 0.1);
+$orthotic-color: #10b981;
+$orthotic-light: rgba(16, 185, 129, 0.1);
+$danger-color: #ef4444;
+$danger-light: rgba(239, 68, 68, 0.1);
+$text-dark: #1e293b;
+$text-medium: #475569;
+$text-light: #64748b;
+$text-lighter: #94a3b8;
+$border-light: rgba(226, 232, 240, 0.8);
+$bg-light: #f8fafc;
+$white: #ffffff;
+$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$shadow-hover: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+$shadow-focus: 0 0 0 3px rgba(99, 102, 241, 0.2);
+$transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+$border-radius-sm: 8px;
+$border-radius: 12px;
+$border-radius-lg: 16px;
+
+.prosthetic-orthotic-section {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background-color: $white;
+  border-radius: $border-radius-lg;
+  border: 1px solid $border-light;
+  padding: 24px;
+  box-shadow: $shadow-sm;
+  margin-bottom: 30px;
+  transition: $transition;
+  
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+  
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    
+    .section-title {
+      margin: 0;
+      font-size: 20px;
+      font-weight: 700;
+      color: $text-dark;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      position: relative;
+      
+      i {
+        font-size: 20px;
+        color: $secondary-color;
+        background-color: $secondary-light;
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: $border-radius-sm;
+      }
+      
+      &::after {
+        content: '';
+        position: absolute;
+        bottom: -8px;
+        left: 0;
+        width: 60px;
+        height: 3px;
+        background: linear-gradient(
+          90deg,
+          $secondary-color,
+          darken($secondary-color, 10%)
+        );
+        border-radius: 3px;
+      }
+    }
+    
+    .optional-badge {
+      font-size: 12px;
+      font-weight: 600;
+      color: $text-lighter;
+      background-color: $bg-light;
+      padding: 6px 12px;
+      border-radius: 20px;
+      border: 1px solid $border-light;
+    }
+  }
+  
+  .content-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-bottom: 30px;
+    
+    .prosthetic-column, .orthotic-column {
+      background: $bg-light;
+      border-radius: $border-radius;
+      border: 1px solid $border-light;
+      overflow: hidden;
+      transition: $transition;
+      box-shadow: $shadow-sm;
+      
+      &:hover {
+        transform: translateY(-3px);
+        box-shadow: $shadow-md;
+      }
+    }
+    
+    .prosthetic-column {
+      border-top: 4px solid $prosthetic-color;
+    }
+    
+    .orthotic-column {
+      border-top: 4px solid $orthotic-color;
+    }
+    
+    .column-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 20px;
+      background: $white;
+      border-bottom: 1px solid $border-light;
+      
+      .title-icon {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 10px;
+        font-size: 16px;
+        
+        .prosthetic-column & {
+          background-color: $prosthetic-light;
+          color: $prosthetic-color;
+        }
+        
+        .orthotic-column & {
+          background-color: $orthotic-light;
+          color: $orthotic-color;
+        }
+      }
+      
+      .column-title {
+        font-size: 16px;
+        font-weight: 700;
+        color: $text-medium;
+        margin: 0;
+      }
+    }
+    
+    .prosthetic-list, .orthotic-list {
+      padding: 20px;
+      min-height: 180px;
+      max-height: 300px;
+      overflow-y: auto;
+      
+      &::-webkit-scrollbar {
+        width: 6px;
+      }
+      
+      &::-webkit-scrollbar-track {
+        background: rgba(241, 245, 249, 0.4);
+        border-radius: 10px;
+      }
+      
+      &::-webkit-scrollbar-thumb {
+        background: rgba(148, 163, 184, 0.3);
+        border-radius: 10px;
+        
+        &:hover {
+          background: rgba(148, 163, 184, 0.5);
+        }
+      }
+      
+      .empty-state {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 30px 0;
+        color: $text-lighter;
+        
+        i {
+          font-size: 24px;
+          margin-bottom: 12px;
+          opacity: 0.6;
+        }
+        
+        p {
+          margin: 0;
+          font-size: 14px;
+          font-weight: 500;
+        }
+      }
+      
+      .item-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 12px 16px;
+        background: $white;
+        border-radius: $border-radius-sm;
+        margin-bottom: 12px;
+        box-shadow: $shadow-sm;
+        border: 1px solid $border-light;
+        transition: $transition;
+        animation: fadeIn 0.3s ease-out;
+        
+        &:last-child {
+          margin-bottom: 0;
+        }
+        
+        &:hover {
+          box-shadow: $shadow-md;
+          transform: translateY(-2px);
+          
+          .remove-btn {
+            opacity: 1;
+          }
+        }
+        
+        .item-content {
+          display: flex;
+          align-items: center;
+          gap: 14px;
+          
+          .item-icon {
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px;
+            font-size: 14px;
+            
+            .prosthetic-column & {
+              background-color: $prosthetic-light;
+              color: $prosthetic-color;
+            }
+            
+            .orthotic-column & {
+              background-color: $orthotic-light;
+              color: $orthotic-color;
+            }
+          }
+        }
+        
+        .item-details {
+          display: flex;
+          flex-direction: column;
+          gap: 4px;
+          
+          .item-type {
+            font-size: 14px;
+            font-weight: 600;
+            color: $text-dark;
+          }
+          
+          .item-usage {
+            font-size: 12px;
+            color: $text-light;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            
+            i {
+              font-size: 10px;
+            }
+          }
+        }
+        
+        .remove-btn {
+          background: transparent;
+          border: none;
+          color: $text-lighter;
+          font-size: 14px;
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: $transition;
+          opacity: 0.5;
+          
+          &:hover {
+            background: $danger-light;
+            color: $danger-color;
+            transform: rotate(90deg);
+          }
+        }
+      }
+    }
+    
+    .add-item-section {
+      padding: 20px;
+      border-top: 1px solid $border-light;
+      background: rgba(255, 255, 255, 0.6);
+      
+      .dropdown-row {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 14px;
+        
+        .select-container {
+          flex: 1;
+          position: relative;
+          
+          .prefix-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 14px;
+            color: $text-lighter;
+            pointer-events: none;
+          }
+          
+          .prosthetic-column & .prefix-icon {
+            color: $prosthetic-color;
+          }
+          
+          .orthotic-column & .prefix-icon {
+            color: $orthotic-color;
+          }
+        }
+        
+        .type-dropdown, .usage-dropdown {
+          width: 100%;
+          padding: 10px 14px 10px 38px;
+          border-radius: $border-radius-sm;
+          border: 1px solid $border-light;
+          background: $white;
+          font-size: 14px;
+          color: $text-dark;
+          transition: $transition;
+          appearance: none;
+          background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+          background-repeat: no-repeat;
+          background-position: right 12px center;
+          background-size: 16px;
+          padding-right: 40px;
+          
+          &:focus {
+            outline: none;
+            box-shadow: $shadow-focus;
+            
+            .prosthetic-column & {
+              border-color: $prosthetic-color;
+            }
+            
+            .orthotic-column & {
+              border-color: $orthotic-color;
+            }
+          }
+          
+          &:hover {
+            border-color: $text-lighter;
+          }
+          
+          option {
+            padding: 8px;
+          }
+        }
+        
+        .clear-field-btn {
+          background: $bg-light;
+          border: 1px solid $border-light;
+          color: $text-light;
+          width: 38px;
+          height: 38px;
+          border-radius: $border-radius-sm;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: $transition;
+          flex-shrink: 0;
+          
+          &:hover {
+            background: $text-lighter;
+            color: $white;
+            transform: rotate(180deg);
+          }
+        }
+      }
+      
+      .add-btn {
+        width: 100%;
+        padding: 12px 16px;
+        color: $white;
+        border: none;
+        border-radius: $border-radius-sm;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: $transition;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        
+        i {
+          font-size: 12px;
+        }
+        
+        &:hover {
+          transform: translateY(-2px);
+          box-shadow: $shadow-md;
+        }
+        
+        &.prosthetic-add {
+          background: linear-gradient(135deg, $prosthetic-color, darken($prosthetic-color, 10%));
+          
+          &:hover {
+            background: linear-gradient(135deg, darken($prosthetic-color, 5%), darken($prosthetic-color, 15%));
+          }
+        }
+        
+        &.orthotic-add {
+          background: linear-gradient(135deg, $orthotic-color, darken($orthotic-color, 10%));
+          
+          &:hover {
+            background: linear-gradient(135deg, darken($orthotic-color, 5%), darken($orthotic-color, 15%));
+          }
+        }
+      }
+    }
+  }
+  
+  .additional-info-container {
+    background: $bg-light;
+    border-radius: $border-radius;
+    padding: 20px;
+    border: 1px solid $border-light;
+    
+    .info-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+      
+      i {
+        color: $primary-color;
+        font-size: 16px;
+      }
+      
+      .label {
+        font-size: 14px;
+        font-weight: 600;
+        color: $text-medium;
+      }
+    }
+    
+    .textarea-container {
+      position: relative;
+      
+      textarea {
+        width: 100%;
+        padding: 14px 16px;
+        border-radius: $border-radius-sm;
+        border: 1px solid $border-light;
+        background: $white;
+        font-size: 14px;
+        color: $text-dark;
+        resize: vertical;
+        transition: $transition;
+        min-height: 100px;
+        
+        &::placeholder {
+          color: $text-lighter;
+        }
+        
+        &:focus {
+          outline: none;
+          border-color: $primary-color;
+          box-shadow: $shadow-focus;
+        }
+      }
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from { 
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Responsive styles
+@media (max-width: 992px) {
+  .prosthetic-orthotic-section {
+    padding: 20px;
+    
+    .content-grid {
+      grid-template-columns: 1fr;
+      gap: 20px;
+      
+      .prosthetic-column, .orthotic-column {
+        &:hover {
+          transform: none;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .prosthetic-orthotic-section {
+    padding: 16px;
+    
+    .section-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+      
+      .optional-badge {
+        align-self: flex-start;
+      }
+    }
+    
+    .add-item-section {
+      .dropdown-row {
+        flex-direction: column;
+        gap: 10px;
+        
+        .clear-field-btn {
+          align-self: flex-end;
+          width: 100%;
+          margin-top: 5px;
+        }
+      }
+      
+      .add-btn {
+        span {
+          display: none;
+        }
+        
+        i {
+          font-size: 16px;
+        }
+      }
+    }
+    
+    .additional-info-container {
+      .info-header {
+        .label {
+          font-size: 13px;
+        }
+      }
+      
+      .textarea-container {
+        textarea {
+          padding: 12px;
+          font-size: 13px;
+        }
+      }
+    }
+  }
+}

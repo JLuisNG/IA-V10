@@ -1,0 +1,2813 @@
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+// Variables avanzadas con sistema de color refinado
+:root {
+  // Sistema de colores avanzado con paletas completas
+  --color-primary-50: #eef5ff;
+  --color-primary-100: #d9e8ff;
+  --color-primary-200: #bcd6ff;
+  --color-primary-300: #8ebaff;
+  --color-primary-400: #5895ff;
+  --color-primary-500: #2c7be5; // Color principal
+  --color-primary-600: #1a64d4;
+  --color-primary-700: #1550b2;
+  --color-primary-800: #174293;
+  --color-primary-900: #0a1e3c;
+  
+  // Colores secundarios
+  --color-success-light: #d1fae5;
+  --color-success: #10b981;
+  --color-success-dark: #047857;
+  
+  --color-warning-light: #fef3c7;
+  --color-warning: #f59e0b;
+  --color-warning-dark: #b45309;
+  
+  --color-danger-light: #fee2e2;
+  --color-danger: #ef4444;
+  --color-danger-dark: #b91c1c;
+  
+  --color-info-light: #dbeafe;
+  --color-info: #3b82f6;
+  --color-info-dark: #1d4ed8;
+  
+  // Gradientes premium
+  --gradient-blue-premium: linear-gradient(135deg, #2c7be5, #3a8ef7, #4facfe);
+  --gradient-blue-dark: linear-gradient(135deg, #174293, #0a1e3c);
+  --gradient-success: linear-gradient(135deg, #10b981, #34d399);
+  --gradient-warning: linear-gradient(135deg, #f59e0b, #fbbf24);
+  --gradient-danger: linear-gradient(135deg, #ef4444, #f87171);
+  --gradient-glass: linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));
+  
+  // Sombras avanzadas con capas
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-xl: 0 20px 40px rgba(0, 0, 0, 0.18);
+  --shadow-blue: 0 8px 30px rgba(44, 123, 229, 0.4);
+  --shadow-success: 0 8px 30px rgba(16, 185, 129, 0.3);
+  --shadow-warning: 0 8px 30px rgba(245, 158, 11, 0.3);
+  --shadow-danger: 0 8px 30px rgba(239, 68, 68, 0.3);
+  
+  // Efectos avanzados
+  --backdrop-blur: blur(20px);
+  --border-light: 1px solid rgba(255, 255, 255, 0.1);
+  --border-blue-glow: 1px solid rgba(44, 123, 229, 0.3);
+}
+
+// Mixins avanzados para efectos premium
+@mixin glass-morphism($opacity: 0.05, $blur: 20px, $border-color: rgba(255, 255, 255, 0.1)) {
+  background: rgba(255, 255, 255, $opacity);
+  backdrop-filter: blur($blur);
+  -webkit-backdrop-filter: blur($blur);
+  border: 1px solid $border-color;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+@mixin frosted-glass($bg-color: rgba(13, 28, 51, 0.7), $blur: 20px) {
+  background: $bg-color;
+  backdrop-filter: blur($blur);
+  -webkit-backdrop-filter: blur($blur);
+  border: var(--border-light);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+@mixin floating-element($intensity: 0.5) {
+  animation: floating #{3 + $intensity}s ease-in-out infinite;
+  
+  @keyframes floating {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-#{5 * $intensity}px); }
+    100% { transform: translateY(0px); }
+  }
+}
+
+@mixin interactive-scale($scale: 1.05) {
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  
+  &:hover {
+    transform: scale($scale);
+  }
+  
+  &:active {
+    transform: scale(#{$scale - 0.05});
+  }
+}
+
+@mixin card-3d-effect($intensity: 1) {
+  position: relative;
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transform-style: preserve-3d;
+  perspective: 1000px;
+  
+  &:hover {
+    transform: translateY(-#{6 * $intensity}px) rotateX(#{3 * $intensity}deg) rotateY(#{3 * $intensity}deg);
+    box-shadow: 
+      20px 20px 30px rgba(0, 0, 0, 0.1),
+      -5px -5px 30px rgba(255, 255, 255, 0.05);
+  }
+}
+
+@mixin enhanced-text-shadow($color: var(--color-primary-500)) {
+  text-shadow: 
+    0 0 5px rgba($color, 0.3),
+    0 0 10px rgba($color, 0.2),
+    0 0 20px rgba($color, 0.1);
+}
+
+@mixin button-glow($color: var(--color-primary-500)) {
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: radial-gradient(circle, rgba($color, 0.4) 0%, transparent 70%);
+    opacity: 0;
+    transform: scale(0.5);
+    transition: all 0.5s;
+    z-index: -1;
+  }
+  
+  &:hover::after {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@mixin tooltip {
+  position: relative;
+  
+  .tooltip {
+    position: absolute;
+    top: -40px;
+    left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    background: rgba(15, 23, 42, 0.9);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    white-space: nowrap;
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.3s ease;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    pointer-events: none;
+    z-index: 1000;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -5px;
+      left: 50%;
+      transform: translateX(-50%) rotate(45deg);
+      width: 10px;
+      height: 10px;
+      background: rgba(15, 23, 42, 0.9);
+    }
+  }
+  
+  &:hover .tooltip {
+    opacity: 1;
+    visibility: visible;
+    transform: translateX(-50%) translateY(0);
+  }
+}
+
+// Animaciones premium
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes shimmerEffect {
+  0% { background-position: -300% 0; }
+  100% { background-position: 300% 0; }
+}
+
+@keyframes blurryReveal {
+  0% { 
+    filter: blur(15px);
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  100% { 
+    filter: blur(0);
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes pulseAnimation {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes floatAnimation {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes shineEffect {
+  0% { transform: translateX(-100%) skewX(-15deg); }
+  100% { transform: translateX(200%) skewX(-15deg); }
+}
+
+@keyframes rippleEffect {
+  0% {
+    transform: scale(0);
+    opacity: 0.4;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideInFromRight {
+  from { 
+    transform: translateX(50px);
+    opacity: 0;
+  }
+  to { 
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromLeft {
+  from { 
+    transform: translateX(-50px);
+    opacity: 0;
+  }
+  to { 
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes slideInFromBottom {
+  from { 
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to { 
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes loadingDots {
+  0%, 100% {
+    opacity: 0.2;
+    transform: scale(0.8);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.2);
+  }
+}
+
+// Estilo principal para la página de detalles del paciente
+.patient-info-page {
+  min-height: 100vh;
+  position: relative;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: #344054;
+  overflow-x: hidden;
+  background-color: #0a1e3c;
+  
+  // Fondo con efecto de parallax avanzado
+  &::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('https://images.unsplash.com/photo-1560264280-88b68371db39?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80');
+    background-size: cover;
+    background-position: center;
+    z-index: -2;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: radial-gradient(circle at 100% 0%, rgba(10, 30, 60, 0.8) 0%, rgba(10, 30, 60, 0.95) 100%);
+    }
+  }
+  
+  // Header principal mejorado
+  .main-header {
+    width: 100%;
+    @include frosted-glass(rgba(6, 20, 40, 0.85), 25px);
+    padding: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    
+    .header-container {
+      max-width: 1800px;
+      margin: 0 auto;
+      padding: 0.85rem 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      
+      // Logo con efectos mejorados
+      .logo-container {
+        display: flex;
+        align-items: center;
+        gap: 1.5rem;
+        
+        .logo-wrapper {
+          position: relative;
+          
+          .logo {
+            height: 50px;
+            border-radius: 12px;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.2));
+            
+            &:hover {
+              transform: scale(1.08) rotate(2deg);
+              filter: drop-shadow(0 0 15px rgba(255, 255, 255, 0.4));
+            }
+          }
+          
+          .logo-glow {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border-radius: 12px;
+            opacity: 0;
+            background: radial-gradient(circle, rgba(255, 255, 255, 0.8) 0%, transparent 70%);
+            mix-blend-mode: overlay;
+            transition: opacity 0.3s;
+          }
+          
+          &:hover .logo-glow {
+            opacity: 0.5;
+          }
+        }
+        
+        // Menú de navegación mejorado
+        .menu-navigation {
+          display: flex;
+          align-items: center;
+          gap: 1.2rem;
+          
+          .nav-button {
+            position: relative;
+            overflow: hidden;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: rgba(255, 255, 255, 0.9);
+            padding: 0.7rem 1.4rem;
+            display: flex; 
+            align-items: center;
+            gap: 0.6rem;
+            cursor: pointer;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            font-weight: 500;
+            
+            i {
+              font-size: 0.9rem;
+              transition: transform 0.3s;
+            }
+            
+            span {
+              letter-spacing: 0.02em;
+              font-size: 0.95rem;
+            }
+            
+            .button-effect {
+              position: absolute;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              background: var(--gradient-blue-premium);
+              opacity: 0;
+              transition: opacity 0.5s;
+              z-index: -1;
+            }
+            
+            &:hover {
+              transform: translateY(-3px);
+              color: white;
+              border-color: rgba(44, 123, 229, 0.3);
+              box-shadow: var(--shadow-blue);
+              
+              i {
+                transform: translateX(-3px);
+              }
+              
+              .button-effect {
+                opacity: 0.1;
+              }
+            }
+            
+            &::before {
+              content: '';
+              position: absolute;
+              top: 0;
+              left: 0;
+              width: 50px;
+              height: 100%;
+              background: linear-gradient(
+                90deg,
+                rgba(255, 255, 255, 0) 0%,
+                rgba(255, 255, 255, 0.2) 50%,
+                rgba(255, 255, 255, 0) 100%
+              );
+              transform: translateX(-100px) skewX(-15deg);
+              transition: transform 0s;
+            }
+            
+            &:hover::before {
+              transform: translateX(300px) skewX(-15deg);
+              transition: transform 0.7s;
+            }
+            
+            &.active {
+              background: var(--gradient-blue-premium);
+              border-color: rgba(255, 255, 255, 0.2);
+              color: white;
+              box-shadow: var(--shadow-blue);
+            }
+          }
+        }
+      }
+      
+      // Perfil de usuario mejorado
+      .user-profile {
+        .profile-button {
+          display: flex;
+          align-items: center;
+          background: rgba(0, 0, 0, 0.2);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 12px;
+          padding: 0.5rem 0.75rem 0.5rem 0.5rem;
+          cursor: pointer;
+          transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+          
+          .avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            background: var(--gradient-blue-premium);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.75rem;
+            font-weight: 600;
+            color: white;
+            flex-shrink: 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            
+            &::before {
+              content: '';
+              position: absolute;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0) 50%);
+            }
+          }
+          
+          .profile-info {
+            .user-name {
+              font-size: 0.95rem;
+              font-weight: 600;
+              color: white;
+              margin-bottom: 0.1rem;
+              display: block;
+            }
+            
+            .user-role {
+              font-size: 0.75rem;
+              color: rgba(255, 255, 255, 0.6);
+              display: block;
+            }
+          }
+          
+          &:hover {
+            background: rgba(255, 255, 255, 0.05);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
+          }
+        }
+      }
+    }
+  }
+  
+  // Contenido principal mejorado
+  .patient-info-content {
+    padding: 2.5rem;
+    position: relative;
+    z-index: 1;
+    animation: blurryReveal 0.6s ease-out;
+    
+    .patient-info-container {
+      max-width: 1800px;
+      margin: 0 auto;
+      
+      // Cabecera del paciente mejorada
+      .patient-info-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        animation: slideInFromLeft 0.5s ease-out;
+        
+        .header-left {
+          display: flex;
+          align-items: center;
+          gap: 1rem;
+          
+          .back-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: white;
+            border-radius: 10px;
+            padding: 0.6rem 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            font-weight: 500;
+            transition: all 0.3s;
+            cursor: pointer;
+            
+            i {
+              font-size: 0.9rem;
+              transition: transform 0.3s;
+            }
+            
+            &:hover {
+              background: rgba(255, 255, 255, 0.15);
+              box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+              transform: translateY(-2px);
+              
+              i {
+                transform: translateX(-3px);
+              }
+            }
+          }
+          
+          .patient-name {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: white;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            @include enhanced-text-shadow;
+            
+            .status-indicator {
+              font-size: 0.8rem;
+              padding: 0.25rem 0.75rem;
+              border-radius: 20px;
+              font-weight: 600;
+              display: inline-flex;
+              align-items: center;
+              
+              &::before {
+                content: '';
+                display: inline-block;
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                margin-right: 6px;
+                animation: pulseAnimation 2s infinite;
+              }
+              
+              &.active {
+                background: rgba(16, 185, 129, 0.1);
+                color: #34d399;
+                
+                &::before {
+                  background: #10b981;
+                  box-shadow: 0 0 10px #10b981;
+                }
+              }
+              
+              &.pending {
+                background: rgba(245, 158, 11, 0.1);
+                color: #fbbf24;
+                
+                &::before {
+                  background: #f59e0b;
+                  box-shadow: 0 0 10px #f59e0b;
+                }
+              }
+              
+              &.review {
+                background: rgba(44, 123, 229, 0.1);
+                color: #60a5fa;
+                
+                &::before {
+                  background: #2c7be5;
+                  box-shadow: 0 0 10px #2c7be5;
+                }
+              }
+              
+              &.expired {
+                background: rgba(239, 68, 68, 0.1);
+                color: #f87171;
+                
+                &::before {
+                  background: #ef4444;
+                  box-shadow: 0 0 10px #ef4444;
+                }
+              }
+            }
+          }
+          
+          .patient-id {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.9rem;
+            font-weight: 500;
+          }
+        }
+        
+        .header-actions {
+          display: flex;
+          gap: 1rem;
+          
+          .action-button {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 10px;
+            color: white;
+            padding: 0.7rem 1.4rem;
+            display: flex;
+            align-items: center;
+            gap: 0.7rem;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            cursor: pointer;
+            
+            i {
+              font-size: 0.9rem;
+              transition: transform 0.3s;
+            }
+            
+            &:hover {
+              background: rgba(255, 255, 255, 0.15);
+              transform: translateY(-3px);
+              box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+              
+              i {
+                transform: scale(1.1);
+              }
+            }
+            
+            &.edit {
+              background: rgba(44, 123, 229, 0.15);
+              border-color: rgba(44, 123, 229, 0.2);
+              
+              &:hover {
+                background: rgba(44, 123, 229, 0.25);
+                box-shadow: 0 8px 20px rgba(44, 123, 229, 0.2);
+              }
+            }
+            
+            &.print {
+              background: rgba(255, 255, 255, 0.08);
+              
+              &:hover {
+                background: rgba(255, 255, 255, 0.15);
+              }
+            }
+          }
+        }
+      }
+      
+      // Navegación por pestañas mejorada
+      .patient-tabs-navigation {
+        display: flex;
+        background: rgba(6, 20, 40, 0.5);
+        padding: 0.5rem;
+        border-radius: 50px;
+        border: var(--border-light);
+        margin-bottom: 2rem;
+        box-shadow: 0 4px 30px rgba(0, 0, 0, 0.25);
+        position: relative;
+        animation: slideInFromBottom 0.5s ease-out 0.2s backwards;
+        
+        &::after {
+          content: '';
+          position: absolute;
+          top: -2px;
+          left: -2px;
+          right: -2px;
+          bottom: -2px;
+          border-radius: 50px;
+          background: linear-gradient(90deg, 
+            transparent, 
+            rgba(44, 123, 229, 0.2), 
+            transparent);
+          opacity: 0;
+          transition: opacity 0.5s;
+          z-index: -1;
+          filter: blur(10px);
+        }
+        
+        &:hover::after {
+          opacity: 1;
+        }
+        
+        .tab-button {
+          flex: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 0.8rem 1.2rem;
+          border-radius: 40px;
+          color: rgba(255, 255, 255, 0.8);
+          font-weight: 500;
+          letter-spacing: 0.02em;
+          cursor: pointer;
+          transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+          position: relative;
+          overflow: hidden;
+          
+          .tab-icon {
+            margin-right: 0.7rem;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            transition: transform 0.3s;
+          }
+          
+          .tab-hover-effect {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 40px;
+            opacity: 0;
+            transform: scale(0.8);
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            z-index: -1;
+          }
+          
+          &:hover {
+            color: white;
+            
+            .tab-icon {
+              transform: scale(1.1) translateY(-2px);
+            }
+            
+            .tab-hover-effect {
+              opacity: 1;
+              transform: scale(1);
+            }
+          }
+          
+          &.active {
+            background: var(--gradient-blue-premium);
+            color: white;
+            
+            &::before {
+              content: '';
+              position: absolute;
+              top: -20%;
+              left: -30%;
+              width: 30%;
+              height: 140%;
+              background: rgba(255, 255, 255, 0.2);
+              transform: rotate(30deg);
+              transition: left 0.5s;
+              filter: blur(3px);
+            }
+            
+            &:hover::before {
+              left: 130%;
+            }
+            
+            .active-indicator {
+              position: absolute;
+              bottom: 0;
+              left: 50%;
+              transform: translateX(-50%);
+              width: 20px;
+              height: 3px;
+              background: white;
+              border-radius: 3px;
+              box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+              animation: pulseAnimation 2s infinite;
+            }
+          }
+        }
+      }
+      
+      // Contenido de pestañas mejorado
+      .tab-content {
+        animation: fadeIn 0.5s ease-out 0.3s backwards;
+        min-height: 500px;
+        
+        // Sección de información general mejorada
+        .general-info-section {
+          display: grid;
+          grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+          gap: 1.8rem;
+          
+          // Tarjeta de información mejorada
+          .info-card {
+            background: rgba(255, 255, 255, 0.97);
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            animation: blurryReveal 0.4s ease-out forwards;
+            @include card-3d-effect(0.5);
+            
+            @for $i from 1 through 3 {
+              &:nth-child(#{$i}) {
+                animation-delay: #{0.1 * $i}s;
+              }
+            }
+            
+            // Borde premium
+            &::after {
+              content: '';
+              position: absolute;
+              inset: 0;
+              border-radius: 16px;
+              padding: 2px;
+              background: linear-gradient(
+                135deg,
+                transparent 40%,
+                rgba(44, 123, 229, 0.3),
+                transparent 60%
+              );
+              -webkit-mask: 
+                linear-gradient(#fff 0 0) content-box, 
+                linear-gradient(#fff 0 0);
+              -webkit-mask-composite: xor;
+              mask-composite: exclude;
+              opacity: 0;
+              transition: opacity 0.4s;
+            }
+            
+            &:hover::after {
+                opacity: 1;
+              }
+              
+              .card-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                padding: 1.4rem 1.8rem;
+                background: linear-gradient(to right, #f9fbfd, #f0f4f8);
+                border-bottom: 1px solid #dce4ef;
+                
+                h3 {
+                  font-size: 1.2rem;
+                  font-weight: 600;
+                  margin: 0;
+                  display: flex;
+                  align-items: center;
+                  gap: 0.7rem;
+                  color: #1d2939;
+                  
+                  i {
+                    color: var(--color-primary-500);
+                    font-size: 1.1rem;
+                    background: rgba(44, 123, 229, 0.1);
+                    width: 32px;
+                    height: 32px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: 8px;
+                    transition: all 0.3s;
+                  }
+                }
+                
+                &:hover i {
+                  transform: scale(1.1);
+                  background: rgba(44, 123, 229, 0.15);
+                }
+                
+                .edit-button {
+                  width: 36px;
+                  height: 36px;
+                  border-radius: 10px;
+                  background: white;
+                  border: 1px solid #dce4ef;
+                  color: #4e5d78;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  transition: all 0.3s;
+                  cursor: pointer;
+                  @include tooltip;
+                  
+                  &:hover {
+                    background: rgba(44, 123, 229, 0.05);
+                    color: var(--color-primary-500);
+                    border-color: rgba(44, 123, 229, 0.2);
+                    transform: translateY(-2px);
+                    box-shadow: 0 5px 15px rgba(44, 123, 229, 0.15);
+                  }
+                  
+                  &.add-button {
+                    background: rgba(16, 185, 129, 0.05);
+                    color: var(--color-success);
+                    border-color: rgba(16, 185, 129, 0.2);
+                    
+                    &:hover {
+                      background: rgba(16, 185, 129, 0.1);
+                      box-shadow: 0 5px 15px rgba(16, 185, 129, 0.15);
+                    }
+                  }
+                }
+              }
+              
+              .card-body {
+                padding: 1.8rem;
+                
+                // Fila de información mejorada
+                .info-row {
+                  display: flex;
+                  margin-bottom: 1.2rem;
+                  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+                  padding-bottom: 1.2rem;
+                  
+                  &:last-child {
+                    margin-bottom: 0;
+                    border-bottom: none;
+                    padding-bottom: 0;
+                  }
+                  
+                  .info-label {
+                    width: 35%;
+                    color: #4e5d78;
+                    font-weight: 500;
+                    font-size: 0.95rem;
+                  }
+                  
+                  .info-value {
+                    flex: 1;
+                    color: #1d2939;
+                    font-weight: 500;
+                    font-size: 0.95rem;
+                    
+                    &.insurance-value, &.agency-value {
+                      display: flex;
+                      align-items: center;
+                      gap: 0.5rem;
+                      
+                      i {
+                        color: var(--color-primary-500);
+                        font-size: 1rem;
+                      }
+                    }
+                    
+                    .policy-number {
+                      background: rgba(0, 0, 0, 0.02);
+                      padding: 0.3rem 0.7rem;
+                      border-radius: 6px;
+                      font-family: monospace;
+                      letter-spacing: 0.05em;
+                    }
+                  }
+                }
+                
+                // Formulario de edición
+                .edit-form {
+                  .form-group {
+                    margin-bottom: 1.5rem;
+                    
+                    label {
+                      display: block;
+                      font-size: 0.9rem;
+                      font-weight: 500;
+                      color: #4e5d78;
+                      margin-bottom: 0.5rem;
+                    }
+                    
+                    input, select {
+                      width: 100%;
+                      padding: 0.8rem 1rem;
+                      border-radius: 8px;
+                      border: 1px solid #dce4ef;
+                      font-size: 0.95rem;
+                      color: #1d2939;
+                      background: white;
+                      transition: all 0.3s;
+                      
+                      &:focus {
+                        outline: none;
+                        border-color: var(--color-primary-500);
+                        box-shadow: 0 0 0 3px rgba(44, 123, 229, 0.15);
+                      }
+                    }
+                    
+                    .address-inline {
+                      display: flex;
+                      gap: 1rem;
+                      margin-top: 0.5rem;
+                      
+                      .state-input {
+                        width: 80px;
+                      }
+                      
+                      .zip-input {
+                        width: 120px;
+                      }
+                    }
+                  }
+                  
+                  .form-actions {
+                    display: flex;
+                    justify-content: flex-end;
+                    gap: 1rem;
+                    margin-top: 2rem;
+                    
+                    .cancel-btn, .save-btn {
+                      padding: 0.7rem 1.5rem;
+                      border-radius: 8px;
+                      font-weight: 500;
+                      transition: all 0.3s;
+                      cursor: pointer;
+                    }
+                    
+                    .cancel-btn {
+                      background: white;
+                      border: 1px solid #dce4ef;
+                      color: #4e5d78;
+                      
+                      &:hover {
+                        background: #f9fafb;
+                        color: #1d2939;
+                      }
+                    }
+                    
+                    .save-btn {
+                      background: var(--color-primary-500);
+                      border: none;
+                      color: white;
+                      
+                      &:hover {
+                        background: var(--color-primary-600);
+                        transform: translateY(-2px);
+                        box-shadow: 0 5px 15px rgba(44, 123, 229, 0.2);
+                      }
+                    }
+                  }
+                  
+                  // Edición de fechas mejorada
+                  .date-range-edit {
+                    display: flex;
+                    align-items: center;
+                    margin-bottom: 1.5rem;
+                    
+                    .form-group {
+                      flex: 1;
+                      margin-bottom: 0;
+                    }
+                    
+                    .date-separator {
+                      display: flex;
+                      align-items: center;
+                      justify-content: center;
+                      width: 60px;
+                      
+                      i {
+                        font-size: 1.5rem;
+                        color: #9aa5b8;
+                      }
+                    }
+                  }
+                }
+                
+                // Rango de fechas para período de certificación mejorado
+                .date-range {
+                  display: flex;
+                  align-items: center;
+                  margin-bottom: 1.5rem;
+                  
+                  .date-block {
+                    flex: 1;
+                    
+                    label {
+                      display: block;
+                      font-size: 0.85rem;
+                      color: #4e5d78;
+                      margin-bottom: 0.5rem;
+                    }
+                    
+                    .date-value {
+                      font-size: 1.1rem;
+                      font-weight: 600;
+                      color: #1d2939;
+                      background: rgba(0, 0, 0, 0.02);
+                      padding: 0.8rem;
+                      border-radius: 10px;
+                      border: 1px solid rgba(0, 0, 0, 0.05);
+                      text-align: center;
+                      position: relative;
+                      overflow: hidden;
+                      
+                      &::after {
+                        content: '';
+                        position: absolute;
+                        top: 0;
+                        left: 0;
+                        width: 100%;
+                        height: 3px;
+                        background: var(--gradient-blue-premium);
+                        transform: scaleX(0);
+                        transform-origin: left;
+                        transition: transform 0.5s;
+                      }
+                      
+                      &:hover::after {
+                        transform: scaleX(1);
+                      }
+                    }
+                  }
+                  
+                  .progress-separator {
+                    width: 60px;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    
+                    .line {
+                      width: 100%;
+                      height: 2px;
+                      background: linear-gradient(to right, #dce4ef, #bcd6ff, #dce4ef);
+                      position: relative;
+                      
+                      &::before, &::after {
+                        content: '';
+                        position: absolute;
+                        top: 50%;
+                        width: 8px;
+                        height: 8px;
+                        border-radius: 50%;
+                        background: var(--color-primary-400);
+                        transform: translateY(-50%);
+                      }
+                      
+                      &::before {
+                        left: 0;
+                      }
+                      
+                      &::after {
+                        right: 0;
+                      }
+                    }
+                  }
+                }
+                
+                // Barra de progreso para período de certificación mejorada
+                .cert-progress-container {
+                  margin-bottom: 1.8rem;
+                  background: white;
+                  border-radius: 12px;
+                  padding: 1.2rem;
+                  border: 1px solid rgba(0, 0, 0, 0.05);
+                  
+                  &:hover {
+                    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+                  }
+                  
+                  .cert-progress {
+                    margin-bottom: 1rem;
+                    
+                    .progress-bar {
+                      width: 100%;
+                      height: 12px;
+                      background: #f0f4f8;
+                      border-radius: 6px;
+                      margin-bottom: 0.6rem;
+                      overflow: hidden;
+                      position: relative;
+                      
+                      .progress-fill {
+                        height: 100%;
+                        border-radius: 6px;
+                        position: relative;
+                        transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1);
+                        
+                        .progress-text {
+                          position: absolute;
+                          right: 10px;
+                          top: 50%;
+                          transform: translateY(-50%);
+                          color: white;
+                          font-size: 0.75rem;
+                          font-weight: 700;
+                          text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+                        }
+                        
+                        &::after {
+                          content: '';
+                          position: absolute;
+                          top: 0;
+                          left: 0;
+                          right: 0;
+                          bottom: 0;
+                          background: linear-gradient(
+                            90deg,
+                            rgba(255, 255, 255, 0) 0%,
+                            rgba(255, 255, 255, 0.3) 50%,
+                            rgba(255, 255, 255, 0) 100%
+                          );
+                          animation: shimmerEffect 2s infinite;
+                        }
+                      }
+                    }
+                  }
+                  
+                  .cert-details {
+                    display: flex;
+                    justify-content: space-between;
+                    
+                    .cert-detail-item {
+                      text-align: center;
+                      flex: 1;
+                      
+                      .detail-label {
+                        font-size: 0.75rem;
+                        color: #697689;
+                        margin-bottom: 0.3rem;
+                        text-transform: uppercase;
+                        letter-spacing: 0.05em;
+                      }
+                      
+                      .detail-value {
+                        font-size: 1.3rem;
+                        font-weight: 700;
+                        color: #1d2939;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 0.3rem;
+                        
+                        i {
+                          font-size: 0.9rem;
+                        }
+                      }
+                      
+                      &.remaining .detail-value {
+                        font-size: 1.5rem;
+                      }
+                    }
+                  }
+                }
+                
+                // Contactos de emergencia mejorados
+                .contacts-list {
+                  .contact-row {
+                    display: flex;
+                    align-items: center;
+                    background: white;
+                    border: 1px solid #dce4ef;
+                    padding: 1rem 1.5rem;
+                    border-radius: 10px;
+                    margin-bottom: 1rem;
+                    transition: all 0.3s;
+                    
+                    &:hover {
+                      transform: translateY(-3px);
+                      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+                      border-color: rgba(44, 123, 229, 0.2);
+                    }
+                    
+                    .contact-name {
+                      flex: 1;
+                      display: flex;
+                      align-items: center;
+                      gap: 0.8rem;
+                      
+                      i {
+                        color: var(--color-primary-500);
+                        background: rgba(44, 123, 229, 0.1);
+                        width: 32px;
+                        height: 32px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        border-radius: 8px;
+                      }
+                      
+                      span {
+                        font-weight: 500;
+                        color: #1d2939;
+                      }
+                    }
+                    
+                    .contact-phone, .contact-relation {
+                      display: flex;
+                      align-items: center;
+                      gap: 0.5rem;
+                      margin-right: 1.5rem;
+                      
+                      i {
+                        color: #697689;
+                        font-size: 0.9rem;
+                      }
+                      
+                      span {
+                        color: #4e5d78;
+                      }
+                    }
+                    
+                    .contact-actions {
+                      display: flex;
+                      gap: 0.5rem;
+                      
+                      .action-btn {
+                        position: relative;
+                        width: 34px;
+                        height: 34px;
+                        border-radius: 8px;
+                        background: white;
+                        border: 1px solid #dce4ef;
+                        color: #697689;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        transition: all 0.3s;
+                        cursor: pointer;
+                        @include tooltip;
+                        
+                        &:hover {
+                          transform: translateY(-2px);
+                          
+                          &.edit {
+                            background: rgba(44, 123, 229, 0.05);
+                            color: var(--color-primary-500);
+                            border-color: rgba(44, 123, 229, 0.2);
+                            box-shadow: 0 4px 10px rgba(44, 123, 229, 0.15);
+                          }
+                          
+                          &.delete {
+                            background: rgba(239, 68, 68, 0.05);
+                            color: #ef4444;
+                            border-color: rgba(239, 68, 68, 0.2);
+                            box-shadow: 0 4px 10px rgba(239, 68, 68, 0.15);
+                          }
+                        }
+                      }
+                    }
+                  }
+                  
+                  .add-more-contacts {
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 0.5rem;
+                    width: 100%;
+                    padding: 0.8rem;
+                    border: 1px dashed #dce4ef;
+                    background: rgba(0, 0, 0, 0.01);
+                    color: var(--color-primary-500);
+                    border-radius: 10px;
+                    font-size: 0.95rem;
+                    font-weight: 500;
+                    cursor: pointer;
+                    transition: all 0.3s;
+                    
+                    i {
+                      font-size: 1.1rem;
+                      transition: transform 0.3s;
+                    }
+                    
+                    &:hover {
+                      background: rgba(44, 123, 229, 0.05);
+                      border-color: rgba(44, 123, 229, 0.3);
+                      transform: translateY(-2px);
+                      
+                      i {
+                        transform: rotate(90deg);
+                      }
+                    }
+                  }
+                }
+                
+                // Formulario para añadir contacto
+                .add-contact-form {
+                  background: rgba(0, 0, 0, 0.01);
+                  border: 1px solid #dce4ef;
+                  border-radius: 12px;
+                  padding: 1.5rem;
+                }
+                
+                // No hay contactos mejorado
+                .no-contacts {
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  padding: 2.5rem 0;
+                  
+                  i {
+                    font-size: 4rem;
+                    color: #cbd5e1;
+                    margin-bottom: 1.5rem;
+                    opacity: 0.5;
+                  }
+                  
+                  p {
+                    color: #4e5d78;
+                    margin-bottom: 1.5rem;
+                    font-size: 1.1rem;
+                  }
+                  
+                  .add-contact-btn {
+                    background: var(--gradient-success);
+                    color: white;
+                    border: none;
+                    padding: 0.8rem 1.5rem;
+                    border-radius: 10px;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.7rem;
+                    font-weight: 500;
+                    transition: all 0.3s;
+                    cursor: pointer;
+                    box-shadow: 0 5px 15px rgba(16, 185, 129, 0.2);
+                    
+                    i {
+                      font-size: 1rem;
+                      color: white;
+                      margin: 0;
+                      opacity: 1;
+                    }
+                    
+                    &:hover {
+                      transform: translateY(-3px);
+                      box-shadow: 0 8px 20px rgba(16, 185, 129, 0.3);
+                    }
+                  }
+                }
+              }
+            }
+          }
+          
+          // Placeholder para secciones futuras mejorado
+          .medical-info-placeholder,
+          .disciplines-placeholder,
+          .schedule-placeholder,
+          .exercises-placeholder,
+          .documents-placeholder,
+          .notes-placeholder {
+            width: 100%;
+            min-height: 400px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            
+            .placeholder-content {
+              background: rgba(255, 255, 255, 0.05);
+              padding: 3.5rem;
+              border-radius: 20px;
+              border: 1px solid rgba(255, 255, 255, 0.1);
+              text-align: center;
+              animation: fadeIn 0.5s ease-out;
+              max-width: 500px;
+              position: relative;
+              overflow: hidden;
+              
+              &::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: radial-gradient(circle at center, rgba(44, 123, 229, 0.05) 0%, transparent 80%);
+                z-index: -1;
+                opacity: 0;
+                transform: scale(0.8);
+                transition: all 0.5s;
+              }
+              
+              &:hover::before {
+                opacity: 1;
+                transform: scale(1.2);
+              }
+              
+              i {
+                font-size: 5rem;
+                color: rgba(255, 255, 255, 0.15);
+                margin-bottom: 1.5rem;
+                display: block;
+                animation: floatAnimation 3s infinite ease-in-out;
+              }
+              
+              p {
+                font-size: 1.8rem;
+                font-weight: 600;
+                color: white;
+                margin-bottom: 0.8rem;
+                @include enhanced-text-shadow;
+              }
+              
+              span {
+                color: rgba(255, 255, 255, 0.6);
+                font-size: 1.1rem;
+                display: block;
+                max-width: 300px;
+                margin: 0 auto;
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    // Floating Action Button mejorado
+    .floating-action-button {
+      position: fixed;
+      bottom: 2.5rem;
+      right: 2.5rem;
+      z-index: 100;
+      
+      .fab-button {
+        position: relative;
+        width: 60px;
+        height: 60px;
+        border-radius: 30px;
+        background: var(--gradient-blue-premium);
+        color: white;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        box-shadow: 0 5px 20px rgba(44, 123, 229, 0.4);
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+        z-index: 2;
+        
+        &:hover {
+          transform: scale(1.1) rotate(90deg);
+          box-shadow: 0 8px 25px rgba(44, 123, 229, 0.5);
+        }
+        
+        // Tooltip
+        .fab-tooltip {
+          position: absolute;
+          top: -45px;
+          right: 0;
+          background: rgba(15, 23, 42, 0.9);
+          color: white;
+          padding: 0.5rem 1rem;
+          border-radius: 6px;
+          font-size: 0.75rem;
+          white-space: nowrap;
+          opacity: 0;
+          visibility: hidden;
+          transition: all 0.3s ease;
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+          transform: translateY(10px);
+          
+          &::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            right: 20px;
+            width: 10px;
+            height: 10px;
+            background: rgba(15, 23, 42, 0.9);
+            transform: rotate(45deg);
+          }
+        }
+        
+        &:hover .fab-tooltip {
+          opacity: 1;
+          visibility: visible;
+          transform: translateY(0);
+        }
+        
+        &::before {
+          content: '';
+          position: absolute;
+          inset: -5px;
+          border-radius: 35px;
+          background: var(--gradient-blue-premium);
+          opacity: 0.5;
+          filter: blur(10px);
+          transition: opacity 0.3s;
+        }
+        
+        &:hover::before {
+          opacity: 0.7;
+        }
+      }
+      
+      .fab-menu {
+        position: absolute;
+        bottom: 70px;
+        right: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        opacity: 0;
+        transform: translateY(20px);
+        pointer-events: none;
+        transition: all 0.3s;
+        
+        .fab-item {
+          position: relative;
+          background: white;
+          color: #1d2939;
+          padding: 0.7rem 1.2rem;
+          border-radius: 30px;
+          display: flex;
+          align-items: center;
+          gap: 0.7rem;
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+          border: none;
+          white-space: nowrap;
+          transition: all 0.3s;
+          cursor: pointer;
+          
+          i {
+            color: var(--color-primary-500);
+          }
+          
+          &:hover {
+            transform: translateX(-5px);
+            background: var(--color-primary-50);
+            box-shadow: 0 5px 15px rgba(44, 123, 229, 0.2);
+          }
+          
+          &::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 30px;
+            border: 1px solid transparent;
+            transition: all 0.3s;
+          }
+          
+          &:hover::after {
+            border-color: rgba(44, 123, 229, 0.2);
+            box-shadow: 0 0 0 3px rgba(44, 123, 229, 0.1);
+          }
+        }
+      }
+      
+      &:hover .fab-menu {
+        opacity: 1;
+        transform: translateY(0);
+        pointer-events: auto;
+      }
+    }
+    
+    // Estados de carga y error mejorados
+    .patient-info-loading {
+      min-height: calc(100vh - 100px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      
+      .loading-spinner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        
+        .spinner-animation {
+          font-size: 3.5rem;
+          margin-bottom: 1.5rem;
+          color: var(--color-primary-400);
+          filter: drop-shadow(0 0 15px rgba(44, 123, 229, 0.5));
+        }
+        
+        .loading-text {
+          display: flex;
+          align-items: center;
+          font-size: 1.2rem;
+          opacity: 0.8;
+          
+          .loading-dots {
+            display: flex;
+            
+            span {
+              margin-left: 2px;
+              animation: loadingDots 1.5s infinite;
+              
+              &:nth-child(2) {
+                animation-delay: 0.2s;
+              }
+              
+              &:nth-child(3) {
+                animation-delay: 0.4s;
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    .patient-not-found {
+      min-height: calc(100vh - 100px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      text-align: center;
+      padding: 2rem;
+      
+      .error-icon {
+        font-size: 5rem;
+        margin-bottom: 1.5rem;
+        color: #f59e0b;
+        text-shadow: 0 0 20px rgba(245, 158, 11, 0.5);
+        animation: floatAnimation 3s infinite ease-in-out;
+      }
+      
+      h2 {
+        font-size: 2.5rem;
+        font-weight: 700;
+        margin-bottom: 1rem;
+        @include enhanced-text-shadow;
+      }
+      
+      p {
+        font-size: 1.1rem;
+        max-width: 500px;
+        margin-bottom: 2rem;
+        opacity: 0.8;
+        line-height: 1.6;
+      }
+      
+      .back-button {
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        color: white;
+        border-radius: 10px;
+        padding: 0.8rem 1.5rem;
+        display: flex;
+        align-items: center;
+        gap: 0.7rem;
+        font-weight: 500;
+        transition: all 0.3s;
+        cursor: pointer;
+        
+        i {
+          font-size: 0.9rem;
+          transition: transform 0.3s;
+        }
+        
+        &:hover {
+          background: rgba(255, 255, 255, 0.15);
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+          transform: translateY(-3px);
+          
+          i {
+            transform: translateX(-3px);
+          }
+        }
+      }
+    }
+  }
+  
+  // Media queries para responsividad mejorados
+  @media (max-width: 1400px) {
+    .patient-info-page {
+      .patient-info-content {
+        .patient-info-container {
+          .general-info-section {
+            grid-template-columns: 1fr;
+          }
+        }
+      }
+    }
+  }
+  
+  @media (max-width: 992px) {
+    .patient-info-page {
+      .patient-info-content {
+        padding: 1.5rem;
+        
+        .patient-info-container {
+          .patient-info-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1.5rem;
+            
+            .header-left {
+              width: 100%;
+              flex-wrap: wrap;
+              
+              .patient-name {
+                font-size: 1.8rem;
+                margin-top: 0.5rem;
+                width: 100%;
+              }
+              
+              .patient-id {
+                margin-top: 0.5rem;
+              }
+            }
+            
+            .header-actions {
+                width: 100%;
+                justify-content: flex-start;
+                
+                .action-button {
+                  flex: 1;
+                  justify-content: center;
+                }
+              }
+            }
+            
+            .patient-tabs-navigation {
+              overflow-x: auto;
+              padding: 0.3rem;
+              
+              .tab-button {
+                padding: 0.7rem 1rem;
+                white-space: nowrap;
+                
+                .tab-icon {
+                  margin-right: 0.5rem;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .patient-info-page {
+        .main-header {
+          .header-container {
+            padding: 0.75rem 1rem;
+            
+            .logo-container {
+              .logo-wrapper {
+                .logo {
+                  height: 40px;
+                }
+              }
+              
+              .menu-navigation {
+                .nav-button {
+                  padding: 0.6rem 1rem;
+                  
+                  span {
+                    display: none;
+                  }
+                  
+                  i {
+                    margin-right: 0;
+                  }
+                }
+              }
+            }
+            
+            .user-profile {
+              .profile-button {
+                .profile-info {
+                  display: none;
+                }
+              }
+            }
+          }
+        }
+        
+        .patient-info-content {
+          padding: 1rem;
+          
+          .patient-info-container {
+            .patient-tabs-navigation {
+              .tab-button {
+                padding: 0.6rem 0.8rem;
+                
+                span {
+                  display: none;
+                }
+                
+                .tab-icon {
+                  margin-right: 0;
+                  font-size: 1.1rem;
+                }
+              }
+            }
+            
+            .general-info-section {
+              .info-card {
+                .card-body {
+                  .info-row {
+                    flex-direction: column;
+                    
+                    .info-label {
+                      width: 100%;
+                      margin-bottom: 0.3rem;
+                    }
+                  }
+                  
+                  .date-range {
+                    flex-direction: column;
+                    gap: 1.5rem;
+                    
+                    .progress-separator {
+                      transform: rotate(90deg);
+                      margin: 0.5rem 0;
+                    }
+                  }
+                  
+                  .cert-details {
+                    flex-direction: column;
+                    gap: 1rem;
+                    
+                    .cert-detail-item {
+                      padding: 0.8rem;
+                      background: rgba(0, 0, 0, 0.02);
+                      border-radius: 8px;
+                      border: 1px solid rgba(0, 0, 0, 0.05);
+                      
+                      &.remaining {
+                        order: -1;
+                        background: rgba(44, 123, 229, 0.05);
+                        border: 1px solid rgba(44, 123, 229, 0.1);
+                      }
+                    }
+                  }
+                  
+                  .contact-row {
+                    flex-direction: column;
+                    align-items: flex-start;
+                    gap: 0.8rem;
+                    
+                    .contact-name, .contact-phone, .contact-relation {
+                      width: 100%;
+                    }
+                    
+                    .contact-actions {
+                      align-self: flex-end;
+                    }
+                  }
+                  
+                  // Formulario responsive
+                  .edit-form {
+                    .date-range-edit {
+                      flex-direction: column;
+                      gap: 1.5rem;
+                      
+                      .date-separator {
+                        transform: rotate(90deg);
+                      }
+                    }
+                    
+                    .address-inline {
+                      flex-direction: column;
+                      gap: 0.5rem;
+                      
+                      input {
+                        width: 100% !important;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        
+        .floating-action-button {
+          bottom: 1.5rem;
+          right: 1.5rem;
+          
+          .fab-button {
+            width: 50px;
+            height: 50px;
+            font-size: 1.2rem;
+          }
+        }
+      }
+    }
+    
+    // Dark mode styles mejorados
+    @media (prefers-color-scheme: dark) {
+      .patient-info-page {
+        .patient-info-content {
+          .patient-info-container {
+            .general-info-section {
+              .info-card {
+                background: rgba(26, 36, 54, 0.95);
+                
+                .card-header {
+                  background: linear-gradient(to right, #0f172a, #1a2436);
+                  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                  
+                  h3 {
+                    color: rgba(255, 255, 255, 0.9);
+                  }
+                  
+                  .edit-button {
+                    background: rgba(255, 255, 255, 0.05);
+                    border-color: rgba(255, 255, 255, 0.1);
+                    color: rgba(255, 255, 255, 0.7);
+                    
+                    &:hover {
+                      background: rgba(44, 123, 229, 0.1);
+                      color: var(--color-primary-300);
+                    }
+                  }
+                }
+                
+                .card-body {
+                  .info-row {
+                    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                    
+                    .info-label {
+                      color: rgba(255, 255, 255, 0.6);
+                    }
+                    
+                    .info-value {
+                      color: rgba(255, 255, 255, 0.9);
+                      
+                      .policy-number {
+                        background: rgba(255, 255, 255, 0.05);
+                      }
+                    }
+                  }
+                  
+                  .edit-form {
+                    input, select {
+                      background: rgba(255, 255, 255, 0.05);
+                      border-color: rgba(255, 255, 255, 0.1);
+                      color: white;
+                      
+                      &:focus {
+                        border-color: var(--color-primary-400);
+                      }
+                    }
+                    
+                    .cancel-btn {
+                      background: rgba(255, 255, 255, 0.05);
+                      border-color: rgba(255, 255, 255, 0.1);
+                      color: rgba(255, 255, 255, 0.8);
+                      
+                      &:hover {
+                        background: rgba(255, 255, 255, 0.1);
+                      }
+                    }
+                  }
+                  
+                  .date-range {
+                    .date-block {
+                      label {
+                        color: rgba(255, 255, 255, 0.6);
+                      }
+                      
+                      .date-value {
+                        color: rgba(255, 255, 255, 0.9);
+                        background: rgba(255, 255, 255, 0.05);
+                        border-color: rgba(255, 255, 255, 0.1);
+                      }
+                    }
+                    
+                    .progress-separator {
+                      .line {
+                        background: linear-gradient(to right, rgba(255, 255, 255, 0.1), var(--color-primary-500), rgba(255, 255, 255, 0.1));
+                      }
+                    }
+                  }
+                  
+                  .cert-progress-container {
+                    background: rgba(255, 255, 255, 0.03);
+                    border-color: rgba(255, 255, 255, 0.05);
+                    
+                    .cert-progress {
+                      .progress-bar {
+                        background: rgba(255, 255, 255, 0.1);
+                      }
+                    }
+                    
+                    .cert-details {
+                      .cert-detail-item {
+                        .detail-label {
+                          color: rgba(255, 255, 255, 0.5);
+                        }
+                        
+                        .detail-value {
+                          color: rgba(255, 255, 255, 0.9);
+                        }
+                        
+                        &.remaining {
+                          background: rgba(44, 123, 229, 0.1);
+                          border-color: rgba(44, 123, 229, 0.2);
+                        }
+                      }
+                    }
+                  }
+                  
+                  .contact-row {
+                    background: rgba(255, 255, 255, 0.03);
+                    border-color: rgba(255, 255, 255, 0.1);
+                    
+                    &:hover {
+                      border-color: rgba(44, 123, 229, 0.3);
+                      box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+                    }
+                    
+                    .contact-name {
+                      span {
+                        color: rgba(255, 255, 255, 0.9);
+                      }
+                    }
+                    
+                    .contact-phone, .contact-relation {
+                      i {
+                        color: rgba(255, 255, 255, 0.5);
+                      }
+                      
+                      span {
+                        color: rgba(255, 255, 255, 0.7);
+                      }
+                    }
+                    
+                    .contact-actions {
+                      .action-btn {
+                        background: rgba(255, 255, 255, 0.05);
+                        border-color: rgba(255, 255, 255, 0.1);
+                        color: rgba(255, 255, 255, 0.7);
+                        
+                        &:hover {
+                          &.edit {
+                            background: rgba(44, 123, 229, 0.1);
+                            color: var(--color-primary-300);
+                          }
+                          
+                          &.delete {
+                            background: rgba(239, 68, 68, 0.1);
+                            color: #f87171;
+                          }
+                        }
+                      }
+                    }
+                  }
+                  
+                  .add-more-contacts {
+                    background: rgba(255, 255, 255, 0.03);
+                    border-color: rgba(255, 255, 255, 0.1);
+                    
+                    &:hover {
+                      background: rgba(44, 123, 229, 0.1);
+                      border-color: rgba(44, 123, 229, 0.2);
+                    }
+                  }
+                  
+                  .add-contact-form {
+                    background: rgba(255, 255, 255, 0.03);
+                    border-color: rgba(255, 255, 255, 0.1);
+                  }
+                }
+              }
+            }
+            
+            .placeholder-content {
+              // Estilos específicos para placeholders en modo oscuro
+              background: rgba(255, 255, 255, 0.03);
+              border-color: rgba(255, 255, 255, 0.08);
+              
+              &:hover::before {
+                background: radial-gradient(circle at center, rgba(44, 123, 229, 0.08) 0%, transparent 80%);
+              }
+            }
+          }
+        }
+        
+        .floating-action-button {
+          .fab-menu {
+            .fab-item {
+              background: rgba(30, 41, 59, 0.9);
+              color: rgba(255, 255, 255, 0.9);
+              
+              i {
+                color: var(--color-primary-300);
+              }
+              
+              &:hover {
+                background: rgba(44, 123, 229, 0.1);
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    // Efectos de desplazamiento premium
+    .scroll-animation {
+      --scroll-offset: 30px;
+      --scroll-duration: 0.5s;
+      --scroll-delay: 0s;
+      
+      opacity: 0;
+      transform: translateY(var(--scroll-offset));
+      transition: 
+        opacity var(--scroll-duration) cubic-bezier(0.34, 1.56, 0.64, 1) var(--scroll-delay),
+        transform var(--scroll-duration) cubic-bezier(0.34, 1.56, 0.64, 1) var(--scroll-delay);
+      
+      &.scroll-visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      
+      &.scroll-left {
+        transform: translateX(calc(-1 * var(--scroll-offset)));
+        
+        &.scroll-visible {
+          transform: translateX(0);
+        }
+      }
+      
+      &.scroll-right {
+        transform: translateX(var(--scroll-offset));
+        
+        &.scroll-visible {
+          transform: translateX(0);
+        }
+      }
+      
+      &.scroll-scale {
+        transform: scale(0.9);
+        
+        &.scroll-visible {
+          transform: scale(1);
+        }
+      }
+      
+      &.scroll-delay-1 { --scroll-delay: 0.1s; }
+      &.scroll-delay-2 { --scroll-delay: 0.2s; }
+      &.scroll-delay-3 { --scroll-delay: 0.3s; }
+      &.scroll-delay-4 { --scroll-delay: 0.4s; }
+      &.scroll-delay-5 { --scroll-delay: 0.5s; }
+    }
+    
+    // Accessibility adjustments
+    @media (prefers-reduced-motion: reduce) {
+      .patient-info-page {
+        * {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+          scroll-behavior: auto !important;
+        }
+      }
+    }
+
+
+    // Corrección para problemas con botones
+
+// Asegurarnos que los elementos interactivos no tengan problemas de propagación de eventos
+.patient-info-page {
+    // Corrección para botones en los tabs
+    .patient-tabs-navigation {
+      .tab-button {
+        z-index: 1; // Añadir z-index para asegurar que el botón está por encima de otros elementos
+        
+        .tab-hover-effect {
+          pointer-events: none; // Prevenir que el efecto de hover bloquee los eventos de clic
+        }
+        
+        &.active::before {
+          pointer-events: none; // Efecto de brillo no debe interferir con los clics
+        }
+        
+        .active-indicator {
+          pointer-events: none; // El indicador no debe interceptar eventos
+        }
+      }
+    }
+    
+    // Corrección para botones de edición
+    .info-card {
+      .card-header {
+        .edit-button {
+          z-index: 10; // Mayor z-index para asegurar accesibilidad
+          
+          .tooltip {
+            pointer-events: none; // El tooltip no debe interceptar eventos
+          }
+          
+          &::after {
+            pointer-events: none; // Efectos visuales no deben bloquear clics
+          }
+        }
+      }
+      
+      // Corrección para los formularios
+      .edit-form {
+        input, select, button {
+          position: relative;
+          z-index: 5; // Asegurar que los campos de formulario reciban eventos
+        }
+      }
+      
+      // Corregir superposición en las tarjetas
+      &::after {
+        pointer-events: none; // El borde premium no debe bloquear eventos
+        z-index: 0; // Menor z-index para que no interfiera
+      }
+    }
+    
+    // Corrección para contactos
+    .contact-row {
+      .contact-actions {
+        .action-btn {
+          z-index: 5; // Mayor z-index para los botones de acción
+          
+          .tooltip {
+            pointer-events: none; // No permitir eventos en los tooltips
+          }
+        }
+      }
+    }
+    
+    // Corrección para botón flotante
+    .floating-action-button {
+      .fab-button {
+        z-index: 100; // Mayor z-index 
+        
+        &::before, &::after {
+          pointer-events: none; // Efectos visuales no deben capturar eventos
+        }
+        
+        .fab-tooltip {
+          pointer-events: none; // Tooltips no deben capturar eventos
+        }
+      }
+      
+      .fab-menu {
+        .fab-item {
+          z-index: 99; // Alto z-index para botones del menú
+          
+          &::after {
+            pointer-events: none; // Efectos no interfieren con clics
+          }
+        }
+      }
+    }
+    
+    // Fix para efectos de card-3d
+    .info-card {
+      &:hover {
+        // Ajustar para que el efecto 3D no interfiera con la funcionalidad
+        transform: translateY(-6px);
+        
+        // Asegurarse que los bordes brillantes no interfieran
+        &::after {
+          pointer-events: none;
+        }
+      }
+    }
+    
+    // Corregir problema con las barras de progreso
+    .cert-progress-container {
+      .progress-bar, .progress-fill, .progress-text {
+        pointer-events: none; // No interferir con interacciones
+      }
+    }
+    
+    // Corregir para efectos hover en general
+    button, a, .action-button, .back-button, .edit-button, .add-contact-btn, .add-more-contacts {
+      // Asegurar posición relativa y z-index para todos los botones
+      position: relative;
+      z-index: 5;
+      
+      // Asegurar que los efectos de brillo no intercepten eventos
+      &::before, &::after {
+        pointer-events: none;
+      }
+    }
+  }
+  
+  // Corregir específicamente los botones de edición y adición
+  .edit-button, .action-btn, .add-button {
+    cursor: pointer !important;
+    position: relative !important;
+    z-index: 10 !important;
+    
+    i {
+      pointer-events: none; // El ícono no debe capturar eventos
+    }
+  }
+  
+  // Corregir clases específicas que podrían estar causando problemas
+  .card-3d-effect {
+    &:hover {
+      // Ajustar para evitar transformaciones 3D excesivas que puedan causar problemas
+      transform: translateY(-5px) !important;
+      
+      &::after {
+        pointer-events: none !important;
+      }
+    }
+  }
+  
+  // Asegurar que la estructura de la tarjeta de contactos sea correcta
+  .emergency-contacts {
+    .card-body {
+      position: relative;
+      
+      .contacts-list {
+        .contact-row {
+          position: relative;
+        }
+      }
+      
+      .add-contact-form {
+        position: relative;
+        z-index: 2;
+      }
+    }
+  }
+  
+  // Ajuste para evitar problemas con los eventos de hover
+  .tooltip {
+    pointer-events: none !important;
+  }
+  
+  // Asegurar que los efectos de sombra, resplandor y borde no interfieran con la funcionalidad
+  .button-effect, .card-header::after, .card-body::after, .tab-hover-effect {
+    pointer-events: none !important;
+  }
+
+  // Estilos específicos para la tarjeta de contactos de emergencia
+.emergency-contacts-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  overflow: hidden;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+  }
+  
+  // Encabezado de la tarjeta
+  .card-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px 20px;
+    background: linear-gradient(to right, #f7f9fc, #edf2f7);
+    border-bottom: 1px solid #e2e8f0;
+    
+    .header-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      
+      i {
+        color: #3b82f6;
+        font-size: 18px;
+        background: rgba(59, 130, 246, 0.1);
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 8px;
+      }
+      
+      h3 {
+        margin: 0;
+        font-size: 16px;
+        font-weight: 600;
+        color: #1e293b;
+      }
+    }
+    
+    .add-button {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: rgba(16, 185, 129, 0.1);
+      border: none;
+      color: #10b981;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      
+      &:hover {
+        background: rgba(16, 185, 129, 0.2);
+        transform: translateY(-2px);
+      }
+      
+      &:active {
+        transform: translateY(0);
+      }
+      
+      i {
+        font-size: 14px;
+      }
+    }
+  }
+  
+  // Cuerpo de la tarjeta
+  .card-body {
+    padding: 20px;
+    
+    // Formulario de contacto
+    .contact-form {
+      background: #f8fafc;
+      border-radius: 8px;
+      padding: 16px;
+      border: 1px solid #e2e8f0;
+      
+      .form-row {
+        margin-bottom: 16px;
+        
+        label {
+          display: block;
+          margin-bottom: 6px;
+          font-size: 14px;
+          font-weight: 500;
+          color: #475569;
+        }
+        
+        input, select {
+          width: 100%;
+          padding: 10px 12px;
+          border-radius: 6px;
+          border: 1px solid #cbd5e1;
+          font-size: 14px;
+          transition: border-color 0.2s ease, box-shadow 0.2s ease;
+          
+          &:focus {
+            outline: none;
+            border-color: #3b82f6;
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+          }
+        }
+      }
+      
+      .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 12px;
+        margin-top: 20px;
+        
+        button {
+          padding: 8px 16px;
+          border-radius: 6px;
+          font-weight: 500;
+          font-size: 14px;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          
+          &.cancel-btn {
+            background: white;
+            border: 1px solid #cbd5e1;
+            color: #64748b;
+            
+            &:hover {
+              background: #f1f5f9;
+              color: #334155;
+            }
+          }
+          
+          &.save-btn {
+            background: #3b82f6;
+            border: none;
+            color: white;
+            
+            &:hover:not(:disabled) {
+              background: #2563eb;
+              transform: translateY(-2px);
+              box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+            }
+            
+            &:active:not(:disabled) {
+              transform: translateY(0);
+            }
+            
+            &:disabled {
+              background: #94a3b8;
+              cursor: not-allowed;
+              opacity: 0.7;
+            }
+          }
+        }
+      }
+    }
+    
+    // Lista de contactos
+    .contacts-list {
+      .contact-item {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 14px 16px;
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        margin-bottom: 12px;
+        transition: all 0.2s ease;
+        
+        &:hover {
+          border-color: #cbd5e1;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+          transform: translateY(-2px);
+        }
+        
+        .contact-details {
+          flex: 1;
+          
+          .contact-name {
+            font-weight: 600;
+            color: #1e293b;
+            font-size: 15px;
+            margin-bottom: 6px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            
+            i {
+              color: #3b82f6;
+              font-size: 14px;
+            }
+          }
+          
+          .contact-info {
+            display: flex;
+            gap: 16px;
+            
+            .contact-phone, .contact-relation {
+              display: flex;
+              align-items: center;
+              gap: 6px;
+              color: #64748b;
+              font-size: 14px;
+              
+              i {
+                color: #94a3b8;
+                font-size: 12px;
+              }
+            }
+          }
+        }
+        
+        .contact-actions {
+          display: flex;
+          gap: 8px;
+          
+          button {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            
+            i {
+              font-size: 12px;
+            }
+            
+            &.edit-btn {
+              background: rgba(59, 130, 246, 0.1);
+              color: #3b82f6;
+              
+              &:hover {
+                background: rgba(59, 130, 246, 0.2);
+                transform: translateY(-2px);
+              }
+            }
+            
+            &.delete-btn {
+              background: rgba(239, 68, 68, 0.1);
+              color: #ef4444;
+              
+              &:hover {
+                background: rgba(239, 68, 68, 0.2);
+                transform: translateY(-2px);
+              }
+            }
+          }
+        }
+      }
+      
+      .add-more-btn {
+        width: 100%;
+        padding: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        background: none;
+        border: 1px dashed #cbd5e1;
+        border-radius: 8px;
+        color: #3b82f6;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        
+        i {
+          font-size: 16px;
+        }
+        
+        &:hover {
+          background: rgba(59, 130, 246, 0.05);
+          border-color: #3b82f6;
+          transform: translateY(-2px);
+        }
+        
+        &:active {
+          transform: translateY(0);
+        }
+      }
+    }
+    
+    // Estado sin contactos
+    .no-contacts {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 30px 20px;
+      text-align: center;
+      
+      i {
+        font-size: 36px;
+        color: #cbd5e1;
+        margin-bottom: 16px;
+      }
+      
+      p {
+        color: #64748b;
+        margin-bottom: 20px;
+        font-size: 15px;
+      }
+      
+      .add-contact-btn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 16px;
+        background: #3b82f6;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 500;
+        font-size: 14px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        
+        i {
+          font-size: 14px;
+          color: white;
+          margin: 0;
+        }
+        
+        &:hover {
+          background: #2563eb;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+        }
+        
+        &:active {
+          transform: translateY(0);
+        }
+      }
+    }
+  }
+}

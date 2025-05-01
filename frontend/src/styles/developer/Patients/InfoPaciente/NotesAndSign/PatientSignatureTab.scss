@@ -1,0 +1,174 @@
+// styles/developer/Patients/InfoPaciente/NotesAndSign/PatientSignatureTab.scss
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+.patient-signature-tab {
+  padding: 10px 0;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  position: relative;
+  
+  .section-title {
+    margin: 0 0 24px;
+    font-size: 18px;
+    font-weight: 700;
+    color: #1e293b;
+    position: relative;
+    
+    &::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 0;
+      width: 60px;
+      height: 3px;
+      background: linear-gradient(
+        90deg,
+        #ec4899,
+        #d946ef
+      );
+      border-radius: 3px;
+    }
+  }
+  
+  .autosaved-badge {
+    position: absolute;
+    top: 12px;
+    right: 10px;
+    font-size: 12px;
+    font-weight: 600;
+    color: #10b981;
+    background: rgba(209, 250, 229, 0.8);
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1px solid rgba(16, 185, 129, 0.2);
+    opacity: 0;
+    transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out;
+    transform: translateY(5px);
+    
+    &.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  
+  .captured-outside-option {
+    margin-bottom: 24px;
+    
+    .checkbox-container {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      cursor: pointer;
+      
+      input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        accent-color: #8b5cf6;
+        cursor: pointer;
+      }
+      
+      .checkbox-text {
+        font-size: 15px;
+        color: #475569;
+      }
+    }
+  }
+  
+  .signature-pad-container {
+    position: relative;
+    margin-bottom: 16px;
+    
+    &.disabled {
+      opacity: 0.7;
+      pointer-events: none;
+    }
+    
+    .signature-pad {
+      position: relative;
+      height: 200px;
+      min-height: 150px;
+      border: 2px dashed rgba(226, 232, 240, 0.9);
+      border-radius: 8px;
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      box-sizing: border-box;
+      
+      canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        cursor: crosshair;
+        z-index: 1;
+        
+        &.disabled {
+          cursor: not-allowed;
+        }
+      }
+      
+      .signature-hint {
+        position: absolute;
+        left: 0;
+        right: 0;
+        text-align: center;
+        bottom: 10px;
+        color: #cbd5e1;
+        font-size: 13px;
+        font-weight: 600;
+        letter-spacing: 1px;
+        z-index: 0;
+        pointer-events: none;
+      }
+    }
+    
+    .clear-btn {
+      padding: 8px 16px;
+      background: #ef4444;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      
+      &:hover {
+        background: #dc2626;
+      }
+      
+      &:disabled {
+        background: #94a3b8;
+        cursor: not-allowed;
+      }
+    }
+  }
+}
+
+// Media queries for responsive design
+@media (max-width: 768px) {
+  .patient-signature-tab {
+    .section-title {
+      font-size: 16px;
+    }
+    
+    .signature-pad-container {
+      .signature-pad {
+        height: 150px;
+      }
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .patient-signature-tab {
+    .signature-pad-container {
+      .signature-pad {
+        height: 120px;
+      }
+    }
+  }
+}

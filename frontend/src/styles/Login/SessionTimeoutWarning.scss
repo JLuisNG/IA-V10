@@ -1,0 +1,164 @@
+.session-timeout-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.6);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+    backdrop-filter: blur(5px);
+    
+    &.show {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .session-timeout-modal {
+      width: 90%;
+      max-width: 400px;
+      background: linear-gradient(120deg, #1a1a2e 0%, #16213e 100%);
+      border-radius: 12px;
+      padding: 30px;
+      color: #fff;
+      transform: translateY(20px);
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      text-align: center;
+      
+      .session-timeout-overlay.show & {
+        transform: translateY(0);
+      }
+    }
+    
+    .timeout-icon {
+      width: 70px;
+      height: 70px;
+      background: rgba(255, 193, 7, 0.2);
+      border-radius: 50%;
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      i {
+        font-size: 32px;
+        color: #ffc107;
+      }
+    }
+    
+    .timeout-title {
+      font-size: 24px;
+      margin-bottom: 15px;
+      font-weight: 600;
+    }
+    
+    .timeout-message {
+      margin-bottom: 20px;
+      
+      p {
+        margin-bottom: 10px;
+        line-height: 1.5;
+        color: rgba(255, 255, 255, 0.8);
+      }
+      
+      .timeout-countdown {
+        font-weight: bold;
+        color: #ffc107;
+      }
+    }
+    
+    .timeout-timer {
+      margin: 15px auto 25px;
+      width: 100px;
+      height: 100px;
+      position: relative;
+      
+      .timer-circle {
+        width: 100%;
+        height: 100%;
+        position: relative;
+        
+        svg {
+          width: 100%;
+          height: 100%;
+          transform: rotate(-90deg);
+          
+          .timer-bg {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.1);
+            stroke-width: 5;
+          }
+          
+          .timer-progress {
+            fill: none;
+            stroke: #ffc107;
+            stroke-width: 5;
+            stroke-linecap: round;
+            stroke-dasharray: 283; // 2 * PI * 45
+            transition: stroke-dashoffset 1s linear;
+          }
+        }
+        
+        .timer-text {
+          position: absolute;
+          top: 50%;
+          left: 50%;
+          transform: translate(-50%, -50%);
+          font-size: 28px;
+          font-weight: 700;
+          color: #ffc107;
+        }
+      }
+    }
+    
+    .timeout-actions {
+      display: flex;
+      gap: 10px;
+      
+      .timeout-button {
+        flex: 1;
+        padding: 12px;
+        font-weight: 600;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        
+        &.stay-logged-in {
+          background: #4CAF50;
+          color: white;
+          
+          &:hover {
+            background: #43A047;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+          }
+          
+          &:active {
+            transform: translateY(0);
+          }
+        }
+        
+        &.logout {
+          background: rgba(255, 255, 255, 0.1);
+          color: white;
+          
+          &:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+          }
+          
+          &:active {
+            transform: translateY(0);
+          }
+        }
+      }
+    }
+  }

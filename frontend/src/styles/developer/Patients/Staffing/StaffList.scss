@@ -1,0 +1,1425 @@
+@import '../../../_variables.scss';
+
+.staff-list-container {
+  width: 100%;
+  animation: blurryReveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+
+  // Pantalla de carga
+  .staff-list-loading {
+    background: rgba(10, 30, 60, 0.8);
+    border-radius: $border-radius-lg;
+    padding: $spacing-12;
+    margin-bottom: $spacing-8;
+    text-align: center;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba($primary-color, 0.2);
+    position: relative;
+    min-height: 400px;
+    @include flex-center;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3), 
+                inset 0 0 60px rgba($primary-color, 0.1);
+    
+    // Fondo con efecto digital
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        linear-gradient(135deg, rgba(10, 30, 60, 0.2) 0%, transparent 100%),
+        radial-gradient(circle at 20% 30%, rgba($primary-color, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba($accent-color, 0.1) 0%, transparent 50%);
+      z-index: -1;
+      opacity: 0.8;
+    }
+    
+    // Efecto de partículas flotantes
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: 
+        radial-gradient(circle at 10% 10%, rgba(255, 255, 255, 0.1) 0%, transparent 2%),
+        radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.1) 0%, transparent 3%),
+        radial-gradient(circle at 30% 70%, rgba(255, 255, 255, 0.1) 0%, transparent 2%),
+        radial-gradient(circle at 70% 40%, rgba(255, 255, 255, 0.1) 0%, transparent 2%),
+        radial-gradient(circle at 90% 90%, rgba(255, 255, 255, 0.1) 0%, transparent 2%);
+      background-size: 150px 150px;
+      animation: floatingParticles 15s linear infinite;
+      opacity: 0.5;
+      z-index: -1;
+    }
+    
+    .loading-container {
+      position: relative;
+      width: 300px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: $spacing-6;
+      
+      // Efecto de holograma
+      .loading-hologram {
+        position: relative;
+        width: 140px;
+        height: 140px;
+        margin-bottom: $spacing-5;
+        
+        .hologram-ring {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+          border: 2px solid rgba($primary-color, 0.3);
+          box-shadow: 
+            0 0 15px rgba($primary-color, 0.5),
+            inset 0 0 15px rgba($primary-color, 0.5);
+          animation: pulseRing 3s infinite ease-in-out;
+        }
+        
+        .hologram-circle {
+          position: absolute;
+          width: 70%;
+          height: 70%;
+          top: 15%;
+          left: 15%;
+          border-radius: 50%;
+          background: radial-gradient(
+            circle at center,
+            rgba($primary-light, 0.4) 0%,
+            rgba($primary-color, 0.2) 40%,
+            rgba($primary-color, 0.1) 60%,
+            transparent 80%
+          );
+          filter: blur(4px);
+          opacity: 0.8;
+          animation: pulsate 3s infinite ease-in-out;
+          
+          &::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 50%;
+            box-shadow: inset 0 0 20px rgba($primary-color, 0.5);
+            animation: shineEffect 2s infinite;
+          }
+        }
+        
+        .hologram-bars {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          @include flex-center;
+          
+          .bar {
+            position: absolute;
+            width: 3px;
+            background: linear-gradient(to top, transparent, $primary-color, transparent);
+            box-shadow: 0 0 8px rgba($primary-color, 0.8);
+            animation-name: barHeight;
+            animation-duration: 1.5s;
+            animation-iteration-count: infinite;
+            animation-timing-function: ease-in-out;
+            
+            &:nth-child(1) {
+              height: 60%;
+              left: 30%;
+              animation-delay: 0.2s;
+            }
+            
+            &:nth-child(2) {
+              height: 40%;
+              left: 40%;
+              animation-delay: 0.6s;
+            }
+            
+            &:nth-child(3) {
+              height: 70%;
+              left: 50%;
+              animation-delay: 0s;
+            }
+            
+            &:nth-child(4) {
+              height: 50%;
+              left: 60%;
+              animation-delay: 0.8s;
+            }
+            
+            &:nth-child(5) {
+              height: 45%;
+              left: 70%;
+              animation-delay: 0.4s;
+            }
+          }
+        }
+      }
+      
+      // Barra de progreso
+      .loading-progress {
+        width: 100%;
+        margin: $spacing-4 0;
+        
+        .progress-bar {
+          height: 6px;
+          width: 100%;
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 3px;
+          overflow: hidden;
+          position: relative;
+          
+          .progress-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: linear-gradient(90deg, $primary-color, $primary-light);
+            box-shadow: 0 0 10px rgba($primary-color, 0.8);
+            border-radius: 3px;
+            width: 0%;
+            animation: progressFill 4.5s ease-in-out forwards;
+          }
+        }
+      }
+      
+      // Texto de carga
+      .loading-text {
+        font-size: $font-lg;
+        font-weight: $font-semibold;
+        color: $white;
+        text-shadow: 0 0 10px rgba($primary-color, 0.8);
+        width: 100%;
+        min-height: 32px;
+        transition: all 0.3s ease-in-out;
+      }
+      
+      // Estado del sistema
+      .loading-status {
+        margin-top: $spacing-4;
+        font-size: $font-sm;
+        color: rgba($white, 0.7);
+        display: flex;
+        align-items: center;
+        gap: $spacing-2;
+        
+        .status-dot {
+          display: inline-block;
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background-color: $success;
+          box-shadow: 0 0 8px $success;
+          animation: blink 1.2s infinite;
+        }
+      }
+    }
+  }
+
+  // Header del listado de personal
+  .staff-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: $spacing-6;
+    
+    .header-left {
+      display: flex;
+      align-items: flex-start;
+      gap: $spacing-4;
+      
+      .back-button {
+        display: flex;
+        align-items: center;
+        gap: $spacing-2;
+        padding: $spacing-2 $spacing-4;
+        background: transparent;
+        border: 1px solid $border-color;
+        border-radius: $border-radius-md;
+        color: $text-secondary;
+        font-weight: $font-medium;
+        cursor: pointer;
+        transition: $transition-quick;
+        
+        i {
+          font-size: $font-md;
+        }
+        
+        &:hover {
+          background: rgba($light-gray, 0.2);
+          transform: translateX(-3px);
+        }
+      }
+      
+      .header-title {
+        h2 {
+          font-size: $font-xl;
+          font-weight: $font-bold;
+          color: $text-light;
+          margin-bottom: $spacing-2;
+        }
+        
+        p {
+          color: $text-secondary;
+          font-size: $font-md;
+        }
+      }
+    }
+    
+    .header-actions {
+      display: flex;
+      gap: $spacing-3;
+      
+      button {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: $spacing-2;
+        padding: $spacing-2 $spacing-4;
+        border-radius: $border-radius-md;
+        font-weight: $font-medium;
+        font-size: $font-sm;
+        cursor: pointer;
+        transition: $transition-medium;
+        
+        i {
+          font-size: $font-md;
+        }
+        
+        &.refresh-btn {
+          background: transparent;
+          color: $text-secondary;
+          border: 1px solid $border-color;
+          
+          &:hover {
+            background: rgba($light-gray, 0.2);
+            color: $text-light;
+          }
+        }
+        
+        &.export-btn {
+          color: $white;
+          border: none;
+          box-shadow: 0 4px 10px rgba($success, 0.25);
+          
+          &:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba($success, 0.3);
+          }
+        }
+      }
+    }
+  }
+  
+  // Métricas de resumen
+  .staff-metrics {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: $spacing-5;
+    margin-bottom: $spacing-6;
+    
+    .metric-card {
+      background: $white;
+      border-radius: $border-radius-md;
+      padding: $spacing-5;
+      display: flex;
+      align-items: center;
+      gap: $spacing-4;
+      box-shadow: $shadow-medium;
+      transition: $transition-medium;
+      
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: $shadow-lg;
+      }
+      
+      .metric-icon {
+        width: 50px;
+        height: 50px;
+        border-radius: $border-radius-sm;
+        background: rgba($primary-color, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        i {
+          font-size: $font-lg;
+          color: $primary-color;
+        }
+      }
+      
+      .metric-data {
+        h3 {
+          font-size: $font-xl;
+          font-weight: $font-bold;
+          color: $dark-gray;
+          margin-bottom: $spacing-1;
+        }
+        
+        p {
+          font-size: $font-sm;
+          color: $medium-gray;
+          margin: 0;
+        }
+      }
+      
+      &:nth-child(1) .metric-icon {
+        background: rgba($primary-color, 0.1);
+        i { color: $primary-color; }
+      }
+      
+      &:nth-child(2) .metric-icon {
+        background: rgba($success, 0.1);
+        i { color: $success; }
+      }
+      
+      &:nth-child(3) .metric-icon {
+        background: rgba($warning, 0.1);
+        i { color: $warning; }
+      }
+      
+      &:nth-child(4) .metric-icon {
+        background: rgba($accent-color, 0.1);
+        i { color: $accent-color; }
+      }
+    }
+  }
+  
+  // Barra de filtros y búsqueda
+  .staff-filters {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-6;
+    
+    .search-filter {
+      display: flex;
+      gap: $spacing-4;
+      flex: 1;
+      
+      .search-input {
+        position: relative;
+        flex: 1;
+        max-width: 400px;
+        
+        i {
+          position: absolute;
+          left: $spacing-3;
+          top: 50%;
+          transform: translateY(-50%);
+          color: $medium-gray;
+          font-size: $font-md;
+        }
+        
+        input {
+          
+          width: 100%;
+          padding: $spacing-3 $spacing-3 $spacing-3 $spacing-8;
+          border: 1px solid $light-gray;
+          border-radius: $border-radius-md;
+          font-size: $font-sm;
+          background: $white;
+          transition: $transition-quick;
+          
+          &:focus {
+            outline: none;
+            border-color: $primary-color;
+            box-shadow: 0 0 0 3px rgba($primary-color, 0.15);
+          }
+          
+          &::placeholder {
+            color: $medium-gray;
+          }
+        }
+        
+        .clear-search {
+          position: absolute;
+          right: $spacing-3;
+          top: 50%;
+          transform: translateY(-50%);
+          background: none;
+          border: none;
+          color: $medium-gray;
+          cursor: pointer;
+          padding: 0;
+          font-size: $font-md;
+          
+          &:hover {
+            color: $dark-gray;
+          }
+        }
+      }
+      
+      .filter-by-role {
+        select {
+          padding: $spacing-3 $spacing-5 $spacing-3 $spacing-3;
+          border: 1px solid $light-gray;
+          border-radius: $border-radius-md;
+          font-size: $font-sm;
+          background: $white;
+          color: $dark-gray;
+          appearance: none;
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+          background-repeat: no-repeat;
+          background-position: right 0.7rem center;
+          background-size: 1rem;
+          cursor: pointer;
+          transition: $transition-quick;
+          min-width: 200px;
+          
+          &:focus {
+            outline: none;
+            border-color: $primary-color;
+            box-shadow: 0 0 0 3px rgba($primary-color, 0.15);
+          }
+        }
+      }
+    }
+    
+    .view-options {
+      display: flex;
+      gap: $spacing-4;
+      
+      .sort-by {
+        select {
+          padding: $spacing-3 $spacing-5 $spacing-3 $spacing-3;
+          border: 1px solid $light-gray;
+          border-radius: $border-radius-md;
+          font-size: $font-sm;
+          background: $white;
+          color: $dark-gray;
+          appearance: none;
+          background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+          background-repeat: no-repeat;
+          background-position: right 0.7rem center;
+          background-size: 1rem;
+          cursor: pointer;
+          transition: $transition-quick;
+          
+          &:focus {
+            outline: none;
+            border-color: $primary-color;
+            box-shadow: 0 0 0 3px rgba($primary-color, 0.15);
+          }
+        }
+      }
+      
+      .view-toggle {
+        display: flex;
+        border: 1px solid $light-gray;
+        border-radius: $border-radius-md;
+        overflow: hidden;
+        
+        .toggle-btn {
+          width: 40px;
+          height: 38px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: $white;
+          border: none;
+          color: $medium-gray;
+          cursor: pointer;
+          transition: $transition-quick;
+          
+          &.active {
+            background: $primary-color;
+            color: $white;
+          }
+          
+          &:not(.active):hover {
+            background: $light-gray;
+            color: $dark-gray;
+          }
+        }
+      }
+    }
+  }
+  
+  // Lista de Personal
+  .staff-list {
+    display: grid;
+    gap: $spacing-6;
+    
+    // Vista en grid
+    &.grid-view {
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+    
+    // Vista en lista
+    &.list-view {
+      grid-template-columns: 1fr;
+      
+      .staff-card {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        
+        .card-header {
+          width: 200px;
+          flex-shrink: 0;
+          padding: $spacing-4;
+        }
+        
+        .card-content {
+          flex: 1;
+          border-left: 1px solid $light-gray;
+          padding: $spacing-4;
+        }
+        
+        .card-footer {
+          width: 200px;
+          flex-shrink: 0;
+          border-left: 1px solid $light-gray;
+          padding: $spacing-4;
+        }
+      }
+    }
+    
+    // Tarjeta de personal
+    .staff-card {
+      background: $white;
+      border-radius: $border-radius-md;
+      overflow: hidden;
+      box-shadow: $shadow-medium;
+      cursor: pointer;
+      transition: $transition-medium;
+      border: 1px solid $light-gray;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      
+      &::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 4px;
+        height: 100%;
+        background: $medium-gray;
+        transition: background 0.3s;
+      }
+      
+      &.active::before {
+        background: $status-active;
+      }
+      
+      &.inactive::before {
+        background: $status-inactive;
+      }
+      
+      &:hover {
+        transform: translateY(-5px);
+        box-shadow: $shadow-lg;
+      }
+      
+      // Encabezado de la tarjeta
+      .card-header {
+        padding: $spacing-4 $spacing-5;
+        display: flex;
+        align-items: center;
+        gap: $spacing-4;
+        border-bottom: 1px solid $light-gray;
+        
+        .avatar {
+          width: 56px;
+          height: 56px;
+          border-radius: 50%;
+          color: $white;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-size: $font-lg;
+          font-weight: $font-bold;
+          position: relative;
+          
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 50%;
+          }
+          
+          .avatar-placeholder {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: $font-lg;
+            font-weight: $font-bold;
+            color: $white;
+            border-radius: 50%;
+            color: #000000;
+          }
+        }
+        
+        .staff-info {
+          flex: 1;
+          
+          h3 {
+            font-size: $font-md;
+            font-weight: $font-semibold;
+            color: $dark-gray;
+            margin: 0 0 $spacing-1 0;
+          }
+          
+          .role-badge {
+            display: inline-block;
+            font-size: $font-xs;
+            padding: $spacing-1 $spacing-2;
+            background: rgba($primary-color, 0.1);
+            color: $primary-color;
+            border-radius: $border-radius-sm;
+            margin-right: $spacing-2;
+          }
+          
+          .status-badge {
+            display: inline-block;
+            font-size: $font-xs;
+            padding: $spacing-1 $spacing-2;
+            border-radius: $border-radius-sm;
+            
+            &.active {
+              background: rgba($status-active, 0.1);
+              color: darken($status-active, 20%);
+            }
+            
+            &.inactive {
+              background: rgba($status-inactive, 0.1);
+              color: darken($status-inactive, 20%);
+            }
+          }
+        }
+      }
+      
+      // Contenido de la tarjeta
+      .card-content {
+        padding: $spacing-4 $spacing-5;
+        
+        .contact-info {
+          margin-bottom: $spacing-4;
+          
+          .info-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: $spacing-2;
+            
+            i {
+              width: 20px;
+              color: $medium-gray;
+              margin-right: $spacing-3;
+              font-size: $font-md;
+            }
+            
+            span {
+              font-size: $font-sm;
+              color: $dark-gray;
+              width: calc(100% - 30px);
+              white-space: nowrap;
+              overflow: hidden;
+              text-overflow: ellipsis;
+            }
+          }
+        }
+        
+        .documents-status {
+          .doc-progress {
+            .progress-label {
+              display: flex;
+              justify-content: space-between;
+              font-size: $font-xs;
+              margin-bottom: $spacing-1;
+              
+              span:first-child {
+                color: $medium-gray;
+              }
+              
+              span:last-child {
+                color: $dark-gray;
+                font-weight: $font-semibold;
+              }
+            }
+            
+            .progress-bar {
+              height: 6px;
+              width: 100%;
+              background: $light-gray;
+              border-radius: 3px;
+              overflow: hidden;
+              
+              .progress-fill {
+                height: 100%;
+                border-radius: 3px;
+                transition: width 0.5s ease;
+              }
+            }
+          }
+        }
+      }
+      
+      // Pie de la tarjeta
+      .card-footer {
+        padding: $spacing-4 $spacing-5;
+        border-top: 1px solid $light-gray;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        
+        .patients-info {
+          display: flex;
+          align-items: center;
+          gap: $spacing-2;
+          font-size: $font-sm;
+          color: $medium-gray;
+          
+          i {
+            color: $primary-color;
+          }
+        }
+        
+        .card-actions {
+          .view-profile-btn {
+            padding: $spacing-2 $spacing-3;
+            background: transparent;
+            border: 1px solid $light-gray;
+            border-radius: $border-radius-sm;
+            font-size: $font-xs;
+            color: $dark-gray;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: $spacing-1;
+            transition: $transition-quick;
+            
+            i {
+              font-size: $font-sm;
+              color: $primary-color;
+            }
+            
+            &:hover {
+              background: $light-gray;
+              border-color: $medium-gray;
+            }
+          }
+        }
+      }
+    }
+    
+    // No hay resultados
+    .no-results {
+      grid-column: 1 / -1;
+      background: $white;
+      border-radius: $border-radius-md;
+      padding: $spacing-8;
+      text-align: center;
+      box-shadow: $shadow-medium;
+      
+      i {
+        font-size: $font-xxxl;
+        color: $light-gray;
+        margin-bottom: $spacing-4;
+      }
+      
+      h3 {
+        font-size: $font-lg;
+        font-weight: $font-semibold;
+        color: $dark-gray;
+        margin: 0 0 $spacing-2 0;
+      }
+      
+      p {
+        font-size: $font-md;
+        color: $medium-gray;
+        margin: 0 0 $spacing-6 0;
+      }
+      
+      .reset-filters {
+        padding: $spacing-3 $spacing-6;
+        background: $primary-color;
+        color: $white;
+        border: none;
+        border-radius: $border-radius-md;
+        font-weight: $font-medium;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        gap: $spacing-2;
+        transition: $transition-medium;
+        
+        &:hover {
+          background: darken($primary-color, 10%);
+          transform: translateY(-3px);
+          box-shadow: $shadow-medium;
+        }
+      }
+    }
+  }
+  
+  // Animaciones
+  @keyframes pulseRing {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 0.8;
+    }
+    50% {
+      transform: scale(1.05);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes pulsate {
+    0%, 100% {
+      transform: scale(1);
+      opacity: 0.7;
+    }
+    50% {
+      transform: scale(1.1);
+      opacity: 0.9;
+    }
+  }
+  
+  @keyframes barHeight {
+    0%, 100% {
+      transform: scaleY(0.6);
+    }
+    50% {
+      transform: scaleY(1);
+    }
+  }
+  
+  @keyframes shineEffect {
+    0% {
+      opacity: 0.5;
+    }
+    50% {
+      opacity: 1;
+    }
+    100% {
+      opacity: 0.5;
+    }
+  }
+  
+  @keyframes progressFill {
+    0% {
+      width: 0%;
+    }
+    20% {
+      width: 40%;
+    }
+    50% {
+      width: 60%;
+    }
+    80% {
+      width: 85%;
+    }
+    100% {
+      width: 100%;
+    }
+  }
+  
+  @keyframes blink {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0.4;
+    }
+  }
+  
+  @keyframes floatingParticles {
+    0% {
+      background-position: 0 0;
+    }
+    100% {
+      background-position: 150px 150px;
+    }
+  }
+  
+  @keyframes blurryReveal {
+    0% { 
+      filter: blur(15px);
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    100% { 
+      filter: blur(0);
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+}
+
+// Media queries para responsividad
+@media (max-width: $breakpoint-xl) {
+  .staff-list-container {
+    .staff-metrics {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    
+    .staff-list {
+      &.grid-view {
+        grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+      }
+    }
+  }
+}
+
+@media (max-width: $breakpoint-lg) {
+  .staff-list-container {
+    .staff-list-header {
+      flex-direction: column;
+      gap: $spacing-4;
+      
+      .header-left {
+        width: 100%;
+      }
+      
+      .header-actions {
+        width: 100%;
+        justify-content: flex-end;
+      }
+    }
+    
+    .staff-filters {
+      flex-direction: column;
+      gap: $spacing-4;
+      
+      .search-filter {
+        width: 100%;
+        
+        .search-input {
+          max-width: none;
+        }
+      }
+      
+      .view-options {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+  }
+}
+
+@media (max-width: $breakpoint-md) {
+  .staff-list-container {
+    .staff-metrics {
+      grid-template-columns: 1fr;
+    }
+    
+    .staff-filters {
+      .search-filter {
+        flex-direction: column;
+        
+        .filter-by-role {
+          width: 100%;
+          
+          select {
+            width: 100%;
+          }
+        }
+      }
+    }
+    
+    .staff-list {
+      &.grid-view {
+        grid-template-columns: 1fr;
+      }
+      
+      &.list
+      .card-header,
+      .card-content,
+      .card-footer {
+        width: 100%;
+        border-left: none;
+      }
+      
+      .card-content {
+        border-top: 1px solid $light-gray;
+      }
+      
+      .card-footer {
+        border-top: 1px solid $light-gray;
+      }
+    }
+  }
+}
+
+/* CSS para mejorar la legibilidad del texto en TherapySync */
+
+/* Mejorar contraste para todos los textos en tarjetas */
+.staff-card .staff-info h3,
+.staff-card .role-badge,
+.staff-card .status-badge,
+.staff-card .contact-info .info-item span,
+.staff-card .patients-info span,
+.staff-card .view-profile-btn span,
+.metric-card .metric-data h3,
+.metric-card .metric-data p {
+  color: #000000 !important;
+  font-weight: 600 !important;
+  text-shadow: none !important;
+}
+
+/* Cambiar colores de texto en el encabezado */
+.staff-list-header .header-title h2 {
+  color: #FFFFFF !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7) !important;
+  font-weight: 700 !important;
+}
+
+.staff-list-header .header-title p {
+  color: #FFFFFF !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7) !important;
+  font-weight: 500 !important;
+}
+
+/* Mejorar contraste del botón de volver */
+.back-button {
+  background: rgba(255, 255, 255, 0.3) !important;
+  color: #FFFFFF !important;
+  font-weight: 600 !important;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7) !important;
+  border: 1px solid rgba(255, 255, 255, 0.4) !important;
+}
+
+/* Mejorar legilibilidad de etiquetas de rol */
+.role-badge {
+  background: #E2F0FF !important;
+  color: #003366 !important;
+  font-weight: 600 !important;
+  border: 1px solid #BBDDFF !important;
+}
+
+/* Mejorar contraste de etiquetas de estado */
+.status-badge.active {
+  background: #E0F8E0 !important;
+  color: #006600 !important;
+  font-weight: 600 !important;
+  border: 1px solid #A0D0A0 !important;
+}
+
+.status-badge.inactive {
+  background: #FFE0E0 !important;
+  color: #CC0000 !important;
+  font-weight: 600 !important;
+  border: 1px solid #FFBBBB !important;
+}
+
+/* Ajustar colores de iconos para mejor contraste */
+.staff-card .contact-info .info-item i,
+.staff-card .patients-info i {
+  color: #0055AA !important;
+}
+
+/* Mejorar fondos para las tarjetas */
+.staff-card {
+  background: #FFFFFF !important;
+  border: 1px solid #D0D0D0 !important;
+}
+
+/* Asegurar que el texto en el botón Ver Perfil sea visible */
+.view-profile-btn {
+  background: #E2F0FF !important;
+  color: #003366 !important;
+  font-weight: 600 !important;
+  border: 1px solid #BBDDFF !important;
+}
+
+.view-profile-btn i {
+  color: #0055AA !important;
+}
+
+/* Mejor contraste para texto en tarjetas métricas */
+.metric-card {
+  background: #FFFFFF !important;
+}
+
+.metric-card .metric-data h3 {
+  color: #000000 !important;
+  font-weight: 700 !important;
+  font-size: 1.5rem !important;
+}
+
+.metric-card .metric-data p {
+  color: #000000 !important;
+  font-weight: 600 !important;
+}
+
+/* Mejorar legibilidad de la barra progreso de documentos */
+.doc-progress .progress-label span:first-child {
+  color: #000000 !important;
+  font-weight: 500 !important;
+}
+
+.doc-progress .progress-label span:last-child {
+  color: #000000 !important;
+  font-weight: 600 !important;
+}
+
+/* Agregar sombra al texto de los nombres de staff */
+.staff-info h3 {
+  text-shadow: 0 0 1px rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Añadir bordes más visibles a las tarjetas */
+.staff-card {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15) !important;
+  border: 1px solid #BBBBBB !important;
+}
+
+/* Mejorar claridad en el email y teléfono */
+.contact-info .info-item span {
+  color: #000000 !important;
+  font-weight: 500 !important;
+}
+
+/* Mejorar fondo del área de filtros para contraste */
+.staff-filters {
+  background: rgba(255, 255, 255, 0.15) !important;
+  backdrop-filter: blur(10px) !important;
+  padding: 15px !important;
+  border-radius: 8px !important;
+  border: 1px solid rgba(255, 255, 255, 0.3) !important;
+}
+
+.staff-filters .search-input input,
+.staff-filters select {
+  color: black !important;
+  border: 1px solid #BBBBBB !important;
+}
+
+.staff-filters .search-input i {
+  color: #555555 !important;
+}
+
+/* Mejorar contraste del icono indicator de estado */
+.avatar-container .status-indicator.active {
+  background-color: #00CC00 !important;
+  border: 2px solid white !important;
+  box-shadow: 0 0 0 1px #00AA00 !important;
+}
+
+/* Fortalecer contraste para el contador de documentos */
+.doc-progress .progress-bar {
+  background: #E0E0E0 !important;
+}
+
+.doc-progress .progress-fill {
+  background: #0073FF !important;
+}
+
+/* Mejoras para los avatares y placeholders */
+
+/* Mejora del avatar placeholder */
+.avatar-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #FFFFFF;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #0074d9, #0050a7);
+  text-shadow: 0 1px 1px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+  border: 2px solid #FFFFFF;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Iniciales específicas por rol para más contraste */
+.staff-card .physical-therapist .avatar-placeholder {
+  background: linear-gradient(135deg, #0074d9, #0050a7); /* Azul para PT */
+}
+
+.staff-card .speech-therapist .avatar-placeholder {
+  background: linear-gradient(135deg, #2ecc40, #1a9a27); /* Verde para ST */
+}
+
+.staff-card .occupational-therapist .avatar-placeholder {
+  background: linear-gradient(135deg, #ff851b, #d56e17); /* Naranja para OT */
+}
+
+.staff-card .administrator .avatar-placeholder {
+  background: linear-gradient(135deg, #6c5ce7, #5341c8); /* Púrpura para Admin */
+}
+
+.staff-card .assistant .avatar-placeholder {
+  background: linear-gradient(135deg, #e84393, #c82e79); /* Rosa para Asistentes */
+}
+
+/* Si no hay clases específicas, puedes usar selección por posición */
+.staff-card:nth-child(1) .avatar-placeholder {
+  background: linear-gradient(135deg, #0074d9, #0050a7); /* Azul */
+}
+
+.staff-card:nth-child(2) .avatar-placeholder {
+  background: linear-gradient(135deg, #2ecc40, #1a9a27); /* Verde */
+}
+
+.staff-card:nth-child(3) .avatar-placeholder {
+  background: linear-gradient(135deg, #ff851b, #d56e17); /* Naranja */
+}
+
+.staff-card:nth-child(4) .avatar-placeholder {
+  background: linear-gradient(135deg, #6c5ce7, #5341c8); /* Púrpura */
+}
+
+.staff-card:nth-child(5) .avatar-placeholder {
+  background: linear-gradient(135deg, #e84393, #c82e79); /* Rosa */
+}
+
+.staff-card:nth-child(6) .avatar-placeholder {
+  background: linear-gradient(135deg, #00a8ff, #0097e6); /* Azul claro */
+}
+
+.staff-card:nth-child(7) .avatar-placeholder {
+  background: linear-gradient(135deg, #f368e0, #d63acd); /* Rosa claro */
+}
+
+.staff-card:nth-child(8) .avatar-placeholder {
+  background: linear-gradient(135deg, #ff9f43, #ee8930); /* Naranja claro */
+}
+
+/* Mejoras para los iconos en la información de contacto */
+.info-item i {
+  width: 20px;
+  color: #0074d9 !important;
+  margin-right: 10px;
+  font-size: 1rem;
+  text-align: center;
+}
+
+.info-item:hover i {
+  color: #0050a7 !important;
+}
+
+/* Iconos específicos */
+.info-item .fa-envelope {
+  color: #d44638 !important; /* Rojo para email */
+}
+
+.info-item .fa-phone {
+  color: #34a853 !important; /* Verde para teléfono */
+}
+
+.info-item .fa-birthday-cake {
+  color: #f368e0 !important; /* Rosa para cumpleaños */
+}
+
+.info-item .fa-map-marker-alt {
+  color: #ff5252 !important; /* Rojo para ubicación */
+}
+
+/* Mejora del avatar container */
+.avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  font-weight: 700;
+  position: relative;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  border: 2px solid #FFFFFF;
+  overflow: hidden;
+}
+
+/* Estilo para las iniciales de avatar en las métricas */
+.staffing-stats .metric-icon,
+.metric-card .metric-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 116, 217, 0.15);
+  color: #0074d9;
+  font-size: 1.3rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(0, 116, 217, 0.3);
+}
+
+/* Mejorar los iconos del footer de las tarjetas */
+.card-footer .patients-info i {
+  color: #0074d9 !important;
+  font-size: 1rem;
+}
+
+/* Mejorar apariencia del botón Ver Perfil */
+.view-profile-btn {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 12px;
+  background: #f5f8fa !important;
+  color: #0074d9 !important;
+  border: 1px solid #d8e2e9 !important;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  font-weight: 600 !important;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.view-profile-btn:hover {
+  background: #e8f2ff !important;
+  border-color: #c2d8f2 !important;
+  transform: translateY(-2px);
+}
+
+.view-profile-btn i {
+  color: #0074d9 !important;
+  font-size: 0.9rem;
+}
+
+/* Mejoras para el estado del avatar */
+.avatar-container .status-indicator {
+  position: absolute;
+  bottom: 0;
+  right: 0;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid white;
+  z-index: 2;
+}
+
+.avatar-container .status-indicator.active {
+  background-color: #10b981;
+  box-shadow: 0 0 0 2px white;
+}
+
+.avatar-container .status-indicator.inactive {
+  background-color: #ef4444;
+  box-shadow: 0 0 0 2px white;
+}
+
+//  VARIANTE: Para colores sólidos en lugar de gradientes 
+
+// .avatar-placeholder {
+//   background-color: #0074d9;
+// }
+
+// .staff-card:nth-child(1) .avatar-placeholder { background-color: #0074d9; }
+// .staff-card:nth-child(2) .avatar-placeholder { background-color: #2ecc40; }
+// .staff-card:nth-child(3) .avatar-placeholder { background-color: #ff851b; }
+// .staff-card:nth-child(4) .avatar-placeholder { background-color: #6c5ce7; }
+// .staff-card:nth-child(5) .avatar-placeholder { background-color: #e84393; }
+// .staff-card:nth-child(6) .avatar-placeholder { background-color: #00a8ff; }
+// .staff-card:nth-child(7) .avatar-placeholder { background-color: #f368e0; }
+// .staff-card:nth-child(8) .avatar-placeholder { background-color: #ff9f43; }
