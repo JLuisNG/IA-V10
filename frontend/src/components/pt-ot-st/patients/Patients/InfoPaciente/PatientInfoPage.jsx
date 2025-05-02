@@ -187,17 +187,28 @@ const formatDateForInput = (dateStr) => {
 };
 
 // General Information Section Component
-const GeneralInformationSection = ({ patient }) => {
+const GeneralInformationSection = ({ patient, setCertPeriodDates }) => {
+
   // Handler for certification period updates
   const handleUpdateCertPeriod = (updatedCertData) => {
     console.log('Certification period updated:', updatedCertData);
-    // Here you would typically update the state or send data to an API
+    if (updatedCertData.startDate && updatedCertData.endDate) {
+      setCertPeriodDates({ 
+        startDate: updatedCertData.startDate, 
+        endDate: updatedCertData.endDate 
+      });
+    }
   };
+  
   
   return (
     <div className="general-info-section">
       <PersonalInfoCard patient={patient} />
-      <CertificationPeriodComponent patient={patient} onUpdateCertPeriod={handleUpdateCertPeriod} />
+      <CertificationPeriodComponent 
+  patient={patient} 
+  onUpdateCertPeriod={handleUpdateCertPeriod}
+/>
+
       <EmergencyContactsComponent patient={patient} />
     </div>
   );
@@ -234,7 +245,8 @@ const DisciplinesSection = ({ patient }) => {
 };
 
 // Schedule Section Component
-const ScheduleSection = ({ patient }) => {
+// Schedule Section Component
+const ScheduleSection = ({ patient, certPeriodDates }) => {
   // Handler for schedule updates
   const handleUpdateSchedule = (updatedSchedule) => {
     console.log('Schedule updated:', updatedSchedule);
@@ -243,10 +255,15 @@ const ScheduleSection = ({ patient }) => {
   
   return (
     <div className="schedule-section">
-      <ScheduleComponent patient={patient} onUpdateSchedule={handleUpdateSchedule} />
+      <ScheduleComponent 
+        patient={patient} 
+        onUpdateSchedule={handleUpdateSchedule} 
+        certPeriodDates={certPeriodDates}
+      />
     </div>
   );
 };
+
 
 // Exercises Section Component
 const ExercisesSection = ({ patient }) => {
@@ -307,6 +324,8 @@ const PatientInfoPage = () => {
   const [notificationCount, setNotificationCount] = useState(5);
   const [isMobile, setIsMobile] = useState(false);
   const userMenuRef = useRef(null);
+  const [certPeriodDates, setCertPeriodDates] = useState({ startDate: '', endDate: '' });
+
   
   // Detect device size
   useEffect(() => {
@@ -891,7 +910,11 @@ const PatientInfoPage = () => {
           {/* Tab content */}
           <div className="tab-content">
             {activeTab === 'general' && (
-              <GeneralInformationSection patient={patient} />
+              <GeneralInformationSection 
+              patient={patient} 
+              setCertPeriodDates={setCertPeriodDates}
+            />
+            
             )}
             {activeTab === 'medical' && (
               <MedicalInformationSection patient={patient} />
@@ -899,8 +922,11 @@ const PatientInfoPage = () => {
             {activeTab === 'disciplines' && (
               <DisciplinesSection patient={patient} />
             )}
-            {activeTab === 'schedule' && (
-              <ScheduleSection patient={patient} />
+           {activeTab === 'schedule' && (
+  <ScheduleSection 
+    patient={patient} 
+    certPeriodDates={certPeriodDates} 
+  />
             )}
             {activeTab === 'exercises' && (
               <ExercisesSection patient={patient} />
@@ -915,7 +941,7 @@ const PatientInfoPage = () => {
         </div>
       </main>
       
-
+ 
     </div>
   );
 };

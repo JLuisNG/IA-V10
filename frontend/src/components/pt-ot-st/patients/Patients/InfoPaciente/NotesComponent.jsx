@@ -9,7 +9,8 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [isAddingNote, setIsAddingNote] = useState(false);
   const [activeNoteId, setActiveNoteId] = useState(null);
-  const [newNoteType, setNewNoteType] = useState('text');
+  const [newNoteType, setNewNoteType] = useState('text'); // Default to text
+  const [newNoteCategory, setNewNoteCategory] = useState('Clinical'); // Default category
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredNotes, setFilteredNotes] = useState([]);
   const [sortBy, setSortBy] = useState('date-desc');
@@ -27,7 +28,23 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
   const canvasRef = useRef(null);
   const signatureCanvasCtx = useRef(null);
   const isDrawing = useRef(false);
-  
+
+  // Define note types based on the image
+  const noteTypes = [
+    { value: 'text', label: 'Text Note' },
+    { value: 'communication-report', label: 'Communication Report' },
+    { value: 'incident-report', label: 'Incident Report' },
+    { value: 'therapy-order', label: 'Therapy Order' },
+    { value: 'face-to-face', label: 'Face to Face' },
+    { value: 'case-conference', label: 'Case Conference' },
+    { value: 'oasis-care-summary', label: 'OASIS Care Summary' },
+    { value: 'nomnc', label: 'NOMNC' },
+    { value: 'kaiser-form', label: 'Kaiser Form' },
+    { value: 'maintenance-assessment-form', label: 'Maintenance Assessment Form' },
+    { value: 'signature', label: 'Signature' },
+    { value: 'file', label: 'File Upload' },
+  ];
+
   // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -112,7 +129,7 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
       ctx.lineJoin = 'round';
       ctx.strokeStyle = 'black';
       
-      // Clear the canvas
+      // Clear the canvas 
       ctx.fillStyle = 'white';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
@@ -122,9 +139,6 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
   useEffect(() => {
     const fetchNotes = async () => {
       setIsLoading(true);
-      // In a real implementation, this would be an API call
-      // For demo purposes, we'll use dummy data based on the patient prop
-      
       // Simulate API delay
       await new Promise(resolve => setTimeout(resolve, 800));
       
@@ -160,7 +174,8 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
       result = result.filter(
         note => note.title.toLowerCase().includes(query) || 
                 note.content.toLowerCase().includes(query) ||
-                note.author.toLowerCase().includes(query)
+                note.author.toLowerCase().includes(query) ||
+                note.noteType.toLowerCase().includes(query) // Include noteType in search
       );
     }
     
@@ -219,13 +234,14 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
     const availableTherapists = therapists.filter(Boolean);
     const availableAssistants = assistants.filter(Boolean);
     
-    // Create some initial notes
+    // Create some initial notes with varied note types
     return [
       {
         id: 1,
         title: 'Initial Evaluation Notes',
         content: `Patient ${patient.name} presented with right-sided weakness following left CVA in 03/2023. Patient demonstrates significant difficulty with all functional mobility tasks requiring assistance for transfers and ambulation. Will benefit from PT intervention to improve strength, balance, and functional mobility.`,
         type: 'text',
+        noteType: 'text', // Added noteType field
         category: 'Clinical',
         author: availableTherapists.length ? availableTherapists[0] : 'System',
         userRole: 'PT',
@@ -239,6 +255,7 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
         title: 'Follow-up: Gait Training',
         content: 'Patient showing improvement in gait pattern with assistive device. Decreased shuffling noted. Continue with current exercise plan and progress as tolerated.',
         type: 'text',
+        noteType: 'follow-up', // Updated noteType
         category: 'Follow-up',
         author: availableAssistants.length ? availableAssistants[0] : 'System',
         userRole: 'PTA',
@@ -252,6 +269,7 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
         title: 'ADL Training Session',
         content: 'Worked on upper extremity dressing tasks. Patient able to don shirt with minimal assistance. Continuing to work on button manipulation and fine motor skills.',
         type: 'text',
+        noteType: 'therapy-session', // Updated noteType
         category: 'Therapy Session',
         author: availableTherapists.length > 1 ? availableTherapists[1] : (availableTherapists.length ? availableTherapists[0] : 'System'),
         userRole: 'OT',
@@ -265,6 +283,7 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
         title: 'Caregiver Education',
         content: 'Met with patient\'s son to educate on safe transfer techniques and home exercise program supervision. Caregiver demonstrated understanding and proper technique.',
         type: 'text',
+        noteType: 'communication-report', // Updated noteType
         category: 'Education',
         author: 'Admin Staff',
         userRole: 'Admin',
@@ -278,6 +297,7 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
         title: 'Balance Assessment',
         content: 'Completed Berg Balance Assessment. Score: 32/56 indicating moderate fall risk. Will implement balance training program focusing on static and dynamic balance activities.',
         type: 'text',
+        noteType: 'oasis-care-summary', // Updated noteType
         category: 'Assessment',
         author: availableTherapists.length ? availableTherapists[0] : 'System',
         userRole: 'PT',
@@ -298,9 +318,6 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
     items.splice(result.destination.index, 0, reorderedItem);
     
     setFilteredNotes(items);
-    
-    // In a real app, you'd also want to update the backend with the new order
-    // onUpdateNotes(items);
   };
 
   // Toggle note pinned status
@@ -310,9 +327,6 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
     );
     
     setNotes(updatedNotes);
-    
-    // In a real app, you'd also want to update the backend
-    // onUpdateNotes(updatedNotes);
   };
 
   // Handle deleting a note
@@ -328,17 +342,12 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
     const updatedNotes = notes.filter(note => note.id !== noteToDelete.id);
     setNotes(updatedNotes);
     
-    // Close the modal and reset the note to delete
     setShowDeleteConfirm(false);
     setNoteToDelete(null);
     
-    // If we're viewing the note, close the view modal
     if (activeNoteId === noteToDelete.id) {
       setActiveNoteId(null);
     }
-    
-    // In a real app, you'd also want to update the backend
-    // onUpdateNotes(updatedNotes);
   };
 
   // Cancel deletion
@@ -366,16 +375,18 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
     const title = form.title.value.trim();
     const category = form.category.value;
     const tags = form.tags.value.split(',').map(tag => tag.trim()).filter(Boolean);
+    const noteType = form.noteType.value; // Get the selected note type
     
     let content = '';
+    let type = noteType;
     
-    // Get content based on note type
-    if (newNoteType === 'text') {
-      content = form.content.value.trim();
-    } else if (newNoteType === 'signature') {
+    if (noteType === 'signature') {
       if (canvasRef.current) {
         content = canvasRef.current.toDataURL();
       }
+    } else {
+      content = form.content.value.trim();
+      type = 'text'; // For all text-based note types, the type remains 'text'
     }
     
     if (!title || !content) {
@@ -383,16 +394,15 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
       return;
     }
     
-    // Get current user info
     const authorName = currentUser?.fullname || 'Current User';
     const userRole = currentUser?.role || 'Staff';
     
-    // Create new note
     const newNote = {
-      id: Date.now(), // simple ID generation for demo
+      id: Date.now(),
       title,
       content,
-      type: newNoteType,
+      type, // Store the type (text or signature)
+      noteType, // Store the specific note type (e.g., communication-report)
       category,
       author: authorName,
       userRole: userRole,
@@ -402,27 +412,16 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
       tags
     };
     
-    // Add new note to state
     const updatedNotes = [newNote, ...notes];
     setNotes(updatedNotes);
     
-    // Reset form
     setIsAddingNote(false);
-    
-    // In a real app, you'd also want to update the backend
-    // onUpdateNotes(updatedNotes);
   };
 
   // Handle file upload
   const handleFileUpload = (e) => {
     const files = e.target.files;
     if (files.length === 0) return;
-    
-    // In a real app, you'd upload the file to your server
-    // For this demo, we'll just create a note with the file name
-    
-    // You would typically upload the file first, then get a URL back
-    // We'll simulate that with a dummy URL
     
     const file = files[0];
     const fileType = file.type.split('/')[0];
@@ -436,16 +435,15 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
       noteType = 'audio';
     }
     
-    // Get current user info
     const authorName = currentUser?.fullname || 'Current User';
     const userRole = currentUser?.role || 'Staff';
     
-    // Create a new note with file information
     const newNote = {
       id: Date.now(),
       title: file.name,
-      content: URL.createObjectURL(file), // In real app, this would be the server URL
+      content: URL.createObjectURL(file),
       type: noteType,
+      noteType: 'file', // File uploads are categorized as 'file'
       category: 'Media',
       author: authorName,
       userRole: userRole,
@@ -455,17 +453,12 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
       tags: [fileType, 'uploaded']
     };
     
-    // Add new note to state
     const updatedNotes = [newNote, ...notes];
     setNotes(updatedNotes);
     
-    // Reset file input
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
-    
-    // In a real app, you'd also want to update the backend
-    // onUpdateNotes(updatedNotes);
   };
 
   // Signature drawing functions
@@ -521,12 +514,10 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
   const formatShortDate = (dateString) => {
     const date = new Date(dateString);
     
-    // Get day, month and year
     const day = date.getDate();
     const month = date.toLocaleString('default', { month: 'short' });
     const year = date.getFullYear();
     
-    // Get time
     const hours = date.getHours();
     const minutes = date.getMinutes().toString().padStart(2, '0');
     const ampm = hours >= 12 ? 'p.m.' : 'a.m.';
@@ -571,8 +562,10 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
   const NoteCard = ({ note, index }) => {
     const [isHovered, setIsHovered] = useState(false);
     
-    // Format date for the card
     const dateFormatted = formatShortDate(note.date);
+    
+    // Get the display label for the note type
+    const noteTypeLabel = noteTypes.find(type => type.value === note.noteType)?.label || 'Text Note';
     
     return (
       <Draggable draggableId={note.id.toString()} index={index}>
@@ -633,6 +626,9 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
                 {note.isPinned && <i className="fas fa-thumbtack pin-icon"></i>}
                 {note.title}
               </h3>
+              <div className="note-type-label">
+                <span className="note-type-badge">{noteTypeLabel}</span>
+              </div>
               
               {note.type === 'text' && (
                 <div className="note-text">
@@ -799,18 +795,24 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
                   exit={{ opacity: 0, y: 10 }}
                   transition={{ duration: 0.2 }}
                 >
-                  <button onClick={() => { handleAddNote('text'); setShowQuickActions(false); }}>
-                    <i className="fas fa-align-left"></i>
-                    <span>Text Note</span>
-                  </button>
-                  <button onClick={() => { fileInputRef.current?.click(); setShowQuickActions(false); }}>
-                    <i className="fas fa-file-upload"></i>
-                    <span>Upload File</span>
-                  </button>
-                  <button onClick={() => { handleAddNote('signature'); setShowQuickActions(false); }}>
-                    <i className="fas fa-signature"></i>
-                    <span>Signature</span>
-                  </button>
+                  {noteTypes.map((type) => (
+                    <button 
+                      key={type.value}
+                      onClick={() => {
+                        if (type.value === 'file') {
+                          fileInputRef.current?.click();
+                        } else {
+                          handleAddNote(type.value);
+                        }
+                        setShowQuickActions(false);
+                      }}
+                    >
+                      <i className={`fas ${type.value === 'signature' ? 'fa-signature' : 
+                                          type.value === 'file' ? 'fa-file-upload' : 
+                                          'fa-align-left'}`}></i>
+                      <span>{type.label}</span>
+                    </button>
+                  ))}
                 </motion.div>
               )}
               
@@ -900,9 +902,7 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
               exit="exit"
             >
               <div className="modal-header">
-                <h3>{newNoteType === 'text' ? 'Add Text Note' : 
-                    newNoteType === 'signature' ? 'Add Signature' : 
-                    'Add Note'}</h3>
+                <h3>Add {noteTypes.find(type => type.value === newNoteType)?.label || 'Note'}</h3>
                 <button className="close-modal" onClick={() => setIsAddingNote(false)}>
                   <i className="fas fa-times"></i>
                 </button>
@@ -910,6 +910,22 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
               
               <form onSubmit={handleSaveNote}>
                 <div className="modal-body">
+                  <div className="form-group">
+                    <label htmlFor="noteType">Note Type</label>
+                    <select 
+                      id="noteType" 
+                      name="noteType" 
+                      value={newNoteType}
+                      onChange={(e) => setNewNoteType(e.target.value)}
+                    >
+                      {noteTypes.map((type) => (
+                        <option key={type.value} value={type.value}>
+                          {type.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+
                   <div className="form-group">
                     <label htmlFor="title">Title</label>
                     <input 
@@ -921,7 +937,7 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
                     />
                   </div>
                   
-                  {newNoteType === 'text' && (
+                  {newNoteType !== 'signature' && (
                     <div className="form-group">
                       <label htmlFor="content">Content</label>
                       <textarea
@@ -1056,36 +1072,26 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
                 const activeNote = notes.find(note => note.id === activeNoteId);
                 if (!activeNote) return null;
                 
-                // Simple Markdown parser
                 const parseMarkdown = (text) => {
                   if (!text) return '';
                   
-                  // Convert headings
                   text = text.replace(/^# (.+)$/gm, '<h1>$1</h1>');
                   text = text.replace(/^## (.+)$/gm, '<h2>$1</h2>');
                   text = text.replace(/^### (.+)$/gm, '<h3>$1</h3>');
-                  
-                  // Convert bold and italic
                   text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
                   text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
-                  
-                  // Convert unordered lists
                   text = text.replace(/^- (.+)$/gm, '<li>$1</li>');
                   text = text.replace(/(<li>.+<\/li>(\n|$))+/g, '<ul>$&</ul>');
-                  
-                  // Convert ordered lists
                   text = text.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
                   text = text.replace(/(<li>.+<\/li>(\n|$))+/g, '<ol>$&</ol>');
-                  
-                  // Convert paragraphs
                   text = text.replace(/^(?!<[uo]l|<li|<h).+$/gm, '<p>$&</p>');
                   text = text.replace(/<\/p>\n<p>/g, '</p><p>');
                   
                   return text;
                 };
                 
-                // Format date for the view header
                 const dateFormatted = formatShortDate(activeNote.date);
+                const noteTypeLabel = noteTypes.find(type => type.value === activeNote.noteType)?.label || 'Text Note';
                 
                 return (
                   <>
@@ -1138,6 +1144,10 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
                             </span>
                           </div>
                         </div>
+                      </div>
+                      
+                      <div className="note-type-label">
+                        <span className="note-type-badge">{noteTypeLabel}</span>
                       </div>
                       
                       {activeNote.type === 'text' && (

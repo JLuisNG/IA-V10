@@ -202,7 +202,9 @@ const CertificationPeriodComponent = ({ patient, onUpdateCertPeriod }) => {
         certPeriod: newCertPeriod,
         insurance: editData.insurance,
         policyNumber: editData.policyNumber,
-        agency: editData.agency
+        agency: editData.agency,
+        startDate: editData.startDate,
+        endDate: editData.endDate   
       });
     }
     
