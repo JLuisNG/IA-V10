@@ -6,6 +6,7 @@ const MedicalInfoComponent = ({ patient, onUpdateMedicalInfo }) => {
   const [isSaving, setIsSaving] = useState(false);
   const [medicalData, setMedicalData] = useState({
     weight: 0,
+    height: 0, // Added height field
     nursingDiagnosis: '',
     pmh: '',
     wbs: '',
@@ -18,6 +19,7 @@ const MedicalInfoComponent = ({ patient, onUpdateMedicalInfo }) => {
     if (patient?.medicalInfo) {
       setMedicalData({
         weight: patient.medicalInfo.weight || 0,
+        height: patient.medicalInfo.height || 0, // Initialize height
         nursingDiagnosis: patient.medicalInfo.nursingDiagnosis || '',
         pmh: patient.medicalInfo.pmh || '',
         wbs: patient.medicalInfo.wbs || '',
@@ -27,7 +29,7 @@ const MedicalInfoComponent = ({ patient, onUpdateMedicalInfo }) => {
     }
   }, [patient]);
   
-  // Handle input changes
+  // Handle input changes for text fields
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     setMedicalData({
@@ -42,6 +44,15 @@ const MedicalInfoComponent = ({ patient, onUpdateMedicalInfo }) => {
     setMedicalData({
       ...medicalData,
       weight: value
+    });
+  };
+  
+  // Handle height input specifically
+  const handleHeightChange = (e) => {
+    const value = parseFloat(e.target.value) || 0;
+    setMedicalData({
+      ...medicalData,
+      height: value
     });
   };
   
@@ -69,6 +80,7 @@ const MedicalInfoComponent = ({ patient, onUpdateMedicalInfo }) => {
     if (patient?.medicalInfo) {
       setMedicalData({
         weight: patient.medicalInfo.weight || 0,
+        height: patient.medicalInfo.height || 0, // Restore height
         nursingDiagnosis: patient.medicalInfo.nursingDiagnosis || '',
         pmh: patient.medicalInfo.pmh || '',
         wbs: patient.medicalInfo.wbs || '',
@@ -79,6 +91,7 @@ const MedicalInfoComponent = ({ patient, onUpdateMedicalInfo }) => {
       // Reset to defaults if no patient data
       setMedicalData({
         weight: 0,
+        height: 0, // Reset height
         nursingDiagnosis: '',
         pmh: '',
         wbs: '',
@@ -200,6 +213,24 @@ const MedicalInfoComponent = ({ patient, onUpdateMedicalInfo }) => {
                 </div>
               </div>
               
+              <div className="form-group height-input">
+                <label>
+                  <i className="fas fa-ruler-vertical"></i>
+                  Height (in)
+                </label>
+                <div className="input-with-icon">
+                  <input 
+                    type="number" 
+                    name="height"
+                    value={medicalData.height} 
+                    onChange={handleHeightChange}
+                    min="0"
+                    step="0.1"
+                  />
+                  <span className="unit-indicator">in</span>
+                </div>
+              </div>
+              
               <div className="form-group clinical-group-select">
                 <label>
                   <i className="fas fa-layer-group"></i>
@@ -210,28 +241,28 @@ const MedicalInfoComponent = ({ patient, onUpdateMedicalInfo }) => {
                   value={medicalData.clinicalGrouping} 
                   onChange={handleInputChange}
                 >
-    <option value="">Select Wound Bed Status</option>
-    <option value="No wounds present">No wounds present</option>
-    <option value="Wound healing well, no signs of infection">Wound healing well, no signs of infection</option>
-    <option value="Clean wound, granulating tissue present">Clean wound, granulating tissue present</option>
-    <option value="Red, inflamed wound edges">Red, inflamed wound edges</option>
-    <option value="Wound with serous drainage">Wound with serous drainage</option>
-    <option value="Wound with purulent drainage">Wound with purulent drainage</option>
-    <option value="Wound with necrotic tissue">Wound with necrotic tissue</option>
-    <option value="Pressure ulcer, Stage 1">Pressure ulcer, Stage 1</option>
-    <option value="Pressure ulcer, Stage 2">Pressure ulcer, Stage 2</option>
-    <option value="Pressure ulcer, Stage 3">Pressure ulcer, Stage 3</option>
-    <option value="Pressure ulcer, Stage 4">Pressure ulcer, Stage 4</option>
-    <option value="Unstageable pressure ulcer">Unstageable pressure ulcer</option>
-    <option value="Deep tissue pressure injury">Deep tissue pressure injury</option>
-    <option value="Venous ulcer">Venous ulcer</option>
-    <option value="Arterial ulcer">Arterial ulcer</option>
-    <option value="Diabetic ulcer">Diabetic ulcer</option>
-    <option value="Surgical wound, well-healing">Surgical wound, well-healing</option>
-    <option value="Surgical wound, dehiscence present">Surgical wound, dehiscence present</option>
-    <option value="Abrasion/Skin tear">Abrasion/Skin tear</option>
-    <option value="To be assessed">To be assessed</option>
-    <option value="TBD">TBD</option>
+                  <option value="">Select Wound Bed Status</option>
+                  <option value="No wounds present">No wounds present</option>
+                  <option value="Wound healing well, no signs of infection">Wound healing well, no signs of infection</option>
+                  <option value="Clean wound, granulating tissue present">Clean wound, granulating tissue present</option>
+                  <option value="Red, inflamed wound edges">Red, inflamed wound edges</option>
+                  <option value="Wound with serous drainage">Wound with serous drainage</option>
+                  <option value="Wound with purulent drainage">Wound with purulent drainage</option>
+                  <option value="Wound with necrotic tissue">Wound with necrotic tissue</option>
+                  <option value="Pressure ulcer, Stage 1">Pressure ulcer, Stage 1</option>
+                  <option value="Pressure ulcer, Stage 2">Pressure ulcer, Stage 2</option>
+                  <option value="Pressure ulcer, Stage 3">Pressure ulcer, Stage 3</option>
+                  <option value="Pressure ulcer, Stage 4">Pressure ulcer, Stage 4</option>
+                  <option value="Unstageable pressure ulcer">Unstageable pressure ulcer</option>
+                  <option value="Deep tissue pressure injury">Deep tissue pressure injury</option>
+                  <option value="Venous ulcer">Venous ulcer</option>
+                  <option value="Arterial ulcer">Arterial ulcer</option>
+                  <option value="Diabetic ulcer">Diabetic ulcer</option>
+                  <option value="Surgical wound, well-healing">Surgical wound, well-healing</option>
+                  <option value="Surgical wound, dehiscence present">Surgical wound, dehiscence present</option>
+                  <option value="Abrasion/Skin tear">Abrasion/Skin tear</option>
+                  <option value="To be assessed">To be assessed</option>
+                  <option value="TBD">TBD</option>
                 </select>
               </div>
             </div>
@@ -306,7 +337,6 @@ const MedicalInfoComponent = ({ patient, onUpdateMedicalInfo }) => {
                 Save Changes
               </button>
             </div>
-
           </div>
         ) : (
           // View mode
@@ -322,6 +352,25 @@ const MedicalInfoComponent = ({ patient, onUpdateMedicalInfo }) => {
                     <div className="data-display">
                       <span className="primary-data">{medicalData.weight}</span>
                       <span className="secondary-data">lbs</span>
+                    </div>
+                  ) : (
+                    <span className="no-data">Not recorded</span>
+                  )}
+                </div>
+              </div>
+            </div>
+            
+            <div className="info-section height-section">
+              <div className="info-icon">
+                <i className="fas fa-ruler-vertical"></i>
+              </div>
+              <div className="info-content">
+                <div className="info-label">Height</div>
+                <div className="info-value height-value">
+                  {medicalData.height > 0 ? (
+                    <div className="data-display">
+                      <span className="primary-data">{medicalData.height}</span>
+                      <span className="secondary-data">in</span>
                     </div>
                   ) : (
                     <span className="no-data">Not recorded</span>

@@ -34,7 +34,7 @@ const CertificationPeriodComponent = ({ patient, onUpdateCertPeriod }) => {
       const mockPeriods = [
         {
           id: 1,
-          period: '03-05-2025 to 05-04-2025',
+          period: '04-05-2025 to 06-04-2025',
           status: 'active',
           insurance: patient.insurance,
           policyNumber: patient.policyNumber,
@@ -202,7 +202,9 @@ const CertificationPeriodComponent = ({ patient, onUpdateCertPeriod }) => {
         certPeriod: newCertPeriod,
         insurance: editData.insurance,
         policyNumber: editData.policyNumber,
-        agency: editData.agency
+        agency: editData.agency,
+        startDate: editData.startDate,
+        endDate: editData.endDate   
       });
     }
     

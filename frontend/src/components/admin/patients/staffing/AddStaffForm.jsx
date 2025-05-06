@@ -34,10 +34,10 @@ const AdminAddStaffForm = ({ onCancel }) => {
   React.useEffect(() => {
     const loadingMessages = [
       { message: 'Conectando con el sistema...', time: 800 },
-      { message: 'Cargando módulos de documentación...', time: 1600 },
-      { message: 'Preparando formulario de registro...', time: 2400 },
-      { message: 'Verificando plantillas de documentos...', time: 3200 },
-      { message: 'Listo para registrar nuevo terapeuta', time: 4000 }
+      { message: 'Cargando módulos de documentación...', time: 600 },
+      { message: 'Preparando formulario de registro...', time: 400 },
+      { message: 'Verificando plantillas de documentos...', time: 500 },
+      { message: 'Listo para registrar nuevo terapeuta', time: 1000 }
     ];
     
     loadingMessages.forEach((item, index) => {

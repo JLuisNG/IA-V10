@@ -1,7 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom'; // Importar useNavigate
+import { useAuth } from '../../login/AuthContext'; // Importar useAuth para obtener currentUser
 import '../../../styles/developer/Welcome/InfoWelcome.scss';
 
 const DevInfoWelcome = ({ isMobile, isTablet }) => {
+  const navigate = useNavigate();
+  const { currentUser } = useAuth(); // Obtener el usuario actual
+  
   // Enhanced state for animations with performance optimizations
   const [animatedStats, setAnimatedStats] = useState({
     activePatients: 0
@@ -19,10 +24,77 @@ const DevInfoWelcome = ({ isMobile, isTablet }) => {
     guide: useRef(null)
   });
   
-  // Real stats data with adjusted animation timings for mobile
-  const stats = {
-    activePatients: 508
-  };
+  // Base de datos estática de pacientes (simulando que viene de una API)
+  const [patients, setPatients] = useState([
+    {
+      id: 1,
+      name: "Vargas, Javier",
+      therapist: "Regina Araquel",
+      therapistType: "PT",
+      agency: "Supportive Health Group",
+      street: "1800 Camden Avenue",
+      city: "Los Angeles",
+      state: "CA",
+      zip: "90025",
+      phone: "(310) 808-5631",
+      certPeriod: "04-19-2023 to 04-19-2025",
+      status: "Active",
+      dob: "05/12/1965",
+      insurance: "Blue Cross Blue Shield",
+      policyNumber: "BCB-123456789",
+      emergencyContact: "Mohammed Ali",
+      emergencyPhone: "(310) 555-7890",
+      notes: "Patient recovering well. Following exercise regimen as prescribed.",
+    },
+    {
+      id: 2,
+      name: "Nava, Luis",
+      therapist: "James Lee",
+      therapistType: "OT",
+      agency: "Intra Care Home Health",
+      street: "1800 Camden Avenue",
+      city: "Los Angeles",
+      state: "CA",
+      zip: "90025",
+      phone: "(310) 808-5631",
+      certPeriod: "04-19-2023 to 04-19-2025",
+      status: "Desactive",
+      dob: "05/12/1965",
+      insurance: "Blue Cross Blue Shield",
+      policyNumber: "BCB-123456789",
+      emergencyContact: "Rick Grimes",
+      emergencyPhone: "(310) 555-7890",
+      notes: "Patient recovering well. Following exercise regimen as prescribed.",
+    }
+  ]);
+  
+  // Calcular estadísticas dinámicamente
+  const [stats, setStats] = useState({
+    activePatients: 0,
+    pendingPatients: 0,
+    totalPatients: 0,
+    newPatientsToday: 0
+  });
+  
+  // Efecto para calcular estadísticas cuando cambian los pacientes
+  useEffect(() => {
+    const calculateStats = () => {
+      const totalPatients = patients.length;
+      const activePatients = patients.filter(p => p.status === "Active").length;
+      const pendingPatients = patients.filter(p => p.status === "Pending").length;
+      // Simulamos pacientes nuevos hoy (en una app real, esto vendría de datos reales)
+      const newPatientsToday = 5;
+      
+      setStats({
+        activePatients,
+        pendingPatients,
+        totalPatients,
+        newPatientsToday
+      });
+    };
+    
+    calculateStats();
+  }, [patients]);
   
   // Enhanced counter animation with optimized timing for mobile
   useEffect(() => {
@@ -140,6 +212,12 @@ const DevInfoWelcome = ({ isMobile, isTablet }) => {
     setHoveredParticles(particles);
   };
 
+  // Función para navegar a la página de pacientes
+  const handleViewPatientsList = () => {
+    const baseRole = currentUser?.role?.split(' - ')[0].toLowerCase() || 'developer';
+    navigate(`/${baseRole}/patients?scrollTo=patients`);
+  };
+
   return (
     <div className={`info-welcome-container ${isMobile ? 'mobile' : ''} ${isTablet ? 'tablet' : ''}`}>
       {/* Premium dashboard cards with responsive layout */}
@@ -170,7 +248,7 @@ const DevInfoWelcome = ({ isMobile, isTablet }) => {
             <div className="card-stats">
               <div className="stat-item">
                 <div className="stat-label">Nuevos (hoy)</div>
-                <div className="stat-value">+5</div>
+                <div className="stat-value">+{stats.newPatientsToday}</div>
               </div>
               <div className="stat-item">
                 <div className="stat-label">Citas pendientes</div>
@@ -178,7 +256,13 @@ const DevInfoWelcome = ({ isMobile, isTablet }) => {
               </div>
             </div>
             <div className="card-footer">
-              <button className="action-button">
+              <button 
+                className="action-button"
+                onClick={(e) => {
+                  e.stopPropagation(); // Evitar que se ejecute el onClick del card
+                  handleViewPatientsList();
+                }}
+              >
                 <div className="button-content">
                   <i className="fas fa-clipboard-list"></i>
                   <span>Ver listado</span>

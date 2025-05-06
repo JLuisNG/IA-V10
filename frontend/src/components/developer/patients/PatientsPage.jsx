@@ -126,8 +126,8 @@ const DevPatientsPage = () => {
   const [showMenuSwitch, setShowMenuSwitch] = useState(false);
   const [showAIAssistant, setShowAIAssistant] = useState(true);
   const [showFilterMenu, setShowFilterMenu] = useState(false);
-  const [currentView, setCurrentView] = useState('list');
-  const [showFilters, setShowFilters] = useState(true);
+  const [currentView, setCurrentView] = useState('grid');
+  const [showFilters, setShowFilters] = useState(false);
   const [sortOption, setSortOption] = useState('nameAsc');
   const [showQuickTour, setShowQuickTour] = useState(false);
   const [activePage, setActivePage] = useState(1);
@@ -530,12 +530,31 @@ const DevPatientsPage = () => {
         }, 300);
         break;
       case 'edit':
-        // Logic for editing patient
-        console.log('Edit patient:', patient);
+        // Navigate to patient info page in edit mode
+        setMenuTransitioning(true);
+        
+        setTimeout(() => {
+          // Navigate to patient info page and pass state to indicate edit mode
+          navigate(`/${baseRole}/paciente/${patient.id}`, { 
+            state: { 
+              initialTab: 'general',
+              initialMode: 'edit' 
+            }
+          });
+        }, 300);
         break;
       case 'notes':
-        // Logic for viewing/editing patient notes
-        console.log('Patient notes:', patient);
+        // Navigate directly to the notes tab
+        setMenuTransitioning(true);
+        
+        setTimeout(() => {
+          // Navigate to patient info page with the notes tab selected
+          navigate(`/${baseRole}/paciente/${patient.id}`, { 
+            state: { 
+              initialTab: 'notes'
+            }
+          });
+        }, 300);
         break;
       default:
         break;
@@ -579,6 +598,12 @@ const DevPatientsPage = () => {
   // Toggle quick tour
   const toggleQuickTour = () => {
     setShowQuickTour(!showQuickTour);
+  };
+
+  // Handle navigation to create patient page
+  const handleNavigateToCreatePatient = () => {
+    if (isLoggingOut) return;
+    navigate('/developer/referrals', { state: { initialView: 'createReferral' } });
   };
 
   return (
@@ -776,12 +801,12 @@ const DevPatientsPage = () => {
                 Streamline your therapy workflow with complete patient information at your fingertips
               </p>
               <div className="header-actions">
-                <button className="header-action-btn" onClick={toggleQuickTour} disabled={isLoggingOut}>
-                  <i className="fas fa-info-circle"></i> Quick Tour
-                </button>
-                <button className="header-action-btn" disabled={isLoggingOut}>
-                  <i className="fas fa-plus"></i> New Patient
-                </button>
+                <button 
+                  className="header-action-btn" 
+                  onClick={handleNavigateToCreatePatient}
+                  disabled={isLoggingOut}
+                >
+                  <i className="fas fa-plus"></i> New Patient </button>
               </div>
             </div>
             
@@ -1178,7 +1203,10 @@ const DevPatientsPage = () => {
       {/* Floating Quick Action Button with Menu */}
       {!isLoggingOut && (
         <div className="quick-action-btn">
-          <button className="add-patient-btn">
+          <button 
+            className="add-patient-btn"
+            onClick={handleNavigateToCreatePatient}
+          >
             <i className="fas fa-plus"></i>
             <span className="btn-tooltip">Add New Patient</span>
           </button>

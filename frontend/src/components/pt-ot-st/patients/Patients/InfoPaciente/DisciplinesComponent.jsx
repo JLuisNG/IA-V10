@@ -19,12 +19,20 @@ const DisciplineCard = ({
   const [isEditing, setIsEditing] = useState(false);
   const [isFrequencyEditing, setIsFrequencyEditing] = useState(false);
   const [tempFrequency, setTempFrequency] = useState(frequency);
-  const [selectedTherapist, setSelectedTherapist] = useState(therapist?.id || '');
-  const [selectedAssistant, setSelectedAssistant] = useState(assistant?.id || '');
+  const [selectedTherapist, setSelectedTherapist] = useState('');
+  const [selectedAssistant, setSelectedAssistant] = useState('');
   const [showTherapistInfo, setShowTherapistInfo] = useState(false);
   const [showAssistantInfo, setShowAssistantInfo] = useState(false);
   const [hoverEffect, setHoverEffect] = useState(false);
-  
+
+  // Inicializar selectedTherapist y selectedAssistant al entrar en modo de edición
+  useEffect(() => {
+    if (isEditing) {
+      setSelectedTherapist(therapist?.id || '');
+      setSelectedAssistant(assistant?.id || '');
+    }
+  }, [isEditing, therapist, assistant]);
+
   // Get icon and color based on discipline type
   const getDisciplineIcon = () => {
     switch (disciplineType) {
@@ -88,11 +96,30 @@ const DisciplineCard = ({
   
   // Handle save therapist changes
   const handleSaveChanges = () => {
-    const newTherapist = therapistsList.find(t => t.id === selectedTherapist);
-    const newAssistant = assistantsList.find(a => a.id === selectedAssistant);
+    // Buscar el nuevo terapeuta y asistente
+    const newTherapist = selectedTherapist 
+      ? therapistsList.find(t => t.id === selectedTherapist) || null 
+      : null;
+    const newAssistant = selectedAssistant 
+      ? assistantsList.find(a => a.id === selectedAssistant) || null 
+      : null;
+
+    console.log('Saving therapist:', newTherapist);
+    console.log('Saving assistant:', newAssistant);
+
+    // Comparar IDs para determinar si hay un cambio
+    const therapistId = therapist?.id || null;
+    const newTherapistId = newTherapist?.id || null;
+    const assistantId = assistant?.id || null;
+    const newAssistantId = newAssistant?.id || null;
+
+    if (newTherapistId !== therapistId) {
+      onChangeTherapist(newTherapist);
+    }
+    if (newAssistantId !== assistantId) {
+      onChangeAssistant(newAssistant);
+    }
     
-    onChangeTherapist(newTherapist);
-    onChangeAssistant(newAssistant);
     setIsEditing(false);
   };
   
@@ -106,7 +133,6 @@ const DisciplineCard = ({
   const getFrequencyDisplay = (freq) => {
     if (!freq) return 'Not set';
     
-    // Parse frequency string and make it readable
     const parts = freq.match(/(\d+[wW])(\d+)/);
     if (parts && parts.length === 3) {
       const weeks = parts[1].slice(0, -1);
@@ -186,14 +212,21 @@ const DisciplineCard = ({
                   <select 
                     id={`therapist-select-${disciplineType}`}
                     value={selectedTherapist}
-                    onChange={(e) => setSelectedTherapist(e.target.value)}
+                    onChange={(e) => {
+                      console.log('Selected therapist ID:', e.target.value);
+                      setSelectedTherapist(e.target.value);
+                    }}
                     disabled={!isActive}
                     className="glass-input"
                   >
                     <option value="">Select {disciplineLabel}</option>
-                    {therapistsList.map(t => (
-                      <option key={t.id} value={t.id}>{t.name}</option>
-                    ))}
+                    {therapistsList.length > 0 ? (
+                      therapistsList.map(t => (
+                        <option key={t.id} value={t.id}>{t.name}</option>
+                      ))
+                    ) : (
+                      <option value="" disabled>No therapists available</option>
+                    )}
                   </select>
                   <i className="fas fa-chevron-down select-arrow"></i>
                 </div>
@@ -208,14 +241,21 @@ const DisciplineCard = ({
                   <select 
                     id={`assistant-select-${disciplineType}`}
                     value={selectedAssistant}
-                    onChange={(e) => setSelectedAssistant(e.target.value)}
+                    onChange={(e) => {
+                      console.log('Selected assistant ID:', e.target.value);
+                      setSelectedAssistant(e.target.value);
+                    }}
                     disabled={!isActive}
                     className="glass-input"
                   >
                     <option value="">Select {assistantLabel}</option>
-                    {assistantsList.map(a => (
-                      <option key={a.id} value={a.id}>{a.name}</option>
-                    ))}
+                    {assistantsList.length > 0 ? (
+                      assistantsList.map(a => (
+                        <option key={a.id} value={a.id}>{a.name}</option>
+                      ))
+                    ) : (
+                      <option value="" disabled>No assistants available</option>
+                    )}
                   </select>
                   <i className="fas fa-chevron-down select-arrow"></i>
                 </div>
@@ -495,19 +535,15 @@ const renderFrequencyVisualization = (frequency, colors) => {
   const weeks = parseInt(parts[1].slice(0, -1));
   const visits = parseInt(parts[2]);
   
-  // Generate a visual representation of the frequency
   const daysInWeek = 7;
   const totalDays = weeks * daysInWeek;
   
-  // Create an array of dots representing days
-  // Distribute visits evenly throughout the period
   const dayDots = [];
   const visitInterval = Math.floor(totalDays / visits);
   
-  // Generate a pattern of visits based on the frequency
   for (let day = 0; day < totalDays; day++) {
     const isVisit = day % visitInterval === Math.floor(visitInterval / 2) && dayDots.filter(d => d.isVisit).length < visits;
-    const isWeekend = day % 7 === 5 || day % 7 === 6; // Saturday or Sunday
+    const isWeekend = day % 7 === 5 || day % 7 === 6;
     
     dayDots.push({
       day,
@@ -601,13 +637,13 @@ const DisciplinesComponent = ({ patient, onUpdateDisciplines }) => {
   
   // Filter therapists by type
   const getTherapistsByType = (type) => {
-    return therapistsList.filter(t => t.type === type);
+    return therapistsList.filter(t => t.type === type) || [];
   };
   
   // Filter assistants by type
   const getAssistantsByType = (type) => {
     const assistantType = type === 'PT' ? 'PTA' : (type === 'OT' ? 'COTA' : 'SLPA');
-    return assistantsList.filter(a => a.type === assistantType);
+    return assistantsList.filter(a => a.type === assistantType) || [];
   };
   
   // Toggle discipline active status
@@ -633,9 +669,11 @@ const DisciplinesComponent = ({ patient, onUpdateDisciplines }) => {
       ...disciplines,
       [type]: {
         ...disciplines[type],
-        therapist
+        therapist: therapist || null
       }
     };
+    
+    console.log(`Updated disciplines for ${type}:`, updatedDisciplines);
     
     setDisciplines(updatedDisciplines);
     
@@ -650,9 +688,11 @@ const DisciplinesComponent = ({ patient, onUpdateDisciplines }) => {
       ...disciplines,
       [type]: {
         ...disciplines[type],
-        assistant
+        assistant: assistant || null
       }
     };
+    
+    console.log(`Updated disciplines for ${type}:`, updatedDisciplines);
     
     setDisciplines(updatedDisciplines);
     
@@ -732,7 +772,7 @@ const DisciplinesComponent = ({ patient, onUpdateDisciplines }) => {
               therapistsList={getTherapistsByType(card.type)}
               assistantsList={getAssistantsByType(card.type)}
             />
-        ))}
+          ))}
         </div>
         <div className="component-decoration">
           <div className="glass-orb top-left"></div>
