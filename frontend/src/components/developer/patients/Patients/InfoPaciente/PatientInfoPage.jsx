@@ -14,7 +14,7 @@ import LogoutAnimation from '../../../../../components/LogOut/LogOut';
 import '../../../../../styles/developer/Patients/InfoPaciente/PatientInfoPage.scss';
 
 // Patient Info Header Component
-const PatientInfoHeader = ({ patient, activeTab, setActiveTab }) => {
+const PatientInfoHeader = ({ patient, activeTab, setActiveTab, onToggleStatus }) => {
   const navigate = useNavigate();
   const rolePrefix = window.location.hash.split('/')[1]; // Extract role from URL (developer, admin, etc.)
 
@@ -22,6 +22,8 @@ const PatientInfoHeader = ({ patient, activeTab, setActiveTab }) => {
   const handleBackToPatients = () => {
     navigate(`/${rolePrefix}/patients`);
   };
+
+  const isActive = patient?.status === 'Active';
 
   return (
     <div className="patient-info-header">
@@ -37,9 +39,12 @@ const PatientInfoHeader = ({ patient, activeTab, setActiveTab }) => {
         <div className="patient-id">#{patient?.id || '0'}</div>
       </div>
       <div className="header-actions">
-        <button className="action-button edit">
-          <i className="fas fa-edit"></i>
-          <span>Edit</span>
+        <button 
+          className={`action-button status-toggle ${isActive ? 'deactivate' : 'activate'}`} 
+          onClick={onToggleStatus}
+        >
+          <i className={`fas ${isActive ? 'fa-user-slash' : 'fa-user-check'}`}></i>
+          <span>{isActive ? 'Deactivate' : 'Activate'}</span>
         </button>
         <button className="action-button print">
           <i className="fas fa-print"></i>
@@ -205,10 +210,9 @@ const GeneralInformationSection = ({ patient, setCertPeriodDates }) => {
     <div className="general-info-section">
       <PersonalInfoCard patient={patient} />
       <CertificationPeriodComponent 
-  patient={patient} 
-  onUpdateCertPeriod={handleUpdateCertPeriod}
-/>
-
+        patient={patient} 
+        onUpdateCertPeriod={handleUpdateCertPeriod}
+      />
       <EmergencyContactsComponent patient={patient} />
     </div>
   );
@@ -245,7 +249,6 @@ const DisciplinesSection = ({ patient }) => {
 };
 
 // Schedule Section Component
-// Schedule Section Component
 const ScheduleSection = ({ patient, certPeriodDates }) => {
   // Handler for schedule updates
   const handleUpdateSchedule = (updatedSchedule) => {
@@ -263,7 +266,6 @@ const ScheduleSection = ({ patient, certPeriodDates }) => {
     </div>
   );
 };
-
 
 // Exercises Section Component
 const ExercisesSection = ({ patient }) => {
@@ -326,7 +328,6 @@ const PatientInfoPage = () => {
   const userMenuRef = useRef(null);
   const [certPeriodDates, setCertPeriodDates] = useState({ startDate: '', endDate: '' });
 
-  
   // Detect device size
   useEffect(() => {
     const handleResize = () => {
@@ -394,6 +395,23 @@ const PatientInfoPage = () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  // Handle patient status toggle (activate/deactivate)
+  const handleToggleStatus = () => {
+    if (patient) {
+      const newStatus = patient.status === 'Active' ? 'Inactive' : 'Active';
+      setPatient({
+        ...patient,
+        status: newStatus
+      });
+      
+      // In a real app, you would make an API call to update the patient status
+      console.log(`Patient ${patient.id} status updated to ${newStatus}`);
+      
+      // You could also show a notification to the user
+      // Example: toast.success(`Patient ${patient.name} has been ${newStatus.toLowerCase()}`);
+    }
+  };
 
   // Fetch patient data
   useEffect(() => {
@@ -549,7 +567,7 @@ const PatientInfoPage = () => {
           state: "CA",
           zip: "90025",
           phone: "(310) 808-5631",
-          certPeriod: "03-05-2025 to 05-04-2025", // Adjusted to match the data in the UI
+          certPeriod: "04-05-2025 to 06-04-2025", // Adjusted to match the data in the UI
           status: "Active",
           dob: "05/12/1965",
           gender: "Male",
@@ -902,6 +920,7 @@ const PatientInfoPage = () => {
             patient={patient} 
             activeTab={activeTab} 
             setActiveTab={setActiveTab}
+            onToggleStatus={handleToggleStatus}
           />
           
           {/* Tabs navigation */}
@@ -911,10 +930,9 @@ const PatientInfoPage = () => {
           <div className="tab-content">
             {activeTab === 'general' && (
               <GeneralInformationSection 
-              patient={patient} 
-              setCertPeriodDates={setCertPeriodDates}
-            />
-            
+                patient={patient} 
+                setCertPeriodDates={setCertPeriodDates}
+              />
             )}
             {activeTab === 'medical' && (
               <MedicalInformationSection patient={patient} />
@@ -922,11 +940,11 @@ const PatientInfoPage = () => {
             {activeTab === 'disciplines' && (
               <DisciplinesSection patient={patient} />
             )}
-           {activeTab === 'schedule' && (
-  <ScheduleSection 
-    patient={patient} 
-    certPeriodDates={certPeriodDates} 
-  />
+            {activeTab === 'schedule' && (
+              <ScheduleSection 
+                patient={patient} 
+                certPeriodDates={certPeriodDates} 
+              />
             )}
             {activeTab === 'exercises' && (
               <ExercisesSection patient={patient} />
@@ -940,8 +958,6 @@ const PatientInfoPage = () => {
           </div>
         </div>
       </main>
-      
- 
     </div>
   );
 };
