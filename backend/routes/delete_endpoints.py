@@ -33,6 +33,8 @@ def delete_exercise(exercise_id: int, db: Session = Depends(get_db)):
 
     return
 
+#///////////////////////// VISITS //////////////////////////#
+
 @router.delete("/visits/{id}")
 def delete_visit(id: int, db: Session = Depends(get_db)):
     visit = db.query(Visit).filter(Visit.id == id).first()
@@ -41,3 +43,29 @@ def delete_visit(id: int, db: Session = Depends(get_db)):
     db.delete(visit)
     db.commit()
     return {"msg": "Deleted"}
+
+#///////////////////////// PATIENTS //////////////////////////#
+
+@router.put("/pacientes/{paciente_id}/deactivate")
+def deactivate_paciente(paciente_id: int, db: Session = Depends(get_db)):
+    paciente = db.query(Pacientes).filter(Pacientes.id_paciente == paciente_id).first()
+
+    if not paciente:
+        raise HTTPException(status_code=404, detail="Paciente no encontrado.")
+
+    paciente.activo = False
+
+    cert_periods = db.query(CertificationPeriod).filter(
+        CertificationPeriod.paciente_id == paciente_id,
+        CertificationPeriod.is_active == True
+    ).all()
+
+    for cert in cert_periods:
+        cert.is_active = False
+
+    db.commit()
+
+    return {
+        "message": "Paciente y sus periodos de certificación activos desactivados.",
+        "paciente_id": paciente.id_paciente
+    }
