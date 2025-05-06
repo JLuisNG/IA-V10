@@ -1,19 +1,18 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../../components/login/AuthContext'; // Importar el contexto de autenticación
+import { useAuth } from '../../../../components/login/AuthContext';
 import logoImg from '../../../../assets/LogoMHC.jpeg';
 import '../../../../styles/developer/Patients/Staffing/StaffingPage.scss';
 import PremiumTabs from '../Patients/PremiunTabs.jsx';
-import StaffingManagerContainer from './StaffingManagerContainer';
 import AddStaffForm from './AddStaffForm';
 import StaffListComponent from './StaffListComponent';
 import StaffEditComponent from './StaffEditComponent';
-import LogoutAnimation from '../../../../components/LogOut/LogOut'; // Importar el componente de animación
+import LogoutAnimation from '../../../../components/LogOut/LogOut';
 
 const AdminStaffingPage = () => {
   const navigate = useNavigate();
-  const { currentUser, logout } = useAuth(); // Usar el contexto de autenticación
-  
+  const { currentUser, logout } = useAuth();
+
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [menuTransitioning, setMenuTransitioning] = useState(false);
   const [showMenuSwitch, setShowMenuSwitch] = useState(false);
@@ -22,12 +21,10 @@ const AdminStaffingPage = () => {
   const [showStaffList, setShowStaffList] = useState(false);
   const [showStaffEdit, setShowStaffEdit] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
-  const [isMobile, setIsMobile] = useState(false); // Para responsive en LogoutAnimation
-  
-  // Referencias
+  const [isMobile, setIsMobile] = useState(false);
+
   const userMenuRef = useRef(null);
-  
-  // Función para obtener iniciales del nombre
+
   function getInitials(name) {
     if (!name) return "U";
     const parts = name.split(' ');
@@ -36,43 +33,39 @@ const AdminStaffingPage = () => {
     }
     return name.substring(0, 2).toUpperCase();
   }
-  
-  // Usar datos de usuario del contexto de autenticación
+
   const userData = {
     name: currentUser?.fullname || currentUser?.username || 'Usuario',
     avatar: getInitials(currentUser?.fullname || currentUser?.username || 'Usuario'),
     email: currentUser?.email || 'usuario@ejemplo.com',
     role: currentUser?.role || 'Usuario',
-    status: 'online', // online, away, busy, offline
+    status: 'online',
   };
-  
-  // Detectar el tamaño de la pantalla para responsive
+
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
     };
-    
-    handleResize(); // Comprobar inicialmente
+
+    handleResize();
     window.addEventListener('resize', handleResize);
-    
+
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-  
-  // Efecto para cerrar menú de usuario al hacer clic fuera
+
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
         setShowUserMenu(false);
       }
     };
-    
+
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
-  
-  // Efecto para mostrar el indicador de cambio de menú cuando el mouse está cerca del borde izquierdo
+
   useEffect(() => {
     const handleMouseMove = (e) => {
       if (e.clientX < 50) {
@@ -81,127 +74,159 @@ const AdminStaffingPage = () => {
         setShowMenuSwitch(false);
       }
     };
-    
+
     document.addEventListener('mousemove', handleMouseMove);
     return () => {
       document.removeEventListener('mousemove', handleMouseMove);
     };
   }, []);
-  
-  // Manejar navegación al menú principal
+
   const handleMainMenuTransition = () => {
-    if (isLoggingOut) return; // No permitir navegación durante cierre de sesión
-    
+    if (isLoggingOut) return;
+
     setMenuTransitioning(true);
-    
-    // Extraer el rol base para la navegación
     const baseRole = currentUser?.role?.split(' - ')[0].toLowerCase() || 'developer';
-    
-    // Simular animación de transición y luego navegar
+
     setTimeout(() => {
       navigate(`/${baseRole}/homePage`);
     }, 300);
   };
-  
-  // Manejar cambio de pestaña
+
   const handleTabChange = (tab) => {
-    if (isLoggingOut) return; // No permitir navegación durante cierre de sesión
-    
+    if (isLoggingOut) return;
+
     if (tab === 'Patients') {
       setMenuTransitioning(true);
-      
-      // Extraer el rol base para la navegación
       const baseRole = currentUser?.role?.split(' - ')[0].toLowerCase() || 'developer';
-      
+
       setTimeout(() => {
         navigate(`/${baseRole}/patients`);
       }, 300);
     }
   };
-  
-  // Manejar selección de opción
+
   const handleOptionSelect = (option) => {
-    if (isLoggingOut) return; // No permitir cambios durante cierre de sesión
-    
+    if (isLoggingOut) return;
+
     setSelectedOption(option);
     setShowAddStaffForm(false);
     setShowStaffList(false);
     setShowStaffEdit(false);
   };
 
-  // Manejar el clic en Add New Staff
   const handleAddStaffClick = (e) => {
-    if (isLoggingOut) return; // No permitir cambios durante cierre de sesión
+    if (isLoggingOut) return;
     if (e) e.stopPropagation();
-    
+
     setSelectedOption('therapists');
     setShowAddStaffForm(true);
     setShowStaffList(false);
     setShowStaffEdit(false);
   };
 
-  // Manejar cierre de sesión - con animación mejorada
   const handleLogout = () => {
     setIsLoggingOut(true);
     setShowUserMenu(false);
-    
-    // Aplicar clase a document.body para efectos globales
     document.body.classList.add('logging-out');
   };
-  
-  // Callback para cuando la animación de cierre de sesión termine
+
   const handleLogoutAnimationComplete = () => {
-    // Ejecutar el logout del contexto de autenticación
     logout();
-    // Navegar a la página de inicio de sesión
     navigate('/');
   };
 
-  const notificationCount = 5; // Example value, replace with actual logic if needed
+  const notificationCount = 5;
 
-  // Manejar el clic en View All Staff
   const handleViewAllStaffClick = (e) => {
-    if (isLoggingOut) return; // No permitir cambios durante cierre de sesión
+    if (isLoggingOut) return;
     if (e) e.stopPropagation();
-    
+
     setSelectedOption('therapists');
     setShowStaffList(true);
     setShowAddStaffForm(false);
     setShowStaffEdit(false);
   };
 
-  // Manejar el clic en Edit Existing Staff
   const handleEditStaffClick = (e) => {
-    if (isLoggingOut) return; // No permitir cambios durante cierre de sesión
+    if (isLoggingOut) return;
     if (e) e.stopPropagation();
-    
+
     setSelectedOption('therapists');
     setShowStaffEdit(true);
     setShowAddStaffForm(false);
     setShowStaffList(false);
   };
 
-  // Manejar cancelación del formulario
   const handleCancelForm = () => {
-    if (isLoggingOut) return; // No permitir cambios durante cierre de sesión
-    
+    if (isLoggingOut) return;
+
     setShowAddStaffForm(false);
     setShowStaffList(false);
     setShowStaffEdit(false);
   };
 
-  // Manejar volver a opciones
   const handleBackToOptions = () => {
-    if (isLoggingOut) return; // No permitir cambios durante cierre de sesión
-    
+    if (isLoggingOut) return;
+
     setShowStaffList(false);
     setShowAddStaffForm(false);
     setShowStaffEdit(false);
+  };
+
+  // Datos simulados para las estadísticas (en un escenario real, vendrían de una API o del estado)
+  const staffList = [
+    { role: 'pt' },
+    { role: 'pta' },
+    { role: 'ot' },
+    { role: 'administrator' },
+    { role: 'support' },
+    // Agrega más datos simulados si es necesario
+  ];
+
+  const therapistCounts = {
+    PT: staffList.filter(staff => staff.role === 'pt').length,
+    PTA: staffList.filter(staff => staff.role === 'pta').length,
+    OT: staffList.filter(staff => staff.role === 'ot').length,
+    COTA: staffList.filter(staff => staff.role === 'cota').length,
+    ST: staffList.filter(staff => staff.role === 'st').length,
+    STA: staffList.filter(staff => staff.role === 'sta').length,
+  };
+
+  const totalTherapists = Object.values(therapistCounts).reduce((sum, count) => sum + count, 0);
+
+  const internalStaffCounts = {
+    Admin: staffList.filter(staff => staff.role === 'administrator').length,
+    Agency: staffList.filter(staff => staff.role === 'agency').length,
+    Support: staffList.filter(staff => staff.role === 'support').length,
+    Developer: staffList.filter(staff => staff.role === 'developer').length,
+  };
+
+  const totalInternalStaff = Object.values(internalStaffCounts).reduce((sum, count) => sum + count, 0);
+
+  const monthlyIncorporations = {
+    currentMonth: 0,
+    previousMonth: 100,
+  };
+
+  let incorporationChange = 0;
+  let changeDirection = '';
+  if (monthlyIncorporations.previousMonth === 0) {
+    incorporationChange = monthlyIncorporations.currentMonth > 0 ? 100 : 0;
+    changeDirection = monthlyIncorporations.currentMonth > 0 ? 'increase' : 'no-change';
+  } else {
+    incorporationChange = Math.round(
+      ((monthlyIncorporations.currentMonth - monthlyIncorporations.previousMonth) / monthlyIncorporations.previousMonth) * 100
+    );
+    changeDirection = incorporationChange > 0 ? 'increase' : incorporationChange < 0 ? 'decrease' : 'no-change';
+  }
+
+  const handleNavigateToCreateReferral = () => {
+    if (isLoggingOut) return;
+    navigate('/developer/referrals', { state: { initialView: 'createReferral' } });
   };
 
   return (
     <div className={`staffing-dashboard ${menuTransitioning ? 'transitioning' : ''} ${isLoggingOut ? 'logging-out' : ''}`}>
-      {/* Animación de cierre de sesión - Mostrar solo cuando se está cerrando sesión */}
       {isLoggingOut && (
         <LogoutAnimation 
           isMobile={isMobile} 
@@ -209,13 +234,11 @@ const AdminStaffingPage = () => {
         />
       )}
       
-      {/* Fondo parallax */}
       <div className="parallax-background">
         <div className="gradient-overlay"></div>
         <div className="animated-particles"></div>
       </div>
       
-      {/* Indicador flotante para cambiar al menú principal */}
       {showMenuSwitch && !isLoggingOut && (
         <div 
           className="menu-switch-indicator"
@@ -226,17 +249,14 @@ const AdminStaffingPage = () => {
         </div>
       )}
       
-      {/* Header con logo y perfil */}
       <header className={`main-header ${isLoggingOut ? 'logging-out' : ''}`}>
         <div className="header-container">
-          {/* Logo y navegación */}
           <div className="logo-container">
             <div className="logo-wrapper">
               <img src={logoImg} alt="TherapySync Logo" className="logo" />
               <div className="logo-glow"></div>
             </div>
             
-            {/* Navegación de menú */}
             <div className="menu-navigation">
               <button 
                 className="nav-button main-menu" 
@@ -261,12 +281,10 @@ const AdminStaffingPage = () => {
             </div>
           </div>
           
-          {/* Sección de pestañas premium */}
           <div className="tabs-section">
             <PremiumTabs activeTab="Staffing" onTabChange={handleTabChange} />
           </div>
           
-          {/* Perfil de usuario */}
           <div className="support-user-profile" ref={userMenuRef}>
             <div 
               className={`support-profile-button ${showUserMenu ? 'active' : ''}`} 
@@ -286,7 +304,6 @@ const AdminStaffingPage = () => {
               <i className={`fas fa-chevron-${showUserMenu ? 'up' : 'down'}`}></i>
             </div>
             
-            {/* Menú desplegable del usuario mejorado con estadísticas */}
             {showUserMenu && !isLoggingOut && (
               <div className="support-user-menu">
                 <div className="support-menu-header">
@@ -304,11 +321,6 @@ const AdminStaffingPage = () => {
                       </span>
                     </div>
                   </div>
-                  
-                  {/* Stats cards */}
-                  
-                  {/* Quick action buttons */}
-       
                 </div>
                 
                 <div className="support-menu-section">
@@ -361,7 +373,6 @@ const AdminStaffingPage = () => {
                 <div className="support-menu-section">
                   <div className="section-title">Support</div>
                   <div className="support-menu-items">
-      
                     <div className="support-menu-item">
                       <i className="fas fa-headset"></i>
                       <span>Contact Support</span>
@@ -389,10 +400,8 @@ const AdminStaffingPage = () => {
         </div>
       </header>
       
-      {/* Contenido principal */}
       <main className={`staffing-content ${isLoggingOut ? 'fade-out' : ''}`}>
         <div className="staffing-container">
-          {/* Header del dashboard */}
           <div className="staffing-header">
             <div className="staffing-title-container">
               <h1 className="staffing-title">Staffing Management Center</h1>
@@ -422,7 +431,6 @@ const AdminStaffingPage = () => {
             </div>
           </div>
 
-          {/* Opciones de Staffing */}
           <div className="staffing-options">
             <div 
               className={`staffing-option-card ${selectedOption === 'therapists' ? 'selected' : ''}`}
@@ -456,55 +464,83 @@ const AdminStaffingPage = () => {
                 <i className="fas fa-user-md"></i>
               </div>
             </div>
+            
+           
           </div>
           
-          {/* Contenedor de estadísticas */}
+          {/* Nueva sección de estadísticas */}
           <div className="stats-container">
             <h2>Staffing Overview</h2>
             <div className="staffing-stats">
+              {/* Total Therapists con desglose */}
               <div className="stat-card">
                 <div className="stat-icon">
-                  <i className="fas fa-user-md"></i>
+                  <i className="fas fa-users"></i>
                 </div>
                 <div className="stat-info">
-                  <h3 className="stat-value">14</h3>
+                  <h3 className="stat-value">{totalTherapists}</h3>
                   <p>Total Therapists</p>
+                  <div className="therapist-breakdown">
+                    <span>PT: {therapistCounts.PT}</span>
+                    <span>PTA: {therapistCounts.PTA}</span>
+                    <span>OT: {therapistCounts.OT}</span>
+                    <span>COTA: {therapistCounts.COTA}</span>
+                    <span>ST: {therapistCounts.ST}</span>
+                    <span>STA: {therapistCounts.STA}</span>
+                  </div>
                 </div>
               </div>
-              
-              <div className="stat-card">
-                <div className="stat-icon">
-                  <i className="fas fa-clipboard-check"></i>
-                </div>
-                <div className="stat-info">
-                  <h3 className="stat-value">243</h3>
-                  <p>Monthly Visits</p>
-                </div>
-              </div>
-              
-              <div className="stat-card">
-                <div className="stat-icon">
-                  <i className="fas fa-chart-line"></i>
-                </div>
-                <div className="stat-info">
-                  <h3 className="stat-value">96%</h3>
-                  <p>Visit Compliance</p>
-                </div>
-              </div>
-              
+
+              {/* Incorporación mensual */}
               <div className="stat-card">
                 <div className="stat-icon">
                   <i className="fas fa-user-plus"></i>
                 </div>
                 <div className="stat-info">
-                  <h3 className="stat-value">3</h3>
-                  <p>Open Positions</p>
+                  <h3 className="stat-value">{monthlyIncorporations.currentMonth}</h3>
+                  <p>Monthly Incorporations</p>
+                  <div className={`change-indicator ${changeDirection}`}>
+                    {changeDirection !== 'no-change' ? (
+                      <>
+                        {Math.abs(incorporationChange)}% {changeDirection === 'increase' ? '↑' : '↓'}
+                      </>
+                    ) : (
+                      'No Change'
+                    )}
+                  </div>
+                </div>
+              </div>
+
+              {/* Personal interno */}
+              <div className="stat-card">
+                <div className="stat-icon">
+                  <i className="fas fa-user-tie"></i>
+                </div>
+                <div className="stat-info">
+                  <h3 className="stat-value">{totalInternalStaff}</h3>
+                  <p>Internal Staff</p>
+                  <div className="internal-staff-breakdown">
+                    <span>Admin: {internalStaffCounts.Admin}</span>
+                    <span>Agency: {internalStaffCounts.Agency}</span>
+                    <span>Support: {internalStaffCounts.Support}</span>
+                    <span>Developer: {internalStaffCounts.Developer}</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Botón para crear un nuevo paciente */}
+              <div className="stat-card action-card" onClick={handleNavigateToCreateReferral}>
+                <div className="stat-icon">
+                  <i className="fas fa-user-plus"></i>
+                </div>
+                <div className="stat-info">
+                  <h3 className="stat-value">Create Patient</h3>
+                  <p>Start a new patient referral</p>
                 </div>
               </div>
             </div>
           </div>
           
-          {/* Área de contenido seleccionado - Aquí se mostrará el contenido específico según la opción elegida */}
           {selectedOption === 'therapists' && showAddStaffForm ? (
             <AddStaffForm onCancel={handleCancelForm} />
           ) : selectedOption === 'therapists' && showStaffList ? (
@@ -587,7 +623,6 @@ const AdminStaffingPage = () => {
         </div>
       </main>
       
-      {/* Botón de Acción Rápida Flotante */}
       {!isLoggingOut && (
         <div className="quick-action-btn">
           <button 

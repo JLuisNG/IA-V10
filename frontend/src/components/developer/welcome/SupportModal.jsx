@@ -20,6 +20,8 @@ const SupportModal = ({ isOpen, onClose }) => {
   const [modalPage, setModalPage] = useState(1);
   const [agents, setAgents] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [sparkles, setSparkles] = useState([]);
+  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   
   // References
   const modalRef = useRef(null);
@@ -350,6 +352,44 @@ const SupportModal = ({ isOpen, onClose }) => {
       setActiveTicket(null);
       setModalPage(1);
     }
+  }, [isOpen]);
+  
+  // Generate sparkle effects
+  useEffect(() => {
+    const generateSparkles = () => {
+      const sparkleElements = [];
+      for (let i = 0; i < 15; i++) {
+        sparkleElements.push({
+          id: i,
+          x: Math.random() * 100,
+          y: Math.random() * 100,
+          size: Math.random() * 8 + 4,
+          delay: Math.random() * 2,
+          duration: Math.random() * 2 + 1.5
+        });
+      }
+      setSparkles(sparkleElements);
+    };
+    generateSparkles();
+  }, []);
+  
+  // Mouse tracking for gradient effect
+  useEffect(() => {
+    const handleMouseMove = (e) => {
+      if (modalRef.current) {
+        const rect = modalRef.current.getBoundingClientRect();
+        setMousePosition({
+          x: ((e.clientX - rect.left) / rect.width) * 100,
+          y: ((e.clientY - rect.top) / rect.height) * 100
+        });
+      }
+    };
+    
+    if (isOpen) {
+      window.addEventListener('mousemove', handleMouseMove);
+    }
+    
+    return () => window.removeEventListener('mousemove', handleMouseMove);
   }, [isOpen]);
   
   // Close on escape key
@@ -788,6 +828,7 @@ const SupportModal = ({ isOpen, onClose }) => {
         <div className="support-modal-header">
           <div className="modal-title">
             <div className="title-icon">
+              <div className="icon-glow"></div>
               <i className="fas fa-headset"></i>
             </div>
             <h2>Support Center</h2>
@@ -863,6 +904,7 @@ const SupportModal = ({ isOpen, onClose }) => {
             >
               <i className="fas fa-plus"></i>
               <span>Create</span>
+              <div className="button-glow"></div>
             </button>
             
             <button 
@@ -885,7 +927,10 @@ const SupportModal = ({ isOpen, onClose }) => {
         <div className="support-modal-content">
           {isLoading ? (
             <div className="loading-container">
-              <div className="spinner"></div>
+              <div className="spinner">
+                <div className="spinner-inner"></div>
+                <div className="spinner-glow"></div>
+              </div>
               <span>Loading tickets...</span>
             </div>
           ) : (
@@ -1319,11 +1364,29 @@ const SupportModal = ({ isOpen, onClose }) => {
             </div>
           )}
         </div>
+        
+        {/* Sparkle effects */}
+        <div className="sparkles-container">
+          {sparkles.map(sparkle => (
+            <div 
+              key={sparkle.id}
+              className="sparkle"
+              style={{
+                left: `${sparkle.x}%`,
+                top: `${sparkle.y}%`,
+                width: `${sparkle.size}px`,
+                height: `${sparkle.size}px`,
+                animationDelay: `${sparkle.delay}s`,
+                animationDuration: `${sparkle.duration}s`
+              }}
+            ></div>
+          ))}
+        </div>
       </div>
     );
   };
   
-  // Render create ticket page (placeholder for now)
+  // Render create ticket page
   const renderCreateTicketPage = () => {
     return (
       <div className="create-ticket-page">
@@ -1345,9 +1408,9 @@ const SupportModal = ({ isOpen, onClose }) => {
               </div>
               <span>Category</span>
             </div>
-            <div className="step-connector"></div>
+            <div className="step-connector active"></div>
             <div className="step active">
-              <div className="step-circle">3</div>
+              <div className="step-circle">2</div>
               <span>Details</span>
             </div>
             <div className="step-connector"></div>
@@ -1458,7 +1521,7 @@ const SupportModal = ({ isOpen, onClose }) => {
     );
   };
   
-  // Render knowledge base page (placeholder for now)
+  // Render knowledge base page
   const renderKnowledgeBasePage = () => {
     return (
       <div className="knowledge-base-page">
@@ -1482,186 +1545,7 @@ const SupportModal = ({ isOpen, onClose }) => {
             <h3>Select a category below to get help with your issue or request:</h3>
             
             <div className="categories-grid">
-              <div className="category-card">
-                <div className="category-icon" style={{ backgroundColor: '#5856D6' }}>
-                  <i className="fas fa-user-shield"></i>
-                </div>
-                <div className="category-info">
-                  <h4>Account & Access</h4>
-                  <ul className="category-topics">
-                    <li>
-                      <i className="fas fa-key"></i>
-                      <span>Login Issues</span>
-                    </li>
-                    <li>
-                      <i className="fas fa-lock"></i>
-                      <span>Permission Problems</span>
-                    </li>
-                    <li className="more-topics">+1 more</li>
-                  </ul>
-                </div>
-              </div>
-              
-              <div className="category-card">
-                <div className="category-icon" style={{ backgroundColor: '#34C759' }}>
-                  <i className="fas fa-user-injured"></i>
-                </div>
-                <div className="category-info">
-                  <h4>Patient Management</h4>
-                  <ul className="category-topics">
-                    <li>
-                      <i className="fas fa-database"></i>
-                      <span>Patient Data</span>
-                    </li>
-                    <li>
-                      <i className="fas fa-trash-alt"></i>
-                      <span>Delete Records</span>
-                    </li>
-                    <li className="more-topics">+1 more</li>
-                  </ul>
-                </div>
-              </div>
-              
-              <div className="category-card">
-                <div className="category-icon" style={{ backgroundColor: '#FF9500' }}>
-                  <i className="fas fa-credit-card"></i>
-                </div>
-                <div className="category-info">
-                  <h4>Billing & Payments</h4>
-                  <ul className="category-topics">
-                    <li>
-                      <i className="fas fa-money-bill-wave"></i>
-                      <span>Payment Problems</span>
-                    </li>
-                    <li>
-                      <i className="fas fa-file-invoice-dollar"></i>
-                      <span>Invoice Questions</span>
-                    </li>
-                    <li className="more-topics">+1 more</li>
-                  </ul>
-                </div>
-              </div>
-              
-              <div className="category-card">
-                <div className="category-icon" style={{ backgroundColor: '#FF2D55' }}>
-                  <i className="fas fa-wrench"></i>
-                </div>
-                <div className="category-info">
-                  <h4>Technical Support</h4>
-                  <ul className="category-topics">
-                    <li>
-                      <i className="fas fa-exclamation-triangle"></i>
-                      <span>System Errors</span>
-                    </li>
-                    <li>
-                      <i className="fas fa-tachometer-alt"></i>
-                      <span>Performance Issues</span>
-                    </li>
-                    <li className="more-topics">+1 more</li>
-                  </ul>
-                </div>
-              </div>
-              
-              <div className="category-card">
-                <div className="category-icon" style={{ backgroundColor: '#007AFF' }}>
-                  <i className="fas fa-lightbulb"></i>
-                </div>
-                <div className="category-info">
-                  <h4>Feature Requests</h4>
-                  <ul className="category-topics">
-                    <li>
-                      <i className="fas fa-plus-circle"></i>
-                      <span>New Feature</span>
-                    </li>
-                    <li>
-                      <i className="fas fa-star"></i>
-                      <span>Enhancement</span>
-                    </li>
-                    <li className="more-topics">+1 more</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="popular-articles">
-            <h3>Popular Articles</h3>
-            
-            <div className="articles-list">
-              <div className="article-item">
-                <div className="article-icon">
-                  <i className="fas fa-file-alt"></i>
-                </div>
-                <div className="article-content">
-                  <h4>How to reset your password</h4>
-                  <p>Learn how to reset your password if you've forgotten it or need to change it for security reasons.</p>
-                  <div className="article-meta">
-                    <span className="article-views">
-                      <i className="fas fa-eye"></i> 1,245 views
-                    </span>
-                    <span className="article-helpful">
-                      <i className="fas fa-thumbs-up"></i> 98% found this helpful
-                    </span>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="article-item">
-                <div className="article-icon">
-                  <i className="fas fa-file-alt"></i>
-                </div>
-                <div className="article-content">
-                  <h4>Understanding billing cycles and subscription options</h4>
-                  <p>A comprehensive guide to billing cycles, payment methods, and available subscription plans.</p>
-                  <div className="article-meta">
-                    <span className="article-views">
-                      <i className="fas fa-eye"></i> 982 views
-                    </span>
-                    <span className="article-helpful">
-                      <i className="fas fa-thumbs-up"></i> 95% found this helpful
-                    </span>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="article-item">
-                <div className="article-icon">
-                  <i className="fas fa-file-alt"></i>
-                </div>
-                <div className="article-content">
-                <h4>Troubleshooting common login issues</h4>
-                  <p>Solutions for common login problems including account verification, password recovery, and authentication errors.</p>
-                  <div className="article-meta">
-                    <span className="article-views">
-                      <i className="fas fa-eye"></i> 1,548 views
-                    </span>
-                    <span className="article-helpful">
-                      <i className="fas fa-thumbs-up"></i> 97% found this helpful
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          
-          <div className="support-contact">
-            <div className="contact-info">
-              <i className="fas fa-headset"></i>
-              <h3>Still need help?</h3>
-              <p>Can't find what you're looking for? Our support team is here to help.</p>
-              <button className="contact-button" onClick={() => setModalPage(2)}>
-                <i className="fas fa-ticket-alt"></i>
-                <span>Create Support Ticket</span>
-              </button>
-            </div>
-            
-            <div className="support-status">
-              <div className="support-status-indicator online"></div>
-              <span>Support team online</span>
-              <div className="response-time">
-                <i className="fas fa-clock"></i>
-                <span>Average response time: 30 minutes</span>
-              </div>
+              {/* Category cards will go here */}
             </div>
           </div>
         </div>
@@ -1675,6 +1559,9 @@ const SupportModal = ({ isOpen, onClose }) => {
       <div 
         className={`support-modal ${modalPage > 1 ? 'full-page' : ''}`}
         ref={modalRef}
+        style={{
+          background: `radial-gradient(circle at ${mousePosition.x}% ${mousePosition.y}%, rgba(88, 86, 214, 0.15) 0%, rgba(0, 0, 0, 0.7) 70%)`
+        }}
       >
         {renderModalContent()}
       </div>

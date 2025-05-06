@@ -20,10 +20,10 @@ const AdminStaffEditComponent = ({ onBackToOptions }) => {
     
     const loadingMessages = [
       { message: 'Verificando permisos de usuario...', time: 800 },
-      { message: 'Recuperando lista de personal...', time: 1600 },
-      { message: 'Cargando documentos asociados...', time: 2400 },
-      { message: 'Preparando interfaz de edición...', time: 3200 },
-      { message: 'Optimizando rendimiento...', time: 4000 }
+      { message: 'Recuperando lista de personal...', time: 500 },
+      { message: 'Cargando documentos asociados...', time: 400 },
+      { message: 'Preparando interfaz de edición...', time: 1200 },
+      { message: 'Optimizando rendimiento...', time: 400 }
     ];
     
     const timeouts = [];

@@ -57,7 +57,7 @@ const ExercisesComponent = ({ patient, onUpdateExercises }) => {
     // Simulating API call with progress tracking
     let progress = 0;
     loadingIntervalRef.current = setInterval(() => {
-      progress += (Math.random() * 2) + 0.5;
+      progress += (Math.random() * 4) + 1.6;
       setLoadingProgress(Math.min(progress, 99));
       
       if (progress >= 99) {
@@ -71,18 +71,18 @@ const ExercisesComponent = ({ patient, onUpdateExercises }) => {
           setLoadingText('Processing exercise data...');
           setTimeout(() => {
             setExerciseLibrary(mockExercises);
-            setLoadingProgress(100);
+            setLoadingProgress(10);
             
             // Completion animation
             setTimeout(() => {
               setIsLoading(false);
               setLoadingProgress(0);
               setLoadingAnimation(null);
-            }, 20);
-          }, 100);
-        }, 250);
+            }, 2);
+          }, 5);
+        }, 5);
       }
-    }, 55);
+    }, 50);
     
     // GSAP animations for page elements
     const timeline = gsap.timeline({ defaults: { ease: "power3.out" } });
@@ -116,7 +116,7 @@ const ExercisesComponent = ({ patient, onUpdateExercises }) => {
         
         setTimeout(() => {
           setModalTransition('');
-        }, 400);
+        }, 10);
       }
     } else {
       document.body.style.overflow = '';
@@ -154,7 +154,7 @@ const ExercisesComponent = ({ patient, onUpdateExercises }) => {
         
         setTimeout(() => {
           setAnimatedExerciseId(null);
-        }, 1000);
+        }, 25);
       }
     }
   }, [animatedExerciseId]);
@@ -381,8 +381,8 @@ const ExercisesComponent = ({ patient, onUpdateExercises }) => {
           setSaveSuccess(true);
           successTimeoutRef.current = setTimeout(() => {
             setSaveSuccess(false);
-          }, 3000);
-        }, 400);
+          }, 50);
+        }, 40);
       }
     }, 30);
   };
@@ -429,7 +429,7 @@ const ExercisesComponent = ({ patient, onUpdateExercises }) => {
             setSaveSuccess(true);
             successTimeoutRef.current = setTimeout(() => {
               setSaveSuccess(false);
-            }, 3000);
+            }, 200);
             
             // Animate the updated exercise
             setAnimatedExerciseId(selectedExercise.id);
@@ -538,7 +538,7 @@ const ExercisesComponent = ({ patient, onUpdateExercises }) => {
             setSaveSuccess(true);
             successTimeoutRef.current = setTimeout(() => {
               setSaveSuccess(false);
-            }, 3000);
+            }, 500);
           });
         }, 500);
       }
@@ -598,7 +598,7 @@ const ExercisesComponent = ({ patient, onUpdateExercises }) => {
               setSaveSuccess(true);
               successTimeoutRef.current = setTimeout(() => {
                 setSaveSuccess(false);
-              }, 3000);
+              }, 500);
               
               // Animate the exercises grid to show changes are applied
               if (exercisesGridRef.current) {
@@ -624,7 +624,7 @@ const ExercisesComponent = ({ patient, onUpdateExercises }) => {
             setSaveError(true);
             errorTimeoutRef.current = setTimeout(() => {
               setSaveError(false);
-            }, 3000);
+            }, 500);
           }
         }, 300);
       }

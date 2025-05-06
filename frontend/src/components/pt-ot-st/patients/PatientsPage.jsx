@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useAuth } from '../../../components/login/AuthContext'; // Importar el contexto de autenticación
+import { useAuth } from '../../../components/login/AuthContext';
 import logoImg from '../../../assets/LogoMHC.jpeg';
 import '../../../styles/developer/Patients/PatientsPage.scss';
 import AIAssistant from '../welcome/AIAssistant';
-import LogoutAnimation from '../../../components/LogOut/LogOut'; // Importa el componente de animación de cierre de sesión
+import LogoutAnimation from '../../../components/LogOut/LogOut';
 
-// Componente de Tabs Premium con animaciones mejoradas
+// Premium Tabs component with animations
 const PremiumTabs = ({ activeTab, onChangeTab }) => {
   return (
     <div className="premium-tabs">
@@ -23,14 +23,14 @@ const PremiumTabs = ({ activeTab, onChangeTab }) => {
   );
 };
 
-// Componente de tarjeta de paciente animada
+// Patient Card component
 const PatientCard = ({ patient, onView, onEdit, onNotes }) => {
   const getStatusClass = (status) => {
     switch(status) {
       case 'Active': return 'status-active';
       case 'Pending': return 'status-pending';
       case 'Review': return 'status-review';
-      case 'Expired': return 'status-expired';
+      case 'Desactive': return 'status-Desactive';
       default: return '';
     }
   };
@@ -88,7 +88,7 @@ const PatientCard = ({ patient, onView, onEdit, onNotes }) => {
   );
 };
 
-// Componente de tarjeta de estadísticas con animación
+// Stat Card component
 const StatCard = ({ title, value, icon, color }) => {
   return (
     <div className={`stat-card ${color}`}>
@@ -108,7 +108,6 @@ const StatCard = ({ title, value, icon, color }) => {
 
 const TPPatientsPage = () => {
   const navigate = useNavigate();
-  // Usar el contexto de autenticación para obtener el usuario actual
   const { currentUser, logout } = useAuth();
   
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -118,15 +117,15 @@ const TPPatientsPage = () => {
   const [showMenuSwitch, setShowMenuSwitch] = useState(false);
   const [showAIAssistant, setShowAIAssistant] = useState(true);
   const [showFilterMenu, setShowFilterMenu] = useState(false);
-  const [currentView, setCurrentView] = useState('list'); // 'list' o 'grid'
+  const [currentView, setCurrentView] = useState('list');
   const [showFilters, setShowFilters] = useState(true);
   const [sortOption, setSortOption] = useState('nameAsc');
   const [showQuickTour, setShowQuickTour] = useState(false);
   const [activePage, setActivePage] = useState(1);
-  const [isMobile, setIsMobile] = useState(false); // Para responsive en LogoutAnimation
-  const notificationCount = 0; // Define notificationCount with a default value
+  const [isMobile, setIsMobile] = useState(false);
+  const notificationCount = 0;
   
-  // Función para obtener iniciales del nombre
+  // Function to get user initials
   function getInitials(name) {
     if (!name) return "U";
     const parts = name.split(' ');
@@ -136,26 +135,26 @@ const TPPatientsPage = () => {
     return name.substring(0, 2).toUpperCase();
   }
   
-  // Datos de usuario del contexto de autenticación
+  // User data from auth context
   const userData = {
     name: currentUser?.fullname || currentUser?.username || 'Usuario',
     avatar: getInitials(currentUser?.fullname || currentUser?.username || 'Usuario'),
     email: currentUser?.email || 'usuario@ejemplo.com',
     role: currentUser?.role || 'Usuario',
-    status: 'online', // online, away, busy, offline
+    status: 'online',
     stats: {},
     quickActions: []
   };
   
-  // Opciones de ordenamiento
+  // Sort options
   const sortOptions = [
     { id: 'nameAsc', text: 'Sort by Name (A-Z)', icon: 'fa-sort-alpha-down' },
     { id: 'nameDesc', text: 'Sort by Name (Z-A)', icon: 'fa-sort-alpha-up' },
     { id: 'statusActive', text: 'Active Certification', icon: 'fa-calendar-check' },
-    { id: 'statusExpired', text: 'Expired Certification', icon: 'fa-calendar-times' }
+    { id: 'statusDesactive', text: 'Desactive', icon: 'fa-calendar-times' }
   ];
   
-  // Estados de búsqueda
+  // Search and filter states
   const [patientSearchTerm, setPatientSearchTerm] = useState('');
   const [agencySearchTerm, setAgencySearchTerm] = useState('');
   const [selectedTherapistType, setSelectedTherapistType] = useState('all');
@@ -163,27 +162,27 @@ const TPPatientsPage = () => {
   const [selectedAgency, setSelectedAgency] = useState('all');
   const [selectedStatus, setSelectedStatus] = useState('all');
   
-  // Referencias
+  // Refs
   const userMenuRef = useRef(null);
   const menuRef = useRef(null);
   const filterMenuRef = useRef(null);
   const searchInputRef = useRef(null);
   
-  // Opciones de menú
+  // Menu options
   const menuOptions = ["Patients", "Therapist"];
   
-  // Opciones de tipo de terapeuta
+  // Therapist types
   const therapistTypes = ['all', 'PT', 'PTA', 'OT', 'COTA', 'ST', 'STA'];
   
-  // Estados de paciente
-  const statusOptions = ['all', 'Active', 'Pending', 'Review', 'Expired'];
+  // Status options
+  const statusOptions = ['all', 'Active', 'Pending', 'Review', 'Desactive'];
   
-  // Datos de muestra de pacientes con información de terapeuta
+  // Patient data (in a real app, this would come from an API)
   const [patients, setPatients] = useState([
     {
       id: 1,
-      name: "Adhami, Soheila",
-      therapist: "John Smith",
+      name: "Vargas, Javier",
+      therapist: "Regina Araquel",
       therapistType: "PT",
       agency: "Supportive Health Group",
       street: "1800 Camden Avenue",
@@ -192,168 +191,40 @@ const TPPatientsPage = () => {
       zip: "90025",
       phone: "(310) 808-5631",
       certPeriod: "04-19-2023 to 04-19-2025",
-      status: "Active"
+      status: "Active",
+      dob: "05/12/1965",
+      insurance: "Blue Cross Blue Shield",
+      policyNumber: "BCB-123456789",
+      emergencyContact: "Mohammed Ali",
+      emergencyPhone: "(310) 555-7890",
+      notes: "Patient recovering well. Following exercise regimen as prescribed.",
     },
     {
       id: 2,
-      name: "Adkin, Wayne Jason Jr",
-      therapist: "Maria Rodriguez",
+      name: "Nava, Luis",
+      therapist: "James Lee",
       therapistType: "OT",
-      agency: "Destiny Home Health Services, Inc",
-      street: "334 E Louise St, #2",
-      city: "Long Beach",
+      agency: "Intra Care Home Health",
+      street: "1800 Camden Avenue",
+      city: "Los Angeles",
       state: "CA",
-      zip: "90805",
-      phone: "(562) 981-2014",
+      zip: "90025",
+      phone: "(310) 808-5631",
       certPeriod: "04-19-2023 to 04-19-2025",
-      status: "Active"
-    },
-    {
-      id: 3,
-      name: "Aguilar, Bertha",
-      therapist: "John Smith",
-      therapistType: "PT",
-      agency: "Supportive Health Group",
-      street: "6142 McKinley Avenue",
-      city: "South Gate",
-      state: "CA",
-      zip: "90280",
-      phone: "(562) 290-8009",
-      certPeriod: "04-24-2023 to 04-24-2025",
-      status: "Active"
-    },
-    {
-      id: 4,
-      name: "Aguilar, Irma",
-      therapist: "Sarah Johnson",
-      therapistType: "COTA",
-      agency: "Intra Care Home Health Providers, Inc",
-      street: "6331 Pacific Drive",
-      city: "Commerce",
-      state: "CA",
-      zip: "90040",
-      phone: "(562) 405-2896",
-      certPeriod: "12-06-2022 to 10-09-2024",
-      status: "Review"
-    },
-    {
-      id: 5,
-      name: "Aguilar De Garcia, Sara",
-      therapist: "David Wilson",
-      therapistType: "ST",
-      agency: "Supportive Health Group",
-      street: "3413 West 111th Place",
-      city: "Inglewood",
-      state: "CA",
-      zip: "90303",
-      phone: "(310) 666-3212",
-      certPeriod: "04-28-2023 to 04-28-2025",
-      status: "Active"
-    },
-    {
-      id: 6,
-      name: "Aguilera, Lilia",
-      therapist: "James Martinez",
-      therapistType: "PT",
-      agency: "Unison Health Services, Inc",
-      street: "12743 Adelphia Ave",
-      city: "San Fernando",
-      state: "CA",
-      zip: "91340",
-      phone: "(818) 424-9591",
-      certPeriod: "04-19-2023 to 04-19-2025",
-      status: "Active"
-    },
-    {
-      id: 7,
-      name: "Alas Gonzalez, Mayita",
-      therapist: "Emma Thompson",
-      therapistType: "PTA",
-      agency: "Supportive Health Group",
-      street: "11613 Mac Govern Avenue",
-      city: "Downey",
-      state: "CA",
-      zip: "90241",
-      phone: "(562) 644-6929",
-      certPeriod: "04-22-2023 to 04-22-2025",
-      status: "Pending"
-    },
-    {
-      id: 8,
-      name: "Albert, David Steven",
-      therapist: "Michael Brown",
-      therapistType: "STA",
-      agency: "All Americans Choice Home Health Inc",
-      street: "8651 Foothill BL",
-      city: "Rancho Cucamonga",
-      state: "CA",
-      zip: "91730",
-      phone: "(951) 233-2677",
-      certPeriod: "04-18-2023 to 04-18-2025",
-      status: "Expired"
-    },
-    {
-      id: 9,
-      name: "Allen, Rebecca",
-      therapist: "John Smith",
-      therapistType: "PT",
-      agency: "Supportive Health Group",
-      street: "427 Willow Drive",
-      city: "Santa Monica",
-      state: "CA",
-      zip: "90403",
-      phone: "(310) 555-7832",
-      certPeriod: "05-11-2023 to 05-11-2025",
-      status: "Active"
-    },
-    {
-      id: 10,
-      name: "Alvarez, Miguel",
-      therapist: "Sarah Johnson",
-      therapistType: "COTA",
-      agency: "Intra Care Home Health Providers, Inc",
-      street: "1824 Ocean Avenue",
-      city: "San Francisco",
-      state: "CA",
-      zip: "94112",
-      phone: "(415) 683-1942",
-      certPeriod: "03-22-2023 to 03-22-2025",
-      status: "Pending"
-    },
-    {
-      id: 11,
-      name: "Andrews, Thomas",
-      therapist: "Michael Brown",
-      therapistType: "STA",
-      agency: "All Americans Choice Home Health Inc",
-      street: "562 Maple Street",
-      city: "Pasadena",
-      state: "CA",
-      zip: "91106",
-      phone: "(626) 355-9087",
-      certPeriod: "01-14-2023 to 01-14-2025",
-      status: "Active"
-    },
-    {
-      id: 12,
-      name: "Barnes, Jennifer",
-      therapist: "Emma Thompson",
-      therapistType: "PTA",
-      agency: "Supportive Health Group",
-      street: "783 Pine Avenue",
-      city: "Long Beach",
-      state: "CA",
-      zip: "90802",
-      phone: "(562) 441-3876",
-      certPeriod: "02-08-2022 to 02-08-2024",
-      status: "Expired"
+      status: "Desactive",
+      dob: "05/12/1965",
+      insurance: "Blue Cross Blue Shield",
+      policyNumber: "BCB-123456789",
+      emergencyContact: "Rick Grimes",
+      emergencyPhone: "(310) 555-7890",
+      notes: "Patient recovering well. Following exercise regimen as prescribed.",
     }
   ]);
   
-  // Extraer agencias únicas para los filtros
+  // Extract unique agencies for filters
   const agencies = [...new Set(patients.map(patient => patient.agency))];
   
-  // Obtener terapeutas basados en el tipo seleccionado
+  // Get therapists based on selected type
   const getFilteredTherapists = () => {
     if (selectedTherapistType === 'all') {
       return [...new Set(patients.map(patient => patient.therapist))];
@@ -364,15 +235,15 @@ const TPPatientsPage = () => {
       .map(patient => patient.therapist))];
   };
   
-  // Terapeutas filtrados basados en el tipo seleccionado
+  // Filtered therapists based on selected type
   const filteredTherapists = getFilteredTherapists();
   
-  // Filtrar agencias basadas en la búsqueda
+  // Filter agencies based on search
   const filteredAgencies = agencies.filter(agency => 
     agency.toLowerCase().includes(agencySearchTerm.toLowerCase())
   );
   
-  // Ordenar pacientes según la opción seleccionada
+  // Sort patients based on selected option
   const sortPatients = (patients) => {
     let sortedPatients = [...patients];
     
@@ -390,10 +261,10 @@ const TPPatientsPage = () => {
           a.name.localeCompare(b.name)
         );
         break;
-      case 'statusExpired':
+      case 'statusDesactive':
         sortedPatients.sort((a, b) => 
-          a.status === 'Expired' && b.status !== 'Expired' ? -1 : 
-          a.status !== 'Expired' && b.status === 'Expired' ? 1 : 
+          a.status === 'Desactive' && b.status !== 'Desactive' ? -1 : 
+          a.status !== 'Desactive' && b.status === 'Desactive' ? 1 : 
           a.name.localeCompare(b.name)
         );
         break;
@@ -404,10 +275,10 @@ const TPPatientsPage = () => {
     return sortedPatients;
   };
   
-  // Filtrar pacientes basados en todos los criterios
+  // Filter patients based on all criteria
   const getFilteredPatients = useCallback(() => {
     const filtered = patients.filter(patient => {
-      // Coincidencia con la búsqueda de paciente
+      // Match patient search
       const matchesPatientSearch = patientSearchTerm === '' || 
         patient.name.toLowerCase().includes(patientSearchTerm.toLowerCase()) ||
         patient.phone.includes(patientSearchTerm) ||
@@ -415,19 +286,19 @@ const TPPatientsPage = () => {
         patient.city.toLowerCase().includes(patientSearchTerm.toLowerCase()) ||
         patient.zip.includes(patientSearchTerm);
       
-      // Coincidencia con el filtro de agencia
+      // Match agency filter
       const matchesAgency = selectedAgency === 'all' || 
         patient.agency === selectedAgency;
       
-      // Coincidencia con el filtro de tipo de terapeuta
+      // Match therapist type filter
       const matchesTherapistType = selectedTherapistType === 'all' || 
         patient.therapistType === selectedTherapistType;
       
-      // Coincidencia con el terapeuta específico
+      // Match specific therapist
       const matchesTherapist = selectedTherapist === 'all' || 
         patient.therapist === selectedTherapist;
         
-      // Coincidencia con el estado
+      // Match status
       const matchesStatus = selectedStatus === 'all' || 
         patient.status === selectedStatus;
       
@@ -437,10 +308,10 @@ const TPPatientsPage = () => {
     return sortPatients(filtered);
   }, [patientSearchTerm, selectedAgency, selectedTherapistType, selectedTherapist, selectedStatus, sortOption, patients]);
   
-  // Obtener pacientes filtrados
+  // Get filtered patients
   const filteredPatients = getFilteredPatients();
   
-  // Paginación
+  // Pagination
   const patientsPerPage = 8;
   const totalPages = Math.ceil(filteredPatients.length / patientsPerPage);
   
@@ -451,27 +322,27 @@ const TPPatientsPage = () => {
   
   const paginatedPatients = getPaginatedPatients();
   
-  // Estadísticas para el dashboard
+  // Dashboard statistics
   const stats = [
     { title: "Total Patients", value: patients.length, icon: "fa-users", color: "blue" },
     { title: "Active Patients", value: patients.filter(p => p.status === "Active").length, icon: "fa-user-check", color: "green" },
     { title: "Pending Approvals", value: patients.filter(p => p.status === "Pending").length, icon: "fa-user-clock", color: "orange" },
-    { title: "Expired Certifications", value: patients.filter(p => p.status === "Expired").length, icon: "fa-user-times", color: "red" },
+    { title: "Desactive Patientss", value: patients.filter(p => p.status === "Desactive").length, icon: "fa-user-times", color: "red" },
   ];
   
-  // Detectar el tamaño de la pantalla para responsive
+  // Detect screen size for responsive design
   useEffect(() => {
     const handleResize = () => {
       setIsMobile(window.innerWidth < 768);
     };
     
-    handleResize(); // Comprobar inicialmente
+    handleResize();
     window.addEventListener('resize', handleResize);
     
     return () => window.removeEventListener('resize', handleResize);
   }, []);
   
-  // Efecto para cerrar menú de filtros al hacer clic fuera
+  // Close filter menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (filterMenuRef.current && !filterMenuRef.current.contains(event.target)) {
@@ -489,7 +360,7 @@ const TPPatientsPage = () => {
     };
   }, []);
   
-  // Efecto para mostrar el indicador de cambio de menú cuando el mouse está cerca del borde izquierdo
+  // Show menu switch indicator when mouse is near left edge
   useEffect(() => {
     const handleMouseMove = (e) => {
       if (e.clientX < 50) {
@@ -505,7 +376,7 @@ const TPPatientsPage = () => {
     };
   }, []);
   
-  // Efecto para poner el foco en el campo de búsqueda cuando se presiona Ctrl+F
+  // Focus on search field when Ctrl+F is pressed
   useEffect(() => {
     const handleKeyDown = (e) => {
       if ((e.ctrlKey || e.metaKey) && e.key === 'f') {
@@ -520,29 +391,24 @@ const TPPatientsPage = () => {
     };
   }, []);
   
-  
-  // Manejar navegación al menú principal
+  // Navigate to main menu
   const handleMainMenuTransition = () => {
     setMenuTransitioning(true);
     setShowAIAssistant(false);
     
-    // Extraer el rol base para la navegación
     const baseRole = currentUser?.role?.split(' - ')[0].toLowerCase() || 'developer';
     
-    // Simular animación de transición y luego navegar
     setTimeout(() => {
       navigate(`/${baseRole}/homePage`);
     }, 300);
   };
   
-  // Manejar cambio de pestaña
+  // Handle tab change
   const handleTabChange = (tab) => {
     if (tab === 'Staffing') {
-      // Navegar a la página de Staffing
       setMenuTransitioning(true);
       setShowAIAssistant(false);
       
-      // Extraer el rol base para la navegación
       const baseRole = currentUser?.role?.split(' - ')[0].toLowerCase() || 'developer';
       
       setTimeout(() => {
@@ -551,49 +417,46 @@ const TPPatientsPage = () => {
     }
   };
   
-  // Manejar clic en una opción de menú
+  // Handle menu option click
   const handleMenuOptionClick = (option) => {
     setActiveMenuOption(option);
     
-    // Navegar según la opción seleccionada (en una app real)
-    if (option === 'Therapist') { // Therapist
+    if (option === 'Therapist') {
       setMenuTransitioning(true);
       
       setTimeout(() => {
-        // Esto navegaría a la página de terapeutas en una app real
-        // Por ahora, permanecer en la misma página
         setMenuTransitioning(false);
       }, 300);
     }
   };
   
-  // Manejar selección de agencia
+  // Handle agency selection
   const handleAgencySelect = (agency) => {
     setSelectedAgency(agency);
     setAgencySearchTerm('');
     setActivePage(1);
   };
   
-  // Manejar selección de tipo de terapeuta
+  // Handle therapist type selection
   const handleTherapistTypeSelect = (type) => {
     setSelectedTherapistType(type);
-    setSelectedTherapist('all'); // Reiniciar terapeuta cuando cambia el tipo
+    setSelectedTherapist('all');
     setActivePage(1);
   };
   
-  // Manejar selección de terapeuta
+  // Handle therapist selection
   const handleTherapistSelect = (therapist) => {
     setSelectedTherapist(therapist);
     setActivePage(1);
   };
   
-  // Manejar selección de estado
+  // Handle status selection
   const handleStatusSelect = (status) => {
     setSelectedStatus(status);
     setActivePage(1);
   };
   
-  // Limpiar todos los filtros
+  // Clear all filters
   const handleClearFilters = () => {
     setPatientSearchTerm('');
     setAgencySearchTerm('');
@@ -605,56 +468,52 @@ const TPPatientsPage = () => {
     setActivePage(1);
   };
   
-  // Manejar cierre de sesión - con animación mejorada
+  // Handle logout with animation
   const handleLogout = () => {
     setIsLoggingOut(true);
     setShowUserMenu(false);
     setShowAIAssistant(false);
     
-    // Aplicar clase a document.body para efectos globales
     document.body.classList.add('logging-out');
   };
   
-  // Callback para cuando la animación de cierre de sesión termine
+  // Callback when logout animation completes
   const handleLogoutAnimationComplete = () => {
-    // Ejecutar el logout del contexto de autenticación
     logout();
-    // Navegar a la página de inicio de sesión
     navigate('/');
   };
 
-  // Cambiar vista entre lista y cuadrícula
+  // Toggle view between list and grid
   const toggleView = (view) => {
     setCurrentView(view);
   };
   
-  // Alternar mostrar/ocultar filtros
+  // Toggle show/hide filters
   const toggleFilters = () => {
     setShowFilters(!showFilters);
   };
   
-  // Manejar búsqueda de pacientes
+  // Handle patient search
   const handlePatientSearch = (e) => {
     setPatientSearchTerm(e.target.value);
     setActivePage(1);
   };
   
-  // Manejar selección de opción de ordenamiento
+  // Handle sort option selection
   const handleSortOptionSelect = (option) => {
     setSortOption(option);
     setShowFilterMenu(false);
   };
   
-  // Manejar clic en botón de acción
+  // Handle action button clicks
   const handleActionClick = (action, patient) => {
     console.log(`${action} clicked for patient:`, patient);
     
-    // Extraer el rol base para la navegación
     const baseRole = currentUser?.role?.split(' - ')[0].toLowerCase() || 'developer';
     
     switch(action) {
       case 'view':
-        // Navegar a la página de información del paciente
+        // Navigate to patient info page with patient ID
         setMenuTransitioning(true);
         
         setTimeout(() => {
@@ -662,25 +521,25 @@ const TPPatientsPage = () => {
         }, 300);
         break;
       case 'edit':
-        // Aquí iría la lógica para editar el paciente
-        console.log('Editar paciente:', patient);
+        // Logic for editing patient
+        console.log('Edit patient:', patient);
         break;
       case 'notes':
-        // Aquí iría la lógica para ver/editar notas del paciente
-        console.log('Notas del paciente:', patient);
+        // Logic for viewing/editing patient notes
+        console.log('Patient notes:', patient);
         break;
       default:
         break;
     }
   };
   
-  // Manejar cambio de página
+  // Handle page change
   const handlePageChange = (pageNumber) => {
     if (pageNumber < 1 || pageNumber > totalPages) return;
     setActivePage(pageNumber);
   };
   
-  // Obtener números de página para mostrar
+  // Get page numbers to display
   const getPageNumbers = () => {
     let pages = [];
     const maxVisiblePages = 5;
@@ -708,14 +567,14 @@ const TPPatientsPage = () => {
     return pages;
   };
 
-  // Mostrar/ocultar tour rápido
+  // Toggle quick tour
   const toggleQuickTour = () => {
     setShowQuickTour(!showQuickTour);
   };
 
   return (
     <div className={`patients-dashboard ${menuTransitioning ? 'transitioning' : ''} ${isLoggingOut ? 'logging-out' : ''}`}>
-      {/* Animación de cierre de sesión - Mostrar solo cuando se está cerrando sesión */}
+      {/* Logout animation */}
       {isLoggingOut && (
         <LogoutAnimation 
           isMobile={isMobile} 
@@ -723,13 +582,13 @@ const TPPatientsPage = () => {
         />
       )}
       
-      {/* Fondo parallax */}
+      {/* Parallax background */}
       <div className="parallax-background">
         <div className="gradient-overlay"></div>
         <div className="animated-particles"></div>
       </div>
       
-      {/* Indicador flotante para cambiar al menú principal */}
+      {/* Menu switch indicator */}
       {showMenuSwitch && !isLoggingOut && (
         <div 
           className="menu-switch-indicator"
@@ -740,17 +599,17 @@ const TPPatientsPage = () => {
         </div>
       )}
       
-      {/* Header con logo y perfil */}
+      {/* Header with logo and profile */}
       <header className={`main-header ${isLoggingOut ? 'logging-out' : ''}`}>
         <div className="header-container">
-          {/* Logo y navegación */}
+          {/* Logo and navigation */}
           <div className="logo-container">
             <div className="logo-wrapper">
-            <img src={logoImg} alt="TherapySync Logo" className="logo" />
+              <img src={logoImg} alt="TherapySync Logo" className="logo" />
               <div className="logo-glow"></div>
             </div>
             
-            {/* Navegación de menú */}
+            {/* Menu navigation */}
             <div className="menu-navigation">
               <button 
                 className="nav-button main-menu" 
@@ -775,12 +634,12 @@ const TPPatientsPage = () => {
             </div>
           </div>
           
-          {/* Sección de pestañas premium */}
+          {/* Premium tabs section */}
           <div className="tabs-section">
             <PremiumTabs activeTab="Patients" onChangeTab={handleTabChange} />
           </div>
           
-          {/* Perfil de usuario */}
+          {/* User profile */}
           <div className="support-user-profile" ref={userMenuRef}>
             <div 
               className={`support-profile-button ${showUserMenu ? 'active' : ''}`} 
@@ -800,7 +659,7 @@ const TPPatientsPage = () => {
               <i className={`fas fa-chevron-${showUserMenu ? 'up' : 'down'}`}></i>
             </div>
             
-            {/* Menú desplegable del usuario mejorado con estadísticas */}
+            {/* User dropdown menu */}
             {showUserMenu && !isLoggingOut && (
               <div className="support-user-menu">
                 <div className="support-menu-header">
@@ -818,11 +677,6 @@ const TPPatientsPage = () => {
                       </span>
                     </div>
                   </div>
-                  
-                  {/* Stats cards */}
-                  
-                  {/* Quick action buttons */}
-       
                 </div>
                 
                 <div className="support-menu-section">
@@ -875,7 +729,6 @@ const TPPatientsPage = () => {
                 <div className="support-menu-section">
                   <div className="section-title">Support</div>
                   <div className="support-menu-items">
-      
                     <div className="support-menu-item">
                       <i className="fas fa-headset"></i>
                       <span>Contact Support</span>
@@ -903,10 +756,10 @@ const TPPatientsPage = () => {
         </div>
       </header>
       
-      {/* Contenido principal */}
+      {/* Main content */}
       <main className={`patients-content ${isLoggingOut ? 'fade-out' : ''}`}>
         <div className="patients-container">
-          {/* Header del dashboard */}
+          {/* Dashboard header */}
           <div className="patients-header">
             <div className="patients-title-container">
               <h1 className="patients-title">Patient Management Center</h1>
@@ -932,7 +785,7 @@ const TPPatientsPage = () => {
             </div>
           </div>
 
-          {/* Estadísticas del Dashboard */}
+          {/* Dashboard statistics */}
           <div className="stats-dashboard">
             {stats.map((stat, index) => (
               <StatCard 
@@ -945,7 +798,7 @@ const TPPatientsPage = () => {
             ))}
           </div>
           
-          {/* Contenedor de filtros mejorado */}
+          {/* Filter container */}
           <div className={`filter-container ${showFilters ? 'expanded' : 'collapsed'}`}>
             <div className="filter-card">
               <div className="filter-header">
@@ -1000,7 +853,42 @@ const TPPatientsPage = () => {
                       </div>
                     </div>
                     
-          
+                    <div className="therapist-filter">
+                      <h4>Therapist Filters</h4>
+                      <div className="therapist-type-filter">
+                        <p>Filter by qualification:</p>
+                        <div className="type-buttons">
+                          {therapistTypes.map((type, index) => (
+                            <button 
+                              key={index} 
+                              className={`type-button ${selectedTherapistType === type ? 'active' : ''}`}
+                              onClick={() => !isLoggingOut && handleTherapistTypeSelect(type)}
+                              disabled={isLoggingOut}
+                            >
+                              {type === 'all' ? 'All' : type}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      
+                      <div className="therapist-list">
+                        <div 
+                          className={`therapist-item ${selectedTherapist === 'all' ? 'active' : ''}`}
+                          onClick={() => !isLoggingOut && handleTherapistSelect('all')}
+                        >
+                          <i className="fas fa-user-md"></i> All Therapists
+                        </div>
+                        {filteredTherapists.map((therapist, index) => (
+                          <div 
+                            key={index} 
+                            className={`therapist-item ${selectedTherapist === therapist ? 'active' : ''}`}
+                            onClick={() => !isLoggingOut && handleTherapistSelect(therapist)}
+                          >
+                            <i className="fas fa-user"></i> {therapist}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
                     
                     <div className="status-filter">
                       <h4>Patient Status</h4>
@@ -1042,7 +930,7 @@ const TPPatientsPage = () => {
               )}
             </div>
           </div>
-          {/* Área de tabla de pacientes con vistas mejoradas */}
+          {/* Patients table area with improved views */}
           <div className="patients-table-area">
             <div className="table-header">
               <div className="patient-search">
@@ -1116,7 +1004,7 @@ const TPPatientsPage = () => {
             </div>
             
             {currentView === 'list' ? (
-              // Vista de lista
+              // List view
               <div className="patients-table-wrapper">
                 <table className="patients-table">
                   <thead>
@@ -1200,7 +1088,7 @@ const TPPatientsPage = () => {
                 </table>
               </div>
             ) : (
-              // Vista de cuadrícula
+              // Grid view
               <div className="patients-grid-wrapper">
                 {paginatedPatients.length > 0 ? (
                   <div className="patients-grid">
@@ -1232,7 +1120,7 @@ const TPPatientsPage = () => {
               </div>
             )}
             
-            {/* Paginación mejorada */}
+            {/* Improved pagination */}
             {filteredPatients.length > 0 && (
               <div className="table-footer">
                 <div className="pagination">
@@ -1275,10 +1163,10 @@ const TPPatientsPage = () => {
         </div>
       </main>
       
-      {/* Asistente de IA - ocultarlo durante el logout */}
+      {/* AI Assistant */}
       {showAIAssistant && !isLoggingOut && <AIAssistant />}
       
-      {/* Botón de Acción Rápida Flotante con Menú */}
+      {/* Floating Quick Action Button with Menu */}
       {!isLoggingOut && (
         <div className="quick-action-btn">
           <button className="add-patient-btn">
@@ -1288,7 +1176,7 @@ const TPPatientsPage = () => {
         </div>
       )}
       
-      {/* Tour Rápido */}
+      {/* Quick Tour */}
       {showQuickTour && !isLoggingOut && (
         <div className="quick-tour">
           <div className="tour-overlay" onClick={toggleQuickTour}></div>

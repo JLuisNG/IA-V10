@@ -2811,3 +2811,100 @@
     }
   }
 }
+
+
+
+
+
+
+
+/* Add this to your PatientInfoPage.scss file */
+
+/* Status indicator styles */
+.status-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-left: 12px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  
+  /* Active status */
+  &.active {
+    background-color: rgba(0, 210, 91, 0.15);
+    color: #00d25b;
+    border: 1px solid rgba(0, 210, 91, 0.3);
+  }
+  
+  /* Inactive status */
+  &.inactive {
+    background-color: rgba(255, 92, 92, 0.15);
+    color: #ff5c5c;
+    border: 1px solid rgba(255, 92, 92, 0.3);
+  }
+}
+
+/* Patient info header modifications */
+.patient-info-header {
+  .patient-name {
+    display: flex;
+    align-items: center;
+    
+    /* When patient is inactive, add visual indication */
+    .status-indicator.inactive + .patient-id,
+    &:has(.status-indicator.inactive) {
+      opacity: 0.7;
+    }
+  }
+
+  /* Button styles for activate/deactivate */
+  .action-button.status-toggle {
+    &.activate {
+      background-color: #00d25b;
+      border-color: #00c655;
+      
+      &:hover {
+        background-color: #00b34d;
+      }
+    }
+    
+    &.deactivate {
+      background-color: #ff5c5c;
+      border-color: #ff4747;
+      
+      &:hover {
+        background-color: #ff3333;
+      }
+    }
+  }
+}
+
+/* Add a visual indication for inactive patients throughout the UI */
+.patient-info-page.inactive-patient {
+  .patient-info-container {
+    position: relative;
+    
+    &::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #ff5c5c 0%, #ff9966 100%);
+      z-index: 10;
+    }
+  }
+  
+  .tab-content {
+    opacity: 0.85;
+  }
+  
+  .info-card {
+    border-left: 3px solid #ff5c5c;
+  }
+}
