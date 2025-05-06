@@ -6,7 +6,9 @@ const MedicalInfoComponent = ({ patient, onUpdateMedicalInfo }) => {
   const [isSaving, setIsSaving] = useState(false);
   const [medicalData, setMedicalData] = useState({
     weight: 0,
-    height: 0, // Added height field
+    height: 0, // Height in inches (total)
+    feet: 0,   // Added feet for display
+    inches: 0, // Added inches for display
     nursingDiagnosis: '',
     pmh: '',
     wbs: '',
@@ -17,9 +19,16 @@ const MedicalInfoComponent = ({ patient, onUpdateMedicalInfo }) => {
   // Initialize with patient data
   useEffect(() => {
     if (patient?.medicalInfo) {
+      // Convert total inches to feet and inches for display
+      const totalInches = patient.medicalInfo.height || 0;
+      const feet = Math.floor(totalInches / 12);
+      const inches = Math.round((totalInches % 12) * 10) / 10; // Round to 1 decimal place
+      
       setMedicalData({
         weight: patient.medicalInfo.weight || 0,
-        height: patient.medicalInfo.height || 0, // Initialize height
+        height: totalInches,
+        feet: feet,
+        inches: inches,
         nursingDiagnosis: patient.medicalInfo.nursingDiagnosis || '',
         pmh: patient.medicalInfo.pmh || '',
         wbs: patient.medicalInfo.wbs || '',
@@ -47,12 +56,29 @@ const MedicalInfoComponent = ({ patient, onUpdateMedicalInfo }) => {
     });
   };
   
-  // Handle height input specifically
-  const handleHeightChange = (e) => {
-    const value = parseFloat(e.target.value) || 0;
+  // Handle feet input for height
+  const handleFeetChange = (e) => {
+    const feetValue = parseInt(e.target.value) || 0;
+    // Calculate total height in inches
+    const totalInches = (feetValue * 12) + medicalData.inches;
+    
     setMedicalData({
       ...medicalData,
-      height: value
+      feet: feetValue,
+      height: totalInches
+    });
+  };
+  
+  // Handle inches input for height
+  const handleInchesChange = (e) => {
+    const inchesValue = parseFloat(e.target.value) || 0;
+    // Calculate total height in inches
+    const totalInches = (medicalData.feet * 12) + inchesValue;
+    
+    setMedicalData({
+      ...medicalData,
+      inches: inchesValue,
+      height: totalInches
     });
   };
   
@@ -61,11 +87,18 @@ const MedicalInfoComponent = ({ patient, onUpdateMedicalInfo }) => {
     // Show saving animation
     setIsSaving(true);
     
+    // Prepare data for saving - we want to save the total height in inches
+    const dataToSave = {
+      ...medicalData,
+      // Ensure height is saved as total inches
+      height: (medicalData.feet * 12) + medicalData.inches
+    };
+    
     // Simulate API call with timeout
     setTimeout(() => {
       // Notify parent component
       if (onUpdateMedicalInfo) {
-        onUpdateMedicalInfo(medicalData);
+        onUpdateMedicalInfo(dataToSave);
       }
       
       // Hide saving animation and exit edit mode
@@ -78,9 +111,15 @@ const MedicalInfoComponent = ({ patient, onUpdateMedicalInfo }) => {
   const handleCancelEdit = () => {
     // Restore original data
     if (patient?.medicalInfo) {
+      const totalInches = patient.medicalInfo.height || 0;
+      const feet = Math.floor(totalInches / 12);
+      const inches = Math.round((totalInches % 12) * 10) / 10;
+      
       setMedicalData({
         weight: patient.medicalInfo.weight || 0,
-        height: patient.medicalInfo.height || 0, // Restore height
+        height: totalInches,
+        feet: feet,
+        inches: inches,
         nursingDiagnosis: patient.medicalInfo.nursingDiagnosis || '',
         pmh: patient.medicalInfo.pmh || '',
         wbs: patient.medicalInfo.wbs || '',
@@ -91,7 +130,9 @@ const MedicalInfoComponent = ({ patient, onUpdateMedicalInfo }) => {
       // Reset to defaults if no patient data
       setMedicalData({
         weight: 0,
-        height: 0, // Reset height
+        height: 0,
+        feet: 0,
+        inches: 0,
         nursingDiagnosis: '',
         pmh: '',
         wbs: '',
@@ -102,6 +143,19 @@ const MedicalInfoComponent = ({ patient, onUpdateMedicalInfo }) => {
     
     // Exit edit mode
     setIsEditing(false);
+  };
+
+  // Format height for display in view mode
+  const formatHeight = (totalInches) => {
+    if (!totalInches || totalInches <= 0) return null;
+    
+    const feet = Math.floor(totalInches / 12);
+    const inches = Math.round((totalInches % 12) * 10) / 10;
+    
+    return {
+      feet,
+      inches
+    };
   };
 
   // Get icon for clinical grouping
@@ -213,21 +267,36 @@ const MedicalInfoComponent = ({ patient, onUpdateMedicalInfo }) => {
                 </div>
               </div>
               
+              {/* Updated height input with feet and inches */}
               <div className="form-group height-input">
                 <label>
                   <i className="fas fa-ruler-vertical"></i>
-                  Height (in)
+                  Height
                 </label>
-                <div className="input-with-icon">
-                  <input 
-                    type="number" 
-                    name="height"
-                    value={medicalData.height} 
-                    onChange={handleHeightChange}
-                    min="0"
-                    step="0.1"
-                  />
-                  <span className="unit-indicator">in</span>
+                <div className="height-inputs-container">
+                  <div className="input-with-icon ft-input">
+                    <input 
+                      type="number" 
+                      name="feet"
+                      value={medicalData.feet} 
+                      onChange={handleFeetChange}
+                      min="0"
+                      step="1"
+                    />
+                    <span className="unit-indicator">ft</span>
+                  </div>
+                  <div className="input-with-icon in-input">
+                    <input 
+                      type="number" 
+                      name="inches"
+                      value={medicalData.inches} 
+                      onChange={handleInchesChange}
+                      min="0"
+                      max="11.9"
+                      step="0.1"
+                    />
+                    <span className="unit-indicator">in</span>
+                  </div>
                 </div>
               </div>
               
@@ -360,6 +429,7 @@ const MedicalInfoComponent = ({ patient, onUpdateMedicalInfo }) => {
               </div>
             </div>
             
+            {/* Updated height display with feet and inches */}
             <div className="info-section height-section">
               <div className="info-icon">
                 <i className="fas fa-ruler-vertical"></i>
@@ -369,8 +439,10 @@ const MedicalInfoComponent = ({ patient, onUpdateMedicalInfo }) => {
                 <div className="info-value height-value">
                   {medicalData.height > 0 ? (
                     <div className="data-display">
-                      <span className="primary-data">{medicalData.height}</span>
-                      <span className="secondary-data">in</span>
+                      <span className="primary-data">
+                        {formatHeight(medicalData.height).feet}' {formatHeight(medicalData.height).inches}"
+                      </span>
+                      <span className="secondary-data">({medicalData.height} in)</span>
                     </div>
                   ) : (
                     <span className="no-data">Not recorded</span>

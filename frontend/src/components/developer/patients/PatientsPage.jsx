@@ -834,136 +834,140 @@ const DevPatientsPage = () => {
           
           {/* Filter container */}
           <div className={`filter-container ${showFilters ? 'expanded' : 'collapsed'}`}>
-            <div className="filter-card">
-              <div className="filter-header">
-                <h3><i className="fas fa-filter"></i> Advanced Filters</h3>
-                <div className="filter-header-actions">
-                  <span className="filter-count">
-                    Showing <strong>{filteredPatients.length}</strong> of <strong>{patients.length}</strong> patients
-                  </span>
-                  <button 
-                    className="toggle-filters-btn" 
-                    onClick={toggleFilters}
-                    title={showFilters ? "Collapse filters" : "Expand filters"}
-                    disabled={isLoggingOut}
-                  >
-                    <i className={`fas fa-chevron-${showFilters ? 'up' : 'down'}`}></i>
-                  </button>
-                </div>
+  <div className="filter-card">
+    {/* Make the entire header clickable to toggle filters */}
+    <div className="filter-header" onClick={toggleFilters} style={{ cursor: 'pointer' }}>
+      <h3><i className="fas fa-filter"></i> Advanced Filters</h3>
+      <div className="filter-header-actions">
+        <span className="filter-count">
+          Showing <strong>{filteredPatients.length}</strong> of <strong>{patients.length}</strong> patients
+        </span>
+        <button 
+          className="toggle-filters-btn" 
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent triggering parent onClick
+            toggleFilters();
+          }}
+          title={showFilters ? "Collapse filters" : "Expand filters"}
+          disabled={isLoggingOut}
+        >
+          <i className={`fas fa-chevron-${showFilters ? 'up' : 'down'}`}></i>
+        </button>
+      </div>
+    </div>
+    
+    {showFilters && (
+      <>
+        <div className="filter-section">
+          <div className="agency-filter">
+            <h4>Healthcare Agencies</h4>
+            <div className="search-box">
+              <i className="fas fa-search"></i>
+              <input 
+                type="text" 
+                placeholder="Search agencies..." 
+                value={agencySearchTerm}
+                onChange={(e) => setAgencySearchTerm(e.target.value)}
+                disabled={isLoggingOut}
+              />
+            </div>
+            
+            <div className="agency-list">
+              <div 
+                className={`agency-item ${selectedAgency === 'all' ? 'active' : ''}`}
+                onClick={() => !isLoggingOut && handleAgencySelect('all')}
+              >
+                <i className="fas fa-hospital-alt"></i> All Agencies
               </div>
-              
-              {showFilters && (
-                <>
-                  <div className="filter-section">
-                    <div className="agency-filter">
-                      <h4>Healthcare Agencies</h4>
-                      <div className="search-box">
-                        <i className="fas fa-search"></i>
-                        <input 
-                          type="text" 
-                          placeholder="Search agencies..." 
-                          value={agencySearchTerm}
-                          onChange={(e) => setAgencySearchTerm(e.target.value)}
-                          disabled={isLoggingOut}
-                        />
-                      </div>
-                      
-                      <div className="agency-list">
-                        <div 
-                          className={`agency-item ${selectedAgency === 'all' ? 'active' : ''}`}
-                          onClick={() => !isLoggingOut && handleAgencySelect('all')}
-                        >
-                          <i className="fas fa-hospital-alt"></i> All Agencies
-                        </div>
-                        {filteredAgencies.map((agency, index) => (
-                          <div 
-                            key={index} 
-                            className={`agency-item ${selectedAgency === agency ? 'active' : ''}`}
-                            onClick={() => !isLoggingOut && handleAgencySelect(agency)}
-                          >
-                            <i className="fas fa-building"></i> {agency}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    <div className="therapist-filter">
-                      <h4>Therapist Filters</h4>
-                      <div className="therapist-type-filter">
-                        <p>Filter by qualification:</p>
-                        <div className="type-buttons">
-                          {therapistTypes.map((type, index) => (
-                            <button 
-                              key={index} 
-                              className={`type-button ${selectedTherapistType === type ? 'active' : ''}`}
-                              onClick={() => !isLoggingOut && handleTherapistTypeSelect(type)}
-                              disabled={isLoggingOut}
-                            >
-                              {type === 'all' ? 'All' : type}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                      
-                      <div className="therapist-list">
-                        <div 
-                          className={`therapist-item ${selectedTherapist === 'all' ? 'active' : ''}`}
-                          onClick={() => !isLoggingOut && handleTherapistSelect('all')}
-                        >
-                          <i className="fas fa-user-md"></i> All Therapists
-                        </div>
-                        {filteredTherapists.map((therapist, index) => (
-                          <div 
-                            key={index} 
-                            className={`therapist-item ${selectedTherapist === therapist ? 'active' : ''}`}
-                            onClick={() => !isLoggingOut && handleTherapistSelect(therapist)}
-                          >
-                            <i className="fas fa-user"></i> {therapist}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    <div className="status-filter">
-                      <h4>Patient Status</h4>
-                      <div className="status-buttons">
-                        {statusOptions.map((status, index) => (
-                          <button 
-                            key={index} 
-                            className={`status-button ${selectedStatus === status ? 'active' : ''} ${status.toLowerCase()}`}
-                            onClick={() => !isLoggingOut && handleStatusSelect(status)}
-                            disabled={isLoggingOut}
-                          >
-                            {status === 'all' ? 'All Statuses' : status}
-                            {status !== 'all' && (
-                              <span className="status-count">
-                                {patients.filter(p => p.status === status).length}
-                              </span>
-                            )}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="filter-footer">
-                    <button 
-                      className="clear-filters" 
-                      onClick={handleClearFilters}
-                      disabled={isLoggingOut}
-                    >
-                      <i className="fas fa-times-circle"></i> Clear Filters
-                    </button>
-                    
-                    <div className="filter-tips">
-                      <div className="tip-icon"><i className="fas fa-lightbulb"></i></div>
-                      <p>Tip: Press <kbd>Ctrl</kbd> + <kbd>F</kbd> to quickly search patients</p>
-                    </div>
-                  </div>
-                </>
-              )}
+              {filteredAgencies.map((agency, index) => (
+                <div 
+                  key={index} 
+                  className={`agency-item ${selectedAgency === agency ? 'active' : ''}`}
+                  onClick={() => !isLoggingOut && handleAgencySelect(agency)}
+                >
+                  <i className="fas fa-building"></i> {agency}
+                </div>
+              ))}
             </div>
           </div>
+          
+          <div className="therapist-filter">
+            <h4>Therapist Filters</h4>
+            <div className="therapist-type-filter">
+              <p>Filter by qualification:</p>
+              <div className="type-buttons">
+                {therapistTypes.map((type, index) => (
+                  <button 
+                    key={index} 
+                    className={`type-button ${selectedTherapistType === type ? 'active' : ''}`}
+                    onClick={() => !isLoggingOut && handleTherapistTypeSelect(type)}
+                    disabled={isLoggingOut}
+                  >
+                    {type === 'all' ? 'All' : type}
+                  </button>
+                ))}
+              </div>
+            </div>
+            
+            <div className="therapist-list">
+              <div 
+                className={`therapist-item ${selectedTherapist === 'all' ? 'active' : ''}`}
+                onClick={() => !isLoggingOut && handleTherapistSelect('all')}
+              >
+                <i className="fas fa-user-md"></i> All Therapists
+              </div>
+              {filteredTherapists.map((therapist, index) => (
+                <div 
+                  key={index} 
+                  className={`therapist-item ${selectedTherapist === therapist ? 'active' : ''}`}
+                  onClick={() => !isLoggingOut && handleTherapistSelect(therapist)}
+                >
+                  <i className="fas fa-user"></i> {therapist}
+                </div>
+              ))}
+            </div>
+          </div>
+          
+          <div className="status-filter">
+            <h4>Patient Status</h4>
+            <div className="status-buttons">
+              {statusOptions.map((status, index) => (
+                <button 
+                  key={index} 
+                  className={`status-button ${selectedStatus === status ? 'active' : ''} ${status.toLowerCase()}`}
+                  onClick={() => !isLoggingOut && handleStatusSelect(status)}
+                  disabled={isLoggingOut}
+                >
+                  {status === 'all' ? 'All Statuses' : status}
+                  {status !== 'all' && (
+                    <span className="status-count">
+                      {patients.filter(p => p.status === status).length}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+        
+        <div className="filter-footer">
+          <button 
+            className="clear-filters" 
+            onClick={handleClearFilters}
+            disabled={isLoggingOut}
+          >
+            <i className="fas fa-times-circle"></i> Clear Filters
+          </button>
+          
+          <div className="filter-tips">
+            <div className="tip-icon"><i className="fas fa-lightbulb"></i></div>
+            <p>Tip: Press <kbd>Ctrl</kbd> + <kbd>F</kbd> to quickly search patients</p>
+          </div>
+        </div>
+      </>
+    )}
+  </div>
+</div>
           {/* Patients table area with improved views */}
           <div className="patients-table-area">
             <div className="table-header">

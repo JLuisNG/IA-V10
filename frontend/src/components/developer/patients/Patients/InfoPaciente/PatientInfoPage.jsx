@@ -99,7 +99,6 @@ const PersonalInfoCard = ({ patient }) => {
         <h3><i className="fas fa-user-circle"></i> Personal Information</h3>
         <button className="edit-button" onClick={toggleEdit}>
           <i className={`fas ${isEditing ? 'fa-check' : 'fa-pen'}`}></i>
-          <span className="tooltip">{isEditing ? 'Save Changes' : 'Edit Information'}</span>
         </button>
       </div>
       <div className="card-body">

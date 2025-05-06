@@ -129,19 +129,32 @@ const DisciplineCard = ({
     setIsFrequencyEditing(false);
   };
   
-  // Get frequency display format
+  // Get frequency display format - updated to match correct interpretation
   const getFrequencyDisplay = (freq) => {
     if (!freq) return 'Not set';
     
-    const parts = freq.match(/(\d+[wW])(\d+)/);
+    const parts = freq.match(/(\d+)w(\d+)/);
     if (parts && parts.length === 3) {
-      const weeks = parts[1].slice(0, -1);
-      const visits = parts[2];
-      return `${visits} visit${visits > 1 ? 's' : ''} per ${weeks} week${weeks > 1 ? 's' : ''}`;
+      const visits = parts[1];
+      const weeks = parts[2];
+      return `${visits} visit${visits > 1 ? 's' : ''} every ${weeks} week${weeks > 1 ? 's' : ''}`;
     }
     
     return freq;
   };
+
+  // Available frequency options
+  const frequencyPresets = [
+    { value: '1w1', label: '1w1' }, // 1 visit every 1 week
+    { value: '2w2', label: '2w2' }, // 2 visits every 2 weeks
+    { value: '1w2', label: '1w2' }, // 1 visit every 2 weeks 
+    { value: '1w5', label: '1w5' }, // 1 visit every 5 weeks
+    { value: '2w4', label: '2w4' }, // 2 visits every 4 weeks
+    { value: '3w2', label: '3w2' }, // 3 visits every 2 weeks
+    { value: '5w4', label: '5w4' }, // 5 visits every 4 weeks
+    { value: '2w1', label: '2w1' }, // 2 visits every 1 week
+    { value: '3w1', label: '3w1' }  // 3 visits every 1 week
+  ];
   
   return (
     <div 
@@ -443,22 +456,27 @@ const DisciplineCard = ({
                   type="text" 
                   value={tempFrequency} 
                   onChange={(e) => setTempFrequency(e.target.value)}
-                  placeholder="e.g. 2w3"
+                  placeholder="e.g. 1w1"
                   className="glass-input frequency-input"
                 />
                 <div className="format-hint">
                   <i className="fas fa-info-circle"></i>
-                  <span>Format: [weeks]w[visits] (e.g. 2w3 = 3 visits every 2 weeks)</span>
+                  <span>Format: [visits]w[weeks] (e.g. 1w1 = 1 visit every 1 week)</span>
                 </div>
               </div>
               
-              <div className="frequency-presets">
-                <button onClick={() => setTempFrequency('1w1')} className="glass-chip">1w1</button>
-                <button onClick={() => setTempFrequency('1w2')} className="glass-chip">1w2</button>
-                <button onClick={() => setTempFrequency('1w3')} className="glass-chip">1w3</button>
-                <button onClick={() => setTempFrequency('2w1')} className="glass-chip">2w1</button>
-                <button onClick={() => setTempFrequency('2w3')} className="glass-chip">2w3</button>
-                <button onClick={() => setTempFrequency('4w1')} className="glass-chip">4w1</button>
+              <div className="frequency-presets-container">
+                <div className="frequency-presets">
+                  {frequencyPresets.map((preset) => (
+                    <button 
+                      key={preset.value} 
+                      onClick={() => setTempFrequency(preset.value)} 
+                      className={`glass-chip ${tempFrequency === preset.value ? 'active' : ''}`}
+                    >
+                      {preset.label}
+                    </button>
+                  ))}
+                </div>
               </div>
               
               <div className="form-actions">
@@ -525,24 +543,55 @@ const DisciplineCard = ({
   );
 };
 
-// Helper function to render frequency visualization
+// Helper function to render frequency visualization - CORRECTED
+// Helper function to render frequency visualization - CORRECTED
 const renderFrequencyVisualization = (frequency, colors) => {
   if (!frequency) return null;
   
-  const parts = frequency.match(/(\d+[wW])(\d+)/);
+  // Updated regex to match the format [visits-per-week]w[total-weeks]
+  const parts = frequency.match(/(\d+)w(\d+)/);
   if (!parts || parts.length < 3) return null;
   
-  const weeks = parseInt(parts[1].slice(0, -1));
-  const visits = parseInt(parts[2]);
+  // Correctly parsing the frequency
+  const visitsPerWeek = parseInt(parts[1]);
+  const totalWeeks = parseInt(parts[2]);
   
   const daysInWeek = 7;
-  const totalDays = weeks * daysInWeek;
+  const totalDays = totalWeeks * daysInWeek;
   
   const dayDots = [];
-  const visitInterval = Math.floor(totalDays / visits);
   
+  // Calculate days with visits based on the correct interpretation
+  const calculateVisitDays = () => {
+    const visitDaysArray = [];
+    
+    // For each week
+    for (let weekIdx = 0; weekIdx < totalWeeks; weekIdx++) {
+      // Distribute the visits per week evenly (excluding weekends if possible)
+      for (let visitIdx = 0; visitIdx < visitsPerWeek; visitIdx++) {
+        // If we have more visits than weekdays, we'll need to place multiple visits on some days
+        if (visitsPerWeek <= 5) {
+          // We can place visits on weekdays only
+          // Spread visits evenly across weekdays (Mon-Fri)
+          const dayOffset = Math.floor(visitIdx * (5 / visitsPerWeek));
+          // Add to visit days (weekIdx * 7 for week offset, dayOffset for day within week, +1 to start on Monday)
+          visitDaysArray.push(weekIdx * daysInWeek + dayOffset + 1);
+        } else {
+          // If more than 5 visits per week, we need to use weekends too
+          const dayOffset = Math.floor(visitIdx * (daysInWeek / visitsPerWeek));
+          visitDaysArray.push(weekIdx * daysInWeek + dayOffset);
+        }
+      }
+    }
+    
+    return visitDaysArray;
+  };
+  
+  const visitDays = calculateVisitDays();
+  
+  // Create the array of day objects
   for (let day = 0; day < totalDays; day++) {
-    const isVisit = day % visitInterval === Math.floor(visitInterval / 2) && dayDots.filter(d => d.isVisit).length < visits;
+    const isVisit = visitDays.includes(day);
     const isWeekend = day % 7 === 5 || day % 7 === 6;
     
     dayDots.push({
@@ -551,11 +600,11 @@ const renderFrequencyVisualization = (frequency, colors) => {
       isWeekend
     });
   }
-
+  
   return (
     <div className="frequency-calendar glass-card-inner">
       <div className="weeks-container">
-        {Array.from({ length: weeks }).map((_, weekIndex) => (
+        {Array.from({ length: totalWeeks }).map((_, weekIndex) => (
           <div key={weekIndex} className="week">
             <div className="week-label">W{weekIndex + 1}</div>
             <div className="days">
@@ -584,6 +633,36 @@ const renderFrequencyVisualization = (frequency, colors) => {
     </div>
   );
 };
+
+// Corrected frequency display format
+const getFrequencyDisplay = (freq) => {
+  if (!freq) return 'Not set';
+  
+  const parts = freq.match(/(\d+)w(\d+)/);
+  if (parts && parts.length === 3) {
+    const visitsPerWeek = parts[1];
+    const totalWeeks = parts[2];
+    return `${visitsPerWeek} visit${visitsPerWeek > 1 ? 's' : ''} per week for ${totalWeeks} week${totalWeeks > 1 ? 's' : ''}`;
+  }
+  
+  return freq;
+};
+
+// Available frequency presets
+const frequencyPresets = [
+  { value: '1w1', label: '1w1' },  // 1 visit per week for 1 week (total: 1 visit)
+  { value: '1w2', label: '1w2' },  // 1 visit per week for 2 weeks (total: 2 visits)
+  { value: '2w2', label: '2w2' },  // 2 visits per week for 2 weeks (total: 4 visits)
+  { value: '3w2', label: '3w2' },  // 3 visits per week for 2 weeks (total: 6 visits)
+  { value: '2w3', label: '2w3' },  // 2 visits per week for 3 weeks (total: 6 visits)
+  { value: '1w4', label: '1w4' },  // 1 visit per week for 4 weeks (total: 4 visits)
+  { value: '2w4', label: '2w4' },  // 2 visits per week for 4 weeks (total: 8 visits)
+  { value: '3w1', label: '3w1' },  // 3 visits per week for 1 week (total: 3 visits)
+  { value: '5w2', label: '5w2' }   // 5 visits per week for 2 weeks (total: 10 visits)
+];
+
+// Format hint text to correctly explain the format
+const formatHintText = "Format: [visits-per-week]w[total-weeks] (e.g. 2w3 = 2 visits per week for 3 weeks)";
 
 // Main component
 const DisciplinesComponent = ({ patient, onUpdateDisciplines }) => {
@@ -641,146 +720,147 @@ const DisciplinesComponent = ({ patient, onUpdateDisciplines }) => {
   };
   
   // Filter assistants by type
-  const getAssistantsByType = (type) => {
-    const assistantType = type === 'PT' ? 'PTA' : (type === 'OT' ? 'COTA' : 'SLPA');
-    return assistantsList.filter(a => a.type === assistantType) || [];
-  };
-  
-  // Toggle discipline active status
-  const handleToggleDiscipline = (type) => {
-    const updatedDisciplines = {
-      ...disciplines,
-      [type]: {
-        ...disciplines[type],
-        isActive: !disciplines[type].isActive
-      }
-    };
-    
-    setDisciplines(updatedDisciplines);
-    
-    if (onUpdateDisciplines) {
-      onUpdateDisciplines(updatedDisciplines);
+// Filter assistants by type
+const getAssistantsByType = (type) => {
+  const assistantType = type === 'PT' ? 'PTA' : (type === 'OT' ? 'COTA' : 'SLPA');
+  return assistantsList.filter(a => a.type === assistantType) || [];
+};
+
+// Toggle discipline active status
+const handleToggleDiscipline = (type) => {
+  const updatedDisciplines = {
+    ...disciplines,
+    [type]: {
+      ...disciplines[type],
+      isActive: !disciplines[type].isActive
     }
   };
   
-  // Change therapist
-  const handleChangeTherapist = (type, therapist) => {
-    const updatedDisciplines = {
-      ...disciplines,
-      [type]: {
-        ...disciplines[type],
-        therapist: therapist || null
-      }
-    };
-    
-    console.log(`Updated disciplines for ${type}:`, updatedDisciplines);
-    
-    setDisciplines(updatedDisciplines);
-    
-    if (onUpdateDisciplines) {
-      onUpdateDisciplines(updatedDisciplines);
+  setDisciplines(updatedDisciplines);
+  
+  if (onUpdateDisciplines) {
+    onUpdateDisciplines(updatedDisciplines);
+  }
+};
+
+// Change therapist
+const handleChangeTherapist = (type, therapist) => {
+  const updatedDisciplines = {
+    ...disciplines,
+    [type]: {
+      ...disciplines[type],
+      therapist: therapist || null
     }
   };
   
-  // Change assistant
-  const handleChangeAssistant = (type, assistant) => {
-    const updatedDisciplines = {
-      ...disciplines,
-      [type]: {
-        ...disciplines[type],
-        assistant: assistant || null
-      }
-    };
-    
-    console.log(`Updated disciplines for ${type}:`, updatedDisciplines);
-    
-    setDisciplines(updatedDisciplines);
-    
-    if (onUpdateDisciplines) {
-      onUpdateDisciplines(updatedDisciplines);
+  console.log(`Updated disciplines for ${type}:`, updatedDisciplines);
+  
+  setDisciplines(updatedDisciplines);
+  
+  if (onUpdateDisciplines) {
+    onUpdateDisciplines(updatedDisciplines);
+  }
+};
+
+// Change assistant
+const handleChangeAssistant = (type, assistant) => {
+  const updatedDisciplines = {
+    ...disciplines,
+    [type]: {
+      ...disciplines[type],
+      assistant: assistant || null
     }
   };
   
-  // Change frequency
-  const handleChangeFrequency = (type, frequency) => {
-    const updatedDisciplines = {
-      ...disciplines,
-      [type]: {
-        ...disciplines[type],
-        frequency
-      }
-    };
-    
-    setDisciplines(updatedDisciplines);
-    
-    if (onUpdateDisciplines) {
-      onUpdateDisciplines(updatedDisciplines);
+  console.log(`Updated disciplines for ${type}:`, updatedDisciplines);
+  
+  setDisciplines(updatedDisciplines);
+  
+  if (onUpdateDisciplines) {
+    onUpdateDisciplines(updatedDisciplines);
+  }
+};
+
+// Change frequency
+const handleChangeFrequency = (type, frequency) => {
+  const updatedDisciplines = {
+    ...disciplines,
+    [type]: {
+      ...disciplines[type],
+      frequency
     }
   };
   
-  // Generate cards for each discipline type
-  const disciplineCards = [
-    {
-      type: 'PT',
-      label: 'Physical Therapist',
-      assistantLabel: 'Physical Therapist Assistant',
-      data: disciplines.PT
-    },
-    {
-      type: 'OT',
-      label: 'Occupational Therapist',
-      assistantLabel: 'Certified Occupational Therapy Assistant',
-      data: disciplines.OT
-    },
-    {
-      type: 'ST',
-      label: 'Speech Therapist',
-      assistantLabel: 'Speech-Language Pathology Assistant',
-      data: disciplines.ST
-    }
-  ];
+  setDisciplines(updatedDisciplines);
   
-  return (
-    <div className="disciplines-component">
-      <div className="card-header">
-        <div className="header-title">
-          <div className="header-icon-wrapper">
-            <i className="fas fa-user-md"></i>
-            <div className="icon-glow"></div>
-          </div>
-          <h3>Therapy Disciplines</h3>
+  if (onUpdateDisciplines) {
+    onUpdateDisciplines(updatedDisciplines);
+  }
+};
+
+// Generate cards for each discipline type
+const disciplineCards = [
+  {
+    type: 'PT',
+    label: 'Physical Therapist',
+    assistantLabel: 'Physical Therapist Assistant',
+    data: disciplines.PT
+  },
+  {
+    type: 'OT',
+    label: 'Occupational Therapist',
+    assistantLabel: 'Certified Occupational Therapy Assistant',
+    data: disciplines.OT
+  },
+  {
+    type: 'ST',
+    label: 'Speech Therapist',
+    assistantLabel: 'Speech-Language Pathology Assistant',
+    data: disciplines.ST
+  }
+];
+
+return (
+  <div className="disciplines-component">
+    <div className="card-header">
+      <div className="header-title">
+        <div className="header-icon-wrapper">
+          <i className="fas fa-user-md"></i>
+          <div className="icon-glow"></div>
         </div>
-        <div className="header-decoration"></div>
+        <h3>Therapy Disciplines</h3>
       </div>
-      
-      <div className="card-body">
-        <div className="disciplines-list">
-          {disciplineCards.map((card, index) => (
-            <DisciplineCard
-              key={card.type}
-              disciplineType={card.type}
-              disciplineLabel={card.label}
-              assistantLabel={card.assistantLabel}
-              therapist={card.data.therapist}
-              assistant={card.data.assistant}
-              frequency={card.data.frequency}
-              isActive={card.data.isActive}
-              onToggle={() => handleToggleDiscipline(card.type)}
-              onChangeTherapist={(therapist) => handleChangeTherapist(card.type, therapist)}
-              onChangeAssistant={(assistant) => handleChangeAssistant(card.type, assistant)}
-              onChangeFrequency={(frequency) => handleChangeFrequency(card.type, frequency)}
-              therapistsList={getTherapistsByType(card.type)}
-              assistantsList={getAssistantsByType(card.type)}
-            />
-          ))}
-        </div>
-        <div className="component-decoration">
-          <div className="glass-orb top-left"></div>
-          <div className="glass-orb bottom-right"></div>
-        </div>
+      <div className="header-decoration"></div>
+    </div>
+    
+    <div className="card-body">
+      <div className="disciplines-list">
+        {disciplineCards.map((card, index) => (
+          <DisciplineCard
+            key={card.type}
+            disciplineType={card.type}
+            disciplineLabel={card.label}
+            assistantLabel={card.assistantLabel}
+            therapist={card.data.therapist}
+            assistant={card.data.assistant}
+            frequency={card.data.frequency}
+            isActive={card.data.isActive}
+            onToggle={() => handleToggleDiscipline(card.type)}
+            onChangeTherapist={(therapist) => handleChangeTherapist(card.type, therapist)}
+            onChangeAssistant={(assistant) => handleChangeAssistant(card.type, assistant)}
+            onChangeFrequency={(frequency) => handleChangeFrequency(card.type, frequency)}
+            therapistsList={getTherapistsByType(card.type)}
+            assistantsList={getAssistantsByType(card.type)}
+          />
+        ))}
+      </div>
+      <div className="component-decoration">
+        <div className="glass-orb top-left"></div>
+        <div className="glass-orb bottom-right"></div>
       </div>
     </div>
-  );
+  </div>
+);
 };
 
 export default DisciplinesComponent;

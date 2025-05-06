@@ -1,6 +1,6 @@
-// Estilos premium para el componente InfoWelcome
+// Premium styles for the InfoWelcome component
 
-// Animaciones avanzadas
+// Advanced animations
 @keyframes fadeInUp {
   from {
     opacity: 0;
@@ -11,36 +11,6 @@
     opacity: 1;
     transform: translateY(0);
     filter: blur(0);
-  }
-}
-
-@keyframes floatParticle {
-  0% {
-    transform: translateY(0) rotate(0);
-    opacity: 0.7;
-  }
-  50% {
-    transform: translateY(-15px) rotate(10deg);
-    opacity: 1;
-  }
-  100% {
-    transform: translateY(0) rotate(0);
-    opacity: 0.7;
-  }
-}
-
-@keyframes pulse {
-  0% {
-    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.6);
-    transform: scale(1);
-  }
-  70% {
-    box-shadow: 0 0 0 15px rgba(255, 255, 255, 0);
-    transform: scale(1.05);
-  }
-  100% {
-    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0);
-    transform: scale(1);
   }
 }
 
@@ -158,7 +128,30 @@
   }
 }
 
-// Contenedor principal
+@keyframes neonGlow {
+  0%, 100% {
+    box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.7),
+                0 0 20px 4px rgba(125, 249, 255, 0.5),
+                0 0 30px 6px rgba(0, 225, 255, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 15px 3px rgba(255, 255, 255, 0.9),
+                0 0 30px 6px rgba(125, 249, 255, 0.7),
+                0 0 45px 9px rgba(0, 225, 255, 0.5);
+  }
+}
+
+@keyframes neonTrail {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+// Main container
 .info-welcome-container {
   display: flex;
   flex-direction: column;
@@ -168,39 +161,7 @@
   padding: 2rem 1rem;
   position: relative;
   
-  // Estilos para el botón de reset view
-  .reset-view-button {
-    position: fixed;
-    bottom: 30px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    backdrop-filter: blur(10px);
-    padding: 12px 20px;
-    border-radius: 30px;
-    color: white;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
-    z-index: 100;
-    
-    i {
-      margin-right: 8px;
-      font-size: 16px;
-    }
-    
-    &:hover {
-      background: rgba(255, 255, 255, 0.2);
-      transform: translateX(-50%) translateY(-5px);
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
-    }
-  }
-  
-  // Estilos para las tarjetas del dashboard
+  // Dashboard cards
   .dashboard-cards {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
@@ -209,7 +170,7 @@
     
     .dashboard-card {
       position: relative;
-      background: rgba(255, 255, 255, 0.07);
+      background: rgba(25, 32, 48, 0.7);
       backdrop-filter: blur(20px);
       -webkit-backdrop-filter: blur(20px);
       border-radius: 20px;
@@ -223,6 +184,9 @@
       opacity: 0;
       transform-style: preserve-3d;
       transform: translateZ(0);
+      box-shadow: 
+        0 10px 30px rgba(0, 0, 0, 0.2),
+        0 0 10px rgba(255, 255, 255, 0.05) inset;
       
       &:nth-child(1) {
         --i: 1;
@@ -236,8 +200,46 @@
         --i: 3;
       }
       
-      // Efecto hover premium
-      &.hover {
+      // Neon border container
+      .neon-border-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+        z-index: 10;
+        
+        // Neon dot that moves around the border
+        .neon-dot {
+          position: absolute;
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+          background: white;
+          transform: translate(-50%, -50%);
+          z-index: 2;
+          animation: neonGlow 1.5s ease-in-out infinite;
+        }
+        
+        // Glow effect around the card
+        .neon-glow {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          border-radius: 20px;
+          box-shadow: 
+            0 0 15px 3px rgba(125, 249, 255, 0.1),
+            0 0 30px 6px rgba(0, 225, 255, 0.05);
+          opacity: 0.6;
+          z-index: 1;
+        }
+      }
+      
+      // Premium hover effect
+      &.active {
         transform: translateY(-15px) scale(1.02) rotateX(2deg) rotateY(-2deg);
         z-index: 10;
         box-shadow: 
@@ -290,36 +292,7 @@
         }
       }
       
-      // Efecto focus premium
-      &.focus {
-        transform: translateY(-20px) scale(1.05);
-        z-index: 20;
-        box-shadow: 
-          0 40px 80px rgba(0, 0, 0, 0.4),
-          0 0 50px rgba(255, 255, 255, 0.1),
-          0 0 0 1px rgba(255, 255, 255, 0.25);
-        
-        .card-bg-decoration {
-          opacity: 0.3;
-        }
-        
-        .icon-container {
-          transform: scale(1.2);
-          
-          i {
-            animation: pulse 2s infinite;
-          }
-        }
-      }
-      
-      // Efecto blur cuando otra tarjeta está en focus
-      &.blur {
-        transform: scale(0.95);
-        opacity: 0.5;
-        filter: blur(2px);
-      }
-      
-      // Líneas de cuadrícula decorativas
+      // Grid lines decoration
       .card-grid-lines {
         position: absolute;
         top: 0;
@@ -336,7 +309,7 @@
         transition: opacity 0.5s ease;
       }
       
-      // Decoraciones flotantes
+      // Floating decorations
       .card-decoration {
         position: absolute;
         top: 0;
@@ -383,7 +356,7 @@
         }
       }
       
-      // Fondo decorativo
+      // Decorative background
       .card-bg-decoration {
         position: absolute;
         top: 0;
@@ -398,25 +371,6 @@
         border-radius: 0 20px 20px 0;
       }
       
-      // Contenedor de partículas
-      .particles-container {
-        position: absolute;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        overflow: hidden;
-        z-index: 1;
-        pointer-events: none;
-        
-        .particle {
-          position: absolute;
-          border-radius: 50%;
-          filter: blur(1px);
-          box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
-        }
-      }
-      
       .card-content {
         position: relative;
         z-index: 2;
@@ -425,7 +379,7 @@
         flex-direction: column;
       }
       
-      // Encabezado de la tarjeta
+      // Card header
       .card-header {
         display: flex;
         align-items: center;
@@ -451,7 +405,7 @@
           }
         }
         
-        // Contenedor del ícono premium
+        // Premium icon container
         .icon-container {
           width: 56px;
           height: 56px;
@@ -463,7 +417,7 @@
           transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
           position: relative;
           
-          // Fondo animado para el ícono
+          // Animated background for icon
           .icon-background {
             position: absolute;
             top: 50%;
@@ -486,7 +440,7 @@
             filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.3));
           }
           
-          // Variantes de color para cada ícono
+          // Color variants for each icon
           &.patients-icon {
             background: linear-gradient(135deg, #36D1DC, #5B86E5);
             box-shadow: 0 10px 20px rgba(91, 134, 229, 0.3);
@@ -496,16 +450,16 @@
             }
           }
           
-          &.support-icon {
-            background: linear-gradient(135deg, #FF9966, #FF5E62);
-            box-shadow: 0 10px 20px rgba(255, 94, 98, 0.3);
+          &.finance-icon {
+            background: linear-gradient(135deg, #56ab2f, #a8e063);
+            box-shadow: 0 10px 20px rgba(168, 224, 99, 0.3);
             
             .icon-background {
-              background: radial-gradient(circle, #FF9966 0%, transparent 70%);
+              background: radial-gradient(circle, #a8e063 0%, transparent 70%);
             }
           }
           
-          &.guide-icon {
+          &.learning-icon {
             background: linear-gradient(135deg, #56CCF2, #2F80ED);
             box-shadow: 0 10px 20px rgba(47, 128, 237, 0.3);
             
@@ -516,7 +470,7 @@
         }
       }
       
-      // Valor del contador
+      // Counter value
       .card-value {
         display: flex;
         align-items: center;
@@ -535,7 +489,16 @@
           letter-spacing: -1px;
         }
         
-        // Insignia de aumento
+        .currency {
+          font-size: 2.4rem;
+          font-weight: 600;
+          color: white;
+          margin-right: 5px;
+          margin-top: 8px;
+          opacity: 0.9;
+        }
+        
+        // Increase badge
         .counter-badge {
           display: flex;
           align-items: center;
@@ -560,7 +523,7 @@
         }
       }
       
-      // Stats adicionales
+      // Additional stats
       .card-stats {
         display: flex;
         margin-bottom: 1.5rem;
@@ -588,7 +551,96 @@
         }
       }
       
-      // Descripción de la tarjeta
+      // Finance metrics
+      .finance-metrics {
+        margin-bottom: 1.5rem;
+        
+        .metric-item {
+          display: flex;
+          align-items: center;
+          margin-bottom: 12px;
+          
+          &:last-child {
+            margin-bottom: 0;
+          }
+          
+          .metric-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            
+            i {
+              color: #a8e063;
+              font-size: 16px;
+            }
+          }
+          
+          .metric-details {
+            flex: 1;
+            
+            .metric-label {
+              color: rgba(255, 255, 255, 0.6);
+              font-size: 0.8rem;
+              margin-bottom: 2px;
+            }
+            
+            .metric-value {
+              color: white;
+              font-size: 1.1rem;
+              font-weight: 600;
+            }
+          }
+        }
+      }
+      
+      // Completed sessions
+      .completed-sessions {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        padding: 12px 15px;
+        
+        .sessions-icon {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #56CCF2, #2F80ED);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-right: 15px;
+          
+          i {
+            color: white;
+            font-size: 18px;
+          }
+        }
+        
+        .sessions-details {
+          flex: 1;
+          
+          .sessions-value {
+            color: white;
+            font-size: 1.4rem;
+            font-weight: 600;
+            line-height: 1.2;
+          }
+          
+          .sessions-label {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85rem;
+          }
+        }
+      }
+      
+      // Card description
       .card-description {
         flex: 1;
         
@@ -598,78 +650,9 @@
           line-height: 1.5;
           margin-bottom: 1rem;
         }
-        
-        // Estado de soporte
-        .support-status {
-          display: flex;
-          align-items: center;
-          position: relative;
-          
-          .status-pulse {
-            position: absolute;
-            width: 18px;
-            height: 18px;
-            background-color: rgba(76, 175, 80, 0.5);
-            border-radius: 50%;
-            left: -3px;
-            top: -3px;
-            animation: statusPulse 2s infinite;
-          }
-          
-          .status-dot {
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background-color: #4CAF50;
-            margin-right: 8px;
-            position: relative;
-            z-index: 1;
-          }
-          
-          span {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 0.95rem;
-          }
-        }
       }
       
-      // Características de soporte
-      .support-features {
-        margin: 1.2rem 0;
-        
-        .feature-item {
-          display: flex;
-          align-items: center;
-          margin-bottom: 10px;
-          
-          &:last-child {
-            margin-bottom: 0;
-          }
-          
-          .feature-icon {
-            width: 28px;
-            height: 28px;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin-right: 10px;
-            
-            i {
-              color: #FF9966;
-              font-size: 12px;
-            }
-          }
-          
-          span {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 0.9rem;
-          }
-        }
-      }
-      
-      // Barra de progreso de aprendizaje
+      // Learning progress
       .learning-progress {
         margin: 1.2rem 0;
         
@@ -722,12 +705,12 @@
         }
       }
       
-      // Footer de la tarjeta
+      // Card footer
       .card-footer {
         margin-top: auto;
         display: flex;
         
-        // Botón de acción premium
+        // Premium action button
         .action-button {
           position: relative;
           background: rgba(255, 255, 255, 0.1);
@@ -744,7 +727,7 @@
           overflow: hidden;
           box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
           
-          // Contenido del botón
+          // Button content
           .button-content {
             position: relative;
             z-index: 2;
@@ -763,7 +746,7 @@
             }
           }
           
-          // Efecto de hover
+          // Hover effect
           .button-hover-effect {
             position: absolute;
             top: 0;
@@ -798,24 +781,9 @@
           &:active {
             transform: translateY(2px);
           }
-          
-          // Variante con animación de pulso
-          &.pulse-animation {
-            &:before {
-              content: '';
-              position: absolute;
-              top: 0;
-              left: 0;
-              right: 0;
-              bottom: 0;
-              border-radius: 12px;
-              animation: pulse 2s infinite;
-              z-index: 0;
-            }
-          }
         }
         
-        // Opciones de tutorial
+        // Tutorial options
         &.tutorial-options {
           display: flex;
           gap: 1rem;
@@ -837,7 +805,7 @@
             overflow: hidden;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
             
-            // Contenido del botón
+            // Button content
             .button-content {
               position: relative;
               z-index: 2;
@@ -857,7 +825,7 @@
               }
             }
             
-            // Efecto de hover
+            // Hover effect
             .button-hover-effect {
               position: absolute;
               top: 0;
@@ -895,7 +863,7 @@
   }
 }
 
-// Media queries para dispositivos móviles
+// Media queries for mobile devices
 @media (max-width: 768px) {
   .info-welcome-container {
     .dashboard-cards {
@@ -917,7 +885,7 @@
           }
         }
         
-        &.hover, &.focus {
+        &.active {
           transform: translateY(-10px) scale(1.02);
         }
       }
@@ -925,7 +893,7 @@
   }
 }
 
-// Animación para efecto de "ripple" en botones
+// Button ripple effect animation
 @keyframes buttonRipple {
   0% {
     box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.3);
@@ -935,7 +903,7 @@
   }
 }
 
-// Degradados de fondo dinámicos
+// Dynamic background gradients
 @keyframes gradientShift {
   0% {
     background-position: 0% 50%;
@@ -948,7 +916,7 @@
   }
 }
 
-// Iluminación de borde
+// Border glow
 @keyframes borderGlow {
   0% {
     box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.2), inset 0 0 0 0 rgba(255, 255, 255, 0.2);
@@ -958,21 +926,5 @@
   }
   100% {
     box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.2), inset 0 0 0 0 rgba(255, 255, 255, 0.2);
-  }
-}
-
-// Movimiento de partículas
-@keyframes particleWave {
-  0% {
-    transform: translate(0, 0);
-  }
-  33% {
-    transform: translate(10px, -15px);
-  }
-  66% {
-    transform: translate(-5px, 10px);
-  }
-  100% {
-    transform: translate(0, 0);
   }
 }

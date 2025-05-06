@@ -819,14 +819,8 @@ const ExercisesComponent = ({ patient, onUpdateExercises }) => {
                 >
                   <div className="exercise-header">
                     <h4>{exercise.name}</h4>
-                    <div className="exercise-actions">
-                      <button
-                        className="more-options-btn"
-                        aria-label="More options"
-                      >
-                        <i className="fas fa-ellipsis-v"></i>
-                      </button>
-                    </div>
+                    
+                    
                   </div>
                   
                   <div className="exercise-image">
