@@ -2908,3 +2908,143 @@
     border-left: 3px solid #ff5c5c;
   }
 }
+
+
+/* Estilos corregidos para la navegación por pestañas */
+.patient-tabs-navigation {
+  display: flex;
+  background: rgba(6, 20, 40, 0.5);
+  padding: 0.5rem;
+  border-radius: 50px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.25);
+  position: relative;
+  overflow: hidden; /* Importante para controlar los efectos internos */
+}
+
+/* Estilo base para todos los botones de pestañas */
+.tab-button {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.8rem 1.2rem;
+  border-radius: 40px;
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  z-index: 1; /* Todos los botones tienen z-index 1 por defecto */
+  transition: all 0.3s ease;
+}
+
+/* El efecto hover no debe interferir con clics */
+.tab-hover-effect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 40px;
+  opacity: 0;
+  transform: scale(0.8);
+  transition: all 0.3s ease;
+  z-index: -1; /* Colocamos el efecto detrás del contenido */
+  pointer-events: none; /* Importante: evita que capture eventos de clic */
+}
+
+/* Estilo del ícono */
+.tab-button .tab-icon {
+  margin-right: 0.7rem;
+  display: flex;
+  align-items: center;
+  font-size: 1rem;
+  transition: transform 0.3s;
+  z-index: 2; /* El ícono aparece por encima */
+}
+
+/* Efectos al pasar el ratón */
+.tab-button:hover {
+  color: white;
+}
+
+.tab-button:hover .tab-icon {
+  transform: scale(1.1) translateY(-2px);
+}
+
+.tab-button:hover .tab-hover-effect {
+  opacity: 1;
+  transform: scale(1);
+}
+
+/* Estilo para la pestaña activa - CORREGIDO */
+.tab-button.active {
+  background: linear-gradient(135deg, #2c7be5, #3a8ef7, #4facfe);
+  color: white;
+  z-index: 0; /* La pestaña activa tiene un z-index MENOR para que aparezca "detrás" */
+  position: relative; /* Asegura que se respete el z-index */
+}
+
+/* Efecto brillante - lo hacemos pointer-events: none para que no interfiera */
+.tab-button.active::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  left: -30%;
+  width: 30%;
+  height: 140%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: rotate(30deg);
+  transition: left 0.5s;
+  filter: blur(3px);
+  pointer-events: none; /* No captura eventos */
+}
+
+.tab-button.active:hover::before {
+  left: 130%;
+}
+
+/* Indicador activo - lo hacemos pointer-events: none para que no interfiera */
+.tab-button .active-indicator {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 3px;
+  background: white;
+  border-radius: 3px;
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+  pointer-events: none; /* No interfiere con clics */
+  z-index: 3; /* Visible por encima del botón */
+}
+
+/* Aseguramos que el contenido de la pestaña se muestre correctamente */
+.tab-content {
+  position: relative;
+  z-index: 2; /* El contenido aparece por encima de las pestañas */
+}
+
+/* Media queries para dispositivos móviles */
+@media (max-width: 768px) {
+  .patient-tabs-navigation {
+    padding: 0.4rem;
+  }
+  
+  .tab-button {
+    padding: 0.6rem 0.8rem;
+  }
+  
+  .tab-button span {
+    display: none;
+  }
+  
+  .tab-button .tab-icon {
+    margin-right: 0;
+    font-size: 1.1rem;
+  }
+}
