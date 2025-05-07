@@ -69,3 +69,22 @@ def deactivate_paciente(paciente_id: int, db: Session = Depends(get_db)):
         "message": "Paciente y sus periodos de certificación activos desactivados.",
         "paciente_id": paciente.id_paciente
     }
+
+#///////////////////////// CERT PERIODS //////////////////////////#
+
+@router.delete("/cert-periods/{cert_id}")
+def delete_certification_period(cert_id: int, db: Session = Depends(get_db)):
+    cert = db.query(CertificationPeriod).filter(CertificationPeriod.id == cert_id).first()
+
+    if not cert:
+        raise HTTPException(status_code=404, detail="Certification period not found.")
+
+    if cert.visits:
+        raise HTTPException(
+            status_code=400,
+            detail="Cannot delete certification period with existing visits."
+        )
+
+    db.delete(cert)
+    db.commit()
+    return {"detail": "Certification period deleted successfully."}

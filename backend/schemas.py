@@ -42,6 +42,21 @@ class StaffResponse(StaffBase):
     class Config:
         from_attributes = True
 
+class StaffAssignmentBase(BaseModel):
+    paciente_id: int
+    staff_id: int
+    rol_asignado: str
+
+class StaffAssignmentCreate(StaffAssignmentBase):
+    pass
+
+class StaffAssignmentResponse(StaffAssignmentBase):
+    id: int
+    fecha_asignacion: datetime
+
+    class Config:
+        from_attributes = True
+
 #/////////////////////////////// PACIENTES ////////////////////////////////#
 
 class PacienteBase(BaseModel):
@@ -225,12 +240,22 @@ class NoteTemplateResponse(NoteTemplateBase):
     class Config:
         from_attributes = True
 
+#//////////////////////////// CERT PERIODS //////////////////////////#
+
 class CertificationPeriodResponse(BaseModel):
     id: int
     paciente_id: int
     start_date: date
     end_date: date
     is_active: bool
+
+    class Config:
+        from_attributes = True
+
+class CertificationPeriodUpdate(BaseModel):
+    start_date: Optional[date] = None
+    end_date: Optional[date] = None
+    is_active: Optional[bool] = None
 
     class Config:
         from_attributes = True

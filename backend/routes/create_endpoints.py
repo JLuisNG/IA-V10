@@ -4,11 +4,12 @@ from typing import List
 from datetime import datetime, timedelta, date
 from database.connection import get_db
 from database.models import (
-    Staff, Pacientes, CertificationPeriod, Documentos, Exercise, PacienteExerciseAssignment, Visit)
+    Staff, Pacientes, CertificationPeriod, Documentos, Exercise, PacienteExerciseAssignment, Visit,
+    StaffAssignment)
 from schemas import (
     StaffCreate, StaffResponse, PacienteCreate, PacienteResponse, DocumentoCreate, 
     DocumentoResponse, ExerciseCreate, ExerciseResponse, PacienteExerciseAssignmentCreate, 
-    VisitCreate)
+    VisitCreate, StaffAssignmentResponse)
 
 router = APIRouter()
 
@@ -41,6 +42,29 @@ def create_staff(staff: StaffCreate, db: Session = Depends(get_db)):
     db.refresh(new_staff)
 
     return new_staff
+
+@router.post("/assign-staff", response_model=StaffAssignmentResponse)
+def assign_staff_to_patient(paciente_id: int, staff_id: int, rol_asignado: str, db: Session = Depends(get_db)):
+    existing_assignment = db.query(StaffAssignment).filter(
+        StaffAssignment.paciente_id == paciente_id,
+        StaffAssignment.rol_asignado == rol_asignado
+    ).first()
+
+    if existing_assignment:
+        existing_assignment.staff_id = staff_id
+        existing_assignment.fecha_asignacion = datetime.utcnow()
+    else:
+        new_assignment = StaffAssignment(
+            paciente_id=paciente_id,
+            staff_id=staff_id,
+            rol_asignado=rol_asignado,
+            fecha_asignacion=datetime.utcnow()
+        )
+        db.add(new_assignment)
+
+    db.commit()
+
+    return existing_assignment if existing_assignment else new_assignment
 
 #////////////////////////// PACIENTES //////////////////////////#
 
