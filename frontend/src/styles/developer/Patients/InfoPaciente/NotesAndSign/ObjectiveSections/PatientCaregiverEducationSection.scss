@@ -1,0 +1,661 @@
+// Enhanced PatientCaregiverEducationSection.scss
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+// Variables
+$primary-color: #8b5cf6;
+$primary-gradient: linear-gradient(135deg, #8b5cf6, #6d28d9);
+$secondary-color: #ec4899;
+$accent-color: #f59e0b;
+$success-color: #10b981;
+$warning-color: #f97316;
+$danger-color: #ef4444;
+$light-bg: #f8fafc;
+$white: #ffffff;
+$card-shadow: 0 10px 25px rgba(0, 0, 0, 0.05), 0 5px 10px rgba(0, 0, 0, 0.03);
+$transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+$border-radius: 16px;
+
+// Category colors
+$wound-color: $danger-color;
+$medication-color: $primary-color;
+$monitoring-color: $success-color;
+$devices-color: $secondary-color;
+$other-color: $accent-color;
+
+.patient-caregiver-education-section {
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  padding: 16px 0;
+  
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    
+    .section-title {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 800;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      
+      i {
+        color: $primary-color;
+        font-size: 20px;
+        padding: 10px;
+        background: rgba(139, 92, 246, 0.1);
+        border-radius: 12px;
+      }
+    }
+    
+    .section-meta {
+      .education-count {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        background: rgba(139, 92, 246, 0.1);
+        border-radius: 12px;
+        padding: 8px 16px;
+        
+        .count-number {
+          font-size: 22px;
+          font-weight: 800;
+          color: $primary-color;
+          line-height: 1;
+        }
+        
+        .count-label {
+          font-size: 12px;
+          color: rgba(139, 92, 246, 0.8);
+          font-weight: 600;
+        }
+      }
+    }
+  }
+  
+  .subsection-title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 700;
+    color: #334155;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    
+    i {
+      color: $primary-color;
+      font-size: 16px;
+    }
+  }
+  
+  .education-options-container {
+    margin-bottom: 30px;
+    background: white;
+    border-radius: $border-radius;
+    padding: 24px;
+    border: 1px solid rgba(226, 232, 240, 0.7);
+    box-shadow: $card-shadow;
+    
+    .education-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+      gap: 16px;
+      
+      .education-actions {
+        .expand-all-button {
+          padding: 8px 16px;
+          background: $light-bg;
+          border: 1px solid rgba(226, 232, 240, 0.7);
+          border-radius: 8px;
+          color: #64748b;
+          font-family: 'Plus Jakarta Sans', sans-serif;
+          font-size: 13px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: $transition;
+          
+          &:hover {
+            background: #e2e8f0;
+            color: #334155;
+          }
+        }
+      }
+    }
+    
+    .education-categories {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+  }
+  
+  .education-category {
+    border-radius: 12px;
+    border: 1px solid rgba(226, 232, 240, 0.7);
+    overflow: hidden;
+    transition: $transition;
+    
+    &:hover {
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.05);
+    }
+    
+    .category-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 16px 20px;
+      background: $light-bg;
+      cursor: pointer;
+      transition: $transition;
+      
+      &:hover {
+        background: darken($light-bg, 2%);
+      }
+      
+      .category-title-container {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        
+        .category-icon {
+          width: 40px;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 10px;
+          background: white;
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+          
+          i {
+            font-size: 18px;
+          }
+        }
+        
+        .category-title {
+          margin: 0;
+          font-size: 15px;
+          font-weight: 700;
+          color: #334155;
+        }
+      }
+      
+      .category-actions {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        
+        .selected-badge {
+          font-size: 12px;
+          font-weight: 600;
+          color: white;
+          background: $primary-color;
+          padding: 3px 8px;
+          border-radius: 20px;
+          white-space: nowrap;
+        }
+        
+        .toggle-button {
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          background: white;
+          border: 1px solid rgba(226, 232, 240, 0.7);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: #64748b;
+          cursor: pointer;
+          transition: $transition;
+          
+          &:hover {
+            background: #e2e8f0;
+            color: #334155;
+          }
+        }
+      }
+    }
+    
+    // Category-specific colors
+    &:nth-child(1) {
+      .category-icon i {
+        color: $wound-color;
+      }
+      
+      .category-actions .selected-badge {
+        background: $wound-color;
+      }
+    }
+    
+    &:nth-child(2) {
+      .category-icon i {
+        color: $medication-color;
+      }
+      
+      .category-actions .selected-badge {
+        background: $medication-color;
+      }
+    }
+    
+    &:nth-child(3) {
+      .category-icon i {
+        color: $monitoring-color;
+      }
+      
+      .category-actions .selected-badge {
+        background: $monitoring-color;
+      }
+    }
+    
+    &:nth-child(4) {
+      .category-icon i {
+        color: $devices-color;
+      }
+      
+      .category-actions .selected-badge {
+        background: $devices-color;
+      }
+    }
+    
+    &:nth-child(5) {
+      .category-icon i {
+        color: $other-color;
+      }
+      
+      .category-actions .selected-badge {
+        background: $other-color;
+      }
+    }
+    
+    .category-content {
+      padding: 5px 20px 20px;
+      animation: slideDown 0.3s ease-out;
+    }
+  }
+  
+  .education-options-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 12px;
+    
+    .checkbox-item {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 8px;
+      background: #f8fafc;
+      border: 1px solid rgba(226, 232, 240, 0.7);
+      transition: $transition;
+      
+      &:hover {
+        background: white;
+        border-color: rgba(139, 92, 246, 0.3);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+      }
+      
+      &.selected {
+        background: rgba(139, 92, 246, 0.05);
+        border-color: rgba(139, 92, 246, 0.3);
+        
+        label {
+          color: #6d28d9;
+          font-weight: 600;
+        }
+      }
+      
+      input[type="checkbox"] {
+        appearance: none;
+        -webkit-appearance: none;
+        width: 22px;
+        height: 22px;
+        border-radius: 6px;
+        border: 2px solid rgba(148, 163, 184, 0.5);
+        background: white;
+        cursor: pointer;
+        position: relative;
+        transition: $transition;
+        flex-shrink: 0;
+        
+        &:hover {
+          border-color: $primary-color;
+        }
+        
+        &:checked {
+          background: $primary-color;
+          border-color: $primary-color;
+          
+          &::after {
+            content: '\f00c';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 14px;
+          }
+        }
+      }
+      
+      label {
+        font-size: 14px;
+        color: #334155;
+        cursor: pointer;
+        flex: 1;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        
+        .option-icon {
+          width: 32px;
+          height: 32px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: rgba(139, 92, 246, 0.1);
+          border-radius: 8px;
+          flex-shrink: 0;
+          
+          i {
+            font-size: 16px;
+            color: $primary-color;
+          }
+        }
+        
+        .option-text {
+          flex: 1;
+        }
+      }
+    }
+  }
+  
+  .questions-container {
+    margin-bottom: 30px;
+    
+    .subsection-title {
+      margin-bottom: 16px;
+    }
+    
+    .question-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 20px;
+    }
+    
+    .question-card {
+      background: white;
+      border-radius: 16px;
+      border: 1px solid rgba(226, 232, 240, 0.7);
+      overflow: hidden;
+      box-shadow: $card-shadow;
+      transition: $transition;
+      
+      &:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0, 0, 0, 0.05);
+      }
+      
+      .question-header {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 16px 20px;
+        background: $light-bg;
+        border-bottom: 1px solid rgba(226, 232, 240, 0.7);
+        
+        .question-icon {
+          width: 40px;
+          height: 40px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          background: white;
+          border-radius: 10px;
+          box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+          
+          i {
+            font-size: 18px;
+            color: $accent-color;
+          }
+        }
+        
+        .question-title {
+          margin: 0;
+          font-size: 16px;
+          font-weight: 700;
+          color: #334155;
+        }
+      }
+      
+      .question-content {
+        padding: 20px;
+        
+        .question-text {
+          margin: 0 0 16px;
+          font-size: 14px;
+          color: #475569;
+          line-height: 1.5;
+        }
+        
+        .answer-selector {
+          display: flex;
+          gap: 12px;
+          
+          .answer-option {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 16px;
+            border-radius: 12px;
+            background: $light-bg;
+            border: 1px solid rgba(226, 232, 240, 0.7);
+            cursor: pointer;
+            transition: $transition;
+            
+            &:hover {
+              background: #f1f5f9;
+              border-color: rgba(139, 92, 246, 0.3);
+            }
+            
+            &.selected {
+              background: rgba(139, 92, 246, 0.1);
+              border-color: rgba(139, 92, 246, 0.5);
+              
+              .option-text {
+                color: $primary-color;
+                font-weight: 700;
+              }
+            }
+            
+            input[type="radio"] {
+              position: absolute;
+              opacity: 0;
+              width: 0;
+              height: 0;
+            }
+            
+            .option-text {
+              font-size: 15px;
+              font-weight: 600;
+              color: #64748b;
+              margin-top: 8px;
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  .additional-info-container {
+    background: white;
+    border-radius: $border-radius;
+    padding: 24px;
+    border: 1px solid rgba(226, 232, 240, 0.7);
+    box-shadow: $card-shadow;
+    
+    .subsection-title {
+      margin-bottom: 16px;
+    }
+    
+    .additional-info-textarea {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 12px;
+      border: 1px solid rgba(203, 213, 225, 0.7);
+      background: $light-bg;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 14px;
+      color: #334155;
+      resize: none;
+      transition: $transition;
+      min-height: 120px;
+      
+      &::placeholder {
+        color: #94a3b8;
+      }
+      
+      &:focus {
+        outline: none;
+        border-color: rgba(139, 92, 246, 0.5);
+        box-shadow: 0 0 0 3px rgba(139, 92, 246, 0.15);
+        background: white;
+      }
+    }
+  }
+}
+
+// Animations
+@keyframes slideDown {
+  from { 
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to { 
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Responsive styles
+@media (max-width: 1200px) {
+  .patient-caregiver-education-section {
+    .education-options-grid {
+      grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    }
+  }
+}
+
+@media (max-width: 992px) {
+  .patient-caregiver-education-section {
+    .section-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 16px;
+      
+      .section-meta {
+        align-self: flex-end;
+      }
+    }
+    
+    .education-options-grid {
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+    
+    .questions-container {
+      .question-cards {
+        grid-template-columns: 1fr;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .patient-caregiver-education-section {
+    padding: 10px 0;
+    
+    .section-header {
+      margin-bottom: 20px;
+      
+      .section-title {
+        font-size: 18px;
+        
+        i {
+          padding: 8px;
+          font-size: 16px;
+        }
+      }
+    }
+    
+    .education-options-container {
+      padding: 20px;
+      
+      .education-header {
+        flex-direction: column;
+        align-items: flex-start;
+        
+        .education-actions {
+          width: 100%;
+          
+          .expand-all-button {
+            width: 100%;
+          }
+        }
+      }
+    }
+    
+    .education-category {
+      .category-header {
+        padding: 14px 16px;
+        
+        .category-title-container {
+          gap: 12px;
+          
+          .category-icon {
+            width: 36px;
+            height: 36px;
+            
+            i {
+              font-size: 16px;
+            }
+          }
+        }
+      }
+    }
+    
+    .education-options-grid {
+      grid-template-columns: 1fr;
+      
+      .checkbox-item {
+        label {
+          .option-text {
+            font-size: 13px;
+          }
+        }
+      }
+    }
+    
+    .questions-container {
+      .question-card {
+        .question-content {
+          .answer-selector {
+            flex-direction: column;
+          }
+        }
+      }
+    }
+    
+    .additional-info-container {
+      padding: 20px;
+    }
+  }
+}

@@ -1,0 +1,804 @@
+@import '../../../_variables.scss';
+
+.add-staff-container {
+  width: 100%;
+  margin-top: $spacing-6;
+  animation: blurryReveal 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+  
+  // Pantalla de carga avanzada
+  .loading-screen {
+    background: rgba(10, 30, 60, 0.8);
+    border-radius: $border-radius-lg;
+    padding: $spacing-12;
+    margin-bottom: $spacing-8;
+    text-align: center;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    border: 1px solid rgba($primary-color, 0.2);
+    position: relative;
+    min-height: 400px;
+    @include flex-center;
+    overflow: hidden;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3), 
+                inset 0 0 60px rgba($primary-color, 0.1);
+    
+    // Fondo con efecto digital
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: 
+        linear-gradient(135deg, rgba(10, 30, 60, 0.2) 0%, transparent 100%),
+        radial-gradient(circle at 20% 30%, rgba($primary-color, 0.1) 0%, transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba($accent-color, 0.1) 0%, transparent 50%);
+      z-index: -1;
+      opacity: 0.8;
+    }
+    
+    // Efecto de partículas flotantes
+    &::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-image: 
+        radial-gradient(circle at 10% 10%, rgba(255, 255, 255, 0.1) 0%, transparent 2%),
+        radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.1) 0%, transparent 3%),
+        radial-gradient(circle at 30% 70%, rgba(255, 255, 255, 0.1) 0%, transparent 2%),
+        radial-gradient(circle at 70% 40%, rgba(255, 255, 255, 0.1) 0%, transparent 2%),
+        radial-gradient(circle at 90% 90%, rgba(255, 255, 255, 0.1) 0%, transparent 2%);
+      background-size: 150px 150px;
+      animation: floatingParticles 15s linear infinite;
+      opacity: 0.5;
+      z-index: -1;
+    }
+    
+    .loader-container {
+      position: relative;
+      width: 300px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: $spacing-6;
+      
+      // Efecto de holograma
+      .loader-hologram {
+        position: relative;
+        width: 140px;
+        height: 140px;
+        margin-bottom: $spacing-5;
+        
+        .hologram-ring {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+          border: 2px solid rgba($primary-color, 0.3);
+          box-shadow: 
+            0 0 15px rgba($primary-color, 0.5),
+            inset 0 0 15px rgba($primary-color, 0.5);
+          animation: pulseRing 3s infinite ease-in-out;
+        }
+        
+        .hologram-circle {
+          position: absolute;
+          width: 70%;
+          height: 70%;
+          top: 15%;
+          left: 15%;
+          border-radius: 50%;
+          background: radial-gradient(
+            circle at center,
+            rgba($primary-light, 0.4) 0%,
+            rgba($primary-color, 0.2) 40%,
+            rgba($primary-color, 0.1) 60%,
+            transparent 80%
+          );
+          filter: blur(4px);
+          opacity: 0.8;
+          animation: pulsate 3s infinite ease-in-out;
+          
+          &::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            border-radius: 50%;
+            box-shadow: inset 0 0 20px rgba($primary-color, 0.5);
+            animation: shineEffect 2s infinite;
+          }
+        }
+        
+        .hologram-bars {
+          position: absolute;
+          width: 100%;
+          height: 100%;
+          @include flex-center;
+          
+          .bar {
+            position: absolute;
+            width: 3px;
+            background: linear-gradient(to top, transparent, $primary-color, transparent);
+            box-shadow: 0 0 8px rgba($primary-color, 0.8);
+            animation-name: barHeight;
+            animation-duration: 1.5s;
+            animation-iteration-count: infinite;
+            animation-timing-function: ease-in-out;
+            
+            &:nth-child(1) {
+              height: 60%;
+              left: 30%;
+              animation-delay: 0.2s;
+            }
+            
+            &:nth-child(2) {
+              height: 40%;
+              left: 40%;
+              animation-delay: 0.6s;
+            }
+            
+            &:nth-child(3) {
+              height: 70%;
+              left: 50%;
+              animation-delay: 0s;
+            }
+            
+            &:nth-child(4) {
+              height: 50%;
+              left: 60%;
+              animation-delay: 0.8s;
+            }
+            
+            &:nth-child(5) {
+              height: 45%;
+              left: 70%;
+              animation-delay: 0.4s;
+            }
+          }
+        }
+      }
+      
+      // Barra de progreso
+      .loader-progress {
+        width: 100%;
+        margin: $spacing-4 0;
+        
+        .progress-bar {
+          height: 6px;
+          width: 100%;
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 3px;
+          overflow: hidden;
+          position: relative;
+          
+          .progress-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: linear-gradient(90deg, $primary-color, $primary-light);
+            box-shadow: 0 0 10px rgba($primary-color, 0.8);
+            border-radius: 3px;
+            width: 0%;
+            animation: progressFill 4.5s ease-in-out forwards;
+          }
+        }
+      }
+      
+      // Texto de carga
+      .loader-text {
+        font-size: $font-lg;
+        font-weight: $font-semibold;
+        color: $white;
+        text-shadow: 0 0 10px rgba($primary-color, 0.8);
+        width: 100%;
+        min-height: 32px;
+        transition: all 0.3s ease-in-out;
+      }
+      
+      // Estado del sistema
+      .loader-status {
+        margin-top: $spacing-4;
+        font-size: $font-sm;
+        color: rgba($white, 0.7);
+        display: flex;
+        align-items: center;
+        gap: $spacing-2;
+        
+        .status-dot {
+          display: inline-block;
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background-color: $success;
+          box-shadow: 0 0 8px $success;
+          animation: blink 1.2s infinite;
+        }
+      }
+    }
+    
+    // Animaciones
+    @keyframes pulseRing {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.8;
+      }
+      50% {
+        transform: scale(1.05);
+        opacity: 1;
+      }
+    }
+    
+    @keyframes pulsate {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.7;
+      }
+      50% {
+        transform: scale(1.1);
+        opacity: 0.9;
+      }
+    }
+    
+    @keyframes barHeight {
+      0%, 100% {
+        transform: scaleY(0.6);
+      }
+      50% {
+        transform: scaleY(1);
+      }
+    }
+    
+    @keyframes shineEffect {
+      0% {
+        opacity: 0.5;
+      }
+      50% {
+        opacity: 1;
+      }
+      100% {
+        opacity: 0.5;
+      }
+    }
+    
+    @keyframes progressFill {
+      0% {
+        width: 0%;
+      }
+      20% {
+        width: 40%;
+      }
+      50% {
+        width: 60%;
+      }
+      80% {
+        width: 85%;
+      }
+      100% {
+        width: 100%;
+      }
+    }
+    
+    @keyframes blink {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.4;
+      }
+    }
+    
+    @keyframes floatingParticles {
+      0% {
+        background-position: 0 0;
+      }
+      100% {
+        background-position: 150px 150px;
+      }
+    }
+  }
+  
+  // Contenedor del formulario
+  .staff-form-container {
+    animation: slideUp 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+    
+    .form-header {
+      margin-bottom: $spacing-8;
+      padding-bottom: $spacing-4;
+      border-bottom: 1px solid $border-color;
+      
+      h2 {
+        font-size: $font-xxl;
+        font-weight: $font-bold;
+        color: $text-light;
+        margin-bottom: $spacing-2;
+        position: relative;
+        display: inline-block;
+        
+        &::after {
+          content: '';
+          position: absolute;
+          bottom: -8px;
+          left: 0;
+          width: 60px;
+          height: 3px;
+          background: linear-gradient(90deg, $primary-color, $primary-light);
+          border-radius: 3px;
+        }
+      }
+      
+      p {
+        color: $text-secondary;
+        font-size: $font-lg;
+        max-width: 800px;
+      }
+    }
+    
+    // Estilos del formulario
+    .staff-form {
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-8;
+      
+      // Secciones del formulario
+      .form-section {
+        background: $white;
+        border-radius: $border-radius-lg;
+        overflow: hidden;
+        box-shadow: $shadow-medium;
+        transition: $transition-medium;
+        
+        &:hover {
+          transform: translateY(-5px);
+          box-shadow: $shadow-xl;
+        }
+        
+        .section-header {
+          background: linear-gradient(to right, #f9fbfd, #f0f4f8);
+          padding: $spacing-5 $spacing-6;
+          border-bottom: 1px solid $medium-gray;
+          display: flex;
+          align-items: center;
+          
+          i {
+            font-size: $font-xl;
+            color: $primary-color;
+            margin-right: $spacing-4;
+            width: 28px;
+            text-align: center;
+          }
+          
+          h3 {
+            font-size: $font-lg;
+            font-weight: $font-semibold;
+            color: $dark-gray;
+            margin: 0;
+          }
+          
+          .section-subtitle {
+            margin-left: auto;
+            font-size: $font-xs;
+            color: $medium-gray;
+            font-style: italic;
+          }
+        }
+        
+        .section-content {
+          padding: $spacing-6;
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+          gap: $spacing-6;
+          
+          &.role-selection {
+            display: block;
+          }
+          
+          .form-group {
+            display: flex;
+            flex-direction: column;
+            
+            label {
+              font-weight: $font-medium;
+              color: $dark-gray;
+              margin-bottom: $spacing-2;
+              font-size: $font-sm;
+            }
+            
+            input, select {
+              border: 1px solid $light-gray;
+              border-radius: $border-radius-md;
+              padding: $spacing-3 $spacing-4;
+              font-size: $font-sm;
+              color: $dark-gray;
+              background-color: $white;
+              transition: $transition-quick;
+              
+              &:focus {
+                outline: none;
+                border-color: $primary-color;
+                box-shadow: 0 0 0 3px rgba($primary-color, 0.15);
+              }
+              
+              &::placeholder {
+                color: $medium-gray;
+              }
+            }
+            
+            select {
+              appearance: none;
+              background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+              background-repeat: no-repeat;
+              background-position: right 1rem center;
+              background-size: 1rem;
+              padding-right: 2.5rem;
+            }
+          }
+        }
+        
+        // Estilo especial para la sección de documentos
+        &.documents-section {
+          .section-content.documents-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: $spacing-5;
+            
+            .document-card {
+              background: $white;
+              border-radius: $border-radius-md;
+              border: 1px solid $light-gray;
+              padding: $spacing-5;
+              transition: $transition-medium;
+              position: relative;
+              overflow: hidden;
+              
+              &::before {
+                content: '';
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 4px;
+                height: 100%;
+                background: $medium-gray;
+                transition: background 0.3s;
+              }
+              
+              &.obtained::before {
+                background: $status-active;
+              }
+              
+              &.pending::before {
+                background: $status-pending;
+              }
+              
+              &:hover {
+                transform: translateY(-5px);
+                box-shadow: $shadow-medium;
+              }
+              
+              .document-header {
+                display: flex;
+                align-items: center;
+                margin-bottom: $spacing-3;
+                
+                .document-icon {
+                  background: rgba($dark-gray, 0.1);
+                  width: 36px;
+                  height: 36px;
+                  border-radius: $border-radius-sm;
+                  @include flex-center;
+                  margin-right: $spacing-3;
+                  
+                  i {
+                    color: $dark-gray;
+                    font-size: $font-md;
+                  }
+                }
+                
+                .document-name {
+                  font-weight: $font-semibold;
+                  color: $dark-gray;
+                  flex: 1;
+                  font-size: $font-sm;
+                }
+                
+                .document-status {
+                  padding: $spacing-1 $spacing-3;
+                  border-radius: $border-radius-full;
+                  font-size: $font-xs;
+                  font-weight: $font-medium;
+                  display: flex;
+                  align-items: center;
+                  gap: $spacing-1;
+                  cursor: pointer;
+                  transition: $transition-quick;
+                  
+                  &.obtained {
+                    background: rgba($status-active, 0.1);
+                    color: darken($status-active, 20%);
+                    
+                    i {
+                      color: $status-active;
+                    }
+                    
+                    &:hover {
+                      background: rgba($status-active, 0.2);
+                    }
+                  }
+                  
+                  &.pending {
+                    background: rgba($status-pending, 0.1);
+                    color: darken($status-pending, 20%);
+                    
+                    i {
+                      color: $status-pending;
+                    }
+                    
+                    &:hover {
+                      background: rgba($status-pending, 0.2);
+                    }
+                  }
+                }
+              }
+              
+              .document-description {
+                font-size: $font-xs;
+                color: $medium-gray;
+                margin-bottom: $spacing-4;
+                padding-left: calc(36px + 0.8rem);
+              }
+              
+              .document-actions {
+                display: flex;
+                flex-direction: column;
+                gap: $spacing-3;
+                
+                .file-upload {
+                  position: relative;
+                  overflow: hidden;
+                  display: inline-block;
+                  
+                  .upload-btn {
+                    display: inline-flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: $spacing-2;
+                    background: $light-gray;
+                    color: $dark-gray;
+                    padding: $spacing-2 $spacing-4;
+                    border-radius: $border-radius-sm;
+                    font-size: $font-sm;
+                    font-weight: $font-medium;
+                    cursor: pointer;
+                    transition: $transition-quick;
+                    border: 1px solid $medium-gray;
+                    
+                    &:hover {
+                      background: darken($light-gray, 5%);
+                      color: $dark-gray;
+                    }
+                    
+                    i {
+                      font-size: $font-md;
+                    }
+                  }
+                  
+                  .file-input {
+                    position: absolute;
+                    top: 0;
+                    left: 0;
+                    opacity: 0;
+                    width: 100%;
+                    height: 100%;
+                    cursor: pointer;
+                  }
+                }
+                
+                .file-info {
+                  display: flex;
+                  align-items: center;
+                  gap: $spacing-2;
+                  background: $light-gray;
+                  padding: $spacing-2 $spacing-4;
+                  border-radius: $border-radius-sm;
+                  font-size: $font-xs;
+                  color: $dark-gray;
+                  
+                  i {
+                    color: $primary-color;
+                  }
+                  
+                  .file-name {
+                    max-width: 200px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
+                  }
+                }
+              }
+              
+              // Tarjeta especial para añadir documentos
+              &.add-document {
+                height: 180px;
+                border: 2px dashed $medium-gray;
+                @include flex-center;
+                cursor: pointer;
+                background: rgba($light-gray, 0.5);
+                
+                &::before {
+                  display: none;
+                }
+                
+                &:hover {
+                  background: $light-gray;
+                  border-color: $dark-gray;
+                }
+                
+                .add-document-content {
+                  display: flex;
+                  flex-direction: column;
+                  align-items: center;
+                  gap: $spacing-4;
+                  color: $medium-gray;
+                  
+                  i {
+                    font-size: $font-xxl;
+                    color: $medium-gray;
+                  }
+                  
+                  span {
+                    font-weight: $font-medium;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      
+      // Acciones del formulario
+      .form-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: $spacing-4;
+        margin-top: $spacing-4;
+        padding: $spacing-4 0;
+        border-top: 1px solid $border-color;
+        
+        button {
+          padding: $spacing-3 $spacing-6;
+          border-radius: $border-radius-md;
+          font-weight: $font-semibold;
+          font-size: $font-md;
+          cursor: pointer;
+          transition: $transition-medium;
+          display: flex;
+          align-items: center;
+          gap: $spacing-2;
+          
+          i {
+            font-size: $font-md;
+          }
+          
+          &.cancel-btn {
+            background: transparent;
+            color: $text-secondary;
+            border: 1px solid $border-color;
+            
+            &:hover {
+              background: rgba(255, 255, 255, 0.1);
+              transform: translateY(-3px);
+            }
+          }
+          
+          &.submit-btn {
+            background: linear-gradient(135deg, $primary-color, $primary-light);
+            color: $white;
+            border: none;
+            box-shadow: 0 4px 15px rgba($primary-color, 0.3);
+            
+            &:hover {
+              transform: translateY(-3px);
+              box-shadow: 0 6px 20px rgba($primary-color, 0.4);
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  // Animaciones
+  @keyframes blurryReveal {
+    0% { 
+      filter: blur(15px);
+      opacity: 0;
+      transform: scale(0.9);
+    }
+    100% { 
+      filter: blur(0);
+      opacity: 1;
+      transform: scale(1);
+    }
+  }
+  
+  @keyframes slideUp {
+    0% {
+      opacity: 0;
+      transform: translateY(30px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+// Media queries para responsividad
+@media (max-width: $breakpoint-xl) {
+  .add-staff-container {
+    .staff-form-container {
+      .staff-form {
+        .form-section {
+          &.documents-section {
+            .section-content.documents-grid {
+              grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: $breakpoint-lg) {
+  .add-staff-container {
+    .staff-form-container {
+      .form-header {
+        h2 {
+          font-size: $font-xl;
+        }
+      }
+      
+      .staff-form {
+        .form-section {
+          .section-content {
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            
+            &.documents-grid {
+              grid-template-columns: 1fr;
+            }
+          }
+        }
+        
+        .form-actions {
+          flex-direction: column-reverse;
+          
+          button {
+            width: 100%;
+            justify-content: center;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: $breakpoint-md) {
+  .add-staff-container {
+    .staff-form-container {
+      .staff-form {
+        .form-section {
+          .section-content {
+            grid-template-columns: 1fr;
+          }
+        }
+      }
+    }
+  }
+}

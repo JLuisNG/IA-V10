@@ -1,0 +1,120 @@
+// Flexbox helpers
+@mixin flex-center {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  @mixin flex-between {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  @mixin flex-column {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  // Media queries
+  @mixin breakpoint($point) {
+    @if $point == sm {
+      @media (min-width: 640px) { @content; }
+    } @else if $point == md {
+      @media (min-width: 768px) { @content; }
+    } @else if $point == lg {
+      @media (min-width: 1024px) { @content; }
+    } @else if $point == xl {
+      @media (min-width: 1280px) { @content; }
+    } @else if $point == 2xl {
+      @media (min-width: 1536px) { @content; }
+    }
+  }
+  
+  // Glass effect
+  @mixin glass-effect($opacity: 0.7, $blur: 10px) {
+    background-color: rgba(255, 255, 255, $opacity);
+    backdrop-filter: blur($blur);
+    -webkit-backdrop-filter: blur($blur);
+  }
+  
+  @mixin dark-glass-effect($opacity: 0.7, $blur: 10px) {
+    background-color: rgba(0, 0, 0, $opacity);
+    backdrop-filter: blur($blur);
+    -webkit-backdrop-filter: blur($blur);
+  }
+  
+  // Text truncation
+  @mixin text-truncate {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  
+  // Multi-line text truncation
+  @mixin text-truncate-lines($lines: 2) {
+    display: -webkit-box;
+    -webkit-line-clamp: $lines;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  // Box shadow
+  @mixin box-shadow($level: 'md') {
+    @if $level == 'sm' {
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.08);
+    } @else if $level == 'md' {
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+    } @else if $level == 'lg' {
+      box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+    } @else if $level == 'xl' {
+      box-shadow: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
+    }
+  }
+  
+  // Glow effects
+  @mixin glow-effect($color: rgba(0, 123, 255, 0.6), $size: 15px) {
+    box-shadow: 0 0 $size $color;
+  }
+  
+  // Transitions
+  @mixin transition($property: all, $duration: 0.3s, $timing: ease) {
+    transition: $property $duration $timing;
+  }
+  
+  // Gradient text
+  @mixin gradient-text($gradient) {
+    background: $gradient;
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  
+  // Absolute positioning
+  @mixin position-absolute($top: 0, $right: 0, $bottom: 0, $left: 0) {
+    position: absolute;
+    top: $top;
+    right: $right;
+    bottom: $bottom;
+    left: $left;
+  }
+  
+  // Center an element absolutely
+  @mixin absolute-center {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }
+  
+  // Hover animation
+  @mixin hover-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    
+    &:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+  }
+
+  

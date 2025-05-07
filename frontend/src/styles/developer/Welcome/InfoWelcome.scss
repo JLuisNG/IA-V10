@@ -1,0 +1,930 @@
+// Premium styles for the InfoWelcome component
+
+// Advanced animations
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+    filter: blur(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes float {
+  0% {
+    transform: translateY(0px);
+    filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.4));
+  }
+  50% {
+    transform: translateY(-15px);
+    filter: drop-shadow(0 20px 25px rgba(0, 0, 0, 0.2));
+  }
+  100% {
+    transform: translateY(0px);
+    filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.4));
+  }
+}
+
+@keyframes blink {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(0.85);
+  }
+}
+
+@keyframes gradientFlow {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+@keyframes ripple {
+  0% {
+    transform: scale(0);
+    opacity: 0.8;
+  }
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+@keyframes statusPulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scale(1.5);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 0;
+  }
+}
+
+@keyframes rotateSpin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes fillProgress {
+  from {
+    width: 0%;
+  }
+  to {
+    width: 65%;
+  }
+}
+
+@keyframes progressGlow {
+  0% {
+    left: -100%;
+  }
+  100% {
+    left: 100%;
+  }
+}
+
+@keyframes badgeUp {
+  0% {
+    opacity: 0;
+    transform: translateY(5px) scale(0.9);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes decorationFloat {
+  0% {
+    transform: translateY(0) rotate(0);
+  }
+  50% {
+    transform: translateY(-10px) rotate(5deg);
+  }
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+}
+
+@keyframes neonGlow {
+  0%, 100% {
+    box-shadow: 0 0 10px 2px rgba(255, 255, 255, 0.7),
+                0 0 20px 4px rgba(125, 249, 255, 0.5),
+                0 0 30px 6px rgba(0, 225, 255, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 15px 3px rgba(255, 255, 255, 0.9),
+                0 0 30px 6px rgba(125, 249, 255, 0.7),
+                0 0 45px 9px rgba(0, 225, 255, 0.5);
+  }
+}
+
+@keyframes neonTrail {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+// Main container
+.info-welcome-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+  position: relative;
+  
+  // Dashboard cards
+  .dashboard-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 2.5rem;
+    perspective: 1000px;
+    
+    .dashboard-card {
+      position: relative;
+      background: rgba(25, 32, 48, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-radius: 20px;
+      padding: 2rem;
+      transition: all 0.6s cubic-bezier(0.165, 0.84, 0.44, 1);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      height: 350px;
+      overflow: hidden;
+      animation: fadeInUp 0.7s ease-out forwards;
+      animation-delay: calc(var(--i, 0) * 0.15s);
+      opacity: 0;
+      transform-style: preserve-3d;
+      transform: translateZ(0);
+      box-shadow: 
+        0 10px 30px rgba(0, 0, 0, 0.2),
+        0 0 10px rgba(255, 255, 255, 0.05) inset;
+      
+      &:nth-child(1) {
+        --i: 1;
+      }
+      
+      &:nth-child(2) {
+        --i: 2;
+      }
+      
+      &:nth-child(3) {
+        --i: 3;
+      }
+      
+      // Neon border container
+      .neon-border-container {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        pointer-events: none;
+        z-index: 10;
+        
+        // Neon dot that moves around the border
+        .neon-dot {
+          position: absolute;
+          width: 12px;
+          height: 12px;
+          border-radius: 50%;
+          background: white;
+          transform: translate(-50%, -50%);
+          z-index: 2;
+          animation: neonGlow 1.5s ease-in-out infinite;
+        }
+        
+        // Glow effect around the card
+        .neon-glow {
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          border-radius: 20px;
+          box-shadow: 
+            0 0 15px 3px rgba(125, 249, 255, 0.1),
+            0 0 30px 6px rgba(0, 225, 255, 0.05);
+          opacity: 0.6;
+          z-index: 1;
+        }
+      }
+      
+      // Premium hover effect
+      &.active {
+        transform: translateY(-15px) scale(1.02) rotateX(2deg) rotateY(-2deg);
+        z-index: 10;
+        box-shadow: 
+          0 30px 60px rgba(0, 0, 0, 0.3),
+          0 0 30px rgba(255, 255, 255, 0.05),
+          0 0 0 1px rgba(255, 255, 255, 0.2);
+        
+        .card-bg-decoration {
+          opacity: 0.25;
+          transform: scale(1.1) translateX(-5%);
+        }
+        
+        .icon-container {
+          transform: scale(1.15);
+          
+          .icon-background {
+            opacity: 1;
+            transform: scale(1.5);
+          }
+        }
+        
+        .card-decoration {
+          opacity: 1;
+          
+          .deco-circle {
+            animation: decorationFloat 3s ease-in-out infinite;
+          }
+          
+          .deco-square {
+            animation: decorationFloat 4s ease-in-out infinite 0.5s;
+          }
+          
+          .deco-triangle {
+            animation: decorationFloat 3.5s ease-in-out infinite 1s;
+          }
+        }
+        
+        .card-grid-lines {
+          opacity: 0.15;
+        }
+        
+        .action-button, .tutorial-button {
+          .button-hover-effect {
+            opacity: 0.1;
+          }
+        }
+        
+        .progress-bar .progress-glow {
+          animation: progressGlow 2s linear infinite;
+        }
+      }
+      
+      // Grid lines decoration
+      .card-grid-lines {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-image: 
+          linear-gradient(to right, rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+          linear-gradient(to bottom, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+        background-size: 20px 20px;
+        z-index: 0;
+        opacity: 0.08;
+        pointer-events: none;
+        transition: opacity 0.5s ease;
+      }
+      
+      // Floating decorations
+      .card-decoration {
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        z-index: 0;
+        pointer-events: none;
+        opacity: 0.5;
+        transition: opacity 0.5s ease;
+        
+        .deco-circle {
+          position: absolute;
+          top: 15%;
+          right: 10%;
+          width: 30px;
+          height: 30px;
+          border-radius: 50%;
+          border: 2px solid rgba(255, 255, 255, 0.1);
+          transition: all 0.5s ease;
+        }
+        
+        .deco-square {
+          position: absolute;
+          bottom: 20%;
+          left: 15%;
+          width: 20px;
+          height: 20px;
+          border: 2px solid rgba(255, 255, 255, 0.1);
+          transform: rotate(45deg);
+          transition: all 0.5s ease;
+        }
+        
+        .deco-triangle {
+          position: absolute;
+          top: 60%;
+          right: 15%;
+          width: 0;
+          height: 0;
+          border-left: 15px solid transparent;
+          border-right: 15px solid transparent;
+          border-bottom: 25px solid rgba(255, 255, 255, 0.05);
+          transition: all 0.5s ease;
+        }
+      }
+      
+      // Decorative background
+      .card-bg-decoration {
+        position: absolute;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        width: 45%;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.05) 100%);
+        opacity: 0.1;
+        transition: all 0.6s ease;
+        transform: scale(1) translateX(0);
+        z-index: 0;
+        border-radius: 0 20px 20px 0;
+      }
+      
+      .card-content {
+        position: relative;
+        z-index: 2;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+      
+      // Card header
+      .card-header {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.8rem;
+        
+        h3 {
+          font-size: 1.4rem;
+          font-weight: 600;
+          color: white;
+          margin: 0;
+          position: relative;
+          
+          &::after {
+            content: '';
+            position: absolute;
+            bottom: -6px;
+            left: 0;
+            width: 40px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+          }
+        }
+        
+        // Premium icon container
+        .icon-container {
+          width: 56px;
+          height: 56px;
+          border-radius: 15px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-right: 1.2rem;
+          transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          position: relative;
+          
+          // Animated background for icon
+          .icon-background {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            opacity: 0.5;
+            transition: all 0.5s ease;
+            z-index: 0;
+            filter: blur(5px);
+          }
+          
+          i {
+            color: white;
+            font-size: 1.5rem;
+            position: relative;
+            z-index: 1;
+            filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.3));
+          }
+          
+          // Color variants for each icon
+          &.patients-icon {
+            background: linear-gradient(135deg, #36D1DC, #5B86E5);
+            box-shadow: 0 10px 20px rgba(91, 134, 229, 0.3);
+            
+            .icon-background {
+              background: radial-gradient(circle, #36D1DC 0%, transparent 70%);
+            }
+          }
+          
+          &.finance-icon {
+            background: linear-gradient(135deg, #56ab2f, #a8e063);
+            box-shadow: 0 10px 20px rgba(168, 224, 99, 0.3);
+            
+            .icon-background {
+              background: radial-gradient(circle, #a8e063 0%, transparent 70%);
+            }
+          }
+          
+          &.learning-icon {
+            background: linear-gradient(135deg, #56CCF2, #2F80ED);
+            box-shadow: 0 10px 20px rgba(47, 128, 237, 0.3);
+            
+            .icon-background {
+              background: radial-gradient(circle, #56CCF2 0%, transparent 70%);
+            }
+          }
+        }
+      }
+      
+      // Counter value
+      .card-value {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        
+        .counter {
+          font-size: 3.8rem;
+          font-weight: 700;
+          color: white;
+          line-height: 1;
+          background: linear-gradient(90deg, #ffffff, #e1e1e1);
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          text-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+          font-family: 'Montserrat', sans-serif;
+          letter-spacing: -1px;
+        }
+        
+        .currency {
+          font-size: 2.4rem;
+          font-weight: 600;
+          color: white;
+          margin-right: 5px;
+          margin-top: 8px;
+          opacity: 0.9;
+        }
+        
+        // Increase badge
+        .counter-badge {
+          display: flex;
+          align-items: center;
+          background: rgba(76, 175, 80, 0.2);
+          border-radius: 12px;
+          padding: 5px 8px;
+          margin-left: 12px;
+          font-size: 0.85rem;
+          color: #81c784;
+          animation: badgeUp 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+          animation-delay: 0.8s;
+          opacity: 0;
+          
+          i {
+            margin-right: 4px;
+            font-size: 0.8rem;
+          }
+          
+          span {
+            font-weight: 600;
+          }
+        }
+      }
+      
+      // Additional stats
+      .card-stats {
+        display: flex;
+        margin-bottom: 1.5rem;
+        
+        .stat-item {
+          flex: 1;
+          padding-right: 10px;
+          
+          &:last-child {
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            padding-left: 15px;
+          }
+          
+          .stat-label {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+          }
+          
+          .stat-value {
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+          }
+        }
+      }
+      
+      // Finance metrics
+      .finance-metrics {
+        margin-bottom: 1.5rem;
+        
+        .metric-item {
+          display: flex;
+          align-items: center;
+          margin-bottom: 12px;
+          
+          &:last-child {
+            margin-bottom: 0;
+          }
+          
+          .metric-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 12px;
+            
+            i {
+              color: #a8e063;
+              font-size: 16px;
+            }
+          }
+          
+          .metric-details {
+            flex: 1;
+            
+            .metric-label {
+              color: rgba(255, 255, 255, 0.6);
+              font-size: 0.8rem;
+              margin-bottom: 2px;
+            }
+            
+            .metric-value {
+              color: white;
+              font-size: 1.1rem;
+              font-weight: 600;
+            }
+          }
+        }
+      }
+      
+      // Completed sessions
+      .completed-sessions {
+        display: flex;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 12px;
+        padding: 12px 15px;
+        
+        .sessions-icon {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          background: linear-gradient(135deg, #56CCF2, #2F80ED);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-right: 15px;
+          
+          i {
+            color: white;
+            font-size: 18px;
+          }
+        }
+        
+        .sessions-details {
+          flex: 1;
+          
+          .sessions-value {
+            color: white;
+            font-size: 1.4rem;
+            font-weight: 600;
+            line-height: 1.2;
+          }
+          
+          .sessions-label {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.85rem;
+          }
+        }
+      }
+      
+      // Card description
+      .card-description {
+        flex: 1;
+        
+        p {
+          color: rgba(255, 255, 255, 0.9);
+          font-size: 1rem;
+          line-height: 1.5;
+          margin-bottom: 1rem;
+        }
+      }
+      
+      // Learning progress
+      .learning-progress {
+        margin: 1.2rem 0;
+        
+        .progress-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 8px;
+          
+          span {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            
+            &.progress-percent {
+              color: white;
+              font-weight: 600;
+            }
+          }
+        }
+        
+        .progress-bar-container {
+          width: 100%;
+          height: 6px;
+          background: rgba(255, 255, 255, 0.1);
+          border-radius: 3px;
+          overflow: hidden;
+          
+          .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #56CCF2, #2F80ED);
+            border-radius: 3px;
+            position: relative;
+            animation: fillProgress 1.5s cubic-bezier(0.165, 0.84, 0.44, 1) forwards;
+            animation-delay: 0.5s;
+            
+            .progress-glow {
+              position: absolute;
+              top: 0;
+              left: -100%;
+              height: 100%;
+              width: 50px;
+              background: linear-gradient(90deg, 
+                transparent 0%,
+                rgba(255, 255, 255, 0.6) 50%,
+                transparent 100%
+              );
+              transform: skewX(-20deg);
+            }
+          }
+        }
+      }
+      
+      // Card footer
+      .card-footer {
+        margin-top: auto;
+        display: flex;
+        
+        // Premium action button
+        .action-button {
+          position: relative;
+          background: rgba(255, 255, 255, 0.1);
+          border: none;
+          border-radius: 12px;
+          color: white;
+          padding: 0.8rem 1.5rem;
+          font-size: 0.95rem;
+          cursor: pointer;
+          transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          overflow: hidden;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+          
+          // Button content
+          .button-content {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            align-items: center;
+            
+            i {
+              margin-right: 0.5rem;
+              font-size: 1rem;
+              transition: transform 0.3s ease;
+            }
+            
+            span {
+              font-weight: 500;
+              transition: all 0.3s ease;
+            }
+          }
+          
+          // Hover effect
+          .button-hover-effect {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.5) 100%);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 1;
+          }
+          
+          &:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            
+            .button-content {
+              i {
+                transform: translateX(-3px);
+              }
+              
+              span {
+                transform: translateX(3px);
+              }
+            }
+            
+            .button-hover-effect {
+              opacity: 0.05;
+            }
+          }
+          
+          &:active {
+            transform: translateY(2px);
+          }
+        }
+        
+        // Tutorial options
+        &.tutorial-options {
+          display: flex;
+          gap: 1rem;
+          
+          .tutorial-button {
+            position: relative;
+            flex: 1;
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            padding: 0.8rem 0.6rem;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            
+            // Button content
+            .button-content {
+              position: relative;
+              z-index: 2;
+              display: flex;
+              align-items: center;
+              
+              i {
+                margin-right: 0.4rem;
+                font-size: 0.9rem;
+                transition: transform 0.3s ease;
+              }
+              
+              span {
+                font-weight: 500;
+                white-space: nowrap;
+                transition: all 0.3s ease;
+              }
+            }
+            
+            // Hover effect
+            .button-hover-effect {
+              position: absolute;
+              top: 0;
+              left: 0;
+              right: 0;
+              bottom: 0;
+              background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.5) 100%);
+              opacity: 0;
+              transition: opacity 0.3s ease;
+              z-index: 1;
+            }
+            
+            &:hover {
+              transform: translateY(-5px);
+              box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+              
+              .button-content {
+                i {
+                  transform: scale(1.1);
+                }
+              }
+              
+              .button-hover-effect {
+                opacity: 0.05;
+              }
+            }
+            
+            &:active {
+              transform: translateY(2px);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Media queries for mobile devices
+@media (max-width: 768px) {
+  .info-welcome-container {
+    .dashboard-cards {
+      grid-template-columns: 1fr;
+      
+      .dashboard-card {
+        height: auto;
+        min-height: 300px;
+        
+        .card-header {
+          h3 {
+            font-size: 1.2rem;
+          }
+        }
+        
+        .card-value {
+          .counter {
+            font-size: 3rem;
+          }
+        }
+        
+        &.active {
+          transform: translateY(-10px) scale(1.02);
+        }
+      }
+    }
+  }
+}
+
+// Button ripple effect animation
+@keyframes buttonRipple {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.3);
+  }
+  100% {
+    box-shadow: 0 0 0 20px rgba(255, 255, 255, 0);
+  }
+}
+
+// Dynamic background gradients
+@keyframes gradientShift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+// Border glow
+@keyframes borderGlow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.2), inset 0 0 0 0 rgba(255, 255, 255, 0.2);
+  }
+  50% {
+    box-shadow: 0 0 10px 0 rgba(255, 255, 255, 0.4), inset 0 0 8px 0 rgba(255, 255, 255, 0.4);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 255, 255, 0.2), inset 0 0 0 0 rgba(255, 255, 255, 0.2);
+  }
+}

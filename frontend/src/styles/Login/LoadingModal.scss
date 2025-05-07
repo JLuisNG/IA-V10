@@ -1,0 +1,328 @@
+// Variables
+$primary-color: #2c80dc;
+$primary-dark: #1c5da0;
+$secondary-color: #34495e;
+$accent-color: #00bcd4;
+$success-color: #27ae60;
+$warning-color: #f39c12;
+$danger-color: #e74c3c;
+$light-color: #ecf0f1;
+$dark-color: #1e2a36;
+$glass-background: rgba(20, 30, 48, 0.95);
+
+// Animaciones
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+@keyframes slideLeft {
+  from { transform: translateX(20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+@keyframes gradientFlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes scaleIn {
+  0% { transform: scale(0); opacity: 0; }
+  60% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes sparkle {
+  0% { transform: scale(0) rotate(0deg); opacity: 0; }
+  50% { transform: scale(1) rotate(180deg); opacity: 1; }
+  100% { transform: scale(0) rotate(360deg); opacity: 0; }
+}
+
+.loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: $glass-background;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
+  
+  &.show {
+    opacity: 1;
+    visibility: visible;
+  }
+  
+  .loading-content {
+    text-align: center;
+    max-width: 450px;
+    padding: 2rem;
+    
+    h3 {
+      font-size: 1.8rem;
+      margin: 1.5rem 0 1rem;
+      color: white;
+      font-weight: 700;
+      transition: all 0.3s ease;
+      
+      &.success {
+        color: $success-color;
+      }
+      
+      &.error {
+        color: $danger-color;
+      }
+    }
+    
+    .loading-spinner {
+      position: relative;
+      width: 120px;
+      height: 120px;
+      margin: 0 auto;
+      
+      .spinner-circle {
+        position: absolute;
+        border: 4px solid transparent;
+        border-radius: 50%;
+        
+        &.outer {
+          width: 100%;
+          height: 100%;
+          border-top-color: $primary-color;
+          animation: rotate 1.5s linear infinite;
+          box-shadow: 0 0 20px rgba(44, 128, 220, 0.5);
+        }
+        
+        &.middle {
+          width: 75%;
+          height: 75%;
+          top: 12.5%;
+          left: 12.5%;
+          border-right-color: $accent-color;
+          animation: rotate 1.2s linear infinite reverse;
+        }
+        
+        &.inner {
+          width: 50%;
+          height: 50%;
+          top: 25%;
+          left: 25%;
+          border-bottom-color: $success-color;
+          animation: rotate 0.9s linear infinite;
+        }
+      }
+      
+      .spinner-sparkles {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        
+        .sparkle {
+          position: absolute;
+          width: 10px;
+          height: 10px;
+          background: white;
+          border-radius: 50%;
+          transform: scale(0);
+          animation: sparkle 1.5s ease infinite;
+          box-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        }
+      }
+      
+      .check-icon, .error-icon {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%) scale(0);
+        font-size: 4rem;
+        opacity: 0;
+        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        
+        &.show {
+          transform: translate(-50%, -50%) scale(1);
+          opacity: 1;
+        }
+      }
+      
+      .check-icon {
+        color: $success-color;
+        text-shadow: 0 0 15px rgba(39, 174, 96, 0.5);
+      }
+      
+      .error-icon {
+        color: $danger-color;
+        text-shadow: 0 0 15px rgba(231, 76, 60, 0.5);
+      }
+    }
+    
+    .progress-container {
+      display: flex;
+      align-items: center;
+      margin: 1.5rem 0;
+      
+      .progress-bar {
+        flex: 1;
+        height: 6px;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 3px;
+        overflow: hidden;
+        
+        .progress-bar-inner {
+          height: 100%;
+          background: linear-gradient(to right, $primary-color, $accent-color);
+          background-size: 200% 200%;
+          animation: gradientFlow 2s ease infinite;
+          width: 0;
+          transition: width 0.5s ease;
+          box-shadow: 0 0 8px rgba(0, 188, 212, 0.5);
+        }
+      }
+      
+      .progress-percentage {
+        min-width: 40px;
+        text-align: right;
+        font-size: 0.85rem;
+        color: rgba(255, 255, 255, 0.8);
+        margin-left: 1rem;
+      }
+    }
+    
+    .status-message {
+      font-size: 1.1rem;
+      color: rgba(255, 255, 255, 0.8);
+      min-height: 1.5rem;
+      margin-bottom: 1.5rem;
+      animation: fadeIn 0.5s;
+      
+      &.success {
+        color: $success-color;
+      }
+      
+      &.error {
+        color: $danger-color;
+      }
+    }
+    
+    .loading-steps {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      margin-top: 1rem;
+      text-align: left;
+      gap: 0.5rem;
+      
+      .step-indicator {
+        display: flex;
+        align-items: center;
+        opacity: 0.5;
+        transition: all 0.3s ease;
+        animation: fadeIn 0.5s forwards;
+        
+        &.current {
+          opacity: 1;
+          animation: slideLeft 0.3s ease forwards;
+          
+          .step-dot {
+            border-color: $accent-color;
+            background-color: rgba(0, 188, 212, 0.2);
+            box-shadow: 0 0 0 4px rgba(0, 188, 212, 0.1);
+            transform: scale(1.1);
+          }
+          
+          .step-name {
+            color: $accent-color;
+            font-weight: 600;
+          }
+        }
+        
+        &.completed {
+          opacity: 0.7;
+          
+          .step-dot {
+            background-color: $success-color;
+            border-color: $success-color;
+            
+            i {
+              opacity: 1;
+              transform: scale(1);
+            }
+          }
+          
+          .step-name {
+            text-decoration: line-through;
+            color: rgba(255, 255, 255, 0.7);
+          }
+        }
+        
+        .step-dot {
+          width: 20px;
+          height: 20px;
+          border-radius: 50%;
+          border: 2px solid rgba(255, 255, 255, 0.3);
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          margin-right: 10px;
+          transition: all 0.3s ease;
+          position: relative;
+          
+          i {
+            font-size: 0.7rem;
+            color: white;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.3s ease;
+          }
+        }
+        
+        .step-name {
+          font-size: 0.9rem;
+          color: rgba(255, 255, 255, 0.7);
+          transition: all 0.3s ease;
+        }
+      }
+    }
+  }
+}
+
+// Responsive
+@media (max-width: 576px) {
+  .loading-overlay .loading-content {
+    width: 90%;
+    padding: 1.5rem;
+    
+    h3 {
+      font-size: 1.5rem;
+    }
+    
+    .loading-spinner {
+      width: 100px;
+      height: 100px;
+    }
+    
+    .status-message {
+      font-size: 1rem;
+    }
+  }
+}
+

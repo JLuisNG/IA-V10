@@ -1,0 +1,875 @@
+// Enhanced NutritionalAssessmentModal.scss
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+// Variables
+$primary-color: #4361ee;
+$primary-gradient: linear-gradient(135deg, #4361ee, #3a0ca3);
+$secondary-color: #4cc9f0;
+$accent-color: #f72585;
+$success-color: #10b981;
+$warning-color: #f59e0b;
+$danger-color: #ef4444;
+$nutrition-primary: #f97316;
+$nutrition-light: rgba(249, 115, 22, 0.1);
+$nutrition-gradient: linear-gradient(135deg, #f97316, #ea580c);
+$light-bg: #f8fafc;
+$white: #ffffff;
+$card-shadow: 0 10px 25px rgba(0, 0, 0, 0.05), 0 5px 10px rgba(0, 0, 0, 0.03);
+$card-shadow-hover: 0 15px 35px rgba(0, 0, 0, 0.1), 0 5px 15px rgba(0, 0, 0, 0.05);
+$transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+$border-radius: 16px;
+$border-radius-sm: 12px;
+$border-radius-lg: 20px;
+
+.nutritional-assessment-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.75);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  padding: 24px;
+  overflow-y: auto;
+  backdrop-filter: blur(8px);
+  animation: fadeIn 0.4s ease-out;
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  .nutritional-assessment-modal {
+    background: white;
+    border-radius: $border-radius-lg;
+    box-shadow: 
+      0 25px 50px rgba(0, 0, 0, 0.15),
+      0 10px 30px rgba(0, 0, 0, 0.1),
+      0 5px 15px rgba(249, 115, 22, 0.1);
+    width: 100%;
+    max-width: 900px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    position: relative;
+    animation: slideUp 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+    border: 1px solid rgba(226, 232, 240, 0.8);
+    
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: $nutrition-gradient;
+      z-index: 1;
+    }
+    
+    @keyframes slideUp {
+      from { 
+        transform: translateY(30px); 
+        opacity: 0; 
+      }
+      to { 
+        transform: translateY(0); 
+        opacity: 1; 
+      }
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px;
+      background: $white;
+      border-bottom: 1px solid rgba(226, 232, 240, 0.7);
+      position: relative;
+      
+      h2 {
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        margin: 0;
+        font-size: 20px;
+        font-weight: 800;
+        color: #1e293b;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        
+        i {
+          color: $nutrition-primary;
+          font-size: 18px;
+          background: $nutrition-light;
+          width: 36px;
+          height: 36px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 10px;
+        }
+      }
+      
+      .close-button {
+        width: 36px;
+        height: 36px;
+        border-radius: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: $light-bg;
+        border: 1px solid rgba(226, 232, 240, 0.7);
+        color: #64748b;
+        cursor: pointer;
+        transition: $transition;
+        
+        i {
+          font-size: 14px;
+          transition: $transition;
+        }
+        
+        &:hover {
+          background: #e2e8f0;
+          color: #1e293b;
+          transform: rotate(90deg);
+          
+          i {
+            transform: scale(1.1);
+          }
+        }
+      }
+    }
+    
+    .modal-content {
+      padding: 24px;
+      overflow-y: auto;
+      max-height: calc(90vh - 140px); // Header and footer height
+      background: #fafbff;
+      
+      &::-webkit-scrollbar {
+        width: 8px;
+      }
+      
+      &::-webkit-scrollbar-track {
+        background: rgba(241, 245, 249, 0.4);
+        border-radius: 10px;
+        margin: 5px;
+      }
+      
+      &::-webkit-scrollbar-thumb {
+        background: rgba(148, 163, 184, 0.3);
+        border-radius: 10px;
+        
+        &:hover {
+          background: rgba(148, 163, 184, 0.5);
+        }
+      }
+      
+      .info-note {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 16px;
+        background: rgba(186, 230, 253, 0.5);
+        border-radius: 12px;
+        margin-bottom: 24px;
+        border-left: 4px solid #0ea5e9;
+        
+        .info-icon {
+          color: #0ea5e9;
+          font-size: 18px;
+          flex-shrink: 0;
+        }
+        
+        p {
+          font-family: 'Plus Jakarta Sans', sans-serif;
+          font-size: 14px;
+          color: #0369a1;
+          margin: 0;
+          line-height: 1.5;
+        }
+      }
+      
+      .assessment-instructions {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 20px;
+        background: white;
+        border-radius: $border-radius;
+        box-shadow: $card-shadow;
+        margin-bottom: 24px;
+        border: 1px solid rgba(226, 232, 240, 0.7);
+        transition: $transition;
+        
+        &:hover {
+          box-shadow: $card-shadow-hover;
+          transform: translateY(-2px);
+        }
+        
+        .instruction-icon {
+          flex-shrink: 0;
+          width: 44px;
+          height: 44px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 12px;
+          background: rgba(249, 115, 22, 0.1);
+          color: $nutrition-primary;
+          font-size: 20px;
+        }
+        
+        .instruction-text {
+          flex: 1;
+          
+          h3 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            margin: 0 0 8px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #1e293b;
+          }
+          
+          p {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            margin: 0;
+            font-size: 14px;
+            line-height: 1.6;
+            color: #334155;
+          }
+        }
+      }
+      
+      .assessment-form {
+        background: white;
+        border-radius: $border-radius;
+        box-shadow: $card-shadow;
+        overflow: hidden;
+        border: 1px solid rgba(226, 232, 240, 0.7);
+        margin-bottom: 24px;
+        
+        .form-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 20px;
+          background: $light-bg;
+          border-bottom: 1px solid rgba(226, 232, 240, 0.7);
+          
+          h3 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            margin: 0;
+            font-size: 16px;
+            font-weight: 700;
+            color: #1e293b;
+          }
+          
+          .total-badge {
+            .score-value {
+              font-family: 'Plus Jakarta Sans', sans-serif;
+              font-size: 14px;
+              font-weight: 700;
+              padding: 5px 12px;
+              border-radius: 20px;
+              display: inline-flex;
+              align-items: center;
+              justify-content: center;
+              transition: $transition;
+              
+              &.animate {
+                animation: pulse 0.6s cubic-bezier(0.4, 0, 0.6, 1);
+                
+                @keyframes pulse {
+                  0%, 100% { 
+                    transform: scale(1);
+                  }
+                  50% { 
+                    transform: scale(1.1);
+                  }
+                }
+              }
+              
+              &.good {
+                background: rgba(16, 185, 129, 0.1);
+                color: $success-color;
+              }
+              
+              &.moderate-risk {
+                background: rgba(245, 158, 11, 0.1);
+                color: $warning-color;
+              }
+              
+              &.high-risk {
+                background: rgba(239, 68, 68, 0.1);
+                color: $danger-color;
+              }
+            }
+          }
+        }
+        
+        .checklist {
+          padding: 0;
+          
+          .checklist-item {
+            padding: 16px 20px;
+            border-bottom: 1px solid rgba(226, 232, 240, 0.7);
+            cursor: pointer;
+            transition: $transition;
+            
+            &:last-child {
+              border-bottom: none;
+            }
+            
+            &:nth-child(odd) {
+              background: rgba(248, 250, 252, 0.5);
+            }
+            
+            &:hover {
+              background: rgba(249, 115, 22, 0.05);
+            }
+            
+            &.checked {
+              background: rgba(249, 115, 22, 0.1);
+            }
+            
+            .checkbox-container {
+              display: flex;
+              position: relative;
+              padding-left: 40px;
+              cursor: pointer;
+              user-select: none;
+              
+              input {
+                position: absolute;
+                opacity: 0;
+                height: 0;
+                width: 0;
+                
+                &:checked ~ .checkmark {
+                  background-color: $nutrition-primary;
+                  border-color: $nutrition-primary;
+                  
+                  &:after {
+                    display: block;
+                  }
+                }
+                
+                &:checked ~ .question-content {
+                  .question-text-wrapper {
+                    .question-text {
+                      color: #1e293b;
+                      font-weight: 600;
+                    }
+                    
+                    .question-points {
+                      color: $nutrition-primary;
+                      font-weight: 600;
+                    }
+                  }
+                  
+                  i {
+                    color: $nutrition-primary;
+                  }
+                }
+              }
+              
+              .checkmark {
+                position: absolute;
+                top: 0;
+                left: 0;
+                height: 24px;
+                width: 24px;
+                background-color: white;
+                border: 2px solid rgba(203, 213, 225, 0.8);
+                border-radius: 6px;
+                transition: $transition;
+                
+                &:after {
+                  content: "";
+                  position: absolute;
+                  display: none;
+                  left: 7px;
+                  top: 3px;
+                  width: 6px;
+                  height: 12px;
+                  border: solid white;
+                  border-width: 0 2px 2px 0;
+                  transform: rotate(45deg);
+                }
+              }
+              
+              &:hover .checkmark {
+                border-color: $nutrition-primary;
+              }
+              
+              .question-content {
+                display: flex;
+                align-items: flex-start;
+                gap: 12px;
+                margin-top: 2px;
+                
+                i {
+                  color: #64748b;
+                  font-size: 16px;
+                  margin-top: 2px;
+                  transition: $transition;
+                }
+                
+                .question-text-wrapper {
+                  display: flex;
+                  flex-direction: column;
+                  
+                  .question-text {
+                    font-family: 'Plus Jakarta Sans', sans-serif;
+                    font-size: 14px;
+                    color: #334155;
+                    margin-bottom: 4px;
+                    transition: $transition;
+                  }
+                  
+                  .question-points {
+                    font-family: 'Plus Jakarta Sans', sans-serif;
+                    font-size: 13px;
+                    color: #64748b;
+                    transition: $transition;
+                  }
+                }
+              }
+            }
+          }
+        }
+        
+        .score-summary {
+          padding: 20px;
+          border-top: 1px solid rgba(226, 232, 240, 0.7);
+          background: $light-bg;
+          
+          .total-score {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+            transition: $transition;
+            
+            &.good {
+              background: rgba(16, 185, 129, 0.05);
+              border: 1px solid rgba(16, 185, 129, 0.1);
+              
+              .score-label {
+                i {
+                  color: $success-color;
+                }
+              }
+              
+              .risk-badge {
+                background: rgba(16, 185, 129, 0.1);
+                color: $success-color;
+              }
+            }
+            
+            &.moderate-risk {
+              background: rgba(245, 158, 11, 0.05);
+              border: 1px solid rgba(245, 158, 11, 0.1);
+              
+              .score-label {
+                i {
+                  color: $warning-color;
+                }
+              }
+              
+              .risk-badge {
+                background: rgba(245, 158, 11, 0.1);
+                color: $warning-color;
+              }
+            }
+            
+            &.high-risk {
+              background: rgba(239, 68, 68, 0.05);
+              border: 1px solid rgba(239, 68, 68, 0.1);
+              
+              .score-label {
+                i {
+                  color: $danger-color;
+                }
+              }
+              
+              .risk-badge {
+                background: rgba(239, 68, 68, 0.1);
+                color: $danger-color;
+              }
+            }
+            
+            .score-label {
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              font-family: 'Plus Jakarta Sans', sans-serif;
+              font-size: 15px;
+              font-weight: 700;
+              color: #1e293b;
+              margin-right: auto;
+              
+              i {
+                font-size: 14px;
+              }
+            }
+            
+            .score-value {
+              font-family: 'Plus Jakarta Sans', sans-serif;
+              font-size: 15px;
+              font-weight: 700;
+              color: #334155;
+              
+              &.animate {
+                animation: pulse 0.6s cubic-bezier(0.4, 0, 0.6, 1);
+              }
+            }
+            
+            .risk-badge {
+              font-family: 'Plus Jakarta Sans', sans-serif;
+              font-size: 13px;
+              font-weight: 700;
+              padding: 5px 12px;
+              border-radius: 20px;
+            }
+          }
+        }
+        
+        .risk-levels {
+          padding: 0 20px 20px;
+          display: grid;
+          grid-template-columns: 1fr 1fr 1fr;
+          gap: 16px;
+          
+          .risk-level {
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid rgba(226, 232, 240, 0.7);
+            transition: $transition;
+            
+            &.active {
+              transform: translateY(-5px);
+              box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1);
+              border-width: 1px;
+              border-style: solid;
+              
+              &:nth-child(1) {
+                border-color: rgba(16, 185, 129, 0.3);
+              }
+              
+              &:nth-child(2) {
+                border-color: rgba(245, 158, 11, 0.3);
+              }
+              
+              &:nth-child(3) {
+                border-color: rgba(239, 68, 68, 0.3);
+              }
+            }
+            
+            .risk-level-header {
+              padding: 12px 16px;
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              
+              i {
+                font-size: 14px;
+                color: white;
+              }
+              
+              span {
+                font-family: 'Plus Jakarta Sans', sans-serif;
+                font-size: 14px;
+                font-weight: 700;
+                color: white;
+              }
+              
+              &.good {
+                background: $success-color;
+              }
+              
+              &.moderate {
+                background: $warning-color;
+              }
+              
+              &.high {
+                background: $danger-color;
+              }
+            }
+            
+            p {
+              padding: 12px 16px;
+              margin: 0;
+              font-family: 'Plus Jakarta Sans', sans-serif;
+              font-size: 13px;
+              color: #475569;
+              line-height: 1.5;
+            }
+          }
+        }
+        
+        .intervention-section {
+          padding: 20px;
+          border-top: 1px solid rgba(226, 232, 240, 0.7);
+          
+          .section-header {
+            margin-bottom: 16px;
+            
+            h3 {
+              font-family: 'Plus Jakarta Sans', sans-serif;
+              font-size: 16px;
+              font-weight: 700;
+              color: #1e293b;
+              margin: 0;
+              display: flex;
+              align-items: center;
+              gap: 8px;
+              
+              i {
+                color: $nutrition-primary;
+                font-size: 14px;
+              }
+            }
+          }
+          
+          textarea {
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            border: 1px solid rgba(203, 213, 225, 0.8);
+            background: $light-bg;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 14px;
+            color: #334155;
+            resize: vertical;
+            line-height: 1.6;
+            transition: $transition;
+            min-height: 120px;
+            
+            &::placeholder {
+              color: #94a3b8;
+            }
+            
+            &:focus {
+              outline: none;
+              background: white;
+              border-color: rgba(249, 115, 22, 0.5);
+              box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.15);
+            }
+          }
+        }
+      }
+    }
+    
+    .modal-footer {
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      padding: 16px 24px;
+      background: white;
+      border-top: 1px solid rgba(226, 232, 240, 0.7);
+      
+      .cancel-btn {
+        padding: 12px 20px;
+        border-radius: 12px;
+        background: white;
+        border: 1px solid rgba(226, 232, 240, 0.8);
+        color: #475569;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: $transition;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        
+        i {
+          font-size: 12px;
+        }
+        
+        &:hover {
+          background: #f1f5f9;
+          color: #334155;
+          transform: translateY(-2px);
+        }
+      }
+      
+      .submit-btn {
+        padding: 12px 20px;
+        border-radius: 12px;
+        background: $nutrition-primary;
+        border: none;
+        color: white;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: $transition;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        box-shadow: 
+          0 4px 12px rgba(249, 115, 22, 0.2),
+          0 2px 6px rgba(249, 115, 22, 0.1);
+        
+        i {
+          font-size: 12px;
+        }
+        
+        &:hover {
+          background: #ea580c;
+          transform: translateY(-2px);
+          box-shadow: 
+            0 6px 15px rgba(249, 115, 22, 0.3),
+            0 3px 8px rgba(249, 115, 22, 0.15);
+        }
+      }
+    }
+  }
+}
+
+// Responsive styles
+@media (max-width: 992px) {
+  .nutritional-assessment-modal-overlay {
+    .nutritional-assessment-modal {
+      max-width: 95%;
+      
+      .modal-content {
+        .assessment-form {
+          .risk-levels {
+            grid-template-columns: 1fr;
+            
+            .risk-level {
+              &.active {
+                transform: translateX(0);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .nutritional-assessment-modal-overlay {
+    padding: 16px;
+    
+    .nutritional-assessment-modal {
+      .modal-header {
+        padding: 16px 20px;
+        
+        h2 {
+          font-size: 18px;
+          
+          i {
+            width: 32px;
+            height: 32px;
+            font-size: 16px;
+          }
+        }
+      }
+      
+      .modal-content {
+        padding: 16px 20px;
+        
+        .info-note {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 8px;
+        }
+        
+        .assessment-instructions {
+          flex-direction: column;
+          align-items: flex-start;
+          gap: 12px;
+          padding: 16px;
+        }
+        
+        .assessment-form {
+          .form-header {
+            padding: 16px;
+          }
+          
+          .checklist {
+            .checklist-item {
+              padding: 14px 16px;
+            }
+          }
+          
+          .score-summary {
+            padding: 16px;
+            
+            .total-score {
+              flex-direction: column;
+              align-items: flex-start;
+              gap: 12px;
+              padding: 14px;
+              
+              .score-label {
+                margin-right: 0;
+              }
+            }
+          }
+          
+          .intervention-section {
+            padding: 16px;
+          }
+        }
+      }
+      
+      .modal-footer {
+        padding: 12px 20px;
+        
+        .cancel-btn,
+        .submit-btn {
+          flex: 1;
+          justify-content: center;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 576px) {
+  .nutritional-assessment-modal-overlay {
+    .nutritional-assessment-modal {
+      .modal-header {
+        h2 {
+          font-size: 16px;
+        }
+      }
+      
+      .modal-content {
+        .assessment-form {
+          .checklist {
+            .checklist-item {
+              .checkbox-container {
+                .question-content {
+                  flex-direction: column;
+                  gap: 6px;
+                  
+                  i {
+                    margin-top: 0;
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+      
+      .modal-footer {
+        flex-direction: column-reverse;
+        gap: 8px;
+      }
+    }
+  }
+}

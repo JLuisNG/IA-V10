@@ -1,0 +1,234 @@
+// styles/GeoRestriction/GeoRestrictionModal.scss
+
+.geo-restriction-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(rgba(14, 20, 46, 0.9), rgba(16, 33, 63, 0.95));
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 3000; // Mayor que otros modales
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.4s ease, visibility 0.4s ease;
+    
+    &.show {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .geo-restriction-modal {
+        width: 90%;
+        max-width: 500px;
+        background: linear-gradient(135deg, #0f1a36 0%, #1e2747 100%);
+        border-radius: 20px;
+        padding: 40px 30px;
+        color: #fff;
+        transform: translateY(30px) scale(0.95);
+        transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+        box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        position: relative;
+        overflow: hidden;
+        
+        &:before {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 6px;
+          background: linear-gradient(90deg, #d63031, #e84393);
+        }
+        
+        .geo-restriction-overlay.show & {
+          transform: translateY(0) scale(1);
+        }
+      }
+      
+      .geo-icon {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 30px;
+        position: relative;
+        
+        i.fas.fa-globe-americas {
+          font-size: 80px;
+          color: #3498db;
+          opacity: 0.7;
+          position: absolute;
+          top: 0;
+          left: 10px;
+        }
+        
+        .geo-lock {
+          position: absolute;
+          bottom: 5px;
+          right: 0;
+          background: #d63031;
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: 3px solid rgba(255, 255, 255, 0.1);
+          box-shadow: 0 5px 15px rgba(214, 48, 49, 0.5);
+          
+          i {
+            font-size: 18px;
+            color: white;
+          }
+        }
+      }
+      
+      .geo-title {
+        font-size: 28px;
+        text-align: center;
+        margin-bottom: 25px;
+        font-weight: 700;
+        color: #fff;
+        letter-spacing: 0.5px;
+      }
+      
+      .geo-message {
+        margin-bottom: 30px;
+        
+        p {
+          text-align: center;
+          line-height: 1.7;
+          color: rgba(255, 255, 255, 0.85);
+          margin-bottom: 20px;
+          font-size: 16px;
+        }
+        
+        .location-info {
+          background: rgba(0, 0, 0, 0.2);
+          border-radius: 12px;
+          padding: 20px;
+          margin: 20px 0;
+          border: 1px solid rgba(255, 255, 255, 0.05);
+          
+          .location-detail {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            
+            &:last-child {
+              margin-bottom: 0;
+            }
+            
+            .label {
+              color: rgba(255, 255, 255, 0.6);
+              font-size: 14px;
+            }
+            
+            .value {
+              color: #3498db;
+              font-weight: 600;
+              font-size: 14px;
+            }
+          }
+        }
+        
+        .restriction-note {
+          display: flex;
+          align-items: flex-start;
+          background: rgba(255, 152, 0, 0.1);
+          padding: 15px;
+          border-radius: 10px;
+          margin-top: 20px;
+          border-left: 3px solid #ff9800;
+          
+          i {
+            color: #ff9800;
+            font-size: 18px;
+            margin-right: 10px;
+            margin-top: 2px;
+          }
+          
+          p {
+            text-align: left;
+            margin-bottom: 0;
+            font-size: 14px;
+            color: rgba(255, 255, 255, 0.9);
+          }
+        }
+      }
+      
+      .geo-actions {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 25px;
+        
+        .geo-button {
+          flex: 1;
+          padding: 14px;
+          border: none;
+          border-radius: 8px;
+          font-weight: 600;
+          font-size: 15px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          
+          i {
+            margin-right: 8px;
+          }
+          
+          &.primary {
+            background: #3498db;
+            color: white;
+            
+            &:hover {
+              background: #2980b9;
+              transform: translateY(-3px);
+              box-shadow: 0 8px 20px rgba(52, 152, 219, 0.3);
+            }
+            
+            &:active {
+              transform: translateY(0);
+            }
+          }
+          
+          &.secondary {
+            background: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.9);
+            
+            &:hover {
+              background: rgba(255, 255, 255, 0.1);
+              transform: translateY(-3px);
+            }
+            
+            &:active {
+              transform: translateY(0);
+            }
+          }
+        }
+      }
+      
+      .geo-footer {
+        text-align: center;
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.5);
+        
+        p {
+          line-height: 1.6;
+        }
+      }
+    }
+    
+    // Animaciones
+    @keyframes globe-spin {
+      0% {
+        transform: rotate(0deg);
+      }
+      100% {
+        transform: rotate(360deg);
+      }
+    }

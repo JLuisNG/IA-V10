@@ -1,0 +1,342 @@
+// Variables
+$calendar-bg: rgba(20, 20, 35, 0.98);
+$calendar-border: rgba(255, 255, 255, 0.1);
+$accent-color: #f97316;
+$text-color: #e2e8f0;
+$text-muted: #a0aec0;
+$input-bg: rgba(26, 32, 44, 0.7);
+$border-color: rgba(74, 85, 104, 0.5);
+$hover-color: rgba(249, 115, 22, 0.15);
+$today-color: rgba(249, 115, 22, 0.2);
+$selected-color: #f97316;
+$day-hover-bg: rgba(249, 115, 22, 0.15);
+$day-other-month: rgba(160, 174, 192, 0.4);
+$input-disabled: rgba(26, 32, 44, 0.5);
+
+// Estilos del DatePicker
+.custom-date-picker {
+  width: 100%;
+  position: static;
+  
+  // Contenedor de etiqueta
+  label {
+    color: $text-muted;
+    font-size: 0.95rem;
+    margin-bottom: 8px;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+  }
+  
+  // Contenedor del input
+  .date-input-wrapper {
+    position: relative;
+    cursor: pointer;
+    
+    // Input de fecha
+    .custom-date-input {
+      background-color: $input-bg;
+      border: 1px solid $border-color;
+      border-radius: 10px;
+      color: $text-color;
+      padding: 12px 15px;
+      width: 100%;
+      font-size: 1rem;
+      transition: all 0.3s ease;
+      cursor: pointer;
+      caret-color: transparent;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05) inset;
+      position: relative;
+      z-index: 1;
+      
+      &:focus, &:active {
+        border-color: $accent-color;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba($accent-color, 0.25);
+      }
+      
+      &::placeholder {
+        color: rgba($text-muted, 0.6);
+      }
+      
+      // Estado deshabilitado
+      &.disabled {
+        opacity: 0.7;
+        cursor: not-allowed;
+        background-color: $input-disabled;
+        color: rgba($text-color, 0.7);
+      }
+    }
+    
+    // Icono de calendario
+    .calendar-icon {
+      position: absolute;
+      right: 15px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: $accent-color;
+      font-size: 1.2rem;
+      pointer-events: none;
+      transition: transform 0.3s ease;
+      z-index: 2;
+    }
+    
+    // Efecto hover
+    &:hover .calendar-icon {
+      transform: translateY(-50%) scale(1.1);
+    }
+  }
+  
+  // Overlay del calendario (fondo semi-transparente que cubre toda la pantalla)
+  .calendar-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 99990;
+  }
+  
+  // Dropdown del calendario
+  .calendar-dropdown {
+    position: fixed;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 320px;
+    background: linear-gradient(145deg, $calendar-bg, darken($calendar-bg, 5%));
+    backdrop-filter: blur(10px);
+    border-radius: 16px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), 
+                0 0 0 1px $calendar-border,
+                0 0 20px rgba($accent-color, 0.3);
+    padding: 20px;
+    z-index: 99999;
+    
+    // Encabezado del calendario (mes/año y navegación)
+    .calendar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      
+      // Texto del mes y año
+      .month-year {
+        font-size: 1.2rem;
+        font-weight: 600;
+        color: $accent-color;
+        padding: 5px 12px;
+        border-radius: 8px;
+        background: rgba($accent-color, 0.1);
+        text-transform: capitalize;
+      }
+      
+      // Botones de navegación
+      .navigation {
+        display: flex;
+        gap: 8px;
+        
+        .nav-btn {
+          width: 36px;
+          height: 36px;
+          border-radius: 50%;
+          border: none;
+          background: rgba($accent-color, 0.15);
+          color: $accent-color;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          cursor: pointer;
+          transition: all 0.2s ease;
+          
+          &:hover {
+            background: rgba($accent-color, 0.25);
+            transform: scale(1.05);
+          }
+          
+          &:active {
+            transform: scale(0.95);
+          }
+        }
+      }
+    }
+    
+    // Cuerpo del calendario
+    .calendar-body {
+      margin-bottom: 15px;
+      
+      // Encabezados de días de la semana
+      .weekdays {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        text-align: center;
+        margin-bottom: 10px;
+        
+        .weekday {
+          color: $text-muted;
+          font-size: 0.85rem;
+          font-weight: 600;
+          padding: 5px 0;
+        }
+      }
+      
+      // Contenedor de los días
+      .days {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 5px;
+        margin-top: 10px;
+        
+        .day {
+          width: 36px;
+          height: 36px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border-radius: 50%;
+          font-size: 0.9rem;
+          color: $text-color;
+          cursor: pointer;
+          transition: all 0.15s ease;
+          margin: 0 auto;
+          
+          // Asegurarse de que los días sean visibles
+          background-color: transparent;
+          
+          &:not(.other-month):hover {
+            background: rgba($accent-color, 0.15);
+            color: $accent-color;
+            transform: scale(1.1);
+          }
+          
+          &.today {
+            color: $accent-color;
+            font-weight: 600;
+            box-shadow: inset 0 0 0 2px $accent-color;
+          }
+          
+          &.selected {
+            background: $accent-color;
+            color: white;
+            font-weight: 600;
+          }
+          
+          &.other-month {
+            color: rgba($text-muted, 0.4);
+            cursor: default;
+          }
+        }
+      }
+    }
+    
+    // Pie del calendario
+    .calendar-footer {
+      display: flex;
+      justify-content: space-between;
+      padding-top: 15px;
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      
+      // Botones del pie
+      .calendar-btn {
+        padding: 8px 15px;
+        border: none;
+        border-radius: 8px;
+        font-size: 0.9rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        
+        // Botón de borrar
+        &.clear-btn {
+          background: rgba($text-muted, 0.15);
+          color: $text-muted;
+          
+          &:hover {
+            background: rgba($text-muted, 0.25);
+            color: $text-color;
+          }
+        }
+        
+        // Botón de hoy
+        &.today-btn {
+          background: rgba($accent-color, 0.2);
+          color: $accent-color;
+          
+          &:hover {
+            background: rgba($accent-color, 0.3);
+          }
+        }
+        
+        &:active {
+          transform: scale(0.95);
+        }
+      }
+    }
+  }
+}
+
+// Estilos específicos para usar en el cert-period-container
+.cert-period-container {
+  position: relative;
+  
+  .date-inputs {
+    display: flex;
+    align-items: center;
+    position: relative;
+    
+    // Contenedor de la fecha de inicio
+    .start-date {
+      flex: 1;
+      
+      .custom-date-picker {
+        .custom-date-input {
+          border-top-right-radius: 0;
+          border-bottom-right-radius: 0;
+        }
+      }
+    }
+    
+    // Separador entre fechas
+    .date-separator {
+      width: 40px;
+      height: 44px;
+      background: linear-gradient(180deg, rgba($input-bg, 0.7), rgba($input-bg, 0.5));
+      border-top: 1px solid $border-color;
+      border-bottom: 1px solid $border-color;
+      color: $accent-color;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 -1px;
+      font-size: 1.2rem;
+      font-weight: 500;
+      z-index: 1;
+    }
+    
+    // Contenedor de la fecha de fin
+    .end-date {
+      flex: 1;
+      
+      .custom-date-picker {
+        .custom-date-input {
+          border-top-left-radius: 0;
+          border-bottom-left-radius: 0;
+          border-left: none;
+          background-color: rgba($input-bg, 0.5);
+          color: rgba($text-color, 0.7);
+        }
+      }
+    }
+  }
+  
+  // Texto informativo debajo de las fechas
+  small.form-text {
+    color: rgba($accent-color, 0.8);
+    font-size: 0.85rem;
+    margin-top: 8px;
+    display: block;
+    font-style: italic;
+  }
+}

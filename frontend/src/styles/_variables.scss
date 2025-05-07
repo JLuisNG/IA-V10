@@ -1,0 +1,264 @@
+/* =========== VARIABLES GLOBALES =========== */
+// Colores principales
+$primary-color: #2c3e50;
+$accent-color: #3498db;
+$text-color: #ffffff;
+$text-dark: #2c3e50;
+$text-light: #ffffff;
+$error-color: #ff3e3e;
+$success-color: #4CAF50;
+$bg-dark: #1e2530;
+$bg-darker: #181d25;
+
+// Colores de estado
+$status-active: #10b981;  // Verde// Colores principales
+$primary-color: #0073ff;
+$primary-light: #00c6ff;
+$primary-dark: #0050a7;
+
+$secondary-color: #01b49f;
+$secondary-light: #3adfbc;
+$secondary-dark: #008573;
+
+$accent-color: #ff7e00;
+$accent-light: #ffa84d;
+$accent-dark: #cc6500;
+
+// Colores neutros
+$white: #ffffff;
+$light-gray: #f1f5f9;
+$medium-gray: #94a3b8;
+$dark-gray: #334155;
+$black: #0f172a;
+
+// Colores de estado
+$success: #10b981;
+$warning: #fbbf24;
+$error: #ef4444;
+$info: #3b82f6;
+
+// Sombras
+$shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06);
+$shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1), 0 2px 4px rgba(0, 0, 0, 0.06);
+$shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1), 0 4px 6px rgba(0, 0, 0, 0.05);
+$shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.1), 0 10px 10px rgba(0, 0, 0, 0.04);
+
+// Fuentes
+$font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+  Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+
+// Tamaños de fuente
+$font-size-xs: 0.75rem;     // 12px
+$font-size-sm: 0.875rem;    // 14px
+$font-size-base: 1rem;      // 16px
+$font-size-lg: 1.125rem;    // 18px
+$font-size-xl: 1.25rem;     // 20px
+$font-size-2xl: 1.5rem;     // 24px
+$font-size-3xl: 1.875rem;   // 30px
+$font-size-4xl: 2.25rem;    // 36px
+$font-size-5xl: 3rem;       // 48px
+
+// Espaciado
+$spacing-1: 0.25rem;   // 4px
+$spacing-2: 0.5rem;    // 8px
+$spacing-3: 0.75rem;   // 12px
+$spacing-4: 1rem;      // 16px
+$spacing-5: 1.25rem;   // 20px
+$spacing-6: 1.5rem;    // 24px
+$spacing-8: 2rem;      // 32px
+$spacing-10: 2.5rem;   // 40px
+$spacing-12: 3rem;     // 48px
+$spacing-16: 4rem;     // 64px
+$spacing-20: 5rem;     // 80px
+
+// Bordes
+$border-radius-sm: 0.125rem;  // 2px
+$border-radius-md: 0.25rem;   // 4px
+$border-radius-lg: 0.5rem;    // 8px
+$border-radius-xl: 0.75rem;   // 12px
+$border-radius-2xl: 1rem;     // 16px
+$border-radius-3xl: 1.5rem;   // 24px
+$border-radius-full: 9999px;
+
+// Breakpoints
+$breakpoint-sm: 640px;
+$breakpoint-md: 768px;
+$breakpoint-lg: 1024px;
+$breakpoint-xl: 1280px;
+$breakpoint-2xl: 1536px;
+
+// Transiciones
+$transition-fast: 150ms;
+$transition-base: 300ms;
+$transition-slow: 500ms;
+
+// Z-indices
+$z-index-dropdown: 1000;
+$z-index-sticky: 1020;
+$z-index-fixed: 1030;
+$z-index-modal-backdrop: 1040;
+$z-index-modal: 1050;
+$z-index-popover: 1060;
+$z-index-tooltip: 1070;
+$status-inactive: #ef4444; // Rojo
+$status-pending: #f59e0b;  // Naranja
+$status-unsigned: #ef4444;
+
+// Colores de categoría
+$category-premium: #10b981;  // Verde
+$category-standard: #3b82f6;  // Azul
+$category-basic: #f97316;    // Naranja
+
+// Gradientes y fondos
+$gradient-start: rgba($primary-color, 0.85);
+$gradient-end: rgba($accent-color, 0.85);
+$glass-bg: rgba(255, 255, 255, 0.1);
+$hover-bg: rgba(255, 255, 255, 0.15);
+$input-bg: rgba(255, 255, 255, 0.1);
+$bg-dropdown: #2a3341;
+
+// Bordes
+$border-color: rgba(255, 255, 255, 0.1);
+$glass-border: rgba(255, 255, 255, 0.2);
+
+// Sombras y efectos
+$shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+$shadow-light: 0 4px 6px rgba(0, 0, 0, 0.1);
+$shadow-medium: 0 8px 32px rgba(0, 0, 0, 0.15);
+$shadow-color: rgba(0, 0, 0, 0.3);
+
+// Transiciones
+$transition: all 0.3s ease;
+$transition-quick: all 0.2s ease;
+$transition-medium: all 0.3s ease;
+
+// Bordes y espaciado
+$border-radius-sm: 10px;
+$border-radius-md: 15px;
+$border-radius-lg: 20px;
+$border-radius-xl: 25px;
+$border-radius-circle: 50%;
+
+// Tamaños de tipografía
+$font-xs: 0.85em;
+$font-sm: 0.9em;
+$font-md: 1em;
+$font-lg: 1.2em;
+$font-xl: 1.8em;
+$font-xxl: 2.5em;
+$font-xxxl: 3.8em;
+
+// Grosor de fuente
+$font-light: 300;
+$font-regular: 400;
+$font-medium: 500;
+$font-semibold: 600;
+$font-bold: 700;
+
+
+$bg-dark: #1e2530;
+$bg-darker: #181d25;
+$bg-dropdown: #2a3341;
+$accent-blue: #3498db;
+$accent-blue-hover: #2980b9;
+$text-primary: #ffffff;
+$text-secondary: rgba(255, 255, 255, 0.7);
+$border-color: rgba(255, 255, 255, 0.1);
+
+$category-premium: #10b981;  // Verde
+$category-standard: #3b82f6;  // Azul
+$category-basic: #f97316;  // Naranja
+
+$status-active: #10b981;
+$status-pending: #f59e0b;
+$status-unsigned: #ef4444;
+
+$shadow-light: 0 4px 6px rgba(0, 0, 0, 0.1);
+$shadow-medium: 0 8px 32px rgba(0, 0, 0, 0.15);
+
+$transition-quick: all 0.2s ease;
+$transition-medium: all 0.3s ease;
+
+
+
+
+
+/* =========== MIXINS REUTILIZABLES =========== */
+@mixin flex-center {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+@mixin glass-effect {
+  background: $glass-bg;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@mixin hover-lift {
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+}
+
+@mixin card-base {
+  @include glass-effect;
+  transition: $transition;
+  position: relative;
+  overflow: hidden;
+}
+
+@mixin section-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+@mixin gradient-text {
+  background: linear-gradient(45deg, #fff, $accent-color);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+
+// src/styles/variables.scss
+$primary-color: #0074d9;
+$secondary-color: #39cccc;
+$danger-color: #ff4136;
+$success-color: #2ecc40;
+$warning-color: #ffdc00;
+$light-gray: #f8f9fa;
+$medium-gray: #e9ecef;
+$dark-gray: #343a40;
+$border-radius: 4px;
+$box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+// Mixins
+@mixin button($bg-color, $text-color: white) {
+  background-color: $bg-color;
+  color: $text-color;
+  padding: 8px 12px;
+  border-radius: $border-radius;
+  border: none;
+  cursor: pointer;
+  font-weight: 500;
+  text-decoration: none;
+  display: inline-block;
+  transition: background-color 0.2s;
+  
+  &:hover {
+    background-color: darken($bg-color, 10%);
+  }
+}
+
+@mixin card {
+  background-color: white;
+  border-radius: $border-radius;
+  box-shadow: $box-shadow;
+  padding: 1.5rem;
+}
+
+

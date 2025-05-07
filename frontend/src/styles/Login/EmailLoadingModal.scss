@@ -1,0 +1,614 @@
+// Variables
+$primary-color: #1890ff;
+$primary-gradient-start: #1484c5;
+$primary-gradient-end: #6b1b99;
+$secondary-color: #34495e;
+$accent-color: #00d2ff;
+$success-color: #22c55e;
+$warning-color: #f59e0b;
+$danger-color: #ef4444;
+$light-color: #ecf0f1;
+$dark-color: #1e293b;
+
+// Fondos de tipo vidrio
+$glass-background: rgba(30, 41, 59, 0.85);
+$success-glass-bg: rgba(30, 59, 41, 0.85);
+
+// Animaciones
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes expandIn {
+  0% { transform: scale(0.8); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.1); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.8; }
+}
+
+@keyframes flyEmail {
+  0% { 
+    left: 20%; 
+    top: 50%;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  10% {
+    left: 25%;
+    top: 40%;
+    transform: translate(-50%, -50%) scale(1.1) rotate(5deg);
+  }
+  30% {
+    left: 50%;
+    top: 30%;
+    transform: translate(-50%, -50%) scale(1.2) rotate(-5deg);
+  }
+  60% {
+    left: 75%;
+    top: 40%;
+    transform: translate(-50%, -50%) scale(1.1) rotate(5deg);
+  }
+  90% {
+    left: 80%;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(0.9) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    left: 80%;
+    top: 50%;
+    transform: translate(-50%, -50%) scale(0.1);
+    opacity: 0;
+  }
+}
+
+@keyframes trailEffect {
+  0% { width: 0; opacity: 0; }
+  10% { width: 20px; opacity: 0.7; }
+  70% { width: 60px; opacity: 0.5; }
+  100% { width: 0; opacity: 0; }
+}
+
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
+}
+
+@keyframes cloudReceive {
+  0% { transform: scale(1); }
+  10% { transform: scale(1.1); }
+  20% { transform: scale(1); }
+  100% { transform: scale(1); }
+}
+
+@keyframes gradientFlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes popIn {
+  0% { transform: scale(0); opacity: 0; }
+  80% { transform: scale(1.2); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes slideUp {
+  0% { transform: translateY(20px); opacity: 0; }
+  100% { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes gradientBg {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes badgePulse {
+  0% { transform: scale(0); opacity: 0; }
+  80% { transform: scale(1.4); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.email-loading-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: $glass-background;
+  z-index: 9999;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+  backdrop-filter: blur(12px);
+  
+  &.show {
+    opacity: 1;
+    visibility: visible;
+    
+    .email-loading-content {
+      animation: expandIn 0.5s cubic-bezier(0.26, 0.53, 0.74, 1.48) forwards;
+    }
+  }
+  
+  &.success-bg {
+    background: linear-gradient(135deg, rgba(30, 60, 40, 0.9), rgba(40, 70, 50, 0.9), rgba(30, 60, 40, 0.9));
+    background-size: 200% 200%;
+    animation: gradientBg 8s ease infinite;
+  }
+  
+  .email-loading-content {
+    text-align: center;
+    max-width: 500px;
+    width: 90%;
+    padding: 2.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+    
+    // Efecto de brillo
+    .glow-effect {
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: radial-gradient(
+        ellipse at center,
+        rgba(255, 255, 255, 0.1) 0%,
+        rgba(255, 255, 255, 0) 70%
+      );
+      pointer-events: none;
+      animation: pulse 4s ease-in-out infinite;
+      z-index: -1;
+    }
+    
+    h3 {
+      font-size: 1.8rem;
+      margin: 1.5rem 0 1rem;
+      color: white;
+      font-weight: 700;
+      transition: all 0.3s ease;
+      text-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+      letter-spacing: 0.5px;
+      
+      &.success {
+        color: $success-color;
+        text-shadow: 0 0 15px rgba($success-color, 0.5);
+      }
+    }
+    
+    // Animación principal del email
+    .email-animation-container {
+      height: 180px;
+      position: relative;
+      margin-bottom: 20px;
+      
+      .email-scene {
+        position: relative;
+        height: 100%;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        
+        // Dispositivo origen (computadora o dispositivo)
+        .device {
+          width: 100px;
+          height: 80px;
+          position: relative;
+          margin-left: 40px;
+          
+          &.sender {
+            .device-screen {
+              width: 100%;
+              height: 70%;
+              background: #2d3748;
+              border-radius: 8px 8px 0 0;
+              border: 2px solid #4a5568;
+              position: relative;
+              overflow: hidden;
+              
+              &:before {
+                content: '';
+                position: absolute;
+                top: 8px;
+                left: 8px;
+                width: 30%;
+                height: 15%;
+                background: rgba(255, 255, 255, 0.1);
+                border-radius: 2px;
+              }
+              
+              &:after {
+                content: '';
+                position: absolute;
+                top: 40%;
+                left: 15%;
+                width: 70%;
+                height: 8%;
+                background: rgba(255, 255, 255, 0.15);
+                border-radius: 2px;
+                box-shadow: 0 15px 0 rgba(255, 255, 255, 0.15);
+              }
+            }
+            
+            .device-base {
+              width: 110%;
+              height: 10px;
+              background: #4a5568;
+              margin-left: -5%;
+              border-radius: 0 0 5px 5px;
+              
+              &:after {
+                content: '';
+                position: absolute;
+                bottom: -10px;
+                left: 30%;
+                width: 40%;
+                height: 5px;
+                background: #2d3748;
+                border-radius: 3px;
+              }
+            }
+          }
+        }
+        
+        // Correo electrónico volando
+        .flying-email {
+          position: absolute;
+          left: 20%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+          z-index: 10;
+          transition: all 0.2s ease;
+          
+          &.animate {
+            animation: flyEmail 3s ease-in-out forwards;
+            
+            .email-trail {
+              opacity: 1;
+              animation: trailEffect 3s ease-in-out infinite;
+            }
+          }
+          
+          .email-icon {
+            width: 50px;
+            height: 40px;
+            background: white;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            z-index: 2;
+            position: relative;
+            
+            i {
+              font-size: 24px;
+              color: $primary-color;
+            }
+          }
+          
+          .email-trail {
+            position: absolute;
+            top: 50%;
+            right: 100%;
+            height: 3px;
+            width: 0;
+            background: linear-gradient(to left, rgba(255, 255, 255, 0.8), transparent);
+            transform: translateY(-50%);
+            opacity: 0;
+            border-radius: 3px;
+          }
+        }
+        
+        // Servidor/Nube de recepción
+        .server-cloud {
+          width: 70px;
+          height: 70px;
+          border-radius: 50%;
+          background: rgba(255, 255, 255, 0.1);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          position: relative;
+          margin-right: 40px;
+          
+          i {
+            font-size: 36px;
+            color: rgba(255, 255, 255, 0.8);
+          }
+          
+          &:after {
+            content: '';
+            position: absolute;
+            inset: -5px;
+            border-radius: 50%;
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            animation: rotate 15s linear infinite;
+          }
+        }
+      }
+    }
+    
+    // Barra de progreso
+    .progress-container {
+      display: flex;
+      align-items: center;
+      margin: 1.5rem 0;
+      
+      .progress-bar {
+        flex: 1;
+        height: 8px;
+        background-color: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        overflow: hidden;
+        box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.2);
+        
+        .progress-bar-inner {
+          height: 100%;
+          background: linear-gradient(to right, $primary-gradient-start, $accent-color, $primary-gradient-end);
+          background-size: 200% 200%;
+          animation: gradientFlow 2s ease infinite;
+          width: 0;
+          transition: width 0.3s ease;
+          box-shadow: 0 0 10px rgba($accent-color, 0.7);
+          border-radius: 4px;
+        }
+      }
+      
+      .progress-percentage {
+        min-width: 50px;
+        text-align: right;
+        font-size: 1rem;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.9);
+        margin-left: 1rem;
+      }
+    }
+    
+    // Mensaje de estado
+    .status-message {
+      font-size: 1.2rem;
+      color: rgba(255, 255, 255, 0.9);
+      min-height: 1.8rem;
+      margin-bottom: 1.5rem;
+      animation: fadeIn 0.5s;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+      
+      &.success {
+        color: $success-color;
+      }
+    }
+    
+    // Detalles del email que se está enviando
+    .email-details {
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 1rem;
+      text-align: left;
+      animation: fadeIn 0.5s;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      
+      .email-to, .email-subject {
+        margin-bottom: 0.5rem;
+        font-size: 0.95rem;
+        color: rgba(255, 255, 255, 0.8);
+        
+        span {
+          color: rgba(255, 255, 255, 0.6);
+          margin-right: 8px;
+          display: inline-block;
+          width: 60px;
+        }
+      }
+      
+      .email-subject {
+        margin-bottom: 0;
+      }
+    }
+    
+    // Animación de éxito
+    .email-success-animation {
+      height: 180px;
+      position: relative;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      .success-icon {
+        position: absolute;
+        font-size: 80px;
+        color: $success-color;
+        opacity: 0;
+        transform: scale(0);
+        transition: all 0.5s ease;
+        text-shadow: 0 0 20px rgba($success-color, 0.4);
+        
+        &.show {
+          opacity: 1;
+          transform: scale(1);
+          animation: pulse 2s infinite;
+        }
+      }
+      
+      .mail-sent-icon {
+        position: absolute;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: transform 0.5s ease 0.3s, opacity 0.5s ease 0.3s;
+        
+        i {
+          font-size: 60px;
+          color: white;
+          text-shadow: 0 0 15px rgba(255, 255, 255, 0.4);
+        }
+        
+        .notification-badge {
+          position: absolute;
+          top: 0;
+          right: -5px;
+          background: $primary-color;
+          color: white;
+          width: 25px;
+          height: 25px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: bold;
+          font-size: 14px;
+          opacity: 0;
+          transform: scale(0);
+          box-shadow: 0 0 10px rgba($primary-color, 0.7);
+        }
+        
+        &.show {
+          opacity: 1;
+          transform: translateY(0);
+          animation: bounce 2s ease infinite 1s;
+          
+          .notification-badge {
+            animation: badgePulse 0.5s ease forwards 0.8s;
+          }
+        }
+      }
+    }
+    
+    // Caja de información post-envío
+    .email-info-box {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-top: 1.5rem;
+      text-align: left;
+      opacity: 0;
+      transform: translateY(20px);
+      transition: all 0.5s ease 0.5s;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      
+      &.show {
+        opacity: 1;
+        transform: translateY(0);
+      }
+      
+      p {
+        margin: 0.5rem 0;
+        font-size: 0.95rem;
+        color: rgba(255, 255, 255, 0.8);
+        
+        i {
+          margin-right: 8px;
+          color: $accent-color;
+        }
+        
+        &:last-child {
+          margin-bottom: 0;
+          
+          i {
+            color: $warning-color;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Animación de rotación
+@keyframes rotate {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+// Responsive
+@media (max-width: 576px) {
+  .email-loading-overlay .email-loading-content {
+    padding: 1.5rem;
+    
+    h3 {
+      font-size: 1.6rem;
+    }
+    
+    .email-animation-container {
+      height: 150px;
+      
+      .email-scene {
+        .device {
+          width: 80px;
+          height: 60px;
+          margin-left: 20px;
+        }
+        
+        .server-cloud {
+          width: 60px;
+          height: 60px;
+          margin-right: 20px;
+          
+          i {
+            font-size: 30px;
+          }
+        }
+        
+        .flying-email .email-icon {
+          width: 40px;
+          height: 32px;
+          
+          i {
+            font-size: 20px;
+          }
+        }
+      }
+    }
+    
+    .status-message {
+      font-size: 1.1rem;
+    }
+    
+    .email-details {
+      padding: 0.8rem;
+      
+      .email-to, .email-subject {
+        font-size: 0.85rem;
+        
+        span {
+          width: 50px;
+        }
+      }
+    }
+    
+    .email-success-animation {
+      height: 150px;
+      
+      .success-icon {
+        font-size: 70px;
+      }
+      
+      .mail-sent-icon i {
+        font-size: 50px;
+      }
+    }
+    
+    .email-info-box {
+      padding: 0.8rem;
+      
+      p {
+        font-size: 0.85rem;
+      }
+    }
+  }
+}

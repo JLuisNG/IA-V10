@@ -1,0 +1,168 @@
+// StandardizedTest.scss
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+// Variables
+$primary-color: #4361ee;
+$primary-gradient: linear-gradient(135deg, #4361ee, #3a0ca3);
+$secondary-color: #4cc9f0;
+$accent-color: #f72585;
+$success-color: #10b981;
+$warning-color: #f59e0b;
+$danger-color: #ef4444;
+$light-bg: #f8fafc;
+$white: #ffffff;
+$transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+.test-card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid rgba(226, 232, 240, 0.7);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: $transition;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  
+  &:hover {
+    border-color: rgba(67, 97, 238, 0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.07);
+  }
+  
+  .test-info {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    
+    .test-icon {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(67, 97, 238, 0.1);
+      color: $primary-color;
+      border-radius: 12px;
+      font-size: 18px;
+      transition: $transition;
+      
+      .test-card:hover & {
+        transform: scale(1.05);
+        background: rgba(67, 97, 238, 0.15);
+      }
+    }
+    
+    .test-details {
+      h4 {
+        margin: 0 0 4px;
+        font-size: 15px;
+        font-weight: 600;
+        color: #334155;
+      }
+      
+      .test-status {
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        
+        &.complete {
+          color: $success-color;
+        }
+        
+        &.incomplete {
+          color: $warning-color;
+        }
+        
+        .badge {
+          display: inline-block;
+          padding: 2px 8px;
+          border-radius: 20px;
+          font-size: 11px;
+          font-weight: 600;
+          
+          &.complete {
+            background: rgba(16, 185, 129, 0.1);
+            color: $success-color;
+          }
+          
+          &.incomplete {
+            background: rgba(245, 158, 11, 0.1);
+            color: $warning-color;
+          }
+        }
+        
+        .test-score {
+          font-weight: 600;
+          color: #64748b;
+        }
+      }
+    }
+  }
+  
+  .test-action {
+    button {
+      width: 36px;
+      height: 36px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #f1f5f9;
+      color: #64748b;
+      border: none;
+      border-radius: 10px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: $transition;
+      
+      &:hover {
+        background: $primary-color;
+        color: white;
+        transform: scale(1.1);
+      }
+    }
+  }
+}
+
+// Responsive styles
+@media (max-width: 768px) {
+  .test-card {
+    padding: 12px;
+    
+    .test-info {
+      gap: 12px;
+      
+      .test-icon {
+        width: 38px;
+        height: 38px;
+        font-size: 16px;
+      }
+      
+      .test-details {
+        h4 {
+          font-size: 14px;
+        }
+        
+        .test-status {
+          font-size: 12px;
+          gap: 6px;
+          
+          .badge {
+            font-size: 10px;
+            padding: 2px 6px;
+          }
+        }
+      }
+    }
+    
+    .test-action {
+      button {
+        width: 32px;
+        height: 32px;
+        font-size: 12px;
+      }
+    }
+  }
+}
