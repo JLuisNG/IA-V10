@@ -1,22 +1,57 @@
 import React, { useState, useEffect, useRef } from 'react';
-import '../../../../../styles/developer/Patients/InfoPaciente/NotesComponent.scss';
 import { motion, AnimatePresence } from 'framer-motion';
 import { DragDropContext, Droppable, Draggable } from 'react-beautiful-dnd';
 import { useAuth } from '../../../../login/AuthContext';
+
+// Note types with icons and colors
+const NOTE_TYPES = [
+  { value: 'text', label: 'Text Note', icon: 'fa-file-alt', color: '#3b82f6' },
+  { value: 'communication-report', label: 'Communication Report', icon: 'fa-comment-dots', color: '#8b5cf6' },
+  { value: 'incident-report', label: 'Incident Report', icon: 'fa-exclamation-triangle', color: '#ef4444' },
+  { value: 'therapy-order', label: 'Therapy Order', icon: 'fa-clipboard-list', color: '#10b981' },
+  { value: 'face-to-face', label: 'Face to Face', icon: 'fa-users', color: '#f59e0b' },
+  { value: 'case-conference', label: 'Case Conference', icon: 'fa-briefcase', color: '#6366f1' },
+  { value: 'oasis-care-summary', label: 'OASIS Care Summary', icon: 'fa-heartbeat', color: '#ec4899' },
+  { value: 'nomnc', label: 'NOMNC', icon: 'fa-file-contract', color: '#64748b' },
+  { value: 'kaiser-form', label: 'Kaiser Form', icon: 'fa-file-medical', color: '#0ea5e9' },
+  { value: 'maintenance-assessment-form', label: 'Maintenance Assessment Form', icon: 'fa-tasks', color: '#14b8a6' },
+  { value: 'signature', label: 'Signature', icon: 'fa-signature', color: '#6b7280' },
+  { value: 'file', label: 'File Upload', icon: 'fa-file-upload', color: '#9333ea' },
+];
+
+// Categories with colors
+const CATEGORIES = [
+  { value: 'Clinical', color: 'rgb(44, 123, 229)' },
+  { value: 'Follow-up', color: 'rgb(76, 175, 80)' },
+  { value: 'Therapy Session', color: 'rgb(156, 39, 176)' },
+  { value: 'Assessment', color: 'rgb(255, 152, 0)' },
+  { value: 'Education', color: 'rgb(0, 188, 212)' },
+  { value: 'Administrative', color: 'rgb(96, 125, 139)' },
+  { value: 'Media', color: 'rgb(244, 67, 54)' },
+];
+
+// Role colors
+const ROLE_COLORS = {
+  PT: '#3b82f6',
+  OT: '#8b5cf6',
+  ST: '#ec4899',
+  PTA: '#60a5fa',
+  COTA: '#a78bfa',
+  ADMIN: '#64748b',
+};
 
 const NotesComponent = ({ patient, onUpdateNotes }) => {
   const [notes, setNotes] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isAddingNote, setIsAddingNote] = useState(false);
   const [activeNoteId, setActiveNoteId] = useState(null);
-  const [newNoteType, setNewNoteType] = useState('text'); // Default to text
-  const [newNoteCategory, setNewNoteCategory] = useState('Clinical'); // Default category
+  const [newNoteType, setNewNoteType] = useState('text');
+  const [newNoteCategory, setNewNoteCategory] = useState('Clinical');
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredNotes, setFilteredNotes] = useState([]);
   const [sortBy, setSortBy] = useState('date-desc');
   const [categories, setCategories] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('all');
-  const [isFullscreen, setIsFullscreen] = useState(false);
   const [showQuickActions, setShowQuickActions] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [noteToDelete, setNoteToDelete] = useState(null);
@@ -29,22 +64,6 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
   const signatureCanvasCtx = useRef(null);
   const isDrawing = useRef(false);
 
-  // Define note types based on the image
-  const noteTypes = [
-    { value: 'text', label: 'Text Note' },
-    { value: 'communication-report', label: 'Communication Report' },
-    { value: 'incident-report', label: 'Incident Report' },
-    { value: 'therapy-order', label: 'Therapy Order' },
-    { value: 'face-to-face', label: 'Face to Face' },
-    { value: 'case-conference', label: 'Case Conference' },
-    { value: 'oasis-care-summary', label: 'OASIS Care Summary' },
-    { value: 'nomnc', label: 'NOMNC' },
-    { value: 'kaiser-form', label: 'Kaiser Form' },
-    { value: 'maintenance-assessment-form', label: 'Maintenance Assessment Form' },
-    { value: 'signature', label: 'Signature' },
-    { value: 'file', label: 'File Upload' },
-  ];
-
   // Animation variants
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -52,7 +71,7 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
       opacity: 1,
       transition: { 
         when: "beforeChildren",
-        staggerChildren: 0.1
+        staggerChildren: 0.08
       }
     }
   };
@@ -75,7 +94,7 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
     hidden: { 
       opacity: 0,
       scale: 0.8,
-      y: 50
+      y: 30
     },
     visible: { 
       opacity: 1,
@@ -90,7 +109,7 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
     exit: { 
       opacity: 0,
       scale: 0.8,
-      y: 50,
+      y: 30,
       transition: { duration: 0.2 }
     }
   };
@@ -175,7 +194,7 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
         note => note.title.toLowerCase().includes(query) || 
                 note.content.toLowerCase().includes(query) ||
                 note.author.toLowerCase().includes(query) ||
-                note.noteType.toLowerCase().includes(query) // Include noteType in search
+                note.noteType.toLowerCase().includes(query)
       );
     }
     
@@ -241,11 +260,11 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
         title: 'Initial Evaluation Notes',
         content: `Patient ${patient.name} presented with right-sided weakness following left CVA in 03/2023. Patient demonstrates significant difficulty with all functional mobility tasks requiring assistance for transfers and ambulation. Will benefit from PT intervention to improve strength, balance, and functional mobility.`,
         type: 'text',
-        noteType: 'text', // Added noteType field
+        noteType: 'text', 
         category: 'Clinical',
         author: availableTherapists.length ? availableTherapists[0] : 'System',
         userRole: 'PT',
-        date: '2025-02-11T14:30:00',
+        date: '2025-04-11T14:30:00',
         isPinned: true,
         isEditable: true,
         tags: ['Initial Eval', 'PT', 'Mobility']
@@ -255,11 +274,11 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
         title: 'Follow-up: Gait Training',
         content: 'Patient showing improvement in gait pattern with assistive device. Decreased shuffling noted. Continue with current exercise plan and progress as tolerated.',
         type: 'text',
-        noteType: 'follow-up', // Updated noteType
+        noteType: 'follow-up',
         category: 'Follow-up',
         author: availableAssistants.length ? availableAssistants[0] : 'System',
         userRole: 'PTA',
-        date: '2025-02-15T10:45:00',
+        date: '2025-04-15T10:45:00',
         isPinned: false,
         isEditable: true,
         tags: ['Gait Training', 'Progress']
@@ -269,11 +288,11 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
         title: 'ADL Training Session',
         content: 'Worked on upper extremity dressing tasks. Patient able to don shirt with minimal assistance. Continuing to work on button manipulation and fine motor skills.',
         type: 'text',
-        noteType: 'therapy-session', // Updated noteType
+        noteType: 'therapy-session',
         category: 'Therapy Session',
         author: availableTherapists.length > 1 ? availableTherapists[1] : (availableTherapists.length ? availableTherapists[0] : 'System'),
         userRole: 'OT',
-        date: '2025-02-20T13:15:00',
+        date: '2025-04-20T13:15:00',
         isPinned: false,
         isEditable: true,
         tags: ['OT', 'ADL', 'Dressing']
@@ -283,11 +302,11 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
         title: 'Caregiver Education',
         content: 'Met with patient\'s son to educate on safe transfer techniques and home exercise program supervision. Caregiver demonstrated understanding and proper technique.',
         type: 'text',
-        noteType: 'communication-report', // Updated noteType
+        noteType: 'communication-report',
         category: 'Education',
         author: 'Admin Staff',
         userRole: 'Admin',
-        date: '2025-02-25T09:30:00',
+        date: '2025-04-25T09:30:00',
         isPinned: true,
         isEditable: true,
         tags: ['Caregiver', 'Education', 'HEP']
@@ -297,11 +316,11 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
         title: 'Balance Assessment',
         content: 'Completed Berg Balance Assessment. Score: 32/56 indicating moderate fall risk. Will implement balance training program focusing on static and dynamic balance activities.',
         type: 'text',
-        noteType: 'oasis-care-summary', // Updated noteType
+        noteType: 'assessment', 
         category: 'Assessment',
         author: availableTherapists.length ? availableTherapists[0] : 'System',
         userRole: 'PT',
-        date: '2025-03-02T11:00:00',
+        date: '2025-05-02T11:00:00',
         isPinned: false,
         isEditable: true,
         tags: ['Balance', 'Assessment', 'Fall Risk']
@@ -375,7 +394,7 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
     const title = form.title.value.trim();
     const category = form.category.value;
     const tags = form.tags.value.split(',').map(tag => tag.trim()).filter(Boolean);
-    const noteType = form.noteType.value; // Get the selected note type
+    const noteType = form.noteType.value;
     
     let content = '';
     let type = noteType;
@@ -401,8 +420,8 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
       id: Date.now(),
       title,
       content,
-      type, // Store the type (text or signature)
-      noteType, // Store the specific note type (e.g., communication-report)
+      type,
+      noteType,
       category,
       author: authorName,
       userRole: userRole,
@@ -443,7 +462,7 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
       title: file.name,
       content: URL.createObjectURL(file),
       type: noteType,
-      noteType: 'file', // File uploads are categorized as 'file'
+      noteType: 'file',
       category: 'Media',
       author: authorName,
       userRole: userRole,
@@ -533,29 +552,20 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
 
   // Get user role color
   const getRoleColor = (role) => {
-    switch (role?.toUpperCase()) {
-      case 'PT': return '#3b82f6';
-      case 'OT': return '#8b5cf6';
-      case 'ST': return '#ec4899';
-      case 'PTA': return '#60a5fa';
-      case 'COTA': return '#a78bfa';
-      case 'ADMIN': return '#64748b';
-      default: return '#64748b';
-    }
+    return ROLE_COLORS[role?.toUpperCase()] || '#64748b';
   };
 
   // Get category color
   const getCategoryColor = (category) => {
-    switch (category?.toLowerCase().replace(/\s+/g, '-')) {
-      case 'clinical': return 'rgb(44, 123, 229)';
-      case 'follow-up': return 'rgb(76, 175, 80)';
-      case 'therapy-session': return 'rgb(156, 39, 176)';
-      case 'assessment': return 'rgb(255, 152, 0)';
-      case 'education': return 'rgb(0, 188, 212)';
-      case 'administrative': return 'rgb(96, 125, 139)';
-      case 'media': return 'rgb(244, 67, 54)';
-      default: return 'rgb(100, 116, 139)';
-    }
+    const foundCategory = CATEGORIES.find(cat => 
+      cat.value.toLowerCase() === category?.toLowerCase()
+    );
+    return foundCategory?.color || 'rgb(100, 116, 139)';
+  };
+
+  // Get note type info
+  const getNoteTypeInfo = (noteType) => {
+    return NOTE_TYPES.find(type => type.value === noteType) || NOTE_TYPES[0];
   };
 
   // Note card component
@@ -563,9 +573,7 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
     const [isHovered, setIsHovered] = useState(false);
     
     const dateFormatted = formatShortDate(note.date);
-    
-    // Get the display label for the note type
-    const noteTypeLabel = noteTypes.find(type => type.value === note.noteType)?.label || 'Text Note';
+    const noteTypeInfo = getNoteTypeInfo(note.noteType);
     
     return (
       <Draggable draggableId={note.id.toString()} index={index}>
@@ -627,7 +635,9 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
                 {note.title}
               </h3>
               <div className="note-type-label">
-                <span className="note-type-badge">{noteTypeLabel}</span>
+                <span className="note-type-badge" style={{backgroundColor: `${noteTypeInfo.color}20`, color: noteTypeInfo.color}}>
+                  <i className={`fas ${noteTypeInfo.icon}`}></i> {noteTypeInfo.label}
+                </span>
               </div>
               
               {note.type === 'text' && (
@@ -706,8 +716,27 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
     );
   };
 
+  // Parse markdown helper function
+  const parseMarkdown = (text) => {
+    if (!text) return '';
+    
+    text = text.replace(/^# (.+)$/gm, '<h1>$1</h1>');
+    text = text.replace(/^## (.+)$/gm, '<h2>$1</h2>');
+    text = text.replace(/^### (.+)$/gm, '<h3>$1</h3>');
+    text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+    text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
+    text = text.replace(/^- (.+)$/gm, '<li>$1</li>');
+    text = text.replace(/(<li>.+<\/li>(\n|$))+/g, '<ul>$&</ul>');
+    text = text.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
+    text = text.replace(/(<li>.+<\/li>(\n|$))+/g, '<ol>$&</ol>');
+    text = text.replace(/^(?!<[uo]l|<li|<h).+$/gm, '<p>$&</p>');
+    text = text.replace(/<\/p>\n<p>/g, '</p><p>');
+    
+    return text;
+  };
+
   return (
-    <div className={`notes-component ${isFullscreen ? 'fullscreen' : ''}`}>
+    <div className="notes-component">
       <div className="notes-header">
         <div className="header-left">
           <div className="icon-wrapper">
@@ -731,9 +760,10 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
               <button 
                 className="clear-search"
                 onClick={() => setSearchQuery('')}
+                aria-label="Clear search"
               >
                 <i className="fas fa-times"></i>
-              </button>
+                </button>
             )}
           </div>
           
@@ -769,14 +799,6 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
           </div>
           
           <div className="view-actions">
-            <button 
-              className="view-btn fullscreen-btn"
-              onClick={() => setIsFullscreen(!isFullscreen)}
-              title={isFullscreen ? "Exit Fullscreen" : "Fullscreen Mode"}
-            >
-              <i className={`fas ${isFullscreen ? 'fa-compress-alt' : 'fa-expand-alt'}`}></i>
-            </button>
-            
             <div className="add-note-container">
               <button 
                 className="add-note-btn"
@@ -795,7 +817,7 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
                   exit={{ opacity: 0, y: 10 }}
                   transition={{ duration: 0.2 }}
                 >
-                  {noteTypes.map((type) => (
+                  {NOTE_TYPES.map((type) => (
                     <button 
                       key={type.value}
                       onClick={() => {
@@ -807,9 +829,7 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
                         setShowQuickActions(false);
                       }}
                     >
-                      <i className={`fas ${type.value === 'signature' ? 'fa-signature' : 
-                                          type.value === 'file' ? 'fa-file-upload' : 
-                                          'fa-align-left'}`}></i>
+                      <i className={`fas ${type.icon}`} style={{color: type.color}}></i>
                       <span>{type.label}</span>
                     </button>
                   ))}
@@ -893,16 +913,27 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
       {/* Add/Edit Note Modal */}
       <AnimatePresence>
         {isAddingNote && (
-          <div className="modal-overlay">
+          <div className="modal-overlay" onClick={() => setIsAddingNote(false)}>
             <motion.div 
               className="note-modal add-note-modal"
               variants={modalVariants}
               initial="hidden"
               animate="visible"
               exit="exit"
+              onClick={(e) => e.stopPropagation()}
             >
               <div className="modal-header">
-                <h3>Add {noteTypes.find(type => type.value === newNoteType)?.label || 'Note'}</h3>
+                <h3>
+                  {(() => {
+                    const typeInfo = getNoteTypeInfo(newNoteType);
+                    return (
+                      <>
+                        <i className={`fas ${typeInfo.icon}`} style={{color: typeInfo.color, marginRight: '8px'}}></i>
+                        Add {typeInfo.label}
+                      </>
+                    );
+                  })()}
+                </h3>
                 <button className="close-modal" onClick={() => setIsAddingNote(false)}>
                   <i className="fas fa-times"></i>
                 </button>
@@ -917,8 +948,9 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
                       name="noteType" 
                       value={newNoteType}
                       onChange={(e) => setNewNoteType(e.target.value)}
+                      className="note-type-select"
                     >
-                      {noteTypes.map((type) => (
+                      {NOTE_TYPES.map((type) => (
                         <option key={type.value} value={type.value}>
                           {type.label}
                         </option>
@@ -937,7 +969,7 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
                     />
                   </div>
                   
-                  {newNoteType !== 'signature' && (
+                  {newNoteType !== 'signature' ? (
                     <div className="form-group">
                       <label htmlFor="content">Content</label>
                       <textarea
@@ -990,9 +1022,7 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
                         <small>Tip: You can use Markdown for formatting (*italic*, **bold**, # heading, etc.)</small>
                       </div>
                     </div>
-                  )}
-                  
-                  {newNoteType === 'signature' && (
+                  ) : (
                     <div className="form-group signature-group">
                       <label>Signature</label>
                       <div className="signature-container">
@@ -1020,13 +1050,11 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
                     <div className="form-group">
                       <label htmlFor="category">Category</label>
                       <select id="category" name="category">
-                        <option value="Clinical">Clinical</option>
-                        <option value="Follow-up">Follow-up</option>
-                        <option value="Therapy Session">Therapy Session</option>
-                        <option value="Assessment">Assessment</option>
-                        <option value="Education">Education</option>
-                        <option value="Administrative">Administrative</option>
-                        <option value="Media">Media</option>
+                        {CATEGORIES.map(category => (
+                          <option key={category.value} value={category.value}>
+                            {category.value}
+                          </option>
+                        ))}
                       </select>
                     </div>
                     
@@ -1072,26 +1100,8 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
                 const activeNote = notes.find(note => note.id === activeNoteId);
                 if (!activeNote) return null;
                 
-                const parseMarkdown = (text) => {
-                  if (!text) return '';
-                  
-                  text = text.replace(/^# (.+)$/gm, '<h1>$1</h1>');
-                  text = text.replace(/^## (.+)$/gm, '<h2>$1</h2>');
-                  text = text.replace(/^### (.+)$/gm, '<h3>$1</h3>');
-                  text = text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
-                  text = text.replace(/\*(.+?)\*/g, '<em>$1</em>');
-                  text = text.replace(/^- (.+)$/gm, '<li>$1</li>');
-                  text = text.replace(/(<li>.+<\/li>(\n|$))+/g, '<ul>$&</ul>');
-                  text = text.replace(/^\d+\. (.+)$/gm, '<li>$1</li>');
-                  text = text.replace(/(<li>.+<\/li>(\n|$))+/g, '<ol>$&</ol>');
-                  text = text.replace(/^(?!<[uo]l|<li|<h).+$/gm, '<p>$&</p>');
-                  text = text.replace(/<\/p>\n<p>/g, '</p><p>');
-                  
-                  return text;
-                };
-                
                 const dateFormatted = formatShortDate(activeNote.date);
-                const noteTypeLabel = noteTypes.find(type => type.value === activeNote.noteType)?.label || 'Text Note';
+                const noteTypeInfo = getNoteTypeInfo(activeNote.noteType);
                 
                 return (
                   <>
@@ -1147,7 +1157,12 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
                       </div>
                       
                       <div className="note-type-label">
-                        <span className="note-type-badge">{noteTypeLabel}</span>
+                        <span className="note-type-badge" style={{
+                          backgroundColor: `${noteTypeInfo.color}20`, 
+                          color: noteTypeInfo.color
+                        }}>
+                          <i className={`fas ${noteTypeInfo.icon}`}></i> {noteTypeInfo.label}
+                        </span>
                       </div>
                       
                       {activeNote.type === 'text' && (
@@ -1280,14 +1295,7 @@ const NotesComponent = ({ patient, onUpdateNotes }) => {
                 
                 <div className="delete-note-preview">
                   <div className="preview-title">
-                    <i className={`fas ${
-                      noteToDelete.type === 'text' ? 'fa-align-left' : 
-                      noteToDelete.type === 'image' ? 'fa-image' :
-                      noteToDelete.type === 'signature' ? 'fa-signature' :
-                      noteToDelete.type === 'audio' ? 'fa-file-audio' :
-                      noteToDelete.type === 'video' ? 'fa-file-video' :
-                      'fa-file'
-                    }`}></i>
+                    <i className={`fas ${getNoteTypeInfo(noteToDelete.noteType).icon}`}></i>
                     {noteToDelete.title}
                   </div>
                   

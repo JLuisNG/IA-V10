@@ -56,6 +56,7 @@ const PatientInfoHeader = ({ patient, activeTab, setActiveTab, onToggleStatus })
 };
 
 // Tabs Navigation Component
+// Componente TabsNavigation Corregido
 const TabsNavigation = ({ activeTab, setActiveTab }) => {
   const tabs = [
     { id: 'general', label: 'General Info', icon: 'fas fa-user' },
