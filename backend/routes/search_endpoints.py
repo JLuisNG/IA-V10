@@ -17,8 +17,11 @@ from schemas import (
     ExerciseResponse,
     PacienteExerciseAssignmentResponse,
     VisitResponse,
-    CertificationPeriodResponse
-)
+    VisitNoteResponse,
+    NoteTemplateResponse,
+    NoteSectionResponse,
+    CertificationPeriodResponse,
+    StaffAssignmentResponse)
 
 router = APIRouter()
 
@@ -29,20 +32,22 @@ def get_active_staff(db: Session = Depends(get_db)):
     staff_list = db.query(Staff).filter(Staff.activo == True).all()
     return staff_list
 
-@router.get("/paciente/{paciente_id}/assigned-staff", response_model=List[dict])
+@router.get("/paciente/{paciente_id}/assigned-staff", response_model=List[StaffAssignmentResponse])
 def get_assigned_staff(paciente_id: int, db: Session = Depends(get_db)):
     assignments = db.query(StaffAssignment).filter(StaffAssignment.paciente_id == paciente_id).all()
     
     return [
-        {
-            "staff": {
-                "id": a.staff.id,
-                "name": a.staff.name,
-                "email": a.staff.email,
-                "rol": a.staff.rol
-            },
-            "rol_asignado": a.rol_asignado
-        }
+        StaffAssignmentResponse(
+            id=a.id,
+            fecha_asignacion=a.fecha_asignacion,
+            rol_asignado=a.rol_asignado,
+            staff=StaffResponse(
+                id=a.staff.id,
+                name=a.staff.name,
+                email=a.staff.email,
+                rol=a.staff.rol
+            )
+        )
         for a in assignments
     ]
 
@@ -78,8 +83,40 @@ def get_exercises_of_paciente(paciente_id: int, db: Session = Depends(get_db)):
 
 @router.get("/visits/certperiod/{cert_id}", response_model=List[VisitResponse])
 def get_visits_by_certification_period(cert_id: int, db: Session = Depends(get_db)):
-    visits = db.query(Visit).filter(Visit.certification_period_id == cert_id).all()
+    visits = db.query(Visit).filter(
+        Visit.certification_period_id == cert_id,
+        Visit.is_hidden == False
+    ).all()
     return visits
+
+@router.get("/visits/certperiod/{cert_id}/deleted", response_model=List[VisitResponse])
+def get_deleted_visits(cert_id: int, db: Session = Depends(get_db)):
+    visits = db.query(Visit).filter(
+        Visit.certification_period_id == cert_id,
+        Visit.is_hidden == True
+    ).all()
+    return visits
+
+#////////////////////////// NOTAS //////////////////////////#
+
+@router.get("/visit-notes/{visit_id}", response_model=VisitNoteResponse)
+def get_visit_note_by_visit(visit_id: int, db: Session = Depends(get_db)):
+    note = db.query(VisitNote).filter(VisitNote.visit_id == visit_id).first()
+    if not note:
+        raise HTTPException(status_code=404, detail="Note not found")
+    return note
+
+@router.get("/note-sections/{note_id}", response_model=List[NoteSectionResponse])
+def get_sections(note_id: int, db: Session = Depends(get_db)):
+    return db.query(NoteSection).filter(NoteSection.note_id == note_id).all()
+
+@router.get("/note-templates/active", response_model=List[NoteTemplateResponse])
+def get_active_template_sections(discipline: str, note_type: str, db: Session = Depends(get_db)):
+    return db.query(NoteTemplate).filter(
+        NoteTemplate.discipline == discipline,
+        NoteTemplate.note_type == note_type,
+        NoteTemplate.is_active == True
+    ).all()
 
 #////////////////////////// CERT PERIODS //////////////////////////#
 

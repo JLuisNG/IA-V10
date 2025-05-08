@@ -4,12 +4,33 @@ from typing import List
 from datetime import datetime, timedelta, date
 from database.connection import get_db
 from database.models import (
-    Staff, Pacientes, CertificationPeriod, Documentos, Exercise, PacienteExerciseAssignment, Visit,
-    StaffAssignment)
+    Staff, 
+    Pacientes, 
+    CertificationPeriod, 
+    Documentos, Exercise, 
+    PacienteExerciseAssignment, 
+    Visit,
+    StaffAssignment, 
+    NoteSection,
+    VisitNote)
 from schemas import (
-    StaffCreate, StaffResponse, PacienteCreate, PacienteResponse, DocumentoCreate, 
-    DocumentoResponse, ExerciseCreate, ExerciseResponse, PacienteExerciseAssignmentCreate, 
-    VisitCreate, StaffAssignmentResponse)
+    StaffCreate, 
+    StaffResponse, 
+    PacienteCreate, 
+    PacienteResponse, 
+    DocumentoCreate, 
+    DocumentoResponse, 
+    ExerciseCreate, 
+    ExerciseResponse, 
+    PacienteExerciseAssignmentCreate, 
+    VisitCreate, 
+    StaffAssignmentResponse,
+    NoteSectionCreate,
+    NoteSectionResponse,
+    NoteTemplateCreate,
+    NoteTemplateResponse,
+    VisitNoteCreate,
+    VisitNoteResponse)
 
 router = APIRouter()
 
@@ -202,3 +223,58 @@ def create_visit(data: VisitCreate, db: Session = Depends(get_db)):
     db.commit()
     db.refresh(visit)
     return visit
+
+#////////////////////////// NOTAS //////////////////////////#
+
+@router.post("/note-templates", response_model=NoteTemplateResponse)
+def create_template_section(template_data: NoteTemplateCreate, db: Session = Depends(get_db)):
+    new_section = NoteTemplate(**template_data.dict())
+    db.add(new_section)
+    db.commit()
+    db.refresh(new_section)
+    return new_section
+
+@router.post("/visit-notes", response_model=VisitNoteResponse)
+def create_visit_note(data: VisitNoteCreate, db: Session = Depends(get_db)):
+    # Verifica que la visita exista
+    visit = db.query(Visit).filter(Visit.id == data.visit_id).first()
+    if not visit:
+        raise HTTPException(status_code=404, detail="Visit not found")
+
+    # Crea la nota
+    new_note = VisitNote(
+        visit_id=data.visit_id,
+        discipline=data.discipline,
+        note_type=data.note_type,
+        status=data.status or "In Progress"
+    )
+    db.add(new_note)
+    db.flush()  # para obtener el ID antes de agregar las secciones
+
+    # Busca plantilla por disciplina y tipo
+    template_sections = db.query(NoteTemplate).filter(
+        NoteTemplate.discipline == data.discipline,
+        NoteTemplate.note_type == data.note_type,
+        NoteTemplate.is_active == True
+    ).all()
+
+    # Crea cada sección basada en plantilla
+    for template in template_sections:
+        section = NoteSection(
+            note_id=new_note.id,
+            section_name=template.section_name,
+            content=""
+        )
+        db.add(section)
+
+    db.commit()
+    db.refresh(new_note)
+    return new_note
+
+@router.post("/note-sections", response_model=NoteSectionResponse)
+def create_section(data: NoteSectionCreate, db: Session = Depends(get_db)):
+    section = NoteSection(**data.dict())
+    db.add(section)
+    db.commit()
+    db.refresh(section)
+    return section

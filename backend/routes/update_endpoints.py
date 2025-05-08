@@ -1,17 +1,24 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Body
 from sqlalchemy.orm import Session
 from typing import Optional
 from datetime import datetime
 from database.connection import get_db
-from database.models import Staff, Pacientes, CertificationPeriod
+from database.models import Staff, Pacientes, CertificationPeriod, Exercise
 from schemas import (
     StaffUpdate, 
     StaffResponse, 
     PacienteUpdate, 
     PacienteResponse, 
     VisitCreate, 
+    VisitResponse,
     CertificationPeriodUpdate, 
-    CertificationPeriodResponse)
+    CertificationPeriodResponse,
+    ExerciseUpdate,
+    ExerciseResponse,
+    NoteSectionResponse,
+    NoteSectionBase,
+    NoteTemplateResponse,
+    NoteTemplateCreate)
 
 router = APIRouter()
 
@@ -179,24 +186,53 @@ def update_visit(id: int, data: VisitCreate, db: Session = Depends(get_db)):
     db.refresh(visit)
     return visit
 
-#////////////////////////// CERT PERIOD //////////////////////////#
+@router.put("/visits/{visit_id}/restore", response_model=VisitResponse)
+def restore_hidden_visit(visit_id: int, db: Session = Depends(get_db)):
+    visit = db.query(Visit).filter(Visit.id == visit_id).first()
 
-@router.put("/cert-periods/{cert_id}/dates", response_model=CertificationPeriodResponse)
-def update_cert_period_dates(cert_id: int, update_data: CertificationPeriodDatesUpdate, db: Session = Depends(get_db)):
-    cert = db.query(CertificationPeriod).filter(CertificationPeriod.id == cert_id).first()
+    if not visit:
+        raise HTTPException(status_code=404, detail="Visit not found.")
 
-    if not cert:
-        raise HTTPException(status_code=404, detail="Certification period not found.")
+    if not visit.is_hidden:
+        raise HTTPException(status_code=400, detail="Visit is already visible.")
 
-    cert.start_date = update_data.start_date
-    cert.end_date = update_data.end_date
-    paciente = cert.paciente
-    hoy = date.today()
-    cert.is_active = paciente.activo and (cert.start_date <= hoy <= cert.end_date)
+    visit.is_hidden = False
+    db.commit()
+    db.refresh(visit)
+    return visit
+
+#////////////////////////// NOTAS //////////////////////////#
+
+@router.put("/note-sections/{section_id}", response_model=NoteSectionResponse)
+def update_section(section_id: int, data: NoteSectionBase, db: Session = Depends(get_db)):
+    section = db.query(NoteSection).filter(NoteSection.id == section_id).first()
+    if not section:
+        raise HTTPException(status_code=404, detail="Section not found")
+
+    for field, value in data.dict(exclude_unset=True).items():
+        setattr(section, field, value)
 
     db.commit()
-    db.refresh(cert)
-    return cert
+    db.refresh(section)
+    return section
+
+@router.put("/note-templates/{template_id}", response_model=NoteTemplateResponse)
+def update_template_section(template_id: int, db: Session = Depends(get_db), data: NoteTemplateCreate = Body(...)):
+    template = db.query(NoteTemplate).filter(NoteTemplate.id == template_id).first()
+    if not template:
+        raise HTTPException(status_code=404, detail="Template section not found.")
+
+    for field, value in data.dict(exclude_unset=True).items():
+        setattr(template, field, value)
+
+    db.commit()
+    db.refresh(template)
+    return template
+
+#////////////////////////// CERT PERIOD //////////////////////////#
+
+@router.put("/cert-periods/{cert_id}", response_model=CertificationPeriodResponse)
+def update_certification_period(cert_id: int, cert_update: CertificationPeriodUpdate, db: Session = Depends(get_db)):
     cert = db.query(CertificationPeriod).filter(CertificationPeriod.id == cert_id).first()
 
     if not cert:
@@ -205,6 +241,27 @@ def update_cert_period_dates(cert_id: int, update_data: CertificationPeriodDates
     for field, value in cert_update.dict(exclude_unset=True).items():
         setattr(cert, field, value)
 
+    # Recalcular is_active si se editó la fecha o el paciente está inactivo
+    hoy = date.today()
+    cert.is_active = cert.paciente.activo and (cert.start_date <= hoy <= cert.end_date)
+
     db.commit()
     db.refresh(cert)
     return cert
+
+#////////////////////////// EXERCISES //////////////////////////#
+
+@router.put("/exercises/{exercise_id}", response_model=ExerciseResponse)
+def update_exercise(exercise_id: int, update_data: ExerciseUpdate, db: Session = Depends(get_db)):
+    exercise = db.query(Exercise).filter(Exercise.id == exercise_id).first()
+
+    if not exercise:
+        raise HTTPException(status_code=404, detail="Exercise not found.")
+
+    for field, value in update_data.dict(exclude_unset=True).items():
+        setattr(exercise, field, value)
+
+    db.commit()
+    db.refresh(exercise)
+    return exercise
+

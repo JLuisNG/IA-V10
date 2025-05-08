@@ -1,7 +1,12 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from database.connection import get_db
-from database.models import Staff, Pacientes, Exercise, CertificationPeriod
+from database.models import ( 
+    Staff, 
+    Pacientes, 
+    Exercise, 
+    CertificationPeriod,
+    PacienteExerciseAssignment)
 
 router = APIRouter()
 
@@ -38,11 +43,34 @@ def delete_exercise(exercise_id: int, db: Session = Depends(get_db)):
 @router.delete("/visits/{id}")
 def delete_visit(id: int, db: Session = Depends(get_db)):
     visit = db.query(Visit).filter(Visit.id == id).first()
+
     if not visit:
-        raise HTTPException(404, "Visit not found")
-    db.delete(visit)
+        raise HTTPException(status_code=404, detail="Visit not found")
+
+    has_note = visit.note is not None
+    has_signature = visit.note and (
+        visit.note.therapist_signature or
+        visit.note.patient_signature or
+        visit.note.visit_date_signature
+    )
+
+    if has_note or has_signature:
+        visit.is_hidden = True 
+    else:
+        db.delete(visit)
+
     db.commit()
-    return {"msg": "Deleted"}
+    return {"msg": "Visit removed"}
+
+@router.delete("/visit-notes/{note_id}")
+def delete_visit_note(note_id: int, db: Session = Depends(get_db)):
+    note = db.query(VisitNote).filter(VisitNote.id == note_id).first()
+    if not note:
+        raise HTTPException(status_code=404, detail="Note not found")
+
+    db.delete(note)
+    db.commit()
+    return {"detail": "Visit note deleted"}
 
 #///////////////////////// PATIENTS //////////////////////////#
 
@@ -88,3 +116,16 @@ def delete_certification_period(cert_id: int, db: Session = Depends(get_db)):
     db.delete(cert)
     db.commit()
     return {"detail": "Certification period deleted successfully."}
+
+#///////////////////////// EXERCISES //////////////////////////#
+
+@router.delete("/assigned-exercises/{assignment_id}")
+def delete_assigned_exercise(assignment_id: int, db: Session = Depends(get_db)):
+    assignment = db.query(PacienteExerciseAssignment).filter(PacienteExerciseAssignment.id == assignment_id).first()
+
+    if not assignment:
+        raise HTTPException(status_code=404, detail="Exercise assignment not found.")
+
+    db.delete(assignment)
+    db.commit()
+    return {"detail": "Exercise assignment deleted successfully."}

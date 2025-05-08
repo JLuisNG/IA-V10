@@ -129,7 +129,8 @@ class Visit(Base):
     visit_type = Column(String, nullable=False) 
     therapy_type = Column(String, nullable=False)  
     status = Column(String, default="Scheduled")       
-    scheduled_time = Column(String, nullable=True)      
+    scheduled_time = Column(String, nullable=True)
+    is_hidden = Column(Boolean, default=False)      
     
     paciente = relationship("Pacientes", back_populates="visits")
     staff = relationship("Staff", back_populates="visits")
@@ -167,5 +168,9 @@ class NoteTemplate(Base):
 
     id = Column(Integer, primary_key=True)
     discipline = Column(String, nullable=False)
-    note_type = Column(String, nullable=False) 
-    section_name = Column(String, nullable=False)  
+    note_type = Column(String, nullable=False)    
+    section_name = Column(String, nullable=False)
+    is_active = Column(Boolean, default=True)
+    is_required = Column(Boolean, default=False)
+    has_image = Column(Boolean, default=False)
+    image_url = Column(String, nullable=True)
