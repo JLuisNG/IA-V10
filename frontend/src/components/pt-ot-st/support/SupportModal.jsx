@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import '../../../styles/developer/support/SupportModal.scss';
+import '../../../styles/developer/support/SupportModalUs.scss';
 
 const SupportModal = ({ isOpen, onClose, userRole }) => {
   // Estados para controlar los pasos y animaciones

@@ -20,6 +20,7 @@ import DevPatientInfoPage from './components/developer/patients/Patients/InfoPac
 import DevStaffingPage from './components/developer/patients/staffing/StaffingPage';
 import DevAccounting from './components/developer/accounting/Accounting';
 import DevUserProfile from './components/developer/profile/UserProfile';
+import DevSettingsPage from './components/developer/settings/SettingsPage.jsx'; // Added Settings component
 
 // Import administrator components
 import AdminHomePage from './components/admin/welcome/Welcome';
@@ -31,6 +32,7 @@ import AdminPatientInfoPage from './components/admin/patients/Patients/InfoPacie
 import AdminStaffingPage from './components/admin/patients/staffing/StaffingPage';
 import AdminAccounting from './components/admin/accounting/Accounting';
 import AdminUserProfile from './components/admin/profile/UserProfile';
+import AdminSettingsPage from './components/admin/settings/SettingsPage.jsx'; // Added Settings component
 
 // Import therapist components
 import TBHomePage from './components/pt-ot-st/welcome/Welcome';
@@ -39,6 +41,7 @@ import TBPatientsPage from './components/pt-ot-st/patients/PatientsPage';
 import TBPatientInfoPage from './components/pt-ot-st/patients/Patients/InfoPaciente/PatientInfoPage';
 import TBUserProfile from './components/pt-ot-st/profile/UserProfile';
 import TBReferralsPage from './components/pt-ot-st/referrals/ReferralsPage';
+import TBSettingsPage from './components/pt-ot-st/settings/SettingsPage.jsx'; // Added Settings component
 
 // Import new support modal components for Developer role
 import FloatingSupportButton from './components/developer/support/FloatingSupportButton';
@@ -134,6 +137,13 @@ function App() {
                       <FloatingSupportButton />
                     </>
                   } />
+                  {/* Nueva ruta de settings para developer */}
+                  <Route path="/developer/settings" element={
+                    <>
+                      <DevSettingsPage />
+                      <FloatingSupportButton />
+                    </>
+                  } />
                 </Route>
                 
                 {/* Administrator-specific routes */}
@@ -146,6 +156,8 @@ function App() {
                   <Route path="/administrator/staffing" element={<AdminStaffingPage />} />
                   <Route path="/administrator/accounting" element={<AdminAccounting />} />
                   <Route path="/administrator/profile" element={<AdminUserProfile />} />
+                  {/* Nueva ruta de settings para administrator */}
+                  <Route path="/administrator/settings" element={<AdminSettingsPage />} />
                 </Route>
                 
                 {/* Support page - For Admin and Therapy roles, but NOT for Developers */}
@@ -168,10 +180,14 @@ function App() {
                   <Route path="/sta/support" element={<TBSupportPage />} />
                 </Route>
                 
-                {/* Accounting and System Management - Only for Admins and Developers */}
+                {/* Settings route */}
+                <Route element={<RoleBasedRoute allowedRoles={ALL_ROLES} />}>
+                  <Route path="/settings" element={<RoleRedirect />} />
+                </Route>
+                
+                {/* Accounting - Only for Admins and Developers */}
                 <Route element={<RoleBasedRoute allowedRoles={['Administrator', 'Developer']} />}>
                   <Route path="/accounting" element={<RoleRedirect />} />
-                  <Route path="/management" element={<RoleRedirect />} />
                 </Route>
                 
                 {/* Referrals - For all roles */}
@@ -192,6 +208,7 @@ function App() {
                   <Route path="/pt/paciente/:patientId" element={<TBPatientInfoPage />} />
                   <Route path="/pt/profile" element={<TBUserProfile />} />
                   <Route path="/pt/referrals" element={<TBReferralsPage />} />
+                  <Route path="/pt/settings" element={<TBSettingsPage />} />
                 </Route>
                 
                 {/* OT specific routes */}
@@ -201,6 +218,7 @@ function App() {
                   <Route path="/ot/paciente/:patientId" element={<TBPatientInfoPage />} />
                   <Route path="/ot/profile" element={<TBUserProfile />} />
                   <Route path="/ot/referrals" element={<TBReferralsPage />} />
+                  <Route path="/ot/settings" element={<TBSettingsPage />} />
                 </Route>
                 
                 {/* ST specific routes */}
@@ -210,6 +228,7 @@ function App() {
                   <Route path="/st/paciente/:patientId" element={<TBPatientInfoPage />} />
                   <Route path="/st/profile" element={<TBUserProfile />} />
                   <Route path="/st/referrals" element={<TBReferralsPage />} />
+                  <Route path="/st/settings" element={<TBSettingsPage />} />
                 </Route>
                 
                 {/* PTA specific routes */}
@@ -219,6 +238,7 @@ function App() {
                   <Route path="/pta/paciente/:patientId" element={<TBPatientInfoPage />} />
                   <Route path="/pta/profile" element={<TBUserProfile />} />
                   <Route path="/pta/referrals" element={<TBReferralsPage />} />
+                  <Route path="/pta/settings" element={<TBSettingsPage />} />
                 </Route>
                 
                 {/* COTA specific routes */}
@@ -228,6 +248,7 @@ function App() {
                   <Route path="/cota/paciente/:patientId" element={<TBPatientInfoPage />} />
                   <Route path="/cota/profile" element={<TBUserProfile />} />
                   <Route path="/cota/referrals" element={<TBReferralsPage />} />
+                  <Route path="/cota/settings" element={<TBSettingsPage />} />
                 </Route>
                 
                 {/* STA specific routes */}
@@ -237,6 +258,7 @@ function App() {
                   <Route path="/sta/paciente/:patientId" element={<TBPatientInfoPage />} />
                   <Route path="/sta/profile" element={<TBUserProfile />} />
                   <Route path="/sta/referrals" element={<TBReferralsPage />} />
+                  <Route path="/sta/settings" element={<TBSettingsPage />} />
                 </Route>
                 
                 {/* Supportive/Support specific routes */}
@@ -246,6 +268,7 @@ function App() {
                   <Route path="/supportive/paciente/:patientId" element={<TBPatientInfoPage />} />
                   <Route path="/supportive/profile" element={<TBUserProfile />} />
                   <Route path="/supportive/referrals" element={<TBReferralsPage />} />
+                  <Route path="/supportive/settings" element={<TBSettingsPage />} />
                 </Route>
                 
                 {/* Agency specific routes */}
@@ -255,6 +278,7 @@ function App() {
                   <Route path="/agency/paciente/:patientId" element={<TBPatientInfoPage />} />
                   <Route path="/agency/profile" element={<TBUserProfile />} />
                   <Route path="/agency/referrals" element={<TBReferralsPage />} />
+                  <Route path="/agency/settings" element={<TBSettingsPage />} />
                 </Route>
                 
                 {/* Patient routes - available for all roles */}

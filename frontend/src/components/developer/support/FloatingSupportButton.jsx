@@ -1,7 +1,7 @@
 // components/developer/support/FloatingSupportButton.jsx
 import React, { useState, useEffect } from 'react';
-import '../../../styles/developer/support/FloatingSupportButton.scss';
-import SupportModal from '../welcome/SupportModal';
+import '../../../styles/developer/support/FloatingSupportButtonDev.scss';
+import SupportModal from '../welcome/SupportModalDev';
 
 const FloatingSupportButton = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
