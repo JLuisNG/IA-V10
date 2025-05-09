@@ -1801,17 +1801,7 @@ const renderVisitModal = () => {
                         </div>
                       )}
 
-                      <div className="form-group">
-                        <label>Notes</label>
-                        <textarea
-                          name="notes"
-                          value={formData.notes}
-                          onChange={handleInputChange}
-                          placeholder="Add visit notes"
-                          className="form-input"
-                          rows="5"
-                        ></textarea>
-                      </div>
+                      
 
                       <div className="action-buttons">
                         <button 
