@@ -8,6 +8,15 @@ $breakpoints: (
   xxl: 1400px
 );
 
+// Branding colors
+$primary-gradient-start: #36D1DC;
+$primary-gradient-end: #5B86E5;
+$accent-color: #00e5ff;
+$accent-glow: rgba(0, 229, 255, 0.5);
+$error-color: #FF5E62;
+$success-color: #4CAF50;
+$warning-color: #FF9800;
+
 @mixin responsive($breakpoint) {
   @if map-has-key($breakpoints, $breakpoint) {
     @media (max-width: map-get($breakpoints, $breakpoint)) {
@@ -20,7 +29,7 @@ $breakpoints: (
   }
 }
 
-// Glassmorphism mixins
+// Premium glassmorphism mixins
 @mixin glassmorphism($bg-opacity: 0.1, $blur: 15px, $border-opacity: 0.1) {
   background: rgba(255, 255, 255, $bg-opacity);
   backdrop-filter: blur($blur);
@@ -29,7 +38,7 @@ $breakpoints: (
   box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
 }
 
-// Essential animations
+// Premium animations
 @keyframes gradientPulse {
   0% {
     background-position: 0% 50%;
@@ -110,11 +119,11 @@ $breakpoints: (
 @keyframes dropdownReveal {
   0% {
     opacity: 0;
-    transform: translateY(-20px);
+    transform: translateY(-20px) scale(0.95);
   }
   100% {
     opacity: 1;
-    transform: translateY(0);
+    transform: translateY(0) scale(1);
   }
 }
 
@@ -130,25 +139,13 @@ $breakpoints: (
   }
 }
 
-@keyframes badgePulse {
-  0% {
-    transform: scale(1);
-  }
-  50% {
-    transform: scale(1.1);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
 // Header Styles
 .main-header {
   width: 100%;
-  background: rgba(0, 0, 0, 0.2);
+  background: linear-gradient(180deg, rgba(10, 15, 30, 0.9) 0%, rgba(0, 5, 20, 0.85) 100%);
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15);
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
   position: relative;
   z-index: 100;
@@ -160,11 +157,11 @@ $breakpoints: (
   }
   
   &.glow-effect {
-    background: rgba(0, 10, 30, 0.3);
+    background: linear-gradient(180deg, rgba(10, 20, 40, 0.9) 0%, rgba(5, 15, 35, 0.85) 100%);
     box-shadow: 
       0 4px 30px rgba(0, 0, 0, 0.2),
-      0 0 40px rgba(0, 140, 255, 0.1);
-    border-bottom: 1px solid rgba(0, 140, 255, 0.15);
+      0 0 40px rgba(0, 140, 255, 0.15);
+    border-bottom: 1px solid rgba(0, 140, 255, 0.2);
   }
   
   // Transición del header
@@ -184,7 +181,7 @@ $breakpoints: (
   .header-container {
     max-width: 1800px;
     margin: 0 auto;
-    padding: 0.85rem 2rem;
+    padding: 0.9rem 2rem;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -205,11 +202,13 @@ $breakpoints: (
       flex: 0 0 auto;
       position: relative;
       cursor: pointer;
+      display: flex;
+      align-items: center;
       
       @include responsive(md) {
         margin-right: auto;
       }
-      
+
       .logo-glow {
         position: absolute;
         top: 50%;
@@ -217,7 +216,7 @@ $breakpoints: (
         transform: translate(-50%, -50%);
         width: 100%;
         height: 100%;
-        background: radial-gradient(circle, rgba(59, 130, 246, 0.5) 0%, transparent 70%);
+        background: radial-gradient(circle, rgba(54, 209, 220, 0.6) 0%, transparent 70%);
         border-radius: 8px;
         filter: blur(10px);
         animation: logoGlow 3s infinite;
@@ -225,29 +224,119 @@ $breakpoints: (
       }
       
       .logo {
-        height: 48px;
+        height: 50px;
         border-radius: 10px;
-        box-shadow: 0 0 20px rgba(255, 255, 255, 0.15);
+        box-shadow: 0 0 20px rgba(0, 229, 255, 0.2);
         transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         position: relative;
         z-index: 1;
         
         @include responsive(md) {
-          height: 40px;
+          height: 42px;
         }
         
         @include responsive(sm) {
-          height: 36px;
+          height: 38px;
         }
         
         &:hover {
           transform: scale(1.1);
-          box-shadow: 0 0 30px rgba(59, 130, 246, 0.3);
+          box-shadow: 0 0 30px rgba(54, 209, 220, 0.4);
+        }
+      }
+      
+      // Botones de navegación mejorados
+      .menu-navigation {
+        display: flex;
+        gap: 1rem;
+        margin-left: 1.5rem;
+        
+        @include responsive(lg) {
+          margin-left: 1rem;
+          gap: 0.7rem;
+        }
+        
+        @include responsive(md) {
+          margin-left: 0.7rem;
+          gap: 0.5rem;
+        }
+        
+        @include responsive(sm) {
+          margin-left: 0.5rem;
+          gap: 0.3rem;
+        }
+        
+        .nav-button {
+          background: rgba(10, 20, 40, 0.5);
+          border: 1px solid rgba(0, 212, 255, 0.15);
+          border-radius: 10px;
+          color: rgba(255, 255, 255, 0.8);
+          padding: 0.5rem 1rem;
+          display: flex;
+          align-items: center;
+          cursor: pointer;
+          transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          
+          @include responsive(md) {
+            padding: 0.4rem 0.8rem;
+          }
+          
+          @include responsive(sm) {
+            padding: 0.4rem;
+          }
+          
+          i {
+            margin-right: 0.5rem;
+            font-size: 0.9rem;
+            filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
+            
+            @include responsive(sm) {
+              margin-right: 0;
+              font-size: 0.85rem;
+            }
+          }
+          
+          span {
+            font-size: 0.9rem;
+            font-weight: 500;
+            
+            @include responsive(sm) {
+              display: none;
+            }
+          }
+          
+          &:hover {
+            background: rgba(0, 212, 255, 0.1);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 212, 255, 0.2);
+          }
+          
+          &.active {
+            background: linear-gradient(135deg, rgba(0, 229, 255, 0.15), rgba(91, 134, 229, 0.15));
+            color: $accent-color;
+            border-color: rgba(0, 212, 255, 0.3);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 212, 255, 0.25);
+            position: relative;
+            
+            &:after {
+              content: '';
+              position: absolute;
+              bottom: -4px;
+              left: 10%;
+              width: 80%;
+              height: 3px;
+              background: linear-gradient(to right, #00e5ff, #5B86E5);
+              border-radius: 3px;
+              box-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
+            }
+          }
         }
       }
     }
     
-    // Carousel
+    // Enhanced Carousel
     .top-carousel {
       flex: 1;
       display: flex;
@@ -276,13 +365,13 @@ $breakpoints: (
         margin: 0.5rem 0;
       }
       
-      // Flechas del carousel
+      // Flechas del carousel mejoradas
       .carousel-arrow {
-        width: 40px;
-        height: 40px;
+        width: 42px;
+        height: 42px;
         border-radius: 50%;
-        background: rgba(255, 255, 255, 0.05);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(10, 20, 40, 0.7);
+        border: 1px solid rgba(0, 212, 255, 0.2);
         color: white;
         font-size: 0.8rem;
         display: flex;
@@ -291,7 +380,7 @@ $breakpoints: (
         cursor: pointer;
         transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         margin: 0;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
         overflow: hidden;
         z-index: 10;
         
@@ -302,13 +391,13 @@ $breakpoints: (
         }
         
         @include responsive(md) {
-          width: 36px;
-          height: 36px;
+          width: 38px;
+          height: 38px;
         }
         
         @include responsive(sm) {
-          width: 32px;
-          height: 32px;
+          width: 34px;
+          height: 34px;
         }
         
         .arrow-icon {
@@ -329,18 +418,22 @@ $breakpoints: (
             left: 0;
             right: 0;
             bottom: 0;
-            background: radial-gradient(circle, rgba(0, 229, 255, 0.1) 0%, transparent 70%);
+            background: radial-gradient(circle, rgba(0, 229, 255, 0.2) 0%, transparent 70%);
             border-radius: 50%;
             opacity: 0;
             transition: opacity 0.3s ease;
           }
+          
+          i {
+            filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
+          }
         }
         
         &:hover:not(:disabled) {
-          background: rgba(255, 255, 255, 0.1);
+          background: rgba(0, 212, 255, 0.15);
           transform: scale(1.15);
           animation: arrowPulse 2s infinite;
-          box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
+          box-shadow: 0 0 15px rgba(0, 229, 255, 0.4);
           
           .arrow-icon:after {
             opacity: 1;
@@ -352,15 +445,15 @@ $breakpoints: (
         }
       }
       
-      // Opciones del carousel
+      // Opciones del carousel mejoradas
       .carousel-options {
         display: flex;
         position: relative;
         overflow: visible;
-        height: 65px;
+        height: 70px;
         min-width: 650px;
         justify-content: center;
-        perspective: 800px;
+        perspective: 1000px;
         
         @include responsive(xl) {
           min-width: 500px;
@@ -368,22 +461,22 @@ $breakpoints: (
         
         @include responsive(lg) {
           min-width: 400px;
-          height: 60px;
+          height: 65px;
         }
         
         @include responsive(md) {
           min-width: 300px;
-          height: 55px;
+          height: 60px;
         }
         
         @include responsive(sm) {
           min-width: 250px;
-          height: 50px;
+          height: 55px;
         }
         
         .carousel-option {
           position: absolute;
-          height: 55px;
+          height: 60px;
           display: flex;
           flex-direction: column;
           align-items: center;
@@ -398,18 +491,19 @@ $breakpoints: (
           @include responsive(lg) {
             width: 160px;
             padding: 0.5rem;
-            height: 50px;
+            height: 55px;
           }
           
           @include responsive(md) {
             width: 120px;
             padding: 0.25rem;
-            height: 45px;
+            height: 50px;
           }
           
           @include responsive(sm) {
             width: 100px;
             padding: 0.15rem;
+            height: 45px;
           }
           
           // Contenido de la opción
@@ -421,35 +515,39 @@ $breakpoints: (
             
             // Ícono de la opción
             .option-icon {
-              width: 40px;
-              height: 40px;
+              width: 42px;
+              height: 42px;
               border-radius: 50%;
               display: flex;
               align-items: center;
               justify-content: center;
               margin-bottom: 8px;
-              box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+              box-shadow: 0 5px 15px rgba(0, 0, 0, 0.25);
               transition: all 0.5s cubic-bezier(0.23, 1, 0.32, 1);
               animation: iconFadeIn 0.5s ease forwards;
               
               @include responsive(md) {
-                width: 32px;
-                height: 32px;
-                margin-bottom: 4px;
+                width: 36px;
+                height: 36px;
+                margin-bottom: 5px;
               }
               
               @include responsive(sm) {
-                width: 28px;
-                height: 28px;
-                margin-bottom: 2px;
+                width: 32px;
+                height: 32px;
+                margin-bottom: 3px;
               }
               
               i {
                 color: white;
                 font-size: 18px;
-                filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.2));
+                filter: drop-shadow(0 2px 3px rgba(0, 0, 0, 0.3));
                 
                 @include responsive(md) {
+                  font-size: 15px;
+                }
+                
+                @include responsive(sm) {
                   font-size: 14px;
                 }
               }
@@ -458,16 +556,17 @@ $breakpoints: (
           
           // Estado activo (elemento central)
           &.center {
-            transform: translateX(0) translateZ(40px) scale(1.1);
+            transform: translateX(0) translateZ(50px) scale(1.1);
             z-index: 3;
             opacity: 1;
-            color: #00e5ff;
+            color: $accent-color;
             text-shadow: 0 0 12px rgba(0, 229, 255, 0.7);
             font-weight: 600;
             
             .option-icon {
               opacity: 1;
               transform: scale(1.1);
+              box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3), 0 0 15px rgba(0, 229, 255, 0.4);
               
               @include responsive(md) {
                 transform: scale(1.05);
@@ -478,18 +577,18 @@ $breakpoints: (
               animation: highlightGlow 3s infinite;
               
               @include responsive(md) {
-                font-size: 0.9rem;
+                font-size: 0.95rem;
               }
               
               @include responsive(sm) {
-                font-size: 0.8rem;
+                font-size: 0.85rem;
               }
             }
             
             .active-underline {
               width: 70px;
               height: 3px;
-              background: linear-gradient(90deg, #00e5ff, #2979ff);
+              background: linear-gradient(90deg, #00e5ff, #5B86E5);
               border-radius: 3px;
               position: absolute;
               bottom: -8px;
@@ -515,13 +614,12 @@ $breakpoints: (
               right: 0;
               bottom: 0;
               background: radial-gradient(ellipse at center, rgba(0, 229, 255, 0.2) 0%, transparent 70%);
-              border-radius: 20px;
-              filter: blur(5px);
+              filter: blur(8px);
               z-index: -1;
             }
           }
           
-          // Posicionamiento del carousel
+          // Posicionamiento del carousel mejorado
           &.left {
             transform: translateX(-240px) translateZ(-20px) rotateY(10deg) scale(0.9);
             
@@ -595,60 +693,66 @@ $breakpoints: (
           }
           
           span {
-            font-size: 1.2rem;
+            font-size: 1.25rem;
             transition: all 0.3s ease;
             white-space: nowrap;
             filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.5));
             
             @include responsive(lg) {
-              font-size: 1rem;
+              font-size: 1.1rem;
             }
             
             @include responsive(md) {
-              font-size: 0.9rem;
+              font-size: 0.95rem;
+            }
+            
+            @include responsive(sm) {
+              font-size: 0.85rem;
             }
           }
           
-          // Efectos hover avanzados
+          // Efectos hover mejorados
           &:hover {
             &:not(.center) {
+              opacity: 0.9;
+              
               &.left, &.far-left {
-                transform: translateX(-240px) translateZ(-15px) rotateY(8deg) scale(0.92) translateY(-5px);
+                transform: translateX(-240px) translateZ(-15px) rotateY(5deg) scale(0.92) translateY(-5px);
                 
                 @include responsive(xl) {
-                  transform: translateX(-180px) translateZ(-15px) rotateY(8deg) scale(0.92) translateY(-5px);
+                  transform: translateX(-180px) translateZ(-15px) rotateY(5deg) scale(0.92) translateY(-5px);
                 }
                 
                 @include responsive(lg) {
-                  transform: translateX(-150px) translateZ(-15px) rotateY(8deg) scale(0.92) translateY(-5px);
+                  transform: translateX(-150px) translateZ(-15px) rotateY(5deg) scale(0.92) translateY(-5px);
                 }
                 
                 @include responsive(md) {
-                  transform: translateX(-120px) translateZ(-15px) rotateY(8deg) scale(0.87) translateY(-3px);
+                  transform: translateX(-120px) translateZ(-15px) rotateY(5deg) scale(0.87) translateY(-3px);
                 }
                 
                 @include responsive(sm) {
-                  transform: translateX(-90px) translateZ(-15px) rotateY(8deg) scale(0.82) translateY(-2px);
+                  transform: translateX(-90px) translateZ(-15px) rotateY(5deg) scale(0.82) translateY(-2px);
                 }
               }
               
               &.right, &.far-right {
-                transform: translateX(240px) translateZ(-15px) rotateY(-8deg) scale(0.92) translateY(-5px);
+                transform: translateX(240px) translateZ(-15px) rotateY(-5deg) scale(0.92) translateY(-5px);
                 
                 @include responsive(xl) {
-                  transform: translateX(180px) translateZ(-15px) rotateY(-8deg) scale(0.92) translateY(-5px);
+                  transform: translateX(180px) translateZ(-15px) rotateY(-5deg) scale(0.92) translateY(-5px);
                 }
                 
                 @include responsive(lg) {
-                  transform: translateX(150px) translateZ(-15px) rotateY(-8deg) scale(0.92) translateY(-5px);
+                  transform: translateX(150px) translateZ(-15px) rotateY(-5deg) scale(0.92) translateY(-5px);
                 }
                 
                 @include responsive(md) {
-                  transform: translateX(120px) translateZ(-15px) rotateY(-8deg) scale(0.87) translateY(-3px);
+                  transform: translateX(120px) translateZ(-15px) rotateY(-5deg) scale(0.87) translateY(-3px);
                 }
                 
                 @include responsive(sm) {
-                  transform: translateX(90px) translateZ(-15px) rotateY(-8deg) scale(0.82) translateY(-2px);
+                  transform: translateX(90px) translateZ(-15px) rotateY(-5deg) scale(0.82) translateY(-2px);
                 }
               }
             }
@@ -656,8 +760,8 @@ $breakpoints: (
         }
       }
     }
-    
-    // User profile
+
+    // User profile enhanced
     .support-user-profile {
       position: relative;
       z-index: 20;
@@ -674,13 +778,13 @@ $breakpoints: (
       .support-profile-button {
         display: flex;
         align-items: center;
-        background: rgba(0, 0, 0, 0.2);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+        background: rgba(10, 20, 40, 0.8);
+        border: 1px solid rgba(0, 212, 255, 0.15);
         border-radius: 12px;
         padding: 0.5rem 0.75rem 0.5rem 0.5rem;
         cursor: pointer;
         transition: all 0.3s cubic-bezier(0.22, 1, 0.36, 1);
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
         position: relative;
         
         @include responsive(md) {
@@ -716,30 +820,46 @@ $breakpoints: (
           }
         }
         
-        // Avatar
+        // Avatar enhancado
         .support-avatar {
           position: relative;
-          width: 38px;
-          height: 38px;
+          width: 40px;
+          height: 40px;
           border-radius: 12px;
-          background: linear-gradient(135deg, #36D1DC, #5B86E5);
+          background: linear-gradient(135deg, $primary-gradient-start, $primary-gradient-end);
           display: flex;
           align-items: center;
           justify-content: center;
           margin-right: 0.75rem;
           flex-shrink: 0;
-          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(0, 212, 255, 0.2);
           overflow: hidden;
           
           @include responsive(md) {
-            width: 34px;
-            height: 34px;
+            width: 36px;
+            height: 36px;
             margin-right: 0;
           }
           
           @include responsive(sm) {
-            width: 32px;
-            height: 32px;
+            width: 34px;
+            height: 34px;
+          }
+          
+          &:before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: linear-gradient(45deg, 
+              rgba(255, 255, 255, 0) 0%, 
+              rgba(255, 255, 255, 0.1) 50%, 
+              rgba(255, 255, 255, 0) 100%);
+            transform: rotate(45deg);
+            animation: gradientPulse 3s infinite;
+            z-index: 1;
           }
           
           .support-avatar-text {
@@ -748,14 +868,14 @@ $breakpoints: (
             color: white;
             position: relative;
             z-index: 2;
-            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
             
             @include responsive(sm) {
               font-size: 0.85rem;
             }
           }
           
-          // Estado de conexión
+          // Estado de conexión mejorado
           .support-avatar-status {
             position: absolute;
             bottom: -2px;
@@ -775,16 +895,16 @@ $breakpoints: (
             }
             
             &.online {
-              background: #4CAF50;
+              background: $success-color;
               animation: statusPulse 2s infinite;
             }
             
             &.away {
-              background: #FF9800;
+              background: $warning-color;
             }
             
             &.busy {
-              background: #F44336;
+              background: $error-color;
             }
             
             &.offline {
@@ -805,9 +925,9 @@ $breakpoints: (
         }
         
         &:hover {
-          background: rgba(255, 255, 255, 0.05);
+          background: rgba(0, 212, 255, 0.08);
           transform: translateY(-3px);
-          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+          box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 212, 255, 0.2);
           
           i {
             color: white;
@@ -815,28 +935,31 @@ $breakpoints: (
         }
         
         &.active {
-          background: rgba(0, 212, 255, 0.1);
-          border-color: rgba(0, 212, 255, 0.2);
-          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0, 212, 255, 0.1);
+          background: rgba(0, 212, 255, 0.15);
+          border-color: rgba(0, 212, 255, 0.3);
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(0, 212, 255, 0.25);
           
           i {
-            color: #00D4FF;
+            color: $accent-color;
             transform: rotate(180deg);
           }
         }
       }
       
-      // Menú desplegable del usuario
+      // Menú desplegable del usuario mejorado
       .support-user-menu {
         position: absolute;
         top: calc(100% + 0.75rem);
         right: 0;
         width: 340px;
-        background: rgba(8, 15, 30, 0.97);
+        background: linear-gradient(135deg, rgba(12, 20, 40, 0.98), rgba(8, 15, 30, 0.98));
         backdrop-filter: blur(20px);
-        border-radius: 12px;
-        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.4), 0 0 30px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(0, 212, 255, 0.15);
-        border: 1px solid rgba(0, 212, 255, 0.1);
+        border-radius: 16px;
+        box-shadow: 
+          0 30px 60px rgba(0, 0, 0, 0.4), 
+          0 0 30px rgba(0, 0, 0, 0.3), 
+          0 0 0 1px rgba(0, 212, 255, 0.2);
+        border: 1px solid rgba(0, 212, 255, 0.15);
         overflow: hidden;
         z-index: 100;
         animation: dropdownReveal 0.3s cubic-bezier(0.22, 1, 0.36, 1) forwards;
@@ -859,11 +982,11 @@ $breakpoints: (
           right: -15px;
         }
         
-        // Encabezado del menú
+        // Encabezado del menú mejorado
         .support-menu-header {
           padding: 1.5rem;
-          background: linear-gradient(to bottom, rgba(10, 20, 40, 0.97), rgba(8, 15, 30, 0.97));
-          border-bottom: 1px solid rgba(0, 212, 255, 0.1);
+          background: linear-gradient(to bottom, rgba(15, 25, 45, 0.98), rgba(12, 20, 40, 0.97));
+          border-bottom: 1px solid rgba(0, 212, 255, 0.15);
           
           @include responsive(sm) {
             padding: 1.2rem;
@@ -881,8 +1004,8 @@ $breakpoints: (
             .support-user-avatar {
               width: 60px;
               height: 60px;
-              border-radius: 12px;
-              background: linear-gradient(135deg, #36D1DC, #5B86E5);
+              border-radius: 14px;
+              background: linear-gradient(135deg, $primary-gradient-start, $primary-gradient-end);
               display: flex;
               align-items: center;
               justify-content: center;
@@ -892,11 +1015,34 @@ $breakpoints: (
               flex-shrink: 0;
               position: relative;
               box-shadow: 0 0 0 2px rgba(0, 212, 255, 0.3), 0 10px 20px rgba(0, 0, 0, 0.4);
+              overflow: hidden;
+              
+              &:before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: linear-gradient(45deg, 
+                  rgba(255, 255, 255, 0) 0%, 
+                  rgba(255, 255, 255, 0.1) 50%, 
+                  rgba(255, 255, 255, 0) 100%);
+                transform: rotate(45deg);
+                animation: gradientPulse 3s infinite;
+                z-index: 1;
+              }
               
               @include responsive(sm) {
                 width: 50px;
                 height: 50px;
                 font-size: 1.2rem;
+              }
+              
+              span {
+                position: relative;
+                z-index: 2;
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
               }
               
               .avatar-status {
@@ -907,6 +1053,7 @@ $breakpoints: (
                 height: 14px;
                 border-radius: 50%;
                 border: 2px solid #0f172a;
+                z-index: 3;
                 
                 @include responsive(sm) {
                   width: 12px;
@@ -916,16 +1063,16 @@ $breakpoints: (
                 }
                 
                 &.online {
-                  background: #4CAF50;
+                  background: $success-color;
                   animation: statusPulse 2s infinite;
                 }
                 
                 &.away {
-                  background: #FF9800;
+                  background: $warning-color;
                 }
                 
                 &.busy {
-                  background: #F44336;
+                  background: $error-color;
                 }
 
                 &.offline {
@@ -952,7 +1099,7 @@ $breakpoints: (
                 font-size: 0.85rem;
                 color: rgba(255, 255, 255, 0.6);
                 margin-bottom: 0.5rem;
-                
+
                 @include responsive(sm) {
                   font-size: 0.75rem;
                   margin-bottom: 0.4rem;
@@ -970,15 +1117,15 @@ $breakpoints: (
                 }
                 
                 &.online {
-                  color: #4CAF50;
+                  color: $success-color;
                 }
                 
                 &.away {
-                  color: #FF9800;
+                  color: $warning-color;
                 }
                 
                 &.busy {
-                  color: #F44336;
+                  color: $error-color;
                 }
                 
                 &.offline {
@@ -997,11 +1144,11 @@ $breakpoints: (
           }
         }
         
-        // Secciones del menú
+        // Secciones del menú mejoradas
         .support-menu-section {
-          background: rgba(10, 20, 40, 0.3);
+          background: rgba(15, 25, 45, 0.4);
           padding: 0.75rem 0;
-          border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+          border-bottom: 1px solid rgba(0, 212, 255, 0.05);
           
           &:last-child {
             border-bottom: none;
@@ -1010,7 +1157,7 @@ $breakpoints: (
           .section-title {
             padding: 0.5rem 1.5rem;
             font-size: 0.8rem;
-            color: rgba(0, 212, 255, 0.5);
+            color: rgba(0, 212, 255, 0.7);
             text-transform: uppercase;
             letter-spacing: 1px;
             font-weight: 700;
@@ -1026,7 +1173,7 @@ $breakpoints: (
           padding: 0.25rem 0;
         }
         
-        // Items del menú
+        // Items del menú mejorados
         .support-menu-item {
           padding: 0.75rem 1.5rem;
           display: flex;
@@ -1039,10 +1186,10 @@ $breakpoints: (
           }
           
           &:hover {
-            background: linear-gradient(90deg, rgba(0, 212, 255, 0.05), transparent);
+            background: linear-gradient(90deg, rgba(0, 212, 255, 0.08), transparent);
             
             i {
-              color: #00D4FF;
+              color: $accent-color;
               text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
               transform: translateY(-2px);
             }
@@ -1076,109 +1223,26 @@ $breakpoints: (
             }
           }
           
-          .support-notification-badge {
-            min-width: 22px;
-            height: 22px;
-            border-radius: 11px;
-            background: linear-gradient(135deg, #FF5E62, #FF9966);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 0.75rem;
-            font-weight: 600;
-            padding: 0 6px;
-            animation: badgePulse 2s infinite;
-            
-            @include responsive(sm) {
-              min-width: 20px;
-              height: 20px;
-              font-size: 0.7rem;
-            }
-          }
-          
-          // Switches
-          &.toggle-item {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            
-            .toggle-item-content {
-              display: flex;
-              align-items: center;
-              
-              i {
-                margin-right: 1rem;
-                
-                @include responsive(sm) {
-                  margin-right: 0.8rem;
-                }
-              }
-            }
-            
-            .toggle-switch {
-              width: 44px;
-              height: 24px;
-              background: rgba(255, 255, 255, 0.15);
-              border-radius: 12px;
-              position: relative;
-              padding: 2px;
-              transition: all 0.3s ease;
-              
-              @include responsive(sm) {
-                width: 40px;
-                height: 22px;
-              }
-              
-              &:hover {
-                background: rgba(255, 255, 255, 0.2);
-              }
-              
-              .toggle-handle {
-                width: 20px;
-                height: 20px;
-                border-radius: 50%;
-                background: rgba(255, 255, 255, 0.8);
-                position: absolute;
-                left: 2px;
-                top: 2px;
-                transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-                
-                @include responsive(sm) {
-                  width: 18px;
-                  height: 18px;
-                }
-                
-                &.active {
-                  left: calc(100% - 22px);
-                  background: #00D4FF;
-                  box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
-                  
-                  @include responsive(sm) {
-                    left: calc(100% - 20px);
-                  }
-                }
-              }
-            }
-          }
-          
           &.logout {
-            color: #FF5E62;
+            color: $error-color;
             
             i {
-              color: #FF5E62;
+              color: $error-color;
             }
             
             &:hover {
               background: rgba(244, 67, 54, 0.05);
+              
+              i {
+                text-shadow: 0 0 10px rgba(244, 67, 54, 0.5);
+              }
             }
           }
         }
         
-        // Footer del menú
+        // Footer del menú mejorado
         .support-menu-footer {
-          background: linear-gradient(to top, rgba(10, 20, 40, 0.97), rgba(8, 15, 30, 0.8));
+          background: linear-gradient(to top, rgba(10, 20, 40, 0.97), rgba(12, 20, 40, 0.9));
           padding: 0.75rem 0;
           
           .version-info {
@@ -1186,7 +1250,7 @@ $breakpoints: (
             justify-content: space-between;
             padding: 0.5rem 1.5rem;
             font-size: 0.75rem;
-            color: rgba(0, 212, 255, 0.4);
+            color: rgba(0, 212, 255, 0.5);
             
             @include responsive(sm) {
               padding: 0.5rem 1.2rem;
@@ -1218,104 +1282,7 @@ body.logging-out {
   }
 }
 
-/* Agregar estos estilos a tu archivo Header.scss existente */
-
-.main-header {
-  /* Estilos existentes */
-  
-  .header-container {
-    /* Estilos existentes */
-    
-    /* Navegación entre menús - Nuevo para Referrals Page */
-    .logo-container {
-      display: flex;
-      align-items: center;
-      
-      .menu-navigation {
-        display: flex;
-        gap: 1rem;
-        margin-left: 1.5rem;
-        
-        .nav-button {
-          background: rgba(255, 255, 255, 0.05);
-          border: 1px solid rgba(255, 255, 255, 0.1);
-          border-radius: 8px;
-          color: rgba(255, 255, 255, 0.7);
-          padding: 0.5rem 1rem;
-          display: flex;
-          align-items: center;
-          cursor: pointer;
-          transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-          
-          i {
-            margin-right: 0.5rem;
-            font-size: 0.9rem;
-          }
-          
-          span {
-            font-size: 0.9rem;
-            font-weight: 500;
-          }
-          
-          &:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
-          }
-          
-          &.active {
-            background: linear-gradient(135deg, rgba(0, 229, 255, 0.15), rgba(0, 140, 255, 0.15));
-            color: #00e5ff;
-            position: relative;
-            
-            &:after {
-              content: '';
-              position: absolute;
-              bottom: -4px;
-              left: 10%;
-              width: 80%;
-              height: 3px;
-              background: linear-gradient(to right, #00e5ff, #2979ff);
-              border-radius: 3px;
-              box-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
-            }
-          }
-        }
-      }
-    }
-    
-    /* Carrusel modificado para accommodar las opciones de Referrals */
-    .top-carousel {
-      .carousel-options {
-        .carousel-option {
-          &.center {
-            .option-content {
-              .option-icon {
-                animation: iconFadeIn 0.5s ease forwards;
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
-
-/* Animaciones adicionales */
-@keyframes iconFadeIn {
-  0% {
-    opacity: 0;
-    transform: scale(0.5);
-  }
-  100% {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
-/* Media queries para responsividad */
+// Media queries para responsividad
 @media (max-width: 992px) {
   .main-header .header-container {
     .logo-container {

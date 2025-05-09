@@ -2069,3 +2069,211 @@ $role-colors: (
   0% { background-position: -200% 0; }
   100% { background-position: 200% 0; }
 }
+
+// Updated Delete Modal Styling
+// Add these styles to your existing SCSS file
+
+// Delete confirmation modal styling
+.delete-confirm-modal {
+  background: white;
+  border-radius: 12px;
+  width: 450px;
+  max-width: 90vw;
+  box-shadow: 0 20px 25px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  
+  // Header for delete modal
+  .modal-header.delete-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: white;
+    border-bottom: 1px solid #E5E7EB;
+    padding: 1rem 1.25rem;
+    
+    h3 {
+      color: #DC2626; // Red color
+      font-size: 1.1rem;
+      font-weight: 600;
+      margin: 0;
+      padding-bottom: 0.25rem;
+      position: relative;
+      
+      &::after {
+        content: '';
+        position: absolute;
+        left: 0;
+        bottom: 0;
+        width: 2rem;
+        height: 2px;
+        background-color: #DC2626;
+      }
+    }
+    
+    .close-modal {
+      background: transparent;
+      border: none;
+      color: #9CA3AF;
+      width: 24px;
+      height: 24px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s;
+      
+      &:hover {
+        color: #4B5563;
+      }
+    }
+  }
+  
+  // Body for delete modal
+  .modal-body.delete-body {
+    padding: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    
+    .delete-warning-icon {
+      width: 48px;
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1rem;
+      
+      i {
+        color: #DC2626;
+        font-size: 2.5rem;
+      }
+    }
+    
+    .delete-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #111827;
+      margin-bottom: 1.25rem;
+      text-align: center;
+    }
+    
+    // Preview box styling
+    .delete-note-preview {
+      width: 100%;
+      background: #F9FAFB;
+      border: 1px solid #E5E7EB;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      overflow: hidden;
+      
+      .preview-content {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        
+        .preview-image {
+          width: 48px;
+          height: 48px;
+          object-fit: cover;
+          border-radius: 4px;
+          margin-right: 1rem;
+        }
+        
+        .preview-text {
+          flex: 1;
+          
+          .preview-title {
+            font-size: 1rem;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 0.5rem;
+          }
+          
+          .preview-meta {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            
+            .preview-category, .preview-tag {
+              font-size: 0.75rem;
+              padding: 0.2rem 0.5rem;
+              border-radius: 50px;
+              font-weight: 500;
+            }
+            
+            .preview-tag {
+              background: #F3F4F6;
+              color: #4B5563;
+            }
+          }
+        }
+      }
+    }
+    
+    // Warning message
+    .delete-warning {
+      width: 100%;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: #FEF2F2;
+      border: 1px solid #FEE2E2;
+      color: #B91C1C;
+      padding: 0.75rem 1rem;
+      border-radius: 6px;
+      font-size: 0.875rem;
+      
+      i {
+        color: #EF4444;
+      }
+    }
+  }
+  
+  // Footer for delete modal
+  .modal-footer.delete-footer {
+    display: flex;
+    justify-content: flex-end;
+    padding: 1rem 1.5rem;
+    background: #F9FAFB;
+    border-top: 1px solid #E5E7EB;
+    gap: 0.75rem;
+    
+    .cancel-btn, .delete-confirm-btn {
+      font-size: 0.875rem;
+      font-weight: 500;
+      padding: 0.5rem 1rem;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    
+    .cancel-btn {
+      background: white;
+      border: 1px solid #D1D5DB;
+      color: #4B5563;
+      
+      &:hover {
+        background: #F3F4F6;
+        border-color: #9CA3AF;
+      }
+    }
+    
+    .delete-confirm-btn {
+      background: #EF4444;
+      color: white;
+      border: none;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      
+      &:hover {
+        background: #DC2626;
+      }
+      
+      &:active {
+        background: #B91C1C;
+      }
+    }
+  }
+}

@@ -18,7 +18,6 @@ const Header = ({ onLogout }) => {
   const [isTablet, setIsTablet] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [showAIAssistant, setShowAIAssistant] = useState(false);
-  const notificationCount = 5;
   
   // Referencias DOM
   const userMenuRef = useRef(null);
@@ -55,14 +54,13 @@ const Header = ({ onLogout }) => {
     return { baseRole, roleType };
   }
   
-  // Función para filtrar menú según el rol del usuario - MODIFICADA PARA QUITAR SUPPORT
+  // Función para filtrar menú según el rol del usuario - MODIFICADA PARA QUITAR SYSTEM MANAGEMENT
   function getFilteredMenuOptions() {
-    // Opciones completas del menú (sin Support)
+    // Opciones completas del menú (sin System Management)
     const allMenuOptions = [
       { id: 1, name: "Patients", icon: "fa-user-injured", route: `/${baseRole}/patients`, color: "#36D1DC" },
       { id: 2, name: "Referrals", icon: "fa-file-medical", route: `/${baseRole}/referrals`, color: "#FF9966" },
-      { id: 4, name: "System Management", icon: "fa-cogs", route: `/${baseRole}/management`, color: "#8B5CF6" },
-      { id: 5, name: "Accounting", icon: "fa-chart-pie", route: `/${baseRole}/accounting`, color: "#4CAF50" }
+      { id: 3, name: "Accounting", icon: "fa-chart-pie", route: `/${baseRole}/accounting`, color: "#4CAF50" }
     ];
     
     // Filtrar según el tipo de rol
@@ -290,6 +288,18 @@ const Header = ({ onLogout }) => {
     }, isMobile ? 300 : 500);
   };
   
+  // Handle navigation to settings page (nueva función)
+  const handleNavigateToSettings = () => {
+    if (isLoggingOut) return;
+    
+    setShowUserMenu(false);
+    setMenuTransitioning(true);
+    
+    setTimeout(() => {
+      navigate(`/${baseRole}/settings`);
+    }, isMobile ? 300 : 500);
+  };
+  
   // Handle navigation to main menu
   const handleMainMenuTransition = () => {
     navigate(`/${baseRole}/homePage`);
@@ -337,6 +347,9 @@ const Header = ({ onLogout }) => {
     
     return result;
   };
+
+  // Verificar si el usuario es un terapeuta
+  const isTherapist = ['pt', 'ot', 'st', 'pta', 'cota', 'sta'].includes(baseRole);
 
   // Mostrar/ocultar flechas de navegación basado en cantidad de opciones
   const showCarouselArrows = menuOptions.length > 1;
@@ -471,59 +484,39 @@ const Header = ({ onLogout }) => {
                       <i className="fas fa-user-circle"></i>
                       <span>My Profile</span>
                     </div>
-                    <div className="support-menu-item">
+                    <div 
+                      className="support-menu-item"
+                      onClick={handleNavigateToSettings}
+                    >
                       <i className="fas fa-cog"></i>
                       <span>Settings</span>
                     </div>
-                    <div className="support-menu-item">
-                      <i className="fas fa-calendar-alt"></i>
-                      <span>My Schedule</span>
-                    </div>
+                    {/* Mostrar "My Schedule" solo para roles de terapeutas */}
+                    {isTherapist && (
+                      <div className="support-menu-item">
+                        <i className="fas fa-calendar-alt"></i>
+                        <span>My Schedule</span>
+                      </div>
+                    )}
                   </div>
                 </div>
                 
-                <div className="support-menu-section">
-                  <div className="section-title">Preferences</div>
-                  <div className="support-menu-items">
-                  <div className="support-menu-item">
-                      <i className="fas fa-bell"></i>
-                      <span>Notifications</span>
-                      <div className="support-notification-badge">{notificationCount}</div>
-                    </div>
-                    <div className="support-menu-item toggle-item">
-                      <div className="toggle-item-content">
-                        <i className="fas fa-moon"></i>
-                        <span>Dark Mode</span>
+                {/* Mostrar sección de soporte solo para usuarios que no sean developers */}
+                {roleType !== 'developer' && (
+                  <div className="support-menu-section">
+                    <div className="section-title">Support</div>
+                    <div className="support-menu-items">
+                      <div className="support-menu-item">
+                        <i className="fas fa-headset"></i>
+                        <span>Contact Support</span>
                       </div>
-                      <div className="toggle-switch">
-                        <div className="toggle-handle active"></div>
-                      </div>
-                    </div>
-                    <div className="support-menu-item toggle-item">
-                      <div className="toggle-item-content">
-                        <i className="fas fa-volume-up"></i>
-                        <span>Sound Alerts</span>
-                      </div>
-                      <div className="toggle-switch">
-                        <div className="toggle-handle"></div>
+                      <div className="support-menu-item">
+                        <i className="fas fa-bug"></i>
+                        <span>Report Issue</span>
                       </div>
                     </div>
                   </div>
-                </div>
-                
-                <div className="support-menu-section">
-                  <div className="section-title">Support</div>
-                  <div className="support-menu-items">
-                    <div className="support-menu-item">
-                      <i className="fas fa-headset"></i>
-                      <span>Contact Support</span>
-                    </div>
-                    <div className="support-menu-item">
-                      <i className="fas fa-bug"></i>
-                      <span>Report Issue</span>
-                    </div>
-                  </div>
-                </div>
+                )}
                 
                 <div className="support-menu-footer">
                   <div className="support-menu-item logout" onClick={handleLogout}>
@@ -531,7 +524,7 @@ const Header = ({ onLogout }) => {
                     <span>Log Out</span>
                   </div>
                   <div className="version-info">
-                    <span>TherapySync™ Support</span>
+                    <span>TherapySync™</span>
                     <span>v2.7.0</span>
                   </div>
                 </div>

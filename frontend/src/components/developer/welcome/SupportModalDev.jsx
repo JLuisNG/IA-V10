@@ -1,6 +1,5 @@
-// components/developer/support/SupportModal.jsx
 import React, { useState, useEffect, useRef } from 'react';
-import '../../../styles/developer/support/SupportModalDev.scss';
+import '../../../styles/developer/support/SupportDev.scss';
 import { useAuth } from '../../login/AuthContext';
 
 const SupportModal = ({ isOpen, onClose }) => {
