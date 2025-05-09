@@ -62,6 +62,8 @@ def delete_visit(id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"msg": "Visit removed"}
 
+#////////////////////////// NOTAS //////////////////////////#
+
 @router.delete("/visit-notes/{note_id}")
 def delete_visit_note(note_id: int, db: Session = Depends(get_db)):
     note = db.query(VisitNote).filter(VisitNote.id == note_id).first()
@@ -71,6 +73,16 @@ def delete_visit_note(note_id: int, db: Session = Depends(get_db)):
     db.delete(note)
     db.commit()
     return {"detail": "Visit note deleted"}
+
+@router.delete("/note-sections/{section_id}")
+def delete_section(section_id: int, db: Session = Depends(get_db)):
+    section = db.query(NoteSection).filter(NoteSection.id == section_id).first()
+    if not section:
+        raise HTTPException(status_code=404, detail="Section not found")
+    db.delete(section)
+    db.commit()
+    return {"detail": "Section deleted"}
+
 
 #///////////////////////// PATIENTS //////////////////////////#
 

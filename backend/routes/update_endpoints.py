@@ -241,7 +241,6 @@ def update_certification_period(cert_id: int, cert_update: CertificationPeriodUp
     for field, value in cert_update.dict(exclude_unset=True).items():
         setattr(cert, field, value)
 
-    # Recalcular is_active si se editó la fecha o el paciente está inactivo
     hoy = date.today()
     cert.is_active = cert.paciente.activo and (cert.start_date <= hoy <= cert.end_date)
 
