@@ -1,7 +1,12 @@
 from fastapi import APIRouter, HTTPException, Depends
 from sqlalchemy.orm import Session
 from database.connection import get_db
-from database.models import Staff, Pacientes, Exercise, CertificationPeriod
+from database.models import ( 
+    Staff, 
+    Pacientes, 
+    Exercise, 
+    CertificationPeriod,
+    PacienteExerciseAssignment)
 
 router = APIRouter()
 
@@ -38,11 +43,46 @@ def delete_exercise(exercise_id: int, db: Session = Depends(get_db)):
 @router.delete("/visits/{id}")
 def delete_visit(id: int, db: Session = Depends(get_db)):
     visit = db.query(Visit).filter(Visit.id == id).first()
+
     if not visit:
-        raise HTTPException(404, "Visit not found")
-    db.delete(visit)
+        raise HTTPException(status_code=404, detail="Visit not found")
+
+    has_note = visit.note is not None
+    has_signature = visit.note and (
+        visit.note.therapist_signature or
+        visit.note.patient_signature or
+        visit.note.visit_date_signature
+    )
+
+    if has_note or has_signature:
+        visit.is_hidden = True 
+    else:
+        db.delete(visit)
+
     db.commit()
-    return {"msg": "Deleted"}
+    return {"msg": "Visit removed"}
+
+#////////////////////////// NOTAS //////////////////////////#
+
+@router.delete("/visit-notes/{note_id}")
+def delete_visit_note(note_id: int, db: Session = Depends(get_db)):
+    note = db.query(VisitNote).filter(VisitNote.id == note_id).first()
+    if not note:
+        raise HTTPException(status_code=404, detail="Note not found")
+
+    db.delete(note)
+    db.commit()
+    return {"detail": "Visit note deleted"}
+
+@router.delete("/note-sections/{section_id}")
+def delete_section(section_id: int, db: Session = Depends(get_db)):
+    section = db.query(NoteSection).filter(NoteSection.id == section_id).first()
+    if not section:
+        raise HTTPException(status_code=404, detail="Section not found")
+    db.delete(section)
+    db.commit()
+    return {"detail": "Section deleted"}
+
 
 #///////////////////////// PATIENTS //////////////////////////#
 
@@ -69,3 +109,35 @@ def deactivate_paciente(paciente_id: int, db: Session = Depends(get_db)):
         "message": "Paciente y sus periodos de certificación activos desactivados.",
         "paciente_id": paciente.id_paciente
     }
+
+#///////////////////////// CERT PERIODS //////////////////////////#
+
+@router.delete("/cert-periods/{cert_id}")
+def delete_certification_period(cert_id: int, db: Session = Depends(get_db)):
+    cert = db.query(CertificationPeriod).filter(CertificationPeriod.id == cert_id).first()
+
+    if not cert:
+        raise HTTPException(status_code=404, detail="Certification period not found.")
+
+    if cert.visits:
+        raise HTTPException(
+            status_code=400,
+            detail="Cannot delete certification period with existing visits."
+        )
+
+    db.delete(cert)
+    db.commit()
+    return {"detail": "Certification period deleted successfully."}
+
+#///////////////////////// EXERCISES //////////////////////////#
+
+@router.delete("/assigned-exercises/{assignment_id}")
+def delete_assigned_exercise(assignment_id: int, db: Session = Depends(get_db)):
+    assignment = db.query(PacienteExerciseAssignment).filter(PacienteExerciseAssignment.id == assignment_id).first()
+
+    if not assignment:
+        raise HTTPException(status_code=404, detail="Exercise assignment not found.")
+
+    db.delete(assignment)
+    db.commit()
+    return {"detail": "Exercise assignment deleted successfully."}

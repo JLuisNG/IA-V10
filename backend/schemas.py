@@ -20,14 +20,9 @@ class StaffBase(BaseModel):
 class StaffCreate(StaffBase):
     pass
 
-class StaffUpdate(BaseModel): 
+class StaffUpdate(StaffBase):
     name: Optional[str] = None
-    birthday: Optional[date] = None
-    gender: Optional[str] = None
-    postal_code: Optional[str] = None
     email: Optional[str] = None
-    phone: Optional[str] = None
-    alt_phone: Optional[str] = None
     username: Optional[str] = None
     password: Optional[str] = None
     rol: Optional[str] = None
@@ -36,8 +31,28 @@ class StaffUpdate(BaseModel):
     class Config:
         from_attributes = True
 
-class StaffResponse(StaffBase):
+class StaffResponse(BaseModel):
     id: int
+    name: str
+    email: str
+    rol: str
+
+    class Config:
+        from_attributes = True
+
+class StaffAssignmentBase(BaseModel):
+    paciente_id: int
+    staff_id: int
+    rol_asignado: str
+
+class StaffAssignmentCreate(StaffAssignmentBase):
+    pass
+
+class StaffAssignmentResponse(BaseModel):
+    id: int
+    fecha_asignacion: datetime
+    rol_asignado: str
+    staff: StaffResponse
 
     class Config:
         from_attributes = True
@@ -49,7 +64,7 @@ class PacienteBase(BaseModel):
     birthday: date
     gender: str
     address: str
-    contact_info: Optional[str] = None
+    contact_info: Optional[str] = None  
     payor_type: Optional[str] = None
     physician: Optional[str] = None
     agency_id: int
@@ -63,33 +78,18 @@ class PacienteBase(BaseModel):
     height: Optional[str] = None
     pmh: Optional[str] = None
     clinical_grouping: Optional[str] = None
-    disciplines_needed: Optional[str] = None
+    disciplines_needed: Optional[str] = None 
     activo: Optional[bool] = True
 
 class PacienteCreate(PacienteBase):
     initial_cert_start_date: date
 
-class PacienteUpdate(BaseModel):
+class PacienteUpdate(PacienteBase):
     patient_name: Optional[str] = None
     birthday: Optional[date] = None
     gender: Optional[str] = None
     address: Optional[str] = None
-    contact_info: Optional[List[str]] = None
-    payor_type: Optional[str] = None
-    physician: Optional[str] = None
     agency_id: Optional[int] = None
-    nursing_diagnostic: Optional[str] = None
-    urgency_level: Optional[str] = None
-    prior_level_of_function: Optional[str] = None
-    homebound: Optional[str] = None
-    weight_bearing_status: Optional[str] = None
-    reason_for_referral: Optional[str] = None
-    weight: Optional[str] = None
-    height: Optional[str] = None
-    pmh: Optional[str] = None
-    clinical_grouping: Optional[str] = None
-    disciplines_needed: Optional[List[str]] = None
-    activo: Optional[bool] = None
 
     class Config:
         from_attributes = True
@@ -132,6 +132,13 @@ class ExerciseBase(BaseModel):
 
 class ExerciseCreate(ExerciseBase):
     pass
+
+class ExerciseUpdate(ExerciseBase):
+    name: Optional[str] = None
+    discipline: Optional[str] = None
+
+    class Config:
+        from_attributes = True
 
 class ExerciseResponse(ExerciseBase):
     id: int
@@ -215,6 +222,9 @@ class NoteTemplateBase(BaseModel):
     discipline: str
     section_name: str
     is_active: bool = True
+    is_required: Optional[bool] = False
+    has_image: Optional[bool] = False
+    image_url: Optional[str] = None
 
 class NoteTemplateCreate(NoteTemplateBase):
     pass
@@ -225,12 +235,24 @@ class NoteTemplateResponse(NoteTemplateBase):
     class Config:
         from_attributes = True
 
-class CertificationPeriodResponse(BaseModel):
-    id: int
-    paciente_id: int
+#//////////////////////////// CERT PERIODS //////////////////////////#
+
+class CertificationPeriodBase(BaseModel):
     start_date: date
     end_date: date
-    is_active: bool
+    is_active: bool = True
 
+class CertificationPeriodResponse(CertificationPeriodBase):
+    id: int
+    paciente_id: int
+
+    class Config:
+        from_attributes = True
+
+class CertificationPeriodUpdate(CertificationPeriodBase):
+    start_date: Optional[date] = None
+    end_date: Optional[date] = None
+    is_active: Optional[bool] = None
+    
     class Config:
         from_attributes = True
