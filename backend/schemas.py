@@ -206,12 +206,26 @@ class VisitNoteResponse(VisitNoteBase):
         from_attributes = True
         
 class NoteSectionBase(BaseModel):
-    note_id: int
     section_name: str
-    content: Optional[str] = None
+    description: Optional[str] = None
+    is_required: Optional[bool] = False
+    has_static_image: Optional[bool] = False
+    static_image_url: Optional[str] = None
+    form_schema: Optional[Dict] = None 
 
 class NoteSectionCreate(NoteSectionBase):
     pass
+
+class NoteSectionUpdate(BaseModel):
+    section_name: Optional[str] = None
+    description: Optional[str] = None
+    is_required: Optional[bool] = None
+    has_static_image: Optional[bool] = None
+    static_image_url: Optional[str] = None
+    form_schema: Optional[Dict] = None
+
+    class Config:
+        from_attributes = True
 
 class NoteSectionResponse(NoteSectionBase):
     id: int

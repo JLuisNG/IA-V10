@@ -159,11 +159,12 @@ class NoteSection(Base):
     __tablename__ = "note_sections"
 
     id = Column(Integer, primary_key=True)
-    note_id = Column(Integer, ForeignKey("visit_notes.id"), nullable=False)
-    section_name = Column(String, nullable=False)
-    content = Column(Text, nullable=True)
-
-    note = relationship("VisitNote", back_populates="sections")
+    section_name = Column(String, nullable=False, unique=True)
+    description = Column(Text, nullable=True)
+    is_required = Column(Boolean, default=False)
+    has_static_image = Column(Boolean, default=False)
+    static_image_url = Column(String, nullable=True)
+    form_schema = Column(JSON, nullable=True) 
 
 class NoteTemplate(Base):
     __tablename__ = "note_templates"
