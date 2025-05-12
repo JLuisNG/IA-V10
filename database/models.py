@@ -61,7 +61,8 @@ class Documentos(Base):
     paciente_id = Column(Integer, ForeignKey("pacientes.id_paciente"), nullable=True)
     staff_id = Column(Integer, ForeignKey("staff.id"), nullable=True)
     file_name = Column(String, nullable=False)
-    file_data_base64 = Column(Text, nullable=False)
+    ruta_archivo = Column(String)
+    fecha_subida = Column(DateTime, default=datetime.utcnow)
 
     paciente = relationship("Pacientes", back_populates="documentos")
     staff = relationship("Staff", back_populates="documentos")
@@ -103,6 +104,7 @@ class Exercise(Base):
     hep_required = Column(Boolean, default=True)
     discipline = Column(String, nullable=False)  
     focus_area = Column(String, nullable=True)  
+    is_active = Column(Boolean, default=True)
 
 class PacienteExerciseAssignment(Base):
     __tablename__ = "paciente_exercise_assignments"

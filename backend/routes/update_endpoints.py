@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends, Body
 from sqlalchemy.orm import Session
 from typing import Optional
-from datetime import datetime
+from datetime import date, datetime
 from database.connection import get_db
 from database.models import Staff, Pacientes, CertificationPeriod, Exercise
 from schemas import (
@@ -251,14 +251,43 @@ def update_certification_period(cert_id: int, cert_update: CertificationPeriodUp
 #////////////////////////// EXERCISES //////////////////////////#
 
 @router.put("/exercises/{exercise_id}", response_model=ExerciseResponse)
-def update_exercise(exercise_id: int, update_data: ExerciseUpdate, db: Session = Depends(get_db)):
+def update_exercise(
+    exercise_id: int,
+    name: Optional[str] = None,
+    description: Optional[str] = None,
+    image_url: Optional[str] = None,
+    default_sets: Optional[int] = None,
+    default_reps: Optional[int] = None,
+    default_sessions_per_day: Optional[int] = None,
+    hep_required: Optional[bool] = None,
+    discipline: Optional[str] = None,
+    focus_area: Optional[str] = None,
+    db: Session = Depends(get_db)
+):
     exercise = db.query(Exercise).filter(Exercise.id == exercise_id).first()
 
     if not exercise:
         raise HTTPException(status_code=404, detail="Exercise not found.")
 
-    for field, value in update_data.dict(exclude_unset=True).items():
-        setattr(exercise, field, value)
+    # Actualizar solo campos provistos
+    if name is not None:
+        exercise.name = name
+    if description is not None:
+        exercise.description = description
+    if image_url is not None:
+        exercise.image_url = image_url
+    if default_sets is not None:
+        exercise.default_sets = default_sets
+    if default_reps is not None:
+        exercise.default_reps = default_reps
+    if default_sessions_per_day is not None:
+        exercise.default_sessions_per_day = default_sessions_per_day
+    if hep_required is not None:
+        exercise.hep_required = hep_required
+    if discipline is not None:
+        exercise.discipline = discipline
+    if focus_area is not None:
+        exercise.focus_area = focus_area
 
     db.commit()
     db.refresh(exercise)

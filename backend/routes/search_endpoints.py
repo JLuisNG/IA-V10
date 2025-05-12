@@ -1,4 +1,6 @@
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Query
+import os, shutil
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from typing import Optional, List
 from datetime import datetime
@@ -10,7 +12,8 @@ from database.models import (
     PacienteExerciseAssignment, 
     Visit, 
     StaffAssignment,
-    CertificationPeriod)
+    CertificationPeriod,
+    Documentos)
 from schemas import (
     StaffResponse,
     PacienteResponse,
@@ -21,7 +24,8 @@ from schemas import (
     NoteTemplateResponse,
     NoteSectionResponse,
     CertificationPeriodResponse,
-    StaffAssignmentResponse)
+    StaffAssignmentResponse,
+    DocumentoResponse)
 
 router = APIRouter()
 
@@ -117,6 +121,41 @@ def get_active_template_sections(discipline: str, note_type: str, db: Session = 
         NoteTemplate.note_type == note_type,
         NoteTemplate.is_active == True
     ).all()
+
+#////////////////////////// DOCUMENTOS //////////////////////////#
+
+@router.get("/documentos/", response_model=List[DocumentoResponse])
+def get_documents_by_entity(
+    paciente_id: Optional[int] = Query(None),
+    staff_id: Optional[int] = Query(None),
+    db: Session = Depends(get_db)
+):
+    if paciente_id and staff_id:
+        raise HTTPException(status_code=400, detail="Proporcione solo paciente_id o staff_id, no ambos.")
+
+    if not paciente_id and not staff_id:
+        raise HTTPException(status_code=400, detail="Debe proporcionar paciente_id o staff_id.")
+
+    if paciente_id:
+        return db.query(Documentos).filter(Documentos.paciente_id == paciente_id).all()
+
+    return db.query(Documentos).filter(Documentos.staff_id == staff_id).all()
+
+@router.get("/documentos/{doc_id}/preview")
+def preview_document(doc_id: int, db: Session = Depends(get_db)):
+    doc = db.query(Documentos).filter(Documentos.id == doc_id).first()
+    if not doc:
+        raise HTTPException(status_code=404, detail="Documento no encontrado")
+
+    if not os.path.isfile(doc.ruta_archivo):
+        raise HTTPException(status_code=404, detail="Archivo físico no encontrado")
+
+    return FileResponse(
+        path=doc.ruta_archivo,
+        media_type="application/pdf",
+        filename=doc.file_name,
+        headers={"Content-Disposition": f'inline; filename="{doc.file_name}"'}
+    )
 
 #////////////////////////// CERT PERIODS //////////////////////////#
 

@@ -1,4 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends
+import os
 from sqlalchemy.orm import Session
 from database.connection import get_db
 from database.models import ( 
@@ -6,7 +7,8 @@ from database.models import (
     Pacientes, 
     Exercise, 
     CertificationPeriod,
-    PacienteExerciseAssignment)
+    PacienteExerciseAssignment,
+    Documentos)
 
 router = APIRouter()
 
@@ -20,20 +22,6 @@ def delete_staff(staff_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Staff no encontrado.")
 
     db.delete(staff_db)
-    db.commit()
-
-    return
-
-#///////////////////////// EJERCICIOS //////////////////////////#
-
-@router.delete("/exercises/{exercise_id}", status_code=204)
-def delete_exercise(exercise_id: int, db: Session = Depends(get_db)):
-    exercise_db = db.query(Exercise).filter(Exercise.id == exercise_id).first()
-
-    if not exercise_db:
-        raise HTTPException(status_code=404, detail="Ejercicio no encontrado.")
-
-    db.delete(exercise_db)
     db.commit()
 
     return
@@ -83,7 +71,6 @@ def delete_section(section_id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"detail": "Section deleted"}
 
-
 #///////////////////////// PATIENTS //////////////////////////#
 
 @router.put("/pacientes/{paciente_id}/deactivate")
@@ -129,7 +116,48 @@ def delete_certification_period(cert_id: int, db: Session = Depends(get_db)):
     db.commit()
     return {"detail": "Certification period deleted successfully."}
 
+#///////////////////////// DOCUMENTOS //////////////////////////#
+
+@router.delete("/documentos/{doc_id}")
+def delete_document(doc_id: int, db: Session = Depends(get_db)):
+    doc = db.query(Documentos).filter(Documentos.id == doc_id).first()
+    if not doc:
+        raise HTTPException(status_code=404, detail="Documento no encontrado.")
+
+    if doc.ruta_archivo and os.path.isfile(doc.ruta_archivo):
+        try:
+            os.remove(doc.ruta_archivo)
+        except Exception as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"No se pudo eliminar el archivo físico: {str(e)}"
+            )
+
+    db.delete(doc)
+    db.commit()
+
+    return {"detail": "Documento eliminado correctamente."}
+
 #///////////////////////// EXERCISES //////////////////////////#
+
+@router.delete("/exercises/{exercise_id}")
+def deactivate_or_delete_exercise(exercise_id: int, db: Session = Depends(get_db)):
+    exercise = db.query(Exercise).filter(Exercise.id == exercise_id).first()
+    if not exercise:
+        raise HTTPException(status_code=404, detail="Exercise not found.")
+
+    assigned = db.query(PacienteExerciseAssignment).filter(
+        PacienteExerciseAssignment.exercise_id == exercise_id
+    ).first()
+
+    if assigned:
+        exercise.is_active = False
+        db.commit()
+        return {"detail": "Exercise desactivado porque está asignado a pacientes."}
+    else:
+        db.delete(exercise)
+        db.commit()
+        return {"detail": "Exercise eliminado completamente (no estaba asignado)."}
 
 @router.delete("/assigned-exercises/{assignment_id}")
 def delete_assigned_exercise(assignment_id: int, db: Session = Depends(get_db)):

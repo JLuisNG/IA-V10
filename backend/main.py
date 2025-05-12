@@ -25,15 +25,15 @@ async def startup():
         with engine.connect() as conn:
             conn.execute(text("SET search_path TO public;"))
         
-        Base.metadata.create_all(bind=engine)  # SOLO CREA LOS MODELOS DEFINIDOS
+        Base.metadata.create_all(bind=engine)
 
     except Exception as e:
         print(f"Error during startup: {e}")
 
-app.include_router(create_router, prefix="/api")
-app.include_router(search_router, prefix="/api")
-app.include_router(update_router, prefix="/api")
-app.include_router(delete_router, prefix="/api")
+app.include_router(create_router)
+app.include_router(search_router)
+app.include_router(update_router)
+app.include_router(delete_router)
 
 @app.get("/")
 async def root():

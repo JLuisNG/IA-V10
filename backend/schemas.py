@@ -43,7 +43,6 @@ class StaffResponse(BaseModel):
 class StaffAssignmentBase(BaseModel):
     paciente_id: int
     staff_id: int
-    rol_asignado: str
 
 class StaffAssignmentCreate(StaffAssignmentBase):
     pass
@@ -53,6 +52,24 @@ class StaffAssignmentResponse(BaseModel):
     fecha_asignacion: datetime
     rol_asignado: str
     staff: StaffResponse
+
+    class Config:
+        from_attributes = True
+
+#//////////////////////////// DOCUMENTOS //////////////////////////#
+
+class DocumentoBase(BaseModel):
+    paciente_id: Optional[int] = None
+    staff_id: Optional[int] = None
+    file_name: str
+
+class DocumentoCreate(DocumentoBase):
+    ruta_archivo: str
+
+class DocumentoResponse(DocumentoBase):
+    id: int
+    ruta_archivo: str
+    fecha_subida: datetime
 
     class Config:
         from_attributes = True
@@ -100,23 +117,6 @@ class PacienteResponse(PacienteBase):
     class Config:
         from_attributes = True
 
-#//////////////////////////// DOCUMENTOS //////////////////////////#
-
-class DocumentoBase(BaseModel):
-    paciente_id: int
-    staff_id: Optional[int] = None
-    file_name: str
-    file_data_base64: str
-
-class DocumentoCreate(DocumentoBase):
-    pass
-
-class DocumentoResponse(DocumentoBase):
-    id: int
-
-    class Config:
-        from_attributes = True
-
 #//////////////////////////// EJERCICIOS //////////////////////////#
 
 class ExerciseBase(BaseModel):
@@ -129,6 +129,7 @@ class ExerciseBase(BaseModel):
     hep_required: Optional[bool] = True
     discipline: str  
     focus_area: Optional[str] = None
+    is_active: Optional[bool] = True
 
 class ExerciseCreate(ExerciseBase):
     pass
@@ -142,6 +143,7 @@ class ExerciseUpdate(ExerciseBase):
 
 class ExerciseResponse(ExerciseBase):
     id: int
+    is_active: Optional[bool] = True
 
     class Config:
         from_attributes = True      

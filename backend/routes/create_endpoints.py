@@ -1,6 +1,7 @@
-from fastapi import APIRouter, HTTPException, Depends
+import os, shutil, re
+from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, Form
 from sqlalchemy.orm import Session
-from typing import List
+from typing import Optional, List
 from datetime import datetime, timedelta, date
 from database.connection import get_db
 from database.models import (
@@ -14,25 +15,17 @@ from database.models import (
     NoteSection,
     VisitNote)
 from schemas import (
-    StaffCreate, 
-    StaffResponse, 
-    PacienteCreate, 
-    PacienteResponse, 
-    DocumentoCreate, 
-    DocumentoResponse, 
-    ExerciseCreate, 
-    ExerciseResponse, 
-    PacienteExerciseAssignmentCreate, 
-    VisitCreate, 
-    StaffAssignmentResponse,
-    NoteSectionCreate,
-    NoteSectionResponse,
-    NoteTemplateCreate,
-    NoteTemplateResponse,
-    VisitNoteCreate,
-    VisitNoteResponse)
+    StaffCreate, StaffResponse, StaffAssignmentResponse,
+    PacienteCreate, PacienteResponse,
+    DocumentoCreate, DocumentoResponse, 
+    ExerciseCreate, ExerciseResponse, PacienteExerciseAssignmentCreate, 
+    VisitCreate, VisitNoteCreate, VisitNoteResponse,
+    NoteSectionCreate, NoteSectionResponse,
+    NoteTemplateCreate, NoteTemplateResponse)
 
 router = APIRouter()
+
+BASE_STORAGE_PATH = "/app/storage/docs"
 
 #////////////////////////// STAFF //////////////////////////#
 
@@ -55,7 +48,7 @@ def create_staff(staff: StaffCreate, db: Session = Depends(get_db)):
         phone=staff.phone,
         alt_phone=staff.alt_phone,
         username=staff.username,
-        password=staff.password,  # Hasear en un futuro 
+        password=staff.password,
         rol=staff.rol
     )
     db.add(new_staff)
@@ -65,27 +58,38 @@ def create_staff(staff: StaffCreate, db: Session = Depends(get_db)):
     return new_staff
 
 @router.post("/assign-staff", response_model=StaffAssignmentResponse)
-def assign_staff_to_patient(paciente_id: int, staff_id: int, rol_asignado: str, db: Session = Depends(get_db)):
+def assign_staff_to_patient(paciente_id: int, staff_id: int, db: Session = Depends(get_db)):
+    staff = db.query(Staff).filter(Staff.id == staff_id).first()
+    if not staff:
+        raise HTTPException(status_code=404, detail="Staff no encontrado.")
+
+    rol_asignado = staff.rol
+
     existing_assignment = db.query(StaffAssignment).filter(
         StaffAssignment.paciente_id == paciente_id,
         StaffAssignment.rol_asignado == rol_asignado
     ).first()
 
+    if existing_assignment and existing_assignment.staff_id == staff_id:
+        return existing_assignment
+
     if existing_assignment:
         existing_assignment.staff_id = staff_id
         existing_assignment.fecha_asignacion = datetime.utcnow()
-    else:
-        new_assignment = StaffAssignment(
-            paciente_id=paciente_id,
-            staff_id=staff_id,
-            rol_asignado=rol_asignado,
-            fecha_asignacion=datetime.utcnow()
-        )
-        db.add(new_assignment)
+        db.commit()
+        db.refresh(existing_assignment)
+        return existing_assignment
 
+    new_assignment = StaffAssignment(
+        paciente_id=paciente_id,
+        staff_id=staff_id,
+        rol_asignado=rol_asignado,
+        fecha_asignacion=datetime.utcnow()
+    )
+    db.add(new_assignment)
     db.commit()
-
-    return existing_assignment if existing_assignment else new_assignment
+    db.refresh(new_assignment)
+    return new_assignment
 
 #////////////////////////// PACIENTES //////////////////////////#
 
@@ -95,9 +99,14 @@ def create_paciente(paciente: PacienteCreate, db: Session = Depends(get_db)):
         Pacientes.patient_name == paciente.patient_name,
         Pacientes.birthday == paciente.birthday
     ).first()
-
     if existing_paciente:
         raise HTTPException(status_code=400, detail="Paciente ya registrado.")
+
+    agency = db.query(Staff).filter(Staff.id == paciente.agency_id).first()
+    if not agency:
+        raise HTTPException(status_code=404, detail="La agencia no existe.")
+    if agency.rol.lower() != "agency":
+        raise HTTPException(status_code=400, detail="El ID proporcionado no corresponde a una agencia válida.")
 
     new_paciente = Pacientes(
         patient_name=paciente.patient_name,
@@ -121,7 +130,6 @@ def create_paciente(paciente: PacienteCreate, db: Session = Depends(get_db)):
         disciplines_needed=paciente.disciplines_needed,
         activo=paciente.activo
     )
-
     db.add(new_paciente)
     db.commit()
     db.refresh(new_paciente)
@@ -135,7 +143,6 @@ def create_paciente(paciente: PacienteCreate, db: Session = Depends(get_db)):
         end_date=end_date,
         is_active=True
     )
-
     db.add(cert_period)
     db.commit()
 
@@ -143,18 +150,49 @@ def create_paciente(paciente: PacienteCreate, db: Session = Depends(get_db)):
 
 #////////////////////////// DOCUMENTS //////////////////////////#
 
-@router.post("/documentos/", response_model=DocumentoResponse)
-def upload_document(documento: DocumentoCreate, db: Session = Depends(get_db)):
-    new_documento = Documentos(
-        paciente_id=documento.paciente_id,
-        file_name=documento.file_name,
-        file_data_base64=documento.file_data_base64
-    )
-    db.add(new_documento)
-    db.commit()
-    db.refresh(new_documento)
+def sanitize_filename(filename: str) -> str:
+    name, ext = os.path.splitext(filename)
+    name = re.sub(r'[^\w\d-]', '_', name)  
+    return f"{name}{ext.lower()}"
 
-    return new_documento
+@router.post("/documentos/upload", response_model=DocumentoResponse)
+def upload_document(
+    file: UploadFile = File(...),
+    paciente_id: int = Form(None),
+    staff_id: int = Form(None),
+    db: Session = Depends(get_db)
+):
+    if paciente_id and staff_id:
+        raise HTTPException(status_code=400, detail="Solo uno: paciente_id o staff_id.")
+    if not paciente_id and not staff_id:
+        raise HTTPException(status_code=400, detail="Debe indicar paciente_id o staff_id.")
+    if not file.filename.lower().endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="Solo se permiten archivos PDF.")
+
+    clean_filename = sanitize_filename(file.filename)
+
+    entity = "pacientes" if paciente_id else "staff"
+    entity_id = paciente_id or staff_id
+    folder_path = os.path.join(BASE_STORAGE_PATH, entity, str(entity_id))
+    os.makedirs(folder_path, exist_ok=True)
+
+    file_path = os.path.join(folder_path, clean_filename)
+
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
+    new_doc = Documentos(
+        paciente_id=paciente_id,
+        staff_id=staff_id,
+        file_name=clean_filename,
+        ruta_archivo=file_path,
+        fecha_subida=datetime.utcnow()
+    )
+    db.add(new_doc)
+    db.commit()
+    db.refresh(new_doc)
+
+    return new_doc
 
 #////////////////////////// EJERCICIOS //////////////////////////#
 
