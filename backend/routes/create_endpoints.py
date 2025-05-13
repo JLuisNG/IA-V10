@@ -13,7 +13,9 @@ from database.models import (
     Visit,
     StaffAssignment, 
     NoteSection,
-    VisitNote)
+    VisitNote,
+    NoteTemplate,
+    NoteTemplateSection)
 from schemas import (
     StaffCreate, StaffResponse, StaffAssignmentResponse,
     PacienteCreate, PacienteResponse,
@@ -265,21 +267,35 @@ def create_visit(data: VisitCreate, db: Session = Depends(get_db)):
 #////////////////////////// NOTAS //////////////////////////#
 
 @router.post("/note-templates", response_model=NoteTemplateResponse)
-def create_template_section(template_data: NoteTemplateCreate, db: Session = Depends(get_db)):
-    new_section = NoteTemplate(**template_data.dict())
-    db.add(new_section)
+def create_template(template_data: NoteTemplateCreate, db: Session = Depends(get_db)):
+    existing = db.query(NoteTemplate).filter_by(
+        discipline=template_data.discipline,
+        note_type=template_data.note_type
+    ).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Template already exists for this discipline and note type.")
+        
+    new_template = NoteTemplate(
+        discipline=template_data.discipline,
+        note_type=template_data.note_type,
+        is_active=template_data.is_active
+    )
+    db.add(new_template)
     db.commit()
-    db.refresh(new_section)
-    return new_section
+    db.refresh(new_template)
+
+    for i, section_id in enumerate(template_data.section_ids):
+        db.add(NoteTemplateSection(template_id=new_template.id, section_id=section_id, position=i))
+    
+    db.commit()
+    return new_template
 
 @router.post("/visit-notes", response_model=VisitNoteResponse)
 def create_visit_note(data: VisitNoteCreate, db: Session = Depends(get_db)):
-    # Verifica que la visita exista
     visit = db.query(Visit).filter(Visit.id == data.visit_id).first()
     if not visit:
         raise HTTPException(status_code=404, detail="Visit not found")
 
-    # Crea la nota
     new_note = VisitNote(
         visit_id=data.visit_id,
         discipline=data.discipline,
@@ -287,16 +303,14 @@ def create_visit_note(data: VisitNoteCreate, db: Session = Depends(get_db)):
         status=data.status or "In Progress"
     )
     db.add(new_note)
-    db.flush()  # para obtener el ID antes de agregar las secciones
+    db.flush() 
 
-    # Busca plantilla por disciplina y tipo
     template_sections = db.query(NoteTemplate).filter(
         NoteTemplate.discipline == data.discipline,
         NoteTemplate.note_type == data.note_type,
         NoteTemplate.is_active == True
     ).all()
 
-    # Crea cada sección basada en plantilla
     for template in template_sections:
         section = NoteSection(
             note_id=new_note.id,
@@ -311,6 +325,10 @@ def create_visit_note(data: VisitNoteCreate, db: Session = Depends(get_db)):
 
 @router.post("/note-sections", response_model=NoteSectionResponse)
 def create_section(data: NoteSectionCreate, db: Session = Depends(get_db)):
+    existing = db.query(NoteSection).filter_by(section_name=data.section_name).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Section with this name already exists")
+
     section = NoteSection(**data.dict())
     db.add(section)
     db.commit()

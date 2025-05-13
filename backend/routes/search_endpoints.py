@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends, Query
 import os, shutil
 from fastapi.responses import FileResponse
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from typing import Optional, List
 from datetime import datetime
 from database.connection import get_db
@@ -13,7 +13,10 @@ from database.models import (
     Visit, 
     StaffAssignment,
     CertificationPeriod,
-    Documentos)
+    Documentos,
+    NoteSection,
+    NoteTemplate,
+    NoteTemplateSection)
 from schemas import (
     StaffResponse,
     PacienteResponse,
@@ -25,7 +28,8 @@ from schemas import (
     NoteSectionResponse,
     CertificationPeriodResponse,
     StaffAssignmentResponse,
-    DocumentoResponse)
+    DocumentoResponse,
+    NoteTemplateWithSectionsResponse)
 
 router = APIRouter()
 
@@ -110,17 +114,30 @@ def get_visit_note_by_visit(visit_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Note not found")
     return note
 
-@router.get("/note-sections/{note_id}", response_model=List[NoteSectionResponse])
-def get_sections(note_id: int, db: Session = Depends(get_db)):
-    return db.query(NoteSection).filter(NoteSection.note_id == note_id).all()
+@router.get("/note-sections", response_model=List[NoteSectionResponse])
+def get_all_sections(db: Session = Depends(get_db)):
+    return db.query(NoteSection).all()
 
-@router.get("/note-templates/active", response_model=List[NoteTemplateResponse])
-def get_active_template_sections(discipline: str, note_type: str, db: Session = Depends(get_db)):
-    return db.query(NoteTemplate).filter(
-        NoteTemplate.discipline == discipline,
-        NoteTemplate.note_type == note_type,
-        NoteTemplate.is_active == True
-    ).all()
+@router.get("/note-templates/full", response_model=List[NoteTemplateWithSectionsResponse])
+def get_all_templates_with_sections(db: Session = Depends(get_db)):
+    templates = db.query(NoteTemplate).options(
+        joinedload(NoteTemplate.sections).joinedload(NoteTemplateSection.section)
+    ).filter(NoteTemplate.is_active == True).all()
+
+    result = []
+    for template in templates:
+        ordered_sections = sorted(template.sections, key=lambda s: s.position or 0)
+        note_sections = [ts.section for ts in ordered_sections]
+
+        result.append(NoteTemplateWithSectionsResponse(
+            id=template.id,
+            discipline=template.discipline,
+            note_type=template.note_type,
+            is_active=template.is_active,
+            sections=note_sections
+        ))
+
+    return result
 
 #////////////////////////// DOCUMENTOS //////////////////////////#
 

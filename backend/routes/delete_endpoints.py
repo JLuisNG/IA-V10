@@ -8,7 +8,8 @@ from database.models import (
     Exercise, 
     CertificationPeriod,
     PacienteExerciseAssignment,
-    Documentos)
+    Documentos,
+    NoteSection)
 
 router = APIRouter()
 

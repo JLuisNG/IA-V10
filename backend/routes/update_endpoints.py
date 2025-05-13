@@ -1,9 +1,9 @@
-from fastapi import APIRouter, HTTPException, Depends, Body
+from fastapi import APIRouter, HTTPException, Depends, Body, Query
 from sqlalchemy.orm import Session
-from typing import Optional
+from typing import Optional, List
 from datetime import date, datetime
 from database.connection import get_db
-from database.models import Staff, Pacientes, CertificationPeriod, Exercise
+from database.models import Staff, Pacientes, CertificationPeriod, Exercise, NoteSection, NoteTemplate, NoteTemplateSection
 from schemas import (
     StaffUpdate, 
     StaffResponse, 
@@ -16,9 +16,9 @@ from schemas import (
     ExerciseUpdate,
     ExerciseResponse,
     NoteSectionResponse,
-    NoteSectionBase,
-    NoteTemplateResponse,
-    NoteTemplateCreate)
+    NoteSectionUpdate,
+    NoteTemplateUpdate,
+    NoteTemplateResponse)
 
 router = APIRouter()
 
@@ -204,7 +204,7 @@ def restore_hidden_visit(visit_id: int, db: Session = Depends(get_db)):
 #////////////////////////// NOTAS //////////////////////////#
 
 @router.put("/note-sections/{section_id}", response_model=NoteSectionResponse)
-def update_section(section_id: int, data: NoteSectionBase, db: Session = Depends(get_db)):
+def update_section(section_id: int, data: NoteSectionUpdate, db: Session = Depends(get_db)):
     section = db.query(NoteSection).filter(NoteSection.id == section_id).first()
     if not section:
         raise HTTPException(status_code=404, detail="Section not found")
@@ -217,13 +217,44 @@ def update_section(section_id: int, data: NoteSectionBase, db: Session = Depends
     return section
 
 @router.put("/note-templates/{template_id}", response_model=NoteTemplateResponse)
-def update_template_section(template_id: int, db: Session = Depends(get_db), data: NoteTemplateCreate = Body(...)):
-    template = db.query(NoteTemplate).filter(NoteTemplate.id == template_id).first()
+def update_template(
+    template_id: int,
+    discipline: Optional[str] = Query(None),
+    note_type: Optional[str] = Query(None),
+    is_active: Optional[bool] = Query(None),
+    replace_section_ids: Optional[List[int]] = Query(None),
+    add_section_ids: Optional[List[int]] = Query(None),
+    remove_section_ids: Optional[List[int]] = Query(None),
+    db: Session = Depends(get_db)
+):
+    template = db.query(NoteTemplate).filter_by(id=template_id).first()
     if not template:
-        raise HTTPException(status_code=404, detail="Template section not found.")
+        raise HTTPException(status_code=404, detail="Template not found.")
 
-    for field, value in data.dict(exclude_unset=True).items():
-        setattr(template, field, value)
+    if discipline is not None:
+        template.discipline = discipline
+    if note_type is not None:
+        template.note_type = note_type
+    if is_active is not None:
+        template.is_active = is_active
+
+    if replace_section_ids is not None:
+        db.query(NoteTemplateSection).filter_by(template_id=template.id).delete()
+        for i, sid in enumerate(replace_section_ids):
+            db.add(NoteTemplateSection(template_id=template.id, section_id=sid, position=i))
+
+    if add_section_ids is not None:
+        existing_ids = {s.section_id for s in template.sections}
+        current_max = len(template.sections)
+        for i, sid in enumerate(add_section_ids):
+            if sid not in existing_ids:
+                db.add(NoteTemplateSection(template_id=template.id, section_id=sid, position=current_max + i))
+
+    if remove_section_ids is not None:
+        db.query(NoteTemplateSection).filter(
+            NoteTemplateSection.template_id == template.id,
+            NoteTemplateSection.section_id.in_(remove_section_ids)
+        ).delete(synchronize_session=False)
 
     db.commit()
     db.refresh(template)

@@ -1,5 +1,5 @@
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional, List, Dict
 from datetime import datetime, date
 
 #/////////////////////////////// STAFF ////////////////////////////////#
@@ -187,6 +187,8 @@ class VisitResponse(VisitBase):
     class Config:
         from_attributes = True
 
+# --- Notas ---
+
 class VisitNoteBase(BaseModel):
     visit_id: int
     status: Optional[str] = "Scheduled"
@@ -205,6 +207,8 @@ class VisitNoteResponse(VisitNoteBase):
     class Config:
         from_attributes = True
         
+# --- NoteSections ---
+
 class NoteSectionBase(BaseModel):
     section_name: str
     description: Optional[str] = None
@@ -233,20 +237,42 @@ class NoteSectionResponse(NoteSectionBase):
     class Config:
         from_attributes = True
 
+# --- NoteTemplate ---
+
 class NoteTemplateBase(BaseModel):
-    visit_type: str
     discipline: str
-    section_name: str
+    note_type: str
     is_active: bool = True
-    is_required: Optional[bool] = False
-    has_image: Optional[bool] = False
-    image_url: Optional[str] = None
 
 class NoteTemplateCreate(NoteTemplateBase):
-    pass
+    section_ids: List[int]
+
+class NoteTemplateUpdate(BaseModel):
+    discipline: Optional[str] = None
+    note_type: Optional[str] = None
+    is_active: Optional[bool] = None
+
+    replace_section_ids: Optional[List[int]] = None
+    add_section_ids: Optional[List[int]] = None
+    remove_section_ids: Optional[List[int]] = None
+
+    class Config:
+        from_attributes = True
 
 class NoteTemplateResponse(NoteTemplateBase):
     id: int
+
+    class Config:
+        from_attributes = True
+
+# --- NoteTemplateSection ---
+
+class NoteTemplateWithSectionsResponse(BaseModel):
+    id: int
+    discipline: str
+    note_type: str
+    is_active: bool
+    sections: List[NoteSectionResponse]
 
     class Config:
         from_attributes = True

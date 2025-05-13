@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, DateTime, Boolean, ForeignKey, Text
+from sqlalchemy import Column, Integer, String, Date, DateTime, Boolean, ForeignKey, Text, JSON
 from sqlalchemy.orm import relationship
 from database.connection import Base
 from datetime import datetime
@@ -153,7 +153,6 @@ class VisitNote(Base):
     visit_date_signature = Column(Date, nullable=True)
 
     visit = relationship("Visit", back_populates="note")
-    sections = relationship("NoteSection", back_populates="note", cascade="all, delete-orphan")
 
 class NoteSection(Base):
     __tablename__ = "note_sections"
@@ -171,9 +170,18 @@ class NoteTemplate(Base):
 
     id = Column(Integer, primary_key=True)
     discipline = Column(String, nullable=False)
-    note_type = Column(String, nullable=False)    
-    section_name = Column(String, nullable=False)
+    note_type = Column(String, nullable=False)
     is_active = Column(Boolean, default=True)
-    is_required = Column(Boolean, default=False)
-    has_image = Column(Boolean, default=False)
-    image_url = Column(String, nullable=True)
+
+    sections = relationship("NoteTemplateSection", back_populates="template", cascade="all, delete-orphan")
+
+class NoteTemplateSection(Base):
+    __tablename__ = "note_template_sections"
+
+    id = Column(Integer, primary_key=True)
+    template_id = Column(Integer, ForeignKey("note_templates.id"), nullable=False)
+    section_id = Column(Integer, ForeignKey("note_sections.id"), nullable=False)
+    position = Column(Integer, nullable=True)  # opcional para control de orden
+
+    template = relationship("NoteTemplate", back_populates="sections")
+    section = relationship("NoteSection")
