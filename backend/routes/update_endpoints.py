@@ -11,7 +11,7 @@ from database.models import (
     NoteSection, NoteTemplate, NoteTemplateSection,
     Visit, VisitNote)
 from schemas import (
-    VisitCreate, VisitResponse,
+    VisitCreate, VisitResponse, VisitUpdate,
     CertificationPeriodUpdate, CertificationPeriodResponse,
     ExerciseResponse,
     NoteSectionResponse, NoteSectionUpdate,
@@ -163,13 +163,15 @@ def activate_patient(patient_id: int, db: Session = Depends(get_db)):
 
 #////////////////////////// VISITS //////////////////////////#
 
-@router.put("/visits/{id}")
-def update_visit(id: int, data: VisitCreate, db: Session = Depends(get_db)):
+@router.put("/visits/{id}", response_model=VisitResponse)
+def update_visit(id: int, data: VisitUpdate = Depends(), db: Session = Depends(get_db)):
     visit = db.query(Visit).filter(Visit.id == id).first()
     if not visit:
         raise HTTPException(status_code=404, detail="Visit not found")
-    for key, value in data.dict().items():
+
+    for key, value in data.dict(exclude_unset=True).items():
         setattr(visit, key, value)
+
     db.commit()
     db.refresh(visit)
     return visit

@@ -130,6 +130,19 @@ class VisitCreate(BaseModel):
     status: Optional[str] = "Scheduled"
     scheduled_time: Optional[str] = None
 
+class VisitUpdate(BaseModel):
+    patient_id: Optional[int] = None
+    staff_id: Optional[int] = None
+    certification_period_id: Optional[int] = None
+    visit_date: Optional[date] = None
+    visit_type: Optional[str] = None
+    therapy_type: Optional[str] = None
+    status: Optional[str] = None
+    scheduled_time: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
 class VisitResponse(VisitCreate):
     id: int
     note_id: Optional[int] = None

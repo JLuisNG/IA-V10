@@ -26,7 +26,6 @@ def delete_staff(staff_id: int, db: Session = Depends(get_db)):
     db.commit()
     return
 
-
 #///////////////////////// VISITS //////////////////////////#
 
 @router.delete("/visits/{id}")
