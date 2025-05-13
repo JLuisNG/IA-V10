@@ -3,29 +3,27 @@ from sqlalchemy.orm import Session
 from typing import Optional, List
 from datetime import date, datetime
 from database.connection import get_db
-from database.models import Staff, Pacientes, CertificationPeriod, Exercise, NoteSection, NoteTemplate, NoteTemplateSection
+from database.models import (
+    Staff, 
+    Patient, 
+    CertificationPeriod, 
+    Exercise, 
+    NoteSection, NoteTemplate, NoteTemplateSection,
+    Visit, VisitNote)
 from schemas import (
-    StaffUpdate, 
-    StaffResponse, 
-    PacienteUpdate, 
-    PacienteResponse, 
-    VisitCreate, 
-    VisitResponse,
-    CertificationPeriodUpdate, 
-    CertificationPeriodResponse,
-    ExerciseUpdate,
+    VisitCreate, VisitResponse,
+    CertificationPeriodUpdate, CertificationPeriodResponse,
     ExerciseResponse,
-    NoteSectionResponse,
-    NoteSectionUpdate,
-    NoteTemplateUpdate,
-    NoteTemplateResponse)
+    NoteSectionResponse, NoteSectionUpdate,
+    NoteTemplateUpdate, NoteTemplateResponse,
+    VisitNoteResponse, VisitNoteUpdate)
 
 router = APIRouter()
 
 #////////////////////////// STAFF //////////////////////////#
 
 @router.put("/staff/{staff_id}")
-def editar_staff_info(
+def update_staff_info(
     staff_id: int,
     name: Optional[str] = None,
     birthday: Optional[str] = None, 
@@ -36,55 +34,54 @@ def editar_staff_info(
     alt_phone: Optional[str] = None,
     username: Optional[str] = None,
     password: Optional[str] = None,
-    rol: Optional[str] = None,
-    activo: Optional[bool] = None,
+    role: Optional[str] = None,
+    is_active: Optional[bool] = None,
     db: Session = Depends(get_db)
 ):
-    staff_db = db.query(Staff).filter(Staff.id == staff_id).first()
-
-    if not staff_db:
-        raise HTTPException(status_code=404, detail="Staff no encontrado.")
+    staff = db.query(Staff).filter(Staff.id == staff_id).first()
+    if not staff:
+        raise HTTPException(status_code=404, detail="Staff not found.")
 
     if email:
         existing_email = db.query(Staff).filter(Staff.email == email, Staff.id != staff_id).first()
         if existing_email:
-            raise HTTPException(status_code=400, detail="Email ya registrado.")
+            raise HTTPException(status_code=400, detail="Email already registered.")
 
     if username:
         existing_username = db.query(Staff).filter(Staff.username == username, Staff.id != staff_id).first()
         if existing_username:
-            raise HTTPException(status_code=400, detail="Username ya registrado.")
+            raise HTTPException(status_code=400, detail="Username already registered.")
 
-    update_data = {}
-    if name: update_data["name"] = name
-    if birthday: update_data["birthday"] = birthday
-    if gender: update_data["gender"] = gender
-    if postal_code: update_data["postal_code"] = postal_code
-    if email: update_data["email"] = email
-    if phone: update_data["phone"] = phone
-    if alt_phone: update_data["alt_phone"] = alt_phone
-    if username: update_data["username"] = username
-    if password: update_data["password"] = password
-    if rol: update_data["rol"] = rol
-    if activo is not None: update_data["activo"] = activo
+    update_data = {
+        k: v for k, v in {
+            "name": name,
+            "birthday": birthday,
+            "gender": gender,
+            "postal_code": postal_code,
+            "email": email,
+            "phone": phone,
+            "alt_phone": alt_phone,
+            "username": username,
+            "password": password,
+            "role": role,
+            "is_active": is_active
+        }.items() if v is not None
+    }
 
     for key, value in update_data.items():
-        setattr(staff_db, key, value)
+        setattr(staff, key, value)
 
     db.commit()
-    db.refresh(staff_db)
+    db.refresh(staff)
 
-    return {
-        "message": "Staff actualizado correctamente.",
-        "staff_id": staff_db.id
-    }
+    return {"message": "Staff updated successfully.", "staff_id": staff.id}
 
 #////////////////////////// PACIENTES //////////////////////////#
 
-@router.put("/pacientes/{paciente_id}")
-def editar_paciente_info(
-    paciente_id: int,
-    patient_name: Optional[str] = None,
+@router.put("/patients/{patient_id}")
+def update_patient_info(
+    patient_id: int,
+    full_name: Optional[str] = None,
     birthday: Optional[str] = None,
     gender: Optional[str] = None,
     address: Optional[str] = None,
@@ -92,86 +89,77 @@ def editar_paciente_info(
     payor_type: Optional[str] = None,
     physician: Optional[str] = None,
     agency_id: Optional[int] = None,
-    nursing_diagnostic: Optional[str] = None,
+    nursing_diagnosis: Optional[str] = None,
     urgency_level: Optional[str] = None,
     prior_level_of_function: Optional[str] = None,
-    homebound: Optional[str] = None,
+    homebound_status: Optional[str] = None,
     weight_bearing_status: Optional[str] = None,
-    reason_for_referral: Optional[str] = None,
+    referral_reason: Optional[str] = None,
     weight: Optional[str] = None,
     height: Optional[str] = None,
-    pmh: Optional[str] = None,
+    past_medical_history: Optional[str] = None,
     clinical_grouping: Optional[str] = None,
-    disciplines_needed: Optional[str] = None,
-    activo: Optional[bool] = None,
+    required_disciplines: Optional[str] = None,
+    is_active: Optional[bool] = None,
     db: Session = Depends(get_db)
 ):
-    paciente_db = db.query(Pacientes).filter(Pacientes.id_paciente == paciente_id).first()
+    patient = db.query(Patient).filter(Patient.id == patient_id).first()
+    if not patient:
+        raise HTTPException(status_code=404, detail="Patient not found.")
 
-    if not paciente_db:
-        raise HTTPException(status_code=404, detail="Paciente no encontrado.")
-
-    update_data = {}
-    if patient_name: update_data["patient_name"] = patient_name
-    if birthday: update_data["birthday"] = birthday
-    if gender: update_data["gender"] = gender
-    if address: update_data["address"] = address
-    if contact_info: update_data["contact_info"] = contact_info
-    if payor_type: update_data["payor_type"] = payor_type
-    if physician: update_data["physician"] = physician
-    if agency_id: update_data["agency_id"] = agency_id
-    if nursing_diagnostic: update_data["nursing_diagnostic"] = nursing_diagnostic
-    if urgency_level: update_data["urgency_level"] = urgency_level
-    if prior_level_of_function: update_data["prior_level_of_function"] = prior_level_of_function
-    if homebound: update_data["homebound"] = homebound
-    if weight_bearing_status: update_data["weight_bearing_status"] = weight_bearing_status
-    if reason_for_referral: update_data["reason_for_referral"] = reason_for_referral
-    if weight: update_data["weight"] = weight
-    if height: update_data["height"] = height
-    if pmh: update_data["pmh"] = pmh
-    if clinical_grouping: update_data["clinical_grouping"] = clinical_grouping
-    if disciplines_needed: update_data["disciplines_needed"] = disciplines_needed
-    if activo is not None: update_data["activo"] = activo
-
-    for key, value in update_data.items():
-        setattr(paciente_db, key, value)
-
-    db.commit()
-    db.refresh(paciente_db)
-
-    return {
-        "message": "Paciente actualizado correctamente.",
-        "paciente_id": paciente_db.id_paciente
+    update_data = {
+        k: v for k, v in {
+            "full_name": full_name,
+            "birthday": birthday,
+            "gender": gender,
+            "address": address,
+            "contact_info": contact_info,
+            "payor_type": payor_type,
+            "physician": physician,
+            "agency_id": agency_id,
+            "nursing_diagnosis": nursing_diagnosis,
+            "urgency_level": urgency_level,
+            "prior_level_of_function": prior_level_of_function,
+            "homebound_status": homebound_status,
+            "weight_bearing_status": weight_bearing_status,
+            "referral_reason": referral_reason,
+            "weight": weight,
+            "height": height,
+            "past_medical_history": past_medical_history,
+            "clinical_grouping": clinical_grouping,
+            "required_disciplines": required_disciplines,
+            "is_active": is_active
+        }.items() if v is not None
     }
 
-@router.put("/pacientes/{paciente_id}/activate")
-def activate_paciente(paciente_id: int, db: Session = Depends(get_db)):
-    paciente = db.query(Pacientes).filter(Pacientes.id_paciente == paciente_id).first()
-    
-    if not paciente:
-        raise HTTPException(status_code=404, detail="Paciente no encontrado.")
+    for key, value in update_data.items():
+        setattr(patient, key, value)
 
-    paciente.activo = True
+    db.commit()
+    db.refresh(patient)
 
-    cert_period = db.query(CertificationPeriod)\
-        .filter(CertificationPeriod.paciente_id == paciente_id)\
+    return {"message": "Patient updated successfully.", "patient_id": patient.id}
+
+@router.put("/patients/{patient_id}/activate")
+def activate_patient(patient_id: int, db: Session = Depends(get_db)):
+    patient = db.query(Patient).filter(Patient.id == patient_id).first()
+    if not patient:
+        raise HTTPException(status_code=404, detail="Patient not found.")
+
+    patient.is_active = True
+
+    cert = db.query(CertificationPeriod)\
+        .filter(CertificationPeriod.patient_id == patient_id)\
         .order_by(CertificationPeriod.start_date.desc())\
         .first()
 
-    if cert_period:
+    if cert:
         today = datetime.utcnow().date()
-
-        if cert_period.start_date <= today <= cert_period.end_date:
-            cert_period.is_active = True  
-        else:
-            pass
+        if cert.start_date <= today <= cert.end_date:
+            cert.is_active = True
 
     db.commit()
-
-    return {
-        "message": "Paciente reactivado correctamente.",
-        "paciente_id": paciente_id
-    }
+    return {"message": "Patient reactivated successfully.", "patient_id": patient_id}
 
 #////////////////////////// VISITS //////////////////////////#
 
@@ -179,7 +167,7 @@ def activate_paciente(paciente_id: int, db: Session = Depends(get_db)):
 def update_visit(id: int, data: VisitCreate, db: Session = Depends(get_db)):
     visit = db.query(Visit).filter(Visit.id == id).first()
     if not visit:
-        raise HTTPException(404, "Visit not found")
+        raise HTTPException(status_code=404, detail="Visit not found")
     for key, value in data.dict().items():
         setattr(visit, key, value)
     db.commit()
@@ -189,10 +177,8 @@ def update_visit(id: int, data: VisitCreate, db: Session = Depends(get_db)):
 @router.put("/visits/{visit_id}/restore", response_model=VisitResponse)
 def restore_hidden_visit(visit_id: int, db: Session = Depends(get_db)):
     visit = db.query(Visit).filter(Visit.id == visit_id).first()
-
     if not visit:
         raise HTTPException(status_code=404, detail="Visit not found.")
-
     if not visit.is_hidden:
         raise HTTPException(status_code=400, detail="Visit is already visible.")
 
@@ -260,20 +246,50 @@ def update_template(
     db.refresh(template)
     return template
 
+@router.put("/visit-notes/{note_id}", response_model=VisitNoteResponse)
+def update_visit_note(note_id: int, data: VisitNoteUpdate, db: Session = Depends(get_db)):
+    note = db.query(VisitNote).filter(VisitNote.id == note_id).first()
+    if not note:
+        raise HTTPException(status_code=404, detail="Visit note not found")
+
+    if data.status is not None:
+        note.status = data.status
+    if data.therapist_signature is not None:
+        note.therapist_signature = data.therapist_signature
+    if data.patient_signature is not None:
+        note.patient_signature = data.patient_signature
+    if data.visit_date_signature is not None:
+        note.visit_date_signature = data.visit_date_signature
+
+    if data.updated_sections:
+        current_sections = note.sections_data or []
+        section_map = {s["section_id"]: s for s in current_sections}
+
+        for updated in data.updated_sections:
+            section_map[updated.section_id] = {
+                "section_id": updated.section_id,
+                "content": updated.content
+            }
+
+        note.sections_data = list(section_map.values())
+
+    db.commit()
+    db.refresh(note)
+    return note
+
 #////////////////////////// CERT PERIOD //////////////////////////#
 
 @router.put("/cert-periods/{cert_id}", response_model=CertificationPeriodResponse)
 def update_certification_period(cert_id: int, cert_update: CertificationPeriodUpdate, db: Session = Depends(get_db)):
     cert = db.query(CertificationPeriod).filter(CertificationPeriod.id == cert_id).first()
-
     if not cert:
         raise HTTPException(status_code=404, detail="Certification period not found.")
 
     for field, value in cert_update.dict(exclude_unset=True).items():
         setattr(cert, field, value)
 
-    hoy = date.today()
-    cert.is_active = cert.paciente.activo and (cert.start_date <= hoy <= cert.end_date)
+    today = date.today()
+    cert.is_active = cert.patient.is_active and (cert.start_date <= today <= cert.end_date)
 
     db.commit()
     db.refresh(cert)
@@ -296,31 +312,19 @@ def update_exercise(
     db: Session = Depends(get_db)
 ):
     exercise = db.query(Exercise).filter(Exercise.id == exercise_id).first()
-
     if not exercise:
         raise HTTPException(status_code=404, detail="Exercise not found.")
 
-    # Actualizar solo campos provistos
-    if name is not None:
-        exercise.name = name
-    if description is not None:
-        exercise.description = description
-    if image_url is not None:
-        exercise.image_url = image_url
-    if default_sets is not None:
-        exercise.default_sets = default_sets
-    if default_reps is not None:
-        exercise.default_reps = default_reps
-    if default_sessions_per_day is not None:
-        exercise.default_sessions_per_day = default_sessions_per_day
-    if hep_required is not None:
-        exercise.hep_required = hep_required
-    if discipline is not None:
-        exercise.discipline = discipline
-    if focus_area is not None:
-        exercise.focus_area = focus_area
+    if name is not None: exercise.name = name
+    if description is not None: exercise.description = description
+    if image_url is not None: exercise.image_url = image_url
+    if default_sets is not None: exercise.default_sets = default_sets
+    if default_reps is not None: exercise.default_reps = default_reps
+    if default_sessions_per_day is not None: exercise.default_sessions_per_day = default_sessions_per_day
+    if hep_required is not None: exercise.hep_required = hep_required
+    if discipline is not None: exercise.discipline = discipline
+    if focus_area is not None: exercise.focus_area = focus_area
 
     db.commit()
     db.refresh(exercise)
     return exercise
-

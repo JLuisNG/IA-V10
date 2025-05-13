@@ -6,7 +6,7 @@ from sqlalchemy import inspect, text
 sys.path.append("/app")
 
 from database.connection import engine, Base
-from database.models import Staff, Pacientes, CertificationPeriod, Documentos
+from database.models import Staff, Patient, CertificationPeriod, Document
 from routes import create_router, search_router, update_router, delete_router
 
 app = FastAPI()

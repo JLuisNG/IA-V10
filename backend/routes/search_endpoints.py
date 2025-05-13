@@ -1,118 +1,125 @@
 from fastapi import APIRouter, HTTPException, Depends, Query
-import os, shutil
+import os
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session, joinedload
 from typing import Optional, List
-from datetime import datetime
 from database.connection import get_db
 from database.models import (
-    Staff, 
-    Pacientes, 
-    Exercise, 
-    PacienteExerciseAssignment, 
+    Staff, StaffAssignment,
+    Patient, 
+    Exercise, PatientExerciseAssignment, 
     Visit, 
-    StaffAssignment,
     CertificationPeriod,
-    Documentos,
-    NoteSection,
-    NoteTemplate,
-    NoteTemplateSection)
+    Document,
+    NoteSection, NoteTemplate, NoteTemplateSection)
 from schemas import (
-    StaffResponse,
-    PacienteResponse,
-    ExerciseResponse,
-    PacienteExerciseAssignmentResponse,
+    StaffResponse, StaffAssignmentResponse,
+    PatientResponse,
+    ExerciseResponse, PatientExerciseAssignmentResponse,
     VisitResponse,
     VisitNoteResponse,
-    NoteTemplateResponse,
     NoteSectionResponse,
     CertificationPeriodResponse,
-    StaffAssignmentResponse,
-    DocumentoResponse,
+    DocumentResponse,
     NoteTemplateWithSectionsResponse)
 
 router = APIRouter()
 
-#////////////////////////// STAFF //////////////////////////#
+#====================== STAFF ======================#
 
 @router.get("/staff/", response_model=List[StaffResponse])
 def get_active_staff(db: Session = Depends(get_db)):
-    staff_list = db.query(Staff).filter(Staff.activo == True).all()
-    return staff_list
+    return db.query(Staff).filter(Staff.is_active == True).all()
 
-@router.get("/paciente/{paciente_id}/assigned-staff", response_model=List[StaffAssignmentResponse])
-def get_assigned_staff(paciente_id: int, db: Session = Depends(get_db)):
-    assignments = db.query(StaffAssignment).filter(StaffAssignment.paciente_id == paciente_id).all()
+@router.get("/patient/{patient_id}/assigned-staff", response_model=List[StaffAssignmentResponse])
+def get_assigned_staff(patient_id: int, db: Session = Depends(get_db)):
+    assignments = db.query(StaffAssignment).filter(StaffAssignment.patient_id == patient_id).all()
     
     return [
         StaffAssignmentResponse(
             id=a.id,
-            fecha_asignacion=a.fecha_asignacion,
-            rol_asignado=a.rol_asignado,
+            assigned_at=a.assigned_at,
+            assigned_role=a.assigned_role,
             staff=StaffResponse(
                 id=a.staff.id,
                 name=a.staff.name,
                 email=a.staff.email,
-                rol=a.staff.rol
+                role=a.staff.role
             )
         )
         for a in assignments
     ]
 
-#////////////////////////// PACIENTES //////////////////////////#
+#====================== PATIENTS ======================#
 
-@router.get("/pacientes/", response_model=List[PacienteResponse])
-def get_active_pacientes(db: Session = Depends(get_db)):
-    pacientes_list = db.query(Pacientes).filter(Pacientes.activo == True).all()
-    return pacientes_list
+@router.get("/patients/", response_model=List[PatientResponse])
+def get_active_patients(db: Session = Depends(get_db)):
+    return db.query(Patient).filter(Patient.is_active == True).all()
 
-@router.get("/staff/{staff_id}/assigned-patients", response_model=List[PacienteResponse])
+@router.get("/staff/{staff_id}/assigned-patients", response_model=List[PatientResponse])
 def get_assigned_patients(staff_id: int, db: Session = Depends(get_db)):
     assignments = db.query(StaffAssignment).filter(StaffAssignment.staff_id == staff_id).all()
-    pacientes = [a.paciente for a in assignments if a.paciente.activo]
-    return pacientes
+    patients = [a.patient for a in assignments if a.patient.is_active]
+    return patients
 
-#////////////////////////// EJERCICIOS DISPONIBLES //////////////////////////#
+#====================== EXERCISES ======================#
 
 @router.get("/exercises/", response_model=List[ExerciseResponse])
 def get_exercises(discipline: Optional[str] = None, db: Session = Depends(get_db)):
     query = db.query(Exercise)
     if discipline:
         query = query.filter(Exercise.discipline == discipline)
-    exercises = query.all()
-    return exercises
+    return query.all()
 
-@router.get("/pacientes/{paciente_id}/exercises/", response_model=List[PacienteExerciseAssignmentResponse])
-def get_exercises_of_paciente(paciente_id: int, db: Session = Depends(get_db)):
-    assignments = db.query(PacienteExerciseAssignment).filter(PacienteExerciseAssignment.paciente_id == paciente_id).all()
-    return assignments
+@router.get("/patients/{patient_id}/exercises/", response_model=List[PatientExerciseAssignmentResponse])
+def get_exercises_of_patient(patient_id: int, db: Session = Depends(get_db)):
+    return db.query(PatientExerciseAssignment).filter(PatientExerciseAssignment.patient_id == patient_id).all()
 
-#////////////////////////// VISITS //////////////////////////#
+#====================== VISITS ======================#
 
 @router.get("/visits/certperiod/{cert_id}", response_model=List[VisitResponse])
 def get_visits_by_certification_period(cert_id: int, db: Session = Depends(get_db)):
-    visits = db.query(Visit).filter(
+    return db.query(Visit).filter(
         Visit.certification_period_id == cert_id,
         Visit.is_hidden == False
     ).all()
-    return visits
 
 @router.get("/visits/certperiod/{cert_id}/deleted", response_model=List[VisitResponse])
 def get_deleted_visits(cert_id: int, db: Session = Depends(get_db)):
-    visits = db.query(Visit).filter(
+    return db.query(Visit).filter(
         Visit.certification_period_id == cert_id,
         Visit.is_hidden == True
     ).all()
-    return visits
 
-#////////////////////////// NOTAS //////////////////////////#
+#====================== VISIT NOTES ======================#
 
-@router.get("/visit-notes/{visit_id}", response_model=VisitNoteResponse)
-def get_visit_note_by_visit(visit_id: int, db: Session = Depends(get_db)):
+@router.get("/visit-notes/{visit_id}/full", response_model=VisitNoteResponse)
+def get_full_visit_note(visit_id: int, db: Session = Depends(get_db)):
     note = db.query(VisitNote).filter(VisitNote.visit_id == visit_id).first()
     if not note:
         raise HTTPException(status_code=404, detail="Note not found")
-    return note
+
+    template = db.query(NoteTemplate).filter_by(
+        discipline=note.discipline,
+        note_type=note.note_type,
+        is_active=True
+    ).first()
+    if not template:
+        raise HTTPException(status_code=404, detail="Template not found")
+
+    template_sections = (
+        db.query(NoteTemplateSection)
+        .filter(NoteTemplateSection.template_id == template.id)
+        .join(NoteSection)
+        .order_by(NoteTemplateSection.position.asc())
+        .all()
+    )
+    section_objs = [ts.section for ts in template_sections]
+
+    return {
+        **note.__dict__,
+        "template_sections": section_objs
+    }
 
 @router.get("/note-sections", response_model=List[NoteSectionResponse])
 def get_all_sections(db: Session = Depends(get_db)):
@@ -139,43 +146,44 @@ def get_all_templates_with_sections(db: Session = Depends(get_db)):
 
     return result
 
-#////////////////////////// DOCUMENTOS //////////////////////////#
+#====================== DOCUMENTS ======================#
 
-@router.get("/documentos/", response_model=List[DocumentoResponse])
+@router.get("/documents/", response_model=List[DocumentResponse])
 def get_documents_by_entity(
-    paciente_id: Optional[int] = Query(None),
+    patient_id: Optional[int] = Query(None),
     staff_id: Optional[int] = Query(None),
     db: Session = Depends(get_db)
 ):
-    if paciente_id and staff_id:
-        raise HTTPException(status_code=400, detail="Proporcione solo paciente_id o staff_id, no ambos.")
+    if patient_id and staff_id:
+        raise HTTPException(status_code=400, detail="Provide only patient_id or staff_id, not both.")
+    if not patient_id and not staff_id:
+        raise HTTPException(status_code=400, detail="You must specify either patient_id or staff_id.")
 
-    if not paciente_id and not staff_id:
-        raise HTTPException(status_code=400, detail="Debe proporcionar paciente_id o staff_id.")
+    if patient_id:
+        return db.query(Document).filter(Document.patient_id == patient_id).all()
 
-    if paciente_id:
-        return db.query(Documentos).filter(Documentos.paciente_id == paciente_id).all()
+    return db.query(Document).filter(Document.staff_id == staff_id).all()
 
-    return db.query(Documentos).filter(Documentos.staff_id == staff_id).all()
-
-@router.get("/documentos/{doc_id}/preview")
+@router.get("/documents/{doc_id}/preview")
 def preview_document(doc_id: int, db: Session = Depends(get_db)):
-    doc = db.query(Documentos).filter(Documentos.id == doc_id).first()
+    doc = db.query(Document).filter(Document.id == doc_id).first()
     if not doc:
-        raise HTTPException(status_code=404, detail="Documento no encontrado")
+        raise HTTPException(status_code=404, detail="Document not found")
 
-    if not os.path.isfile(doc.ruta_archivo):
-        raise HTTPException(status_code=404, detail="Archivo físico no encontrado")
+    if not os.path.isfile(doc.file_path):
+        raise HTTPException(status_code=404, detail="Physical file not found")
 
     return FileResponse(
-        path=doc.ruta_archivo,
+        path=doc.file_path,
         media_type="application/pdf",
         filename=doc.file_name,
         headers={"Content-Disposition": f'inline; filename="{doc.file_name}"'}
     )
 
-#////////////////////////// CERT PERIODS //////////////////////////#
+#====================== CERTIFICATION PERIODS ======================#
 
-@router.get("/paciente/{paciente_id}/cert-periods", response_model=List[CertificationPeriodResponse])
-def get_cert_periods_by_paciente(paciente_id: int, db: Session = Depends(get_db)):
-    return db.query(CertificationPeriod).filter(CertificationPeriod.paciente_id == paciente_id).order_by(CertificationPeriod.start_date.desc()).all()
+@router.get("/patient/{patient_id}/cert-periods", response_model=List[CertificationPeriodResponse])
+def get_cert_periods_by_patient(patient_id: int, db: Session = Depends(get_db)):
+    return db.query(CertificationPeriod).filter(
+        CertificationPeriod.patient_id == patient_id
+    ).order_by(CertificationPeriod.start_date.desc()).all()
