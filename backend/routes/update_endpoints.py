@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, Depends, Body, Query
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, joinedload
 from typing import Optional, List
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from database.connection import get_db
 from database.models import (
     Staff, 
@@ -147,19 +147,25 @@ def activate_patient(patient_id: int, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Patient not found.")
 
     patient.is_active = True
+    today = datetime.utcnow().date()
 
-    cert = db.query(CertificationPeriod)\
-        .filter(CertificationPeriod.patient_id == patient_id)\
-        .order_by(CertificationPeriod.start_date.desc())\
-        .first()
+    cert_periods = db.query(CertificationPeriod).filter(CertificationPeriod.patient_id == patient_id).all()
 
-    if cert:
-        today = datetime.utcnow().date()
+    found_valid = False
+
+    for cert in cert_periods:
         if cert.start_date <= today <= cert.end_date:
             cert.is_active = True
+            found_valid = True
+        else:
+            cert.is_active = False 
 
     db.commit()
-    return {"message": "Patient reactivated successfully.", "patient_id": patient_id}
+    return {
+        "message": "Patient reactivated successfully.",
+        "patient_id": patient_id,
+        "valid_cert_found": found_valid
+    }
 
 #////////////////////////// VISITS //////////////////////////#
 
@@ -325,6 +331,7 @@ def update_visit_note(note_id: int, data: VisitNoteUpdate, db: Session = Depends
     if not note:
         raise HTTPException(status_code=404, detail="Visit note not found")
 
+    # Update primitive fields
     if data.status is not None:
         note.status = data.status
     if data.therapist_signature is not None:
@@ -332,26 +339,31 @@ def update_visit_note(note_id: int, data: VisitNoteUpdate, db: Session = Depends
     if data.patient_signature is not None:
         note.patient_signature = data.patient_signature
     if data.visit_date_signature is not None:
-        note.visit_date_signature = data.visit_date_signature
+        if isinstance(data.visit_date_signature, str):
+            try:
+                note.visit_date_signature = date.fromisoformat(data.visit_date_signature)
+            except ValueError:
+                raise HTTPException(status_code=400, detail="Invalid date format. Use YYYY-MM-DD.")
+        else:
+            note.visit_date_signature = data.visit_date_signature
 
+    # Update sections_data content
     if data.updated_sections:
-        current_sections = note.sections_data or []
-        section_map = {s["section_id"]: s for s in current_sections}
+        existing = note.sections_data or []
+        section_map = {s["section_id"]: s for s in existing}
 
-        for updated in data.updated_sections:
-            if updated.section_id in section_map:
-                section_map[updated.section_id]["content"] = updated.content
-            else:
-                section_map[updated.section_id] = {
-                    "section_id": updated.section_id,
-                    "content": updated.content
-                }
+        for update in data.updated_sections:
+            section_map[update.section_id] = {
+                "section_id": update.section_id,
+                "content": update.content
+            }
 
         note.sections_data = list(section_map.values())
 
     db.commit()
     db.refresh(note)
 
+    # Return optional template_sections for frontend context
     template = db.query(NoteTemplate).filter_by(
         discipline=note.discipline,
         note_type=note.note_type,
@@ -360,33 +372,51 @@ def update_visit_note(note_id: int, data: VisitNoteUpdate, db: Session = Depends
 
     template_sections = []
     if template:
-        template_section_links = (
+        links = (
             db.query(NoteTemplateSection)
             .filter(NoteTemplateSection.template_id == template.id)
             .join(NoteSection)
             .order_by(NoteTemplateSection.position.asc())
             .all()
         )
-        template_sections = [ts.section for ts in template_section_links]
+        template_sections = [ts.section for ts in links]
 
     return {
         **note.__dict__,
         "template_sections": template_sections
     }
 
+
 #////////////////////////// CERT PERIOD //////////////////////////#
 
 @router.put("/cert-periods/{cert_id}", response_model=CertificationPeriodResponse)
 def update_certification_period(cert_id: int, cert_update: CertificationPeriodUpdate, db: Session = Depends(get_db)):
-    cert = db.query(CertificationPeriod).filter(CertificationPeriod.id == cert_id).first()
+    cert = (
+        db.query(CertificationPeriod)
+        .options(joinedload(CertificationPeriod.patient))
+        .filter(CertificationPeriod.id == cert_id)
+        .first()
+    )
+
     if not cert:
         raise HTTPException(status_code=404, detail="Certification period not found.")
 
-    for field, value in cert_update.dict(exclude_unset=True).items():
-        setattr(cert, field, value)
+    if not cert.patient:
+        cert.patient = db.query(Patient).filter(Patient.id == cert.patient_id).first()
+
+    update_data = cert_update.dict(exclude_unset=True)
+
+    if "start_date" in update_data:
+        cert.start_date = update_data["start_date"]
+
+    if "end_date" in update_data:
+        cert.end_date = update_data["end_date"]
+    elif "start_date" in update_data:
+        cert.end_date = cert.start_date + timedelta(days=60)
 
     today = date.today()
-    cert.is_active = cert.patient.is_active and (cert.start_date <= today <= cert.end_date)
+    patient_active = cert.patient.is_active if cert.patient else False
+    cert.is_active = patient_active and (cert.start_date <= today <= cert.end_date)
 
     db.commit()
     db.refresh(cert)

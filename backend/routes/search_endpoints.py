@@ -1,5 +1,5 @@
 from fastapi import APIRouter, HTTPException, Depends, Query
-import os
+import os, json
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session, joinedload
 from typing import Optional, List
@@ -93,33 +93,38 @@ def get_deleted_visits(cert_id: int, db: Session = Depends(get_db)):
 
 #====================== VISIT NOTES ======================#
 
-@router.get("/visit-notes/{visit_id}/full", response_model=VisitNoteResponse)
-def get_full_visit_note(visit_id: int, db: Session = Depends(get_db)):
+@router.get("/visit-notes/{visit_id}/debug", response_model=VisitNoteResponse)
+def get_note_debug(visit_id: int, db: Session = Depends(get_db)):
     note = db.query(VisitNote).filter(VisitNote.visit_id == visit_id).first()
+
     if not note:
         raise HTTPException(status_code=404, detail="Note not found")
 
-    template = db.query(NoteTemplate).filter_by(
+    print("======= DEBUG INFO FOR NOTE =======")
+    print(f"Note ID: {note.id}")
+    print(f"Visit ID: {note.visit_id}")
+    print(f"Discipline: {note.discipline}")
+    print(f"Note Type: {note.note_type}")
+    print(f"Status: {note.status}")
+    print(f"Therapist Signature: {note.therapist_signature}")
+    print(f"Patient Signature: {note.patient_signature}")
+    print(f"Visit Date Signature: {note.visit_date_signature}")
+    print("Sections Data Raw:", note.sections_data)
+    print("Sections Data JSON Dump:", json.dumps(note.sections_data, indent=2) if note.sections_data else "None")
+    print("======= END DEBUG INFO =======")
+
+    return VisitNoteResponse(
+        id=note.id,
+        visit_id=note.visit_id,
+        status=note.status,
         discipline=note.discipline,
         note_type=note.note_type,
-        is_active=True
-    ).first()
-    if not template:
-        raise HTTPException(status_code=404, detail="Template not found")
-
-    template_sections = (
-        db.query(NoteTemplateSection)
-        .filter(NoteTemplateSection.template_id == template.id)
-        .join(NoteSection)
-        .order_by(NoteTemplateSection.position.asc())
-        .all()
+        therapist_signature=note.therapist_signature,
+        patient_signature=note.patient_signature,
+        visit_date_signature=note.visit_date_signature,
+        sections_data=note.sections_data or [],
+        template_sections=[],
     )
-    section_objs = [ts.section for ts in template_sections]
-
-    return {
-        **note.__dict__,
-        "template_sections": section_objs
-    }
 
 @router.get("/note-sections", response_model=List[NoteSectionResponse])
 def get_all_sections(db: Session = Depends(get_db)):

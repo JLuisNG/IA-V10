@@ -34,20 +34,32 @@ def delete_visit(id: int, db: Session = Depends(get_db)):
     if not visit:
         raise HTTPException(status_code=404, detail="Visit not found")
 
-    has_note = visit.note is not None
-    has_signature = visit.note and (
-        visit.note.therapist_signature or
-        visit.note.patient_signature or
-        visit.note.visit_date_signature
-    )
+    # Verificar si existe nota
+    note = visit.note
+    if note:
+        has_signatures = any([
+            note.therapist_signature,
+            note.patient_signature,
+            note.visit_date_signature
+        ])
 
-    if has_note or has_signature:
-        visit.is_hidden = True
-    else:
-        db.delete(visit)
+        has_sections = any(
+            s.get("content") for s in (note.sections_data or [])
+            if isinstance(s.get("content"), dict) and s["content"]
+        )
 
+        if has_signatures or has_sections:
+            visit.is_hidden = True
+            db.commit()
+            return {"msg": "Visit has content and was hidden instead of deleted."}
+
+        # No hay contenido real, borrar nota primero
+        db.delete(note)
+
+    # Ahora sí, eliminar visita
+    db.delete(visit)
     db.commit()
-    return {"msg": "Visit removed"}
+    return {"msg": "Visit deleted successfully."}
 
 #////////////////////////// NOTAS //////////////////////////#
 

@@ -187,11 +187,15 @@ def create_certification_period(
         raise HTTPException(status_code=404, detail="Patient not found.")
 
     end_date = start_date + timedelta(days=60)
+    today = date.today()
+
+    is_active = patient.is_active and (start_date <= today <= end_date)
+
     new_cert = CertificationPeriod(
         patient_id=patient_id,
         start_date=start_date,
         end_date=end_date,
-        is_active=True
+        is_active=is_active
     )
 
     db.add(new_cert)

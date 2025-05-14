@@ -63,7 +63,7 @@ class PatientCreate(BaseModel):
 class PatientResponse(BaseModel):
     id: int
     full_name: str
-    birthday: date
+    agency_id: int
     gender: str
     address: str
     is_active: Optional[bool] = True
@@ -171,7 +171,6 @@ class CertificationPeriodResponse(BaseModel):
 class CertificationPeriodUpdate(BaseModel):
     start_date: Optional[date] = None
     end_date: Optional[date] = None
-    is_active: Optional[bool] = None
 
     class Config:
         from_attributes = True
