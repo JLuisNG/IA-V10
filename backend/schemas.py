@@ -123,10 +123,8 @@ class PatientExerciseAssignmentResponse(PatientExerciseAssignmentCreate):
 class VisitCreate(BaseModel):
     patient_id: int
     staff_id: int
-    certification_period_id: int
     visit_date: date
     visit_type: str
-    therapy_type: str
     status: Optional[str] = "Scheduled"
     scheduled_time: Optional[str] = None
 
@@ -143,8 +141,16 @@ class VisitUpdate(BaseModel):
     class Config:
         from_attributes = True
 
-class VisitResponse(VisitCreate):
+class VisitResponse(BaseModel):
     id: int
+    patient_id: int
+    staff_id: int
+    certification_period_id: int
+    visit_date: date
+    visit_type: str
+    therapy_type: str
+    status: Optional[str]
+    scheduled_time: Optional[str]
     note_id: Optional[int] = None
 
     class Config:
@@ -203,16 +209,6 @@ class VisitNoteSectionData(BaseModel):
     section_id: int
     content: dict
 
-class VisitNoteCreate(BaseModel):
-    visit_id: int
-    status: Optional[str] = "Scheduled"
-    discipline: str 
-    note_type: str     
-    therapist_signature: Optional[str] = None
-    patient_signature: Optional[str] = None
-    visit_date_signature: Optional[str] = None
-    sections_data: Optional[List[VisitNoteSectionData]] = None
-
 class VisitNoteSectionUpdate(BaseModel):
     section_id: int
     content: Dict
@@ -224,8 +220,16 @@ class VisitNoteUpdate(BaseModel):
     visit_date_signature: Optional[str] = None
     updated_sections: Optional[List[VisitNoteSectionUpdate]] = None
 
-class VisitNoteResponse(VisitNoteCreate):
+class VisitNoteResponse(BaseModel):
     id: int
+    visit_id: int
+    status: str
+    discipline: str
+    note_type: str
+    therapist_signature: Optional[str] = None
+    patient_signature: Optional[str] = None
+    visit_date_signature: Optional[date] = None
+    sections_data: Optional[List[VisitNoteSectionData]] = None
     template_sections: List[NoteSectionResponse] = []
 
     class Config:

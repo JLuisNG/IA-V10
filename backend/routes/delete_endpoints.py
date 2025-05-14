@@ -141,9 +141,9 @@ def delete_document(doc_id: int, db: Session = Depends(get_db)):
     if not doc:
         raise HTTPException(status_code=404, detail="Document not found.")
 
-    if doc.ruta_archivo and os.path.isfile(doc.ruta_archivo):
+    if doc.file_path and os.path.isfile(doc.file_path):
         try:
-            os.remove(doc.ruta_archivo)
+            os.remove(doc.file_path)
         except Exception as e:
             raise HTTPException(
                 status_code=500,
@@ -162,8 +162,8 @@ def deactivate_or_delete_exercise(exercise_id: int, db: Session = Depends(get_db
     if not exercise:
         raise HTTPException(status_code=404, detail="Exercise not found.")
 
-    assigned = db.query(PacienteExerciseAssignment).filter(
-        PacienteExerciseAssignment.exercise_id == exercise_id
+    assigned = db.query(PatientExerciseAssignment).filter(
+        PatientExerciseAssignment.exercise_id == exercise_id
     ).first()
 
     if assigned:
@@ -177,8 +177,8 @@ def deactivate_or_delete_exercise(exercise_id: int, db: Session = Depends(get_db
 
 @router.delete("/assigned-exercises/{assignment_id}")
 def delete_assigned_exercise(assignment_id: int, db: Session = Depends(get_db)):
-    assignment = db.query(PacienteExerciseAssignment).filter(
-        PacienteExerciseAssignment.id == assignment_id
+    assignment = db.query(PatientExerciseAssignment).filter(
+        PatientExerciseAssignment.id == assignment_id
     ).first()
 
     if not assignment:
@@ -187,7 +187,7 @@ def delete_assigned_exercise(assignment_id: int, db: Session = Depends(get_db)):
     db.delete(assignment)
     db.commit()
     return {"detail": "Exercise assignment deleted successfully."}
-    assignment = db.query(PacienteExerciseAssignment).filter(PacienteExerciseAssignment.id == assignment_id).first()
+    assignment = db.query(PatientExerciseAssignment).filter(PatientExerciseAssignment.id == assignment_id).first()
 
     if not assignment:
         raise HTTPException(status_code=404, detail="Exercise assignment not found.")

@@ -8,7 +8,7 @@ from database.models import (
     Staff, StaffAssignment,
     Patient, 
     Exercise, PatientExerciseAssignment, 
-    Visit, 
+    Visit, VisitNote,
     CertificationPeriod,
     Document,
     NoteSection, NoteTemplate, NoteTemplateSection)

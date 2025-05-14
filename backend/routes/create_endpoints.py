@@ -18,11 +18,13 @@ from schemas import (
     PatientCreate, PatientResponse,
     DocumentResponse, 
     ExerciseCreate, ExerciseResponse, PatientExerciseAssignmentCreate, 
-    VisitCreate, VisitNoteCreate, VisitNoteResponse,
+    VisitCreate, VisitResponse,
+    VisitNoteResponse,
     NoteSectionCreate, NoteSectionResponse,
     NoteTemplateCreate, NoteTemplateResponse)
 
 router = APIRouter()
+
 BASE_STORAGE_PATH = "/app/storage/docs"
 
 #====================== STAFF ======================#
@@ -202,10 +204,55 @@ def create_certification_period(
 
 #====================== VISITS ======================#
 
-@router.post("/visits/assign")
+@router.post("/visits/assign", response_model=VisitResponse)
 def create_visit(data: VisitCreate, db: Session = Depends(get_db)):
-    visit = Visit(**data.dict())
+    staff = db.query(Staff).filter(Staff.id == data.staff_id).first()
+    if not staff:
+        raise HTTPException(status_code=404, detail="Staff not found")
+
+    cert = db.query(CertificationPeriod).filter(
+        CertificationPeriod.patient_id == data.patient_id,
+        CertificationPeriod.start_date <= data.visit_date,
+        CertificationPeriod.end_date >= data.visit_date
+    ).first()
+    if not cert:
+        raise HTTPException(status_code=404, detail="No certification period found for given date")
+
+    visit = Visit(
+        patient_id=data.patient_id,
+        staff_id=data.staff_id,
+        certification_period_id=cert.id,
+        visit_date=data.visit_date,
+        visit_type=data.visit_type,
+        therapy_type=staff.role.upper(), 
+        status=data.status,
+        scheduled_time=data.scheduled_time
+    )
     db.add(visit)
+    db.flush()
+
+    template = db.query(NoteTemplate).filter_by(
+        discipline=staff.role.upper(),
+        note_type=data.visit_type,
+        is_active=True
+    ).first()
+    if not template:
+        raise HTTPException(status_code=404, detail="No active template for this visit type and discipline")
+
+    sections = db.query(NoteTemplateSection).filter(
+        NoteTemplateSection.template_id == template.id
+    ).order_by(NoteTemplateSection.position.asc()).all()
+
+    sections_data = [{"section_id": s.section_id, "content": {}} for s in sections]
+
+    note = VisitNote(
+        visit_id=visit.id,
+        discipline=template.discipline,
+        note_type=template.note_type,
+        status="Scheduled",
+        sections_data=sections_data
+    )
+    db.add(note)
     db.commit()
     db.refresh(visit)
     return visit
@@ -235,44 +282,6 @@ def create_template(template_data: NoteTemplateCreate, db: Session = Depends(get
     
     db.commit()
     return new_template
-
-@router.post("/visit-notes", response_model=VisitNoteResponse)
-def create_visit_note(data: VisitNoteCreate, db: Session = Depends(get_db)):
-    visit = db.query(Visit).filter(Visit.id == data.visit_id).first()
-    if not visit:
-        raise HTTPException(status_code=404, detail="Visit not found")
-
-    template = db.query(NoteTemplate).filter_by(
-        discipline=data.discipline,
-        note_type=data.note_type,
-        is_active=True
-    ).first()
-
-    if not template:
-        raise HTTPException(status_code=404, detail="No active template found for this note type and discipline.")
-
-    db.refresh(template)
-    sections = (
-        db.query(NoteTemplateSection)
-        .filter(NoteTemplateSection.template_id == template.id)
-        .order_by(NoteTemplateSection.position.asc())
-        .all()
-    )
-
-    sections_data = [{"section_id": s.section_id, "content": {}} for s in sections]
-
-    new_note = VisitNote(
-        visit_id=data.visit_id,
-        discipline=data.discipline,
-        note_type=data.note_type,
-        status=data.status or "In Progress",
-        sections_data=sections_data
-    )
-
-    db.add(new_note)
-    db.commit()
-    db.refresh(new_note)
-    return new_note
 
 @router.post("/note-sections", response_model=NoteSectionResponse)
 def create_section(data: NoteSectionCreate, db: Session = Depends(get_db)):

@@ -164,15 +164,86 @@ def activate_patient(patient_id: int, db: Session = Depends(get_db)):
 #////////////////////////// VISITS //////////////////////////#
 
 @router.put("/visits/{id}", response_model=VisitResponse)
-def update_visit(id: int, data: VisitUpdate = Depends(), db: Session = Depends(get_db)):
+def update_visit(
+    id: int,
+    patient_id: Optional[int] = Query(None),
+    staff_id: Optional[int] = Query(None),
+    certification_period_id: Optional[int] = Query(None),
+    visit_date: Optional[date] = Query(None),
+    visit_type: Optional[str] = Query(None),
+    therapy_type: Optional[str] = Query(None),
+    status: Optional[str] = Query(None),
+    scheduled_time: Optional[str] = Query(None),
+    db: Session = Depends(get_db)
+):
     visit = db.query(Visit).filter(Visit.id == id).first()
     if not visit:
         raise HTTPException(status_code=404, detail="Visit not found")
 
-    for key, value in data.dict(exclude_unset=True).items():
-        setattr(visit, key, value)
+    original_visit_type = visit.visit_type
+
+    update_fields = {
+        "patient_id": patient_id,
+        "staff_id": staff_id,
+        "certification_period_id": certification_period_id,
+        "visit_date": visit_date,
+        "visit_type": visit_type,
+        "therapy_type": therapy_type,
+        "status": status,
+        "scheduled_time": scheduled_time,
+    }
+
+    for field, value in update_fields.items():
+        if value is not None:
+            setattr(visit, field, value)
 
     db.commit()
+    db.refresh(visit)
+
+    if visit_type and visit_type != original_visit_type:
+        existing_note = visit.note
+
+        if existing_note:
+            is_note_empty = (
+                not existing_note.therapist_signature and
+                not existing_note.patient_signature and
+                not existing_note.visit_date_signature and
+                not any(
+                    s.get("content") for s in (existing_note.sections_data or [])
+                    if isinstance(s, dict)
+                )
+            )
+
+            if is_note_empty:
+                existing_note.note_type = visit_type
+                db.commit()
+                db.refresh(existing_note)
+            else:
+                matching_template = db.query(NoteTemplate).filter_by(
+                    discipline=visit.staff.rol,
+                    note_type=visit_type,
+                    is_active=True
+                ).first()
+
+                if not matching_template:
+                    raise HTTPException(status_code=404, detail="No matching template found")
+
+                template_sections = db.query(NoteTemplateSection)\
+                    .filter(NoteTemplateSection.template_id == matching_template.id)\
+                    .order_by(NoteTemplateSection.position.asc()).all()
+
+                sections_data = [{"section_id": s.section_id, "content": {}} for s in template_sections]
+
+                new_note = VisitNote(
+                    visit_id=visit.id,
+                    discipline=visit.staff.rol,
+                    note_type=visit_type,
+                    sections_data=sections_data
+                )
+                db.add(new_note)
+                db.commit()
+                db.refresh(new_note)
+
     db.refresh(visit)
     return visit
 
@@ -268,16 +339,40 @@ def update_visit_note(note_id: int, data: VisitNoteUpdate, db: Session = Depends
         section_map = {s["section_id"]: s for s in current_sections}
 
         for updated in data.updated_sections:
-            section_map[updated.section_id] = {
-                "section_id": updated.section_id,
-                "content": updated.content
-            }
+            if updated.section_id in section_map:
+                section_map[updated.section_id]["content"] = updated.content
+            else:
+                section_map[updated.section_id] = {
+                    "section_id": updated.section_id,
+                    "content": updated.content
+                }
 
         note.sections_data = list(section_map.values())
 
     db.commit()
     db.refresh(note)
-    return note
+
+    template = db.query(NoteTemplate).filter_by(
+        discipline=note.discipline,
+        note_type=note.note_type,
+        is_active=True
+    ).first()
+
+    template_sections = []
+    if template:
+        template_section_links = (
+            db.query(NoteTemplateSection)
+            .filter(NoteTemplateSection.template_id == template.id)
+            .join(NoteSection)
+            .order_by(NoteTemplateSection.position.asc())
+            .all()
+        )
+        template_sections = [ts.section for ts in template_section_links]
+
+    return {
+        **note.__dict__,
+        "template_sections": template_sections
+    }
 
 #////////////////////////// CERT PERIOD //////////////////////////#
 
