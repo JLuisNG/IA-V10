@@ -1,0 +1,739 @@
+@import '../../../styles/_variables.scss';
+@import '../../../styles/_mixins.scss';
+
+// Variables de color
+$primary-color: #00e5ff;
+$secondary-color: #2979ff;
+$primary-gradient: linear-gradient(135deg, #00e5ff, #2979ff);
+$text-primary: #ffffff;
+$text-secondary: rgba(255, 255, 255, 0.8);
+$border-color: rgba(255, 255, 255, 0.15);
+$background-card: rgba(30, 41, 59, 0.7);
+$positive-color: #4caf50;
+$negative-color: #f44336;
+$card-bg: rgba(15, 23, 42, 0.6);
+$selected-bg: rgba(0, 229, 255, 0.1);
+
+// Animaciones
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    box-shadow: 0 0 0 0 rgba(0, 229, 255, 0.4);
+  }
+  50% {
+    box-shadow: 0 0 0 10px rgba(0, 229, 255, 0);
+  }
+}
+
+// Componente principal
+.monthly-revenue-section {
+  background: $background-card;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid $border-color;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  
+  // Encabezado de la sección
+  .section-header {
+    padding: 1.5rem;
+    border-bottom: 1px solid $border-color;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    .header-title-container {
+      h2 {
+        font-size: 1.5rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+        
+        i {
+          margin-right: 0.75rem;
+          color: $primary-color;
+          font-size: 1.3rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 36px;
+          height: 36px;
+          background: rgba(0, 229, 255, 0.1);
+          border-radius: 8px;
+        }
+      }
+      
+      .title-underline {
+        height: 3px;
+        background: $primary-gradient;
+        border-radius: 1.5px;
+        margin-bottom: 1.5rem;
+      }
+      
+      .metric-toggles {
+        display: flex;
+        gap: 1rem;
+        
+        .metric-toggle {
+          display: flex;
+          align-items: center;
+          padding: 0.5rem 1rem;
+          background: rgba(255, 255, 255, 0.05);
+          border: 1px solid rgba(255, 255, 255, 0.1);
+          border-radius: 8px;
+          color: $text-secondary;
+          font-weight: 500;
+          transition: all 0.3s ease;
+          cursor: pointer;
+          
+          i {
+            margin-right: 0.5rem;
+            font-size: 0.9rem;
+          }
+          
+          &:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: $text-primary;
+          }
+          
+          &.active {
+            background: $primary-gradient;
+            border-color: transparent;
+            color: $text-primary;
+            box-shadow: 0 5px 15px rgba(0, 229, 255, 0.3);
+          }
+        }
+      }
+    }
+    
+    .header-actions {
+      .action-hint {
+        display: flex;
+        align-items: center;
+        color: $text-secondary;
+        font-size: 0.95rem;
+        
+        i {
+          margin-right: 0.5rem;
+          color: $primary-color;
+        }
+      }
+    }
+  }
+  
+  // Comparación de periodos (nuevo)
+  .period-comparison {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+    padding: 1.5rem;
+    
+    .previous-period, .current-period {
+      background: rgba(15, 23, 42, 0.7);
+      border: 1px solid $border-color;
+      border-radius: 12px;
+      padding: 1.5rem;
+      
+      .period-header {
+        margin-bottom: 1.25rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+        padding-bottom: 1rem;
+        
+        h3 {
+          font-size: 1.2rem;
+          font-weight: 600;
+          margin-bottom: 0.35rem;
+        }
+        
+        .period-dates {
+          font-size: 0.9rem;
+          color: $text-secondary;
+        }
+      }
+      
+      .period-total {
+        text-align: center;
+        margin-bottom: 1.5rem;
+        
+        .total-value {
+          font-size: 2.2rem;
+          font-weight: 800;
+          margin-bottom: 0.35rem;
+          
+          &.visits {
+            font-size: 2.5rem;
+            background: linear-gradient(135deg, #673ab7, #9c27b0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+          }
+        }
+        
+        .total-label {
+          font-size: 0.95rem;
+          color: $text-secondary;
+          margin-bottom: 0.5rem;
+        }
+        
+        .change-indicator {
+          font-size: 1rem;
+          font-weight: 600;
+          
+          .positive {
+            color: $positive-color;
+            
+            i {
+              margin-right: 0.25rem;
+            }
+          }
+          
+          .negative {
+            color: $negative-color;
+            
+            i {
+              margin-right: 0.25rem;
+            }
+          }
+        }
+      }
+      
+      .period-avg {
+        text-align: center;
+        padding-top: 1rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.08);
+        
+        .avg-value {
+          font-size: 1.4rem;
+          font-weight: 700;
+          color: $text-primary;
+          margin-bottom: 0.25rem;
+        }
+        
+        .avg-label {
+          font-size: 0.85rem;
+          color: $text-secondary;
+        }
+      }
+    }
+    
+    .current-period {
+      background: linear-gradient(180deg, rgba(0, 229, 255, 0.07) 0%, rgba(15, 23, 42, 0.7) 100%);
+    }
+  }
+  
+  // Tarjetas de meses mejoradas
+  .month-cards {
+    padding: 0 1.5rem 1.5rem;
+    display: flex;
+    gap: 1.25rem;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    scrollbar-color: $primary-color rgba(255, 255, 255, 0.1);
+    
+    &::-webkit-scrollbar {
+      height: 8px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 4px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background-color: rgba(0, 229, 255, 0.3);
+      border-radius: 4px;
+    }
+    
+    .month-card {
+      min-width: 240px;
+      flex-shrink: 0;
+      background: $card-bg;
+      border: 1px solid $border-color;
+      border-radius: 12px;
+      padding: 1.25rem;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      position: relative;
+      overflow: hidden;
+      
+      &.selected {
+        background: $selected-bg;
+        border-color: rgba(0, 229, 255, 0.4);
+        box-shadow: 0 5px 15px rgba(0, 229, 255, 0.2);
+        
+        .month-name {
+          color: $primary-color;
+        }
+        
+        .month-revenue {
+          background: $primary-gradient;
+          -webkit-background-clip: text;
+          -webkit-text-fill-color: transparent;
+          background-clip: text;
+        }
+        
+        .selection-indicator {
+          display: block;
+        }
+      }
+      
+      &.projected {
+        position: relative;
+        
+        .projected-corner {
+          position: absolute;
+          top: 0;
+          right: 0;
+          width: 0;
+          height: 0;
+          border-style: solid;
+          border-width: 0 40px 40px 0;
+          border-color: transparent rgba(41, 121, 255, 0.4) transparent transparent;
+          z-index: 1;
+        }
+        
+        .projected-badge {
+          position: absolute;
+          top: 10px;
+          right: 10px;
+          background: rgba(41, 121, 255, 0.2);
+          color: $secondary-color;
+          border-radius: 4px;
+          padding: 0.25rem 0.5rem;
+          font-size: 0.75rem;
+          font-weight: 600;
+          z-index: 2;
+          
+          i {
+            margin-right: 0.3rem;
+            font-size: 0.7rem;
+          }
+        }
+      }
+      
+      .month-card-inner {
+        position: relative;
+        z-index: 1;
+      }
+      
+      .month-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+        
+        .month-name {
+          font-weight: 700;
+          font-size: 1.2rem;
+          letter-spacing: 0.02em;
+        }
+        
+        .month-growth {
+          display: inline-flex;
+          align-items: center;
+          padding: 0.25rem 0.5rem;
+          border-radius: 4px;
+          font-size: 0.85rem;
+          font-weight: 600;
+          
+          i {
+            margin-right: 0.3rem;
+            font-size: 0.8rem;
+          }
+          
+          &.positive {
+            background: rgba(76, 175, 80, 0.15);
+            color: $positive-color;
+          }
+          
+          &.negative {
+            background: rgba(244, 67, 54, 0.15);
+            color: $negative-color;
+          }
+        }
+      }
+      
+      .month-revenue {
+        font-size: 1.75rem;
+        font-weight: 800;
+        margin-bottom: 1rem;
+      }
+      
+      .month-details {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        
+        .detail-item {
+          display: flex;
+          justify-content: space-between;
+          font-size: 0.9rem;
+          
+          .detail-label {
+            color: $text-secondary;
+            font-weight: 500;
+          }
+          
+          .detail-value {
+            font-weight: 600;
+          }
+        }
+      }
+      
+      .selection-indicator {
+        display: none;
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 3px;
+        background: $primary-gradient;
+        
+        .indicator-dot {
+          position: absolute;
+          top: -4px;
+          left: 50%;
+          transform: translateX(-50%);
+          width: 8px;
+          height: 8px;
+          border-radius: 50%;
+          background: $primary-color;
+          box-shadow: 0 0 8px $primary-color;
+        }
+      }
+    }
+  }
+  
+  // Panel resumen de datos mejorado
+  .data-summary-panel {
+    background: rgba(15, 23, 42, 0.8);
+    border-top: 1px solid $border-color;
+    overflow: hidden;
+    
+    .summary-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid $border-color;
+      
+      h3 {
+        font-size: 1.3rem;
+        font-weight: 700;
+        display: flex;
+        align-items: center;
+        
+        i {
+          margin-right: 0.75rem;
+          color: $primary-color;
+          font-size: 1.1rem;
+        }
+      }
+      
+      .close-button {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.05);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        color: $text-secondary;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        
+        &:hover {
+          background: rgba(255, 255, 255, 0.1);
+          color: $text-primary;
+        }
+      }
+    }
+    
+    .summary-content {
+      padding: 1.5rem;
+      
+      .summary-overview {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1.5rem;
+        margin-bottom: 2rem;
+        
+        .summary-metric {
+          background: rgba(15, 23, 42, 0.6);
+          border: 1px solid $border-color;
+          border-radius: 12px;
+          padding: 1.25rem;
+          text-align: center;
+          
+          .metric-title {
+            font-size: 1rem;
+            color: $text-secondary;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+          }
+          
+          .metric-value {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.75rem;
+          }
+          
+          .metric-comparison {
+            font-size: 0.9rem;
+            
+            span {
+              display: inline-flex;
+              align-items: center;
+              
+              i {
+                margin-right: 0.3rem;
+              }
+              
+              &.positive {
+                color: $positive-color;
+              }
+              
+              &.negative {
+                color: $negative-color;
+              }
+              
+              &.secondary-text {
+                color: $text-secondary;
+              }
+            }
+          }
+        }
+      }
+      
+      // Lista de terapeutas de mayor a menor
+      .therapist-performance {
+        margin-bottom: 2rem;
+        
+        h4 {
+          font-size: 1.1rem;
+          font-weight: 600;
+          margin-bottom: 1rem;
+          padding-bottom: 0.5rem;
+          border-bottom: 1px solid $border-color;
+        }
+        
+        .therapist-list {
+          display: flex;
+          flex-direction: column;
+          gap: 0.75rem;
+          
+          .therapist-item {
+            display: flex;
+            align-items: center;
+            background: rgba(15, 23, 42, 0.6);
+            border: 1px solid $border-color;
+            border-radius: 10px;
+            padding: 1rem;
+            transition: all 0.3s ease;
+            
+            &:hover {
+              background: rgba(15, 23, 42, 0.75);
+              transform: translateX(5px);
+            }
+            
+            .therapist-rank {
+              width: 30px;
+              height: 30px;
+              border-radius: 50%;
+              background: rgba(0, 229, 255, 0.1);
+              color: $primary-color;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-weight: 700;
+              margin-right: 1rem;
+              flex-shrink: 0;
+            }
+            
+            .therapist-info {
+              flex: 1;
+              
+              .therapist-name {
+                font-weight: 600;
+                font-size: 1.05rem;
+                margin-bottom: 0.25rem;
+              }
+              
+              .therapist-metrics {
+                display: flex;
+                gap: 1rem;
+                font-size: 0.85rem;
+                color: $text-secondary;
+                
+                span {
+                  display: flex;
+                  align-items: center;
+                  
+                  i {
+                    margin-right: 0.3rem;
+                  }
+                }
+              }
+            }
+            
+            .therapist-value {
+              font-weight: 700;
+              font-size: 1.1rem;
+              color: $primary-color;
+              text-align: right;
+              
+              .per-visit {
+                display: block;
+                font-size: 0.75rem;
+                font-weight: 400;
+                color: $text-secondary;
+              }
+            }
+          }
+        }
+      }
+      
+      .summary-note {
+        display: flex;
+        align-items: center;
+        padding: 1rem;
+        border-radius: 10px;
+        margin-bottom: 1.5rem;
+        font-size: 0.9rem;
+        
+        i {
+          margin-right: 0.75rem;
+          font-size: 1.1rem;
+        }
+        
+        &.projected {
+          background: rgba(41, 121, 255, 0.1);
+          border: 1px solid rgba(41, 121, 255, 0.2);
+          color: rgba(255, 255, 255, 0.9);
+          
+          i {
+            color: $secondary-color;
+          }
+        }
+      }
+      
+      .summary-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 1rem;
+        
+        .action-button {
+          padding: 0.75rem 1.25rem;
+          border-radius: 8px;
+          font-weight: 600;
+          display: flex;
+          align-items: center;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          
+          i {
+            margin-right: 0.5rem;
+          }
+          
+          &.primary {
+            background: $primary-gradient;
+            color: $text-primary;
+          }
+          
+          &:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+          }
+        }
+      }
+    }
+  }
+  
+  // Estilos responsivos
+  @media (max-width: 992px) {
+    .section-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.75rem;
+    }
+    
+    .period-comparison {
+      grid-template-columns: 1fr;
+      
+      .previous-period, .current-period {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+        
+        .period-header {
+          grid-column: 1 / -1;
+        }
+      }
+    }
+    
+    .summary-content {
+      .summary-overview {
+        grid-template-columns: 1fr;
+      }
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .month-cards {
+      .month-card {
+        min-width: 220px;
+      }
+    }
+    
+    .period-comparison {
+      .previous-period, .current-period {
+        grid-template-columns: 1fr;
+      }
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .section-header {
+      .header-actions {
+        .action-hint {
+          display: none;
+        }
+      }
+      
+      .header-title-container {
+        .metric-toggles {
+          width: 100%;
+          justify-content: space-between;
+          
+          .metric-toggle {
+            flex: 1;
+            justify-content: center;
+          }
+        }
+      }
+    }
+    
+    .month-cards {
+      .month-card {
+        min-width: 180px;
+        
+        .month-revenue {
+          font-size: 1.4rem;
+        }
+      }
+    }
+  }
+}

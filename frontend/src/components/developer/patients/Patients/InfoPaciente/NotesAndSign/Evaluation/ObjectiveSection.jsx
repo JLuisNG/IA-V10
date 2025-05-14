@@ -53,17 +53,19 @@ const ObjectiveSection = ({ data, onChange, onOpenTest, autoSaveMessage }) => {
         </span>
       </div>
       
-      <div className="tabs-container">
-        {tabs.map(tab => (
-          <button 
-            key={tab.id}
-            className={`tab-button ${activeTab === tab.id ? 'active' : ''}`}
-            onClick={() => setActiveTab(tab.id)}
-          >
-            <i className={tab.icon}></i>
-            <span>{tab.label}</span>
-          </button>
-        ))}
+      <div className="tabs-navigation">
+        <div className="tabs-container">
+          {tabs.map(tab => (
+            <button 
+              key={tab.id}
+              className={`tab-button ${activeTab === tab.id ? 'active' : ''}`}
+              onClick={() => setActiveTab(tab.id)}
+            >
+              <i className={tab.icon}></i>
+              <span>{tab.label}</span>
+            </button>
+          ))}
+        </div>
       </div>
       
       <div className="tab-content">
@@ -755,8 +757,8 @@ const ObjectiveSection = ({ data, onChange, onOpenTest, autoSaveMessage }) => {
         )}
       </div>
 
-</div>
-);
+    </div>
+  );
 };
 
 export default ObjectiveSection;

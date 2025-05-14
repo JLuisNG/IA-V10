@@ -6,20 +6,21 @@ import '../../../../styles/developer/Patients/Staffing/StaffingPage.scss';
 import PremiumTabs from '../Patients/PremiunTabs.jsx';
 import AddStaffForm from './AddStaffForm';
 import StaffListComponent from './StaffListComponent';
-import StaffEditComponent from './StaffEditComponent';
 import LogoutAnimation from '../../../../components/LogOut/LogOut';
+import CompanyRegistrationForm from './CompanyRegistrationForm';
+import CompanyListComponent from './CompanyListComponent';
 
 const DevStaffingPage = () => {
   const navigate = useNavigate();
   const { currentUser, logout } = useAuth();
-
+  const [showCompanyForm, setShowCompanyForm] = useState(false);
+  const [showCompanyList, setShowCompanyList] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
   const [menuTransitioning, setMenuTransitioning] = useState(false);
   const [showMenuSwitch, setShowMenuSwitch] = useState(false);
   const [selectedOption, setSelectedOption] = useState(null);
   const [showAddStaffForm, setShowAddStaffForm] = useState(false);
   const [showStaffList, setShowStaffList] = useState(false);
-  const [showStaffEdit, setShowStaffEdit] = useState(false);
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -81,6 +82,44 @@ const DevStaffingPage = () => {
     };
   }, []);
 
+  const handleRegisterCompanyClick = (e) => {
+    if (isLoggingOut) return;
+    if (e) e.stopPropagation();
+  
+    setSelectedOption('companies');
+    setShowCompanyForm(true);
+    setShowCompanyList(false);
+    setShowAddStaffForm(false);
+    setShowStaffList(false);
+  };
+  
+  // Manejar la cancelación del formulario de compañía correctamente
+  const handleCompanyFormCancel = (action) => {
+    if (isLoggingOut) return;
+    
+    setShowCompanyForm(false);
+    
+    // Si viene de la pantalla de éxito y se solicita ver todas las compañías
+    if (action === 'viewCompanies') {
+      setShowCompanyList(true);
+    } else {
+      // Si simplemente se cancela, volver al estado de selección
+      setSelectedOption('companies');
+    }
+  };
+  
+  const handleCompanySave = (companyData) => {
+    if (isLoggingOut) return;
+    console.log('Saved company data:', companyData);
+    
+    // Aquí iría la lógica para enviar datos a la API
+    
+    // Mostrar notificación o mensaje de éxito
+    // Redirigir o resetear formulario según la lógica de UX deseada
+    
+    setShowCompanyForm(false);
+  };
+
   const handleMainMenuTransition = () => {
     if (isLoggingOut) return;
 
@@ -105,13 +144,26 @@ const DevStaffingPage = () => {
     }
   };
 
+  // Arreglado: Manejar correctamente ver todas las compañías
+  const handleViewAllCompaniesClick = (e) => {
+    if (isLoggingOut) return;
+    if (e) e.stopPropagation();
+
+    setSelectedOption('companies');
+    setShowCompanyList(true);
+    setShowCompanyForm(false);
+    setShowAddStaffForm(false);
+    setShowStaffList(false);
+  };
+
   const handleOptionSelect = (option) => {
     if (isLoggingOut) return;
 
     setSelectedOption(option);
     setShowAddStaffForm(false);
     setShowStaffList(false);
-    setShowStaffEdit(false);
+    setShowCompanyForm(false);
+    setShowCompanyList(false);
   };
 
   const handleAddStaffClick = (e) => {
@@ -121,7 +173,8 @@ const DevStaffingPage = () => {
     setSelectedOption('therapists');
     setShowAddStaffForm(true);
     setShowStaffList(false);
-    setShowStaffEdit(false);
+    setShowCompanyForm(false);
+    setShowCompanyList(false);
   };
 
   const handleLogout = () => {
@@ -144,17 +197,8 @@ const DevStaffingPage = () => {
     setSelectedOption('therapists');
     setShowStaffList(true);
     setShowAddStaffForm(false);
-    setShowStaffEdit(false);
-  };
-
-  const handleEditStaffClick = (e) => {
-    if (isLoggingOut) return;
-    if (e) e.stopPropagation();
-
-    setSelectedOption('therapists');
-    setShowStaffEdit(true);
-    setShowAddStaffForm(false);
-    setShowStaffList(false);
+    setShowCompanyForm(false);
+    setShowCompanyList(false);
   };
 
   const handleCancelForm = () => {
@@ -162,15 +206,18 @@ const DevStaffingPage = () => {
 
     setShowAddStaffForm(false);
     setShowStaffList(false);
-    setShowStaffEdit(false);
+    setShowCompanyForm(false);
+    setShowCompanyList(false);
   };
 
+  // Arreglado: Manejar correctamente volver a opciones
   const handleBackToOptions = () => {
     if (isLoggingOut) return;
 
     setShowStaffList(false);
     setShowAddStaffForm(false);
-    setShowStaffEdit(false);
+    setShowCompanyForm(false);
+    setShowCompanyList(false);
   };
 
   // Datos simulados para las estadísticas (en un escenario real, vendrían de una API o del estado)
@@ -408,18 +455,6 @@ const DevStaffingPage = () => {
               <p className="staffing-subtitle">
                 Manage your therapy team, track performance and optimize schedules
               </p>
-              <div className="header-actions">
-                <button className="header-action-btn" disabled={isLoggingOut}>
-                  <i className="fas fa-info-circle"></i> Quick Tour
-                </button>
-                <button 
-                  className="header-action-btn"
-                  onClick={handleAddStaffClick}
-                  disabled={isLoggingOut}
-                >
-                  <i className="fas fa-plus"></i> New Staff Member
-                </button>
-              </div>
             </div>
             
             <div className="assistant-message">
@@ -448,7 +483,7 @@ const DevStaffingPage = () => {
                     onClick={(e) => handleViewAllStaffClick(e)}
                     disabled={isLoggingOut}
                   >
-                    <i className="fas fa-eye"></i> View All
+                    <i className="fas fa-eye"></i> View & Edit Staff
                   </button>
                   <button 
                     className="option-btn" 
@@ -465,10 +500,42 @@ const DevStaffingPage = () => {
               </div>
             </div>
             
-           
+            {/* Opción para Companies & Agencies */}
+            <div 
+              className={`staffing-option-card ${selectedOption === 'companies' ? 'selected' : ''}`}
+              onClick={() => handleOptionSelect('companies')}
+            >
+              <div className="option-icon">
+                <i className="fas fa-building"></i>
+              </div>
+              <div className="option-content">
+                <h3>Companies & Agencies</h3>
+                <p>Add or manage healthcare companies and home care agencies</p>
+                <div className="option-actions">
+                  <button 
+                    className="option-btn view" 
+                    onClick={(e) => handleViewAllCompaniesClick(e)}
+                    disabled={isLoggingOut}
+                  >
+                    <i className="fas fa-list"></i> View All Companies
+                  </button>
+                  <button 
+                    className="option-btn add" 
+                    onClick={(e) => handleRegisterCompanyClick(e)}
+                    disabled={isLoggingOut}
+                  >
+                    <i className="fas fa-plus"></i> Add New Company
+                  </button>
+                </div>
+              </div>
+              <div className="option-glow"></div>
+              <div className="option-bg-icon">
+                <i className="fas fa-building"></i>
+              </div>
+            </div>
           </div>
           
-          {/* Nueva sección de estadísticas */}
+          {/* Sección de estadísticas */}
           <div className="stats-container">
             <h2>Staffing Overview</h2>
             <div className="staffing-stats">
@@ -541,31 +608,44 @@ const DevStaffingPage = () => {
             </div>
           </div>
           
+          {/* Renderizado condicional de componentes - ARREGLADO: Actualizada la lógica para manejar correctamente la visualización */}
           {selectedOption === 'therapists' && showAddStaffForm ? (
             <AddStaffForm onCancel={handleCancelForm} />
           ) : selectedOption === 'therapists' && showStaffList ? (
             <StaffListComponent onBackToOptions={handleBackToOptions} />
-          ) : selectedOption === 'therapists' && showStaffEdit ? (
-            <StaffEditComponent onBackToOptions={handleBackToOptions} />
+          ) : selectedOption === 'companies' && showCompanyForm ? (
+            <CompanyRegistrationForm onCancel={handleCompanyFormCancel} onSave={handleCompanySave} />
+          ) : selectedOption === 'companies' && showCompanyList ? (
+            <CompanyListComponent onBackToOptions={handleBackToOptions} />
           ) : (
             <div className="selected-content-area">
               {selectedOption && (
                 <div className="selected-content-card">
                   <div className="content-header">
                     <h2>
-                      {selectedOption === 'therapists' ? 'Therapists & Office Staff' : 'Scheduling & Assignments'}
+                      {selectedOption === 'therapists' ? 'Therapists & Office Staff' : 
+                      selectedOption === 'companies' ? 'Companies & Agencies' : 
+                      'Scheduling & Assignments'}
                     </h2>
                     <p>
                       {selectedOption === 'therapists' 
                         ? 'View and manage your therapy and office staff team members.' 
+                        : selectedOption === 'companies'
+                        ? 'Manage healthcare companies and home care agencies in the system.'
                         : 'Manage scheduling and patient assignments for your therapy team.'}
                     </p>
                   </div>
                   
                   <div className="content-body">
                     <div className="placeholder-content">
-                      <i className={`fas fa-${selectedOption === 'therapists' ? 'users' : 'calendar-alt'}`}></i>
-                      <p>Select an action to continue with {selectedOption === 'therapists' ? 'staff management' : 'scheduling'}</p>
+                      <i className={`fas fa-${
+                        selectedOption === 'therapists' ? 'users' : 
+                        selectedOption === 'companies' ? 'building' : 
+                        'calendar-alt'}`}></i>
+                      <p>Select an action to continue with {
+                        selectedOption === 'therapists' ? 'staff management' : 
+                        selectedOption === 'companies' ? 'company management' : 
+                        'scheduling'}</p>
                       
                       {selectedOption === 'therapists' && (
                         <div className="action-buttons">
@@ -581,14 +661,26 @@ const DevStaffingPage = () => {
                             onClick={(e) => handleViewAllStaffClick(e)}
                             disabled={isLoggingOut}
                           >
-                            <i className="fas fa-list"></i> View All Staff
+                            <i className="fas fa-list"></i> View & Edit Staff
                           </button>
+                        </div>
+                      )}
+                      
+                      {selectedOption === 'companies' && (
+                        <div className="action-buttons">
                           <button 
-                            className="action-btn edit" 
-                            onClick={(e) => handleEditStaffClick(e)}
+                            className="action-btn add" 
+                            onClick={(e) => handleRegisterCompanyClick(e)}
                             disabled={isLoggingOut}
                           >
-                            <i className="fas fa-user-edit"></i> Edit Existing Staff
+                            <i className="fas fa-building"></i> Register New Company
+                          </button>
+                          <button 
+                            className="action-btn view" 
+                            onClick={(e) => handleViewAllCompaniesClick(e)}
+                            disabled={isLoggingOut}
+                          >
+                            <i className="fas fa-list"></i> View All Companies
                           </button>
                         </div>
                       )}
@@ -615,7 +707,7 @@ const DevStaffingPage = () => {
                 <div className="welcome-select-message">
                   <i className="fas fa-hand-point-up"></i>
                   <h3>Please Select an Option Above</h3>
-                  <p>Choose "Therapists & Office Staff" or "Scheduling & Assignments" to get started</p>
+                  <p>Choose an option to get started with staff or company management</p>
                 </div>
               )}
             </div>
@@ -625,14 +717,24 @@ const DevStaffingPage = () => {
       
       {!isLoggingOut && (
         <div className="quick-action-btn">
-          <button 
-            className="add-staff-btn" 
-            onClick={(e) => handleAddStaffClick(e)}
-            disabled={isLoggingOut}
-          >
-            <i className="fas fa-plus"></i>
-            <span className="btn-tooltip">Add New Staff</span>
-          </button>
+          {selectedOption === 'therapists' || !selectedOption ? (
+            <button 
+              className="add-staff-btn" 
+              onClick={(e) => handleAddStaffClick(e)}
+              disabled={isLoggingOut}
+            >
+              <i className="fas fa-plus"></i>
+              <span className="btn-tooltip">Add New Staff</span>
+            </button>
+          ) : selectedOption === 'companies' ? (
+            <button 
+              className="add-company-btn" 
+              onClick={(e) => handleRegisterCompanyClick(e)}
+              disabled={isLoggingOut}
+            >
+              <i className="fas fa-plus"></i>
+            </button>
+          ) : null}
         </div>
       )}
     </div>

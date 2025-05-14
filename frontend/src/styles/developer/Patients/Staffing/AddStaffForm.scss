@@ -802,3 +802,753 @@
     }
   }
 }
+
+// Estilos específicos para la sección de Agency Affiliation
+.agency-details {
+  background: rgba($light-gray, 0.3);
+  border-radius: $border-radius-md;
+  padding: $spacing-4;
+  margin-top: $spacing-4;
+  border: 1px solid $light-gray;
+  
+  h4 {
+    font-size: $font-md;
+    font-weight: $font-semibold;
+    color: $dark-gray;
+    margin-bottom: $spacing-3;
+  }
+  
+  .agency-info {
+    margin-bottom: $spacing-3;
+    
+    p {
+      margin: $spacing-1 0;
+      font-size: $font-sm;
+      color: $dark-gray;
+      
+      strong {
+        font-weight: $font-medium;
+        color: $primary-color;
+      }
+    }
+  }
+  
+  .agency-confirmation {
+    margin-top: $spacing-3;
+    padding-top: $spacing-3;
+    border-top: 1px dashed rgba($medium-gray, 0.5);
+    
+    .confirmation-text {
+      font-size: $font-sm;
+      color: $medium-gray;
+      display: flex;
+      align-items: flex-start;
+      gap: $spacing-2;
+      
+      i {
+        color: $primary-color;
+        margin-top: 2px;
+      }
+    }
+  }
+}
+
+// Estilos para agregar a AddStaffForm.scss
+.form-section {
+  .section-content {
+    &.role-selection {
+      // Mejoras visuales para la selección de roles
+      .form-group {
+        select {
+          width: 100%;
+          
+          option {
+            padding: $spacing-2;
+          }
+        }
+      }
+    }
+  }
+}
+
+// Asegúrate de que estos estilos se añadan al archivo AddStaffForm.scss existente
+
+/* Estilos para la pantalla de guardado y el modal de éxito */
+
+// Estilos específicos para la pantalla de carga mientras se guarda
+.saving-screen {
+  background: rgba(10, 30, 60, 0.9);
+  z-index: 1500;
+  
+  .loader-container {
+    .loader-hologram {
+      .hologram-circle {
+        background: radial-gradient(
+          circle at center,
+          rgba($success, 0.4) 0%,
+          rgba($success, 0.2) 40%,
+          rgba($success, 0.1) 60%,
+          transparent 80%
+        );
+      }
+      
+      .bar {
+        background: linear-gradient(to top, transparent, $success, transparent);
+        box-shadow: 0 0 8px rgba($success, 0.8);
+      }
+    }
+    
+    .loader-progress {
+      .progress-bar {
+        .progress-fill {
+          background: linear-gradient(90deg, $success, lighten($success, 15%));
+          box-shadow: 0 0 10px rgba($success, 0.8);
+        }
+      }
+    }
+    
+    .loader-text {
+      color: $white;
+      text-shadow: 0 0 10px rgba($success, 0.8);
+    }
+    
+    .loader-status {
+      .status-dot {
+        background-color: $success;
+        box-shadow: 0 0 8px $success;
+      }
+    }
+  }
+}
+
+// Modal de éxito
+.success-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(5px);
+  -webkit-backdrop-filter: blur(5px);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: fadeIn 0.3s ease;
+  
+  .success-modal {
+    background: $white;
+    border-radius: $border-radius-lg;
+    padding: $spacing-6;
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+    box-shadow: $shadow-xl;
+    animation: zoomIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    border: 1px solid rgba($success, 0.3);
+    
+    .success-icon {
+      width: 90px;
+      height: 90px;
+      background: rgba($success, 0.1);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto $spacing-5;
+      
+      i {
+        font-size: $font-xxxl;
+        color: $success;
+        animation: pulse 1.5s infinite;
+      }
+      
+      @keyframes pulse {
+        0% {
+          transform: scale(0.95);
+        }
+        70% {
+          transform: scale(1.1);
+        }
+        100% {
+          transform: scale(0.95);
+        }
+      }
+    }
+    
+    .success-title {
+      font-size: $font-xl;
+      font-weight: $font-bold;
+      color: $dark-gray;
+      margin-bottom: $spacing-4;
+    }
+    
+    .success-message {
+      font-size: $font-md;
+      color: $medium-gray;
+      margin-bottom: $spacing-5;
+      line-height: 1.6;
+      
+      strong {
+        color: $dark-gray;
+        font-weight: $font-semibold;
+      }
+    }
+    
+    .success-actions {
+      display: flex;
+      gap: $spacing-4;
+      
+      button {
+        flex: 1;
+        padding: $spacing-3 $spacing-2;
+        border-radius: $border-radius-md;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: $spacing-2;
+        font-weight: $font-medium;
+        font-size: $font-sm;
+        cursor: pointer;
+        transition: $transition-medium;
+        
+        i {
+          font-size: $font-md;
+        }
+        
+        &.create-another-btn {
+          background: $primary-color;
+          color: $white;
+          border: none;
+          box-shadow: 0 4px 10px rgba($primary-color, 0.25);
+          
+          &:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba($primary-color, 0.3);
+          }
+        }
+        
+        &.view-all-btn {
+          background: $white;
+          color: $dark-gray;
+          border: 1px solid $light-gray;
+          
+          &:hover {
+            background: $light-gray;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.05);
+          }
+        }
+      }
+    }
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes zoomIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+// Media queries para responsividad
+@media (max-width: $breakpoint-md) {
+  .success-modal-overlay {
+    .success-modal {
+      padding: $spacing-4;
+      width: 95%;
+      
+      .success-icon {
+        width: 70px;
+        height: 70px;
+        margin-bottom: $spacing-4;
+        
+        i {
+          font-size: $font-xxl;
+        }
+      }
+      
+      .success-title {
+        font-size: $font-lg;
+      }
+      
+      .success-message {
+        font-size: $font-sm;
+      }
+      
+      .success-actions {
+        flex-direction: column;
+        
+        button {
+          width: 100%;
+        }
+      }
+    }
+  }
+}
+
+
+// Mejoras de animación para pantalla de carga
+.loading-screen, .staff-edit-loading, .company-list-loading {
+  background: rgba(4, 15, 35, 0.9) !important; // Fondo más oscuro como en la imagen
+  border-radius: $border-radius-lg;
+  padding: $spacing-12;
+  margin-bottom: $spacing-8;
+  text-align: center;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba($primary-color, 0.2);
+  position: relative;
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 
+              inset 0 0 60px rgba($primary-color, 0.15);
+  
+  // Fondo con efecto digital mejorado
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: 
+      linear-gradient(135deg, rgba(6, 20, 40, 0.3) 0%, transparent 100%),
+      radial-gradient(circle at 20% 30%, rgba($primary-color, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 80% 70%, rgba($accent-color, 0.15) 0%, transparent 60%);
+    z-index: -1;
+    opacity: 0.9;
+    animation: bgPulse 8s infinite alternate;
+  }
+  
+  // Efecto de partículas flotantes mejorado
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: 
+      radial-gradient(circle at 10% 10%, rgba(44, 123, 229, 0.1) 0%, transparent 2%),
+      radial-gradient(circle at 20% 30%, rgba(44, 123, 229, 0.1) 0%, transparent 3%),
+      radial-gradient(circle at 30% 70%, rgba(44, 123, 229, 0.1) 0%, transparent 2%),
+      radial-gradient(circle at 70% 40%, rgba(44, 123, 229, 0.1) 0%, transparent 2%),
+      radial-gradient(circle at 90% 90%, rgba(44, 123, 229, 0.1) 0%, transparent 2%);
+    background-size: 150px 150px;
+    animation: floatingParticles 20s linear infinite;
+    opacity: 0.6;
+    z-index: -1;
+  }
+  
+  .loader-container, .loading-container {
+    position: relative;
+    width: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: $spacing-6;
+    
+    // Efecto de holograma mejorado
+    .loader-hologram, .loading-hologram {
+      position: relative;
+      width: 140px;
+      height: 140px;
+      margin-bottom: $spacing-5;
+      transform: scale(1.2);
+      
+      .hologram-ring {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        border: 3px solid rgba($primary-color, 0.3);
+        box-shadow: 
+          0 0 25px rgba($primary-color, 0.7),
+          inset 0 0 25px rgba($primary-color, 0.7);
+        animation: pulseRing 4s infinite ease-in-out;
+      }
+      
+      .hologram-circle {
+        position: absolute;
+        width: 70%;
+        height: 70%;
+        top: 15%;
+        left: 15%;
+        border-radius: 50%;
+        background: radial-gradient(
+          circle at center,
+          rgba($primary-light, 0.6) 0%,
+          rgba($primary-color, 0.3) 40%,
+          rgba($primary-color, 0.2) 60%,
+          transparent 80%
+        );
+        filter: blur(8px);
+        opacity: 0.9;
+        animation: pulsate 4s infinite ease-in-out;
+        
+        &::after {
+          content: '';
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          bottom: 0;
+          border-radius: 50%;
+          box-shadow: inset 0 0 25px rgba($primary-color, 0.7);
+          animation: shineEffect 3s infinite;
+        }
+      }
+      
+      .hologram-bars {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        
+        .bar {
+          position: absolute;
+          width: 5px;
+          background: linear-gradient(to top, transparent, $primary-color, transparent);
+          box-shadow: 0 0 15px rgba($primary-color, 1);
+          animation-name: barHeight;
+          animation-duration: 2s;
+          animation-iteration-count: infinite;
+          animation-timing-function: ease-in-out;
+          
+          &:nth-child(1) {
+            height: 60%;
+            left: 30%;
+            animation-delay: 0.2s;
+          }
+          
+          &:nth-child(2) {
+            height: 40%;
+            left: 40%;
+            animation-delay: 0.6s;
+          }
+          
+          &:nth-child(3) {
+            height: 70%;
+            left: 50%;
+            animation-delay: 0s;
+          }
+          
+          &:nth-child(4) {
+            height: 50%;
+            left: 60%;
+            animation-delay: 0.8s;
+          }
+          
+          &:nth-child(5) {
+            height: 45%;
+            left: 70%;
+            animation-delay: 0.4s;
+          }
+        }
+      }
+    }
+    
+    // Barra de progreso mejorada
+    .loader-progress, .loading-progress {
+      width: 100%;
+      margin: $spacing-4 0;
+      
+      .progress-bar {
+        height: 8px;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 4px;
+        overflow: hidden;
+        position: relative;
+        
+        .progress-fill {
+          position: absolute;
+          top: 0;
+          left: 0;
+          height: 100%;
+          background: linear-gradient(90deg, $primary-color, #4facfe);
+          box-shadow: 0 0 15px rgba($primary-color, 1);
+          border-radius: 4px;
+          width: 0%;
+          animation: progressFill 4.5s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
+      }
+    }
+    
+    // Texto de carga mejorado
+    .loader-text, .loading-text {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: $white;
+      text-shadow: 0 0 20px rgba($primary-color, 1);
+      width: 100%;
+      min-height: 36px;
+      margin-bottom: 0.5rem;
+      letter-spacing: 0.02em;
+      transition: all 0.3s ease-in-out;
+      animation: textPulse 2s infinite ease-in-out;
+    }
+    
+    // Estado del sistema mejorado
+    .loader-status, .loading-status {
+      margin-top: $spacing-4;
+      font-size: 0.9rem;
+      color: rgba($white, 0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: $spacing-2;
+      letter-spacing: 0.05em;
+      
+      .status-dot {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background-color: $success;
+        box-shadow: 0 0 10px rgba($success, 1);
+        animation: blinkEnhanced 1.2s infinite;
+      }
+    }
+  }
+}
+
+// Nuevas animaciones mejoradas
+@keyframes pulseRing {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}
+
+@keyframes pulsate {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.15);
+    opacity: 1;
+  }
+}
+
+@keyframes barHeight {
+  0%, 100% {
+    transform: scaleY(0.6);
+  }
+  50% {
+    transform: scaleY(1.1);
+  }
+}
+
+@keyframes shineEffect {
+  0% {
+    opacity: 0.5;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.5;
+  }
+}
+
+@keyframes progressFill {
+  0% {
+    width: 0%;
+  }
+  20% {
+    width: 40%;
+  }
+  50% {
+    width: 60%;
+  }
+  80% {
+    width: 85%;
+  }
+  100% {
+    width: 100%;
+  }
+}
+
+@keyframes blinkEnhanced {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.4;
+    transform: scale(0.8);
+  }
+}
+
+@keyframes floatingParticles {
+  0% {
+    background-position: 0 0;
+  }
+  100% {
+    background-position: 150px 150px;
+  }
+}
+
+@keyframes textPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+  50% {
+    transform: scale(1.03);
+    opacity: 1;
+  }
+}
+
+@keyframes bgPulse {
+  0% {
+    opacity: 0.7;
+    background-position: 0% 0%;
+  }
+  100% {
+    opacity: 0.9;
+    background-position: 10% 10%;
+  }
+}
+
+// Nuevos efectos adicionales para implementar
+// Efecto de onda en el holograma
+.wave-effect {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 0;
+  
+  &::before, &::after {
+    content: '';
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background: transparent;
+    border: 2px solid rgba($primary-color, 0.5);
+    animation: wave 3s infinite linear;
+  }
+  
+  &::after {
+    animation-delay: 1.5s;
+  }
+  
+  @keyframes wave {
+    0% {
+      transform: scale(0.5);
+      opacity: 1;
+    }
+    100% {
+      transform: scale(1.8);
+      opacity: 0;
+    }
+  }
+}
+
+// Efecto de líneas de datos
+.data-lines {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: -1;
+  
+  .line {
+    position: absolute;
+    width: 1px;
+    background: linear-gradient(to bottom, transparent, rgba($primary-color, 0.5), transparent);
+    animation: dataLineMove 8s infinite linear;
+    opacity: 0.4;
+    
+    @for $i from 1 through 20 {
+      &:nth-child(#{$i}) {
+        left: percentage($i / 20);
+        height: random(100) + 50px;
+        animation-delay: random(8) * 0.1s;
+        animation-duration: (random(4) + 6) * 1s;
+      }
+    }
+  }
+  
+  @keyframes dataLineMove {
+    0% {
+      transform: translateY(-100%);
+    }
+    100% {
+      transform: translateY(100vh);
+    }
+  }
+}
+
+// Efecto de escáner holográfico
+.scan-effect {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 0;
+  opacity: 0.7;
+  pointer-events: none;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 200%;
+    height: 4px;
+    background: linear-gradient(90deg, 
+      transparent 0%, 
+      rgba($primary-color, 0.2) 20%, 
+      rgba($primary-color, 0.8) 50%, 
+      rgba($primary-color, 0.2) 80%, 
+      transparent 100%
+    );
+    box-shadow: 0 0 10px rgba($primary-color, 0.8);
+    animation: scanLine 3s ease-in-out infinite;
+  }
+  
+  @keyframes scanLine {
+    0% {
+      top: 0%;
+    }
+    50% {
+      top: 100%;
+    }
+    100% {
+      top: 0%;
+    }
+  }
+}

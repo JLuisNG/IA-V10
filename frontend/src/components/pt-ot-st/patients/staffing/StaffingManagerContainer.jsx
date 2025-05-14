@@ -77,9 +77,6 @@ const TPStaffingManagerContainer = () => {
                     <button className="action-btn view" onClick={handleViewAllStaffClick}>
                       <i className="fas fa-list"></i> View All Staff
                     </button>
-                    <button className="action-btn edit" onClick={handleEditStaffClick}>
-                      <i className="fas fa-user-edit"></i> Edit Existing Staff
-                    </button>
                   </div>
                 </div>
               </div>

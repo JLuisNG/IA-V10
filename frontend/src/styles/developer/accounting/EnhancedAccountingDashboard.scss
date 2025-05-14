@@ -1,0 +1,320 @@
+@import '../../../styles/_variables.scss';
+@import '../../../styles/_mixins.scss';
+
+// Variables de color para el dashboard
+$primary-color: #00e5ff;
+$secondary-color: #2979ff;
+$primary-gradient: linear-gradient(135deg, #00e5ff, #2979ff);
+$accent-color: #ff9966;
+$accent-gradient: linear-gradient(135deg, #ff9966, #ff5e62);
+$success-color: #4caf50;
+$success-gradient: linear-gradient(135deg, #4caf50, #8bc34a);
+$warning-color: #ff9800;
+$warning-gradient: linear-gradient(135deg, #ff9800, #ff5722);
+$error-color: #f44336;
+$error-gradient: linear-gradient(135deg, #f44336, #e53935);
+
+$background-dark: #0f172a;
+$background-card: rgba(30, 41, 59, 0.7);
+$text-primary: #ffffff;
+$text-secondary: rgba(255, 255, 255, 0.7);
+$text-muted: rgba(255, 255, 255, 0.5);
+$border-color: rgba(255, 255, 255, 0.1);
+
+// Variables para roles y estados
+$pt-color: #36D1DC;
+$pta-color: #5B86E5;
+$ot-color: #FF9966;
+$cota-color: #FF5E62;
+$st-color: #56CCF2;
+$sta-color: #2F80ED;
+
+$status-verified: #4caf50;
+$status-pending: #ff9800;
+$status-error: #f44336;
+
+// Animaciones
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -100% 0;
+  }
+  100% {
+    background-position: 100% 0;
+  }
+}
+
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% {
+    transform: scale(1.05);
+    opacity: 1;
+  }
+}
+
+@keyframes rotate {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes progressFill {
+  from {
+    width: 0;
+  }
+  to {
+    width: var(--width, 100%);
+  }
+}
+
+// Mixins
+@mixin glass-card {
+  background: $background-card;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid $border-color;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  
+  &:hover {
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+    border-color: rgba(255, 255, 255, 0.15);
+  }
+}
+
+@mixin section-title {
+  font-size: 1.4rem;
+  font-weight: 600;
+  color: $text-primary;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+  
+  i {
+    margin-right: 0.75rem;
+    color: $primary-color;
+    font-size: 1.2rem;
+  }
+}
+
+@mixin primary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1.25rem;
+  background: $primary-gradient;
+  color: $text-primary;
+  font-weight: 500;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 10px rgba(0, 229, 255, 0.2);
+  
+  i {
+    margin-right: 0.5rem;
+  }
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 229, 255, 0.3);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+@mixin secondary-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.6rem 1.25rem;
+  background: rgba(255, 255, 255, 0.1);
+  color: $text-primary;
+  font-weight: 500;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  i {
+    margin-right: 0.5rem;
+  }
+  
+  &:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+  }
+  
+  &:active {
+    transform: translateY(0);
+  }
+}
+
+@mixin status-badge($color, $bg-opacity: 0.15) {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.3rem 0.75rem;
+  background-color: rgba($color, $bg-opacity);
+  color: $color;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  font-weight: 500;
+  
+  i {
+    margin-right: 0.4rem;
+  }
+}
+
+// Contenedor principal
+.enhanced-accounting-dashboard {
+  width: 100%;
+  min-height: 100vh;
+  background: $background-dark;
+  color: $text-primary;
+  font-family: 'Poppins', sans-serif;
+  
+  // Estado de carga
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 400px;
+    
+    .loading-spinner {
+      width: 50px;
+      height: 50px;
+      border: 3px solid rgba(0, 229, 255, 0.1);
+      border-radius: 50%;
+      border-top-color: $primary-color;
+      animation: rotate 1s infinite linear;
+      margin-bottom: 1.5rem;
+    }
+    
+    h3 {
+      color: $text-secondary;
+      font-weight: 500;
+    }
+  }
+  
+  // Encabezado del dashboard
+  .dashboard-header {
+    padding: 2rem 1.5rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 1rem;
+    
+    .title-section {
+      h1 {
+        font-size: 2.25rem;
+        font-weight: 700;
+        margin-bottom: 0.5rem;
+        display: flex;
+        align-items: center;
+        
+        i {
+          margin-right: 1rem;
+          color: $primary-color;
+          font-size: 1.75rem;
+        }
+      }
+      
+      .subtitle {
+        color: $text-secondary;
+        font-size: 1.1rem;
+        max-width: 600px;
+      }
+    }
+    
+    .period-badge {
+      display: flex;
+      align-items: center;
+      padding: 0.6rem 1.25rem;
+      background: rgba(0, 229, 255, 0.1);
+      border: 1px solid rgba(0, 229, 255, 0.2);
+      border-radius: 50px;
+      color: $primary-color;
+      font-weight: 500;
+      
+      i {
+        margin-right: 0.75rem;
+      }
+    }
+  }
+  
+  // Cuerpo del dashboard
+  .dashboard-body {
+    padding: 0 1.5rem 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+  }
+  
+  // Estilos responsivos
+  @media (max-width: 1024px) {
+    .dashboard-header {
+      flex-direction: column;
+      align-items: flex-start;
+      
+      .period-badge {
+        align-self: flex-start;
+      }
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .dashboard-header {
+      padding: 1.5rem 1rem 1rem;
+      
+      .title-section {
+        h1 {
+          font-size: 1.75rem;
+          
+          i {
+            font-size: 1.5rem;
+          }
+        }
+        
+        .subtitle {
+          font-size: 0.95rem;
+        }
+      }
+    }
+    
+    .dashboard-body {
+      padding: 0 1rem 1.5rem;
+      gap: 1.5rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .dashboard-header {
+      .title-section {
+        h1 {
+          font-size: 1.5rem;
+        }
+      }
+    }
+  }
+}

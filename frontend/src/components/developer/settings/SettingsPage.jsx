@@ -1,11 +1,13 @@
 // components/developer/settings/SettingsPage.jsx
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../login/AuthContext'; // Import Auth context to get user data
 import './../../../styles/settings/SettingsPage.scss';
 
 const SettingsPage = () => {
   const navigate = useNavigate();
   const settingsRef = useRef(null);
+  const { currentUser } = useAuth(); // Get current user from auth context
   
   // Interface settings state
   const [settings, setSettings] = useState({
@@ -29,13 +31,6 @@ const SettingsPage = () => {
     layout: {
       patientViewMode: 'cards', // 'cards', 'list'
       dashboardMetrics: 'detailed', // 'detailed', 'compact'
-    },
-    // Accessibility preferences
-    accessibility: {
-      reducedMotion: false,
-      highContrast: false,
-      largerText: false,
-      keyboardNavigationEnhanced: false,
     }
   });
 
@@ -276,6 +271,24 @@ const SettingsPage = () => {
     }
   };
 
+  // Get user name with fallback
+  const getUserDisplayName = () => {
+    if (currentUser && currentUser.fullname) {
+      return currentUser.fullname;
+    } else if (currentUser && currentUser.username) {
+      return currentUser.username;
+    }
+    return "TherapySync User";
+  };
+
+  // Get user role with fallback
+  const getUserRole = () => {
+    if (currentUser && currentUser.role) {
+      return currentUser.role;
+    }
+    return "User";
+  };
+
   return (
     <div className="settings-page" ref={settingsRef}>
       <div className={`settings-backdrop ${animatingElements.includes('header') ? 'animate' : ''}`}></div>
@@ -302,8 +315,8 @@ const SettingsPage = () => {
               <i className="fas fa-user-md"></i>
             </div>
             <div className="avatar-info">
-              <div className="avatar-name">Dr. TherapySync</div>
-              <div className="avatar-role">Administrator</div>
+              <div className="avatar-name">{getUserDisplayName()}</div>
+              <div className="avatar-role">{getUserRole()}</div>
             </div>
           </div>
           
@@ -358,19 +371,6 @@ const SettingsPage = () => {
               >
                 <i className="fas fa-th-large"></i> 
                 <span>Layout</span>
-              </a>
-            </li>
-            <li>
-              <a 
-                href="#accessibility-section" 
-                className={visibleSection === 'accessibility-section' ? 'active' : ''}
-                onClick={(e) => {
-                  e.preventDefault();
-                  scrollToSection('accessibility-section');
-                }}
-              >
-                <i className="fas fa-universal-access"></i> 
-                <span>Accessibility</span>
               </a>
             </li>
             <li>
@@ -661,7 +661,7 @@ const SettingsPage = () => {
                       <div className="financial-card-content">
                         <div className="financial-header">
                           <div className="financial-title">Next Payment Cycle</div>
-                          <div className="financial-period">August 15 - August 30, 2023</div>
+                          <div className="financial-period">May 15 - May 30, 2025</div>
                         </div>
                         
                         <div className="financial-amount">
@@ -703,7 +703,7 @@ const SettingsPage = () => {
                     <div className="financial-card total-payments">
                       <div className="financial-card-content">
                         <div className="financial-header">
-                          <div className="financial-title">Total Payments (2023)</div>
+                          <div className="financial-title">Total Payments (2025)</div>
                           <div className="financial-period">January 1 - Present</div>
                         </div>
                         
@@ -747,7 +747,7 @@ const SettingsPage = () => {
                       <div className="financial-card-content">
                         <div className="financial-header">
                           <div className="financial-title">Pending Submissions</div>
-                          <div className="financial-period">Needs to be submitted by August 12, 2023</div>
+                          <div className="financial-period">Needs to be submitted by May 12, 2025</div>
                         </div>
                         
                         <div className="financial-amount">
@@ -805,7 +805,6 @@ const SettingsPage = () => {
               <div className="card-glass-effect"></div>
               
               <div className="card-header">
-              // Continuation of Filters Section
                 <h3>Advanced Filters Behavior</h3>
                 <div className="card-subtitle">Set how advanced filters appear when loading patient lists</div>
               </div>
@@ -813,7 +812,7 @@ const SettingsPage = () => {
               <div className="settings-options">
                 <div className="toggle-option">
                   <div className="option-label">
-                    <i className="fas fa-angle-down"></i>
+                  <i className="fas fa-angle-down"></i>
                     <div className="label-text">
                       <span className="label-title">Expand Filters By Default</span>
                       <span className="label-description">Show all available filters when the page loads</span>
@@ -1127,7 +1126,7 @@ const SettingsPage = () => {
                             </div>
                             <div className="detail">
                               <i className="fas fa-calendar"></i>
-                              <span className="detail-text">Next: Aug 15</span>
+                              <span className="detail-text">Next: May 15</span>
                             </div>
                           </div>
                         </div>
@@ -1216,7 +1215,7 @@ const SettingsPage = () => {
                             </td>
                             <td className="column-provider">PT: Dr. Reynolds</td>
                             <td className="column-contact">(555) 123-4567</td>
-                            <td className="column-appointment">Aug 15</td>
+                            <td className="column-appointment">May 15</td>
                             <td className="column-actions">
                               <div className="action-buttons">
                                 <button className="action-icon">
@@ -1269,165 +1268,7 @@ const SettingsPage = () => {
             </div>
           </section>
 
-          {/* Accessibility Section */}
-          <section id="accessibility-section" className="settings-section">
-            <div className="section-header">
-              <div className="section-icon">
-                <i className="fas fa-universal-access"></i>
-              </div>
-              <div className="section-title">
-                <h2>Accessibility</h2>
-                <p>Customize features to make TherapySync more accessible for all users</p>
-              </div>
-            </div>
-
-            <div className="settings-card">
-              <div className="card-glass-effect"></div>
-              
-              <div className="card-header">
-                <h3>Visual Preferences</h3>
-                <div className="card-subtitle">Customize visual aspects of the interface</div>
-              </div>
-              
-              <div className="settings-options">
-                <div className="toggle-option">
-                  <div className="option-label">
-                    <i className="fas fa-low-vision"></i>
-                    <div className="label-text">
-                      <span className="label-title">High Contrast Mode</span>
-                      <span className="label-description">Increase contrast for better visibility</span>
-                    </div>
-                  </div>
-                  <div 
-                    className={`toggle-switch toggle-accessibility-highContrast ${settings.accessibility.highContrast ? 'active' : ''}`}
-                    onClick={() => handleToggleChange('accessibility', 'highContrast')}
-                  >
-                    <div className="toggle-track">
-                      <div className="toggle-indicator">
-                        <div className="indicator-inner"></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="toggle-option">
-                  <div className="option-label">
-                    <i className="fas fa-text-height"></i>
-                    <div className="label-text">
-                      <span className="label-title">Larger Text</span>
-                      <span className="label-description">Increase text size throughout the application</span>
-                    </div>
-                  </div>
-                  <div 
-                    className={`toggle-switch toggle-accessibility-largerText ${settings.accessibility.largerText ? 'active' : ''}`}
-                    onClick={() => handleToggleChange('accessibility', 'largerText')}
-                  >
-                    <div className="toggle-track">
-                      <div className="toggle-indicator">
-                        <div className="indicator-inner"></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="card-header mt-4">
-                <h3>Motion & Navigation</h3>
-                <div className="card-subtitle">Configure motion and navigation settings</div>
-              </div>
-              
-              <div className="settings-options">
-                <div className="toggle-option">
-                  <div className="option-label">
-                    <i className="fas fa-walking"></i>
-                    <div className="label-text">
-                      <span className="label-title">Reduced Motion</span>
-                      <span className="label-description">Minimize animations and transitions</span>
-                    </div>
-                  </div>
-                  <div 
-                    className={`toggle-switch toggle-accessibility-reducedMotion ${settings.accessibility.reducedMotion ? 'active' : ''}`}
-                    onClick={() => handleToggleChange('accessibility', 'reducedMotion')}
-                  >
-                    <div className="toggle-track">
-                      <div className="toggle-indicator">
-                        <div className="indicator-inner"></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="toggle-option">
-                  <div className="option-label">
-                    <i className="fas fa-keyboard"></i>
-                    <div className="label-text">
-                      <span className="label-title">Enhanced Keyboard Navigation</span>
-                      <span className="label-description">Improve keyboard focus and shortcuts</span>
-                    </div>
-                  </div>
-                  <div 
-                    className={`toggle-switch toggle-accessibility-keyboardNavigationEnhanced ${settings.accessibility.keyboardNavigationEnhanced ? 'active' : ''}`}
-                    onClick={() => handleToggleChange('accessibility', 'keyboardNavigationEnhanced')}
-                  >
-                    <div className="toggle-track">
-                      <div className="toggle-indicator">
-                        <div className="indicator-inner"></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="example-display">
-                <div className="example-header">
-                  <h4>Demonstration</h4>
-                  <div className="example-badge">Interactive</div>
-                </div>
-                
-                <div className="accessibility-preview">
-                  <div className={`preview-card ${settings.accessibility.largerText ? 'large-text' : ''} ${settings.accessibility.highContrast ? 'high-contrast' : ''}`}>
-                    <div className="preview-header">
-                      <h5>Patient Overview</h5>
-                      <p>Sample interface with your accessibility settings</p>
-                    </div>
-                    
-                    <div className="preview-content">
-                      <div className="preview-metric">
-                        <div className="metric-number">98</div>
-                        <div className="metric-label">Active Patients</div>
-                      </div>
-                      
-                      <div className={`preview-button ${settings.accessibility.reducedMotion ? 'reduced-motion' : ''}`}>
-                        <i className="fas fa-plus"></i>
-                        <span>Add New Patient</span>
-                      </div>
-                      
-                      <div className={`preview-menu ${settings.accessibility.keyboardNavigationEnhanced ? 'keyboard-enhanced' : ''}`}>
-                        <div className="menu-item" tabIndex={settings.accessibility.keyboardNavigationEnhanced ? 0 : -1}>
-                          <i className="fas fa-user"></i>
-                          <span>Patient Profile</span>
-                        </div>
-                        <div className="menu-item" tabIndex={settings.accessibility.keyboardNavigationEnhanced ? 0 : -1}>
-                          <i className="fas fa-calendar"></i>
-                          <span>Appointments</span>
-                        </div>
-                        <div className="menu-item" tabIndex={settings.accessibility.keyboardNavigationEnhanced ? 0 : -1}>
-                          <i className="fas fa-file-medical"></i>
-                          <span>Medical Records</span>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="preview-footer">
-                      <p>Your current accessibility settings applied</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Advanced Section */}
+          {/* Advanced Section - Updated to show maintenance message */}
           <section id="advanced-section" className="settings-section">
             <div className="section-header">
               <div className="section-icon">
@@ -1442,196 +1283,17 @@ const SettingsPage = () => {
             <div className="settings-card">
               <div className="card-glass-effect"></div>
               
-              <div className="card-header">
-                <h3>Data Management</h3>
-                <div className="card-subtitle">Manage your data and application settings</div>
-              </div>
-              
-              <div className="advanced-options">
-                <div className="advanced-option">
-                  <div className="option-header">
-                    <div className="option-icon">
-                      <i className="fas fa-database"></i>
-                    </div>
-                    <div className="option-title">Export User Settings</div>
-                  </div>
-                  <div className="option-description">
-                    Export your current settings configuration to a JSON file
-                  </div>
-                  <div className="option-action">
-                    <button className="action-button">
-                      <i className="fas fa-download"></i>
-                      <span>Export Settings</span>
-                    </button>
-                  </div>
+              <div className="maintenance-message">
+                <div className="maintenance-icon">
+                  <i className="fas fa-tools"></i>
                 </div>
-                
-                <div className="advanced-option">
-                  <div className="option-header">
-                    <div className="option-icon">
-                      <i className="fas fa-file-import"></i>
-                    </div>
-                    <div className="option-title">Import User Settings</div>
-                  </div>
-                  <div className="option-description">
-                    Import a previously exported settings configuration
-                  </div>
-                  <div className="option-action">
-                    <button className="action-button">
-                      <i className="fas fa-upload"></i>
-                      <span>Import Settings</span>
-                    </button>
-                  </div>
+                <h3>Advanced Settings Under Maintenance</h3>
+                <p>We're currently upgrading the advanced settings module to provide you with new features and improved security options. This section will be available soon.</p>
+                <div className="estimated-time">
+                  <i className="fas fa-clock"></i>
+                  <span>Estimated completion: May 20, 2025</span>
                 </div>
-                
-                <div className="advanced-option">
-                  <div className="option-header">
-                    <div className="option-icon">
-                      <i className="fas fa-sync-alt"></i>
-                    </div>
-                    <div className="option-title">Data Synchronization</div>
-                  </div>
-                  <div className="option-description">
-                    Configure how frequently TherapySync syncs data with the server
-                  </div>
-                  <div className="option-action">
-                    <div className="select-container">
-                      <select className="sync-select">
-                        <option value="realtime">Real-time</option>
-                        <option value="1min">Every minute</option>
-                        <option value="5min">Every 5 minutes</option>
-                        <option value="15min">Every 15 minutes</option>
-                        <option value="manual">Manual only</option>
-                      </select>
-                      <div className="select-arrow">
-                        <i className="fas fa-chevron-down"></i>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="advanced-option">
-                  <div className="option-header">
-                    <div className="option-icon danger">
-                      <i className="fas fa-trash-alt"></i>
-                    </div>
-                    <div className="option-title">Clear Local Data</div>
-                  </div>
-                  <div className="option-description">
-                    Clear all locally stored data and reset application to default state
-                  </div>
-                  <div className="option-action">
-                    <button className="action-button danger">
-                      <i className="fas fa-exclamation-triangle"></i>
-                      <span>Clear Data</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="card-header mt-4">
-                <h3>Developer Options</h3>
-                <div className="card-subtitle">Advanced options for developers and administrators</div>
-              </div>
-              
-              <div className="developer-options">
-                <div className="terminal-container">
-                  <div className="terminal-header">
-                    <div className="terminal-title">
-                      <i className="fas fa-terminal"></i>
-                      <span>System Information</span>
-                    </div>
-                    <div className="terminal-controls">
-                      <div className="control minimize"></div>
-                      <div className="control maximize"></div>
-                      <div className="control close"></div>
-                    </div>
-                  </div>
-                  
-                  <div className="terminal-body">
-                    <div className="terminal-line">
-                      <span className="prompt">$</span>
-                      <span className="command">system.info()</span>
-                    </div>
-                    <div className="terminal-output">
-                      <div className="output-line">TherapySync Premium Edition v5.2.1</div>
-                      <div className="output-line">Environment: Production</div>
-                      <div className="output-line">User Role: Developer</div>
-                      <div className="output-line">Last Sync: 2023-08-08 16:32:45</div>
-                      <div className="output-line">Database Status: Connected</div>
-                      <div className="output-line">API Status: Online</div>
-                      <div className="output-line">License: Enterprise (Valid until 2025-12-31)</div>
-                    </div>
-                    
-                    <div className="terminal-line">
-                      <span className="prompt">$</span>
-                      <span className="command blink">_</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="api-keys-container">
-                  <div className="api-keys-header">
-                    <div className="header-title">
-                      <i className="fas fa-key"></i>
-                      <span>API Access</span>
-                    </div>
-                    <button className="generate-key-button">
-                      <i className="fas fa-plus"></i>
-                      <span>Generate New Key</span>
-                    </button>
-                  </div>
-                  
-                  <div className="api-keys-list">
-                    <div className="api-key-item">
-                      <div className="key-info">
-                        <div className="key-name">Production API Key</div>
-                        <div className="key-value">
-                          <span className="key-mask">••••••••••••••••</span>
-                          <button className="show-key-button">
-                            <i className="fas fa-eye"></i>
-                          </button>
-                        </div>
-                        <div className="key-created">Created: 2023-05-12</div>
-                      </div>
-                      <div className="key-actions">
-                        <button className="key-action copy">
-                          <i className="fas fa-copy"></i>
-                        </button>
-                        <button className="key-action regenerate">
-                          <i className="fas fa-sync-alt"></i>
-                        </button>
-                        <button className="key-action revoke">
-                          <i className="fas fa-trash-alt"></i>
-                        </button>
-                      </div>
-                    </div>
-                    
-                    <div className="api-key-item">
-                      <div className="key-info">
-                        <div className="key-name">Development API Key</div>
-                        <div className="key-value">
-                          <span className="key-mask">••••••••••••••••</span>
-                          <button className="show-key-button">
-                            <i className="fas fa-eye"></i>
-                          </button>
-                        </div>
-                        <div className="key-created">Created: 2023-07-28</div>
-                      </div>
-                      <div className="key-actions">
-                        <button className="key-action copy">
-                          <i className="fas fa-copy"></i>
-                        </button>
-                        <button className="key-action regenerate">
-                          <i className="fas fa-sync-alt"></i>
-                        </button>
-                        <button className="key-action revoke">
-                          <i className="fas fa-trash-alt"></i>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+                <div className="maintenance-decoration"></div>
               </div>
             </div>
           </section>
@@ -1642,7 +1304,7 @@ const SettingsPage = () => {
         <div className="footer-content">
           <div className="last-saved">
             <i className="fas fa-clock"></i>
-            <span>Last saved: Today at 4:05 PM</span>
+            <span>Last saved: Today at {new Date().getHours()}:{String(new Date().getMinutes()).padStart(2, '0')} {new Date().getHours() >= 12 ? 'PM' : 'AM'}</span>
           </div>
           
           <button className="save-button" onClick={handleSaveSettings}>

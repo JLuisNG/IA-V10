@@ -9,6 +9,7 @@ import CustomDatePicker from './CreateNF/DatePicker';
 import DOBDatePicker from './CreateNF/DOBDatePicker';
 import LoadingScreen from './CreateNF/LoadingDates';
 import ReferralStats from './ReferralStats';
+import { toast } from 'react-toastify';
 
 const DevReferralsPage = () => {
   const navigate = useNavigate();
@@ -108,6 +109,21 @@ const DevReferralsPage = () => {
   // State for adding new nurse manager
   const [addingNewManager, setAddingNewManager] = useState(false);
 
+  // API endpoint base URL
+  const API_BASE_URL = 'http://localhost:8000';
+
+  // WBS options from the dropdown
+  const wbsOptions = [
+    { value: '', label: '-- Select WBS --' },
+    { value: 'N/A', label: 'N/A' },
+    { value: 'Full weight Bearing', label: 'Full weight Bearing' },
+    { value: 'Weight Bearing as Tolerated', label: 'Weight Bearing as Tolerated' },
+    { value: 'Partial Weight Bearing (up to 50%)', label: 'Partial Weight Bearing (up to 50%)' },
+    { value: 'Toe Touch Weight Bearing (up to 5%)', label: 'Toe Touch Weight Bearing (up to 5%)' },
+    { value: 'Non-Weight Bearing (0%)', label: 'Non-Weight Bearing (0%)' },
+    { value: 'Clarify w/Patient or MD', label: 'Clarify w/Patient or MD' },
+  ];
+
   // Function to get initials from name
   function getInitials(name) {
     if (!name) return "U";
@@ -127,27 +143,86 @@ const DevReferralsPage = () => {
     status: 'online', // online, away, busy, offline
   };
   
-  // Mock data for selects
-  const physicians = [
-    { id: 1, name: 'James Wilson' },
-    { id: 2, name: 'Sarah Parker' },
-    { id: 3, name: 'Michael Chen' }
-  ];
-  
-  const agencies = [
-    { id: 1, name: 'Destiny Home Health', branches: ['Branch A', 'Branch B'], managers: ['Manager 1', 'Manager 2'] },
-    { id: 2, name: 'Unison Health Services', branches: ['Branch C', 'Branch D'], managers: ['Manager 3', 'Manager 4'] },
-    { id: 3, name: 'Supportive Home Health', branches: ['Branch E', 'Branch F'], managers: ['Manager 5', 'Manager 6'] }
-  ];
-  
-  const therapists = {
-    PT: [{ id: 1, name: 'Willie Blackwell' }, { id: 2, name: 'Emily Rounds' }],
-    PTA: [{ id: 3, name: 'Carlo Gianzon' }, { id: 4, name: 'Anna Lamport' }],
-    OT: [{ id: 5, name: 'James Lee' }, { id: 6, name: 'Richard Lai' }],
-    COTA: [{ id: 7, name: 'Carla Gianzon' }, { id: 8, name: 'Michelle De La Cruz' }],
-    ST: [{ id: 9, name: 'Junni...' }, { id: 10, name: 'Arya ...' }],
-    STA: [{ id: 11, name: 'Thomas Garcia (STA)' }, { id: 12, name: 'Elizabeth Taylor (STA)' }]
+  // Mock data for selects - In a real implementation, these would come from API
+  const fetchPhysicians = async () => {
+    try {
+      // This would be an actual API call in production
+      // const response = await fetch(`${API_BASE_URL}/physicians`);
+      // const data = await response.json();
+      // return data;
+      return [
+        { id: 1, name: 'James Wilson' },
+        { id: 2, name: 'Sarah Parker' },
+        { id: 3, name: 'Michael Chen' }
+      ];
+    } catch (error) {
+      console.error('Error fetching physicians:', error);
+      return [];
+    }
   };
+
+  const fetchAgencies = async () => {
+    try {
+      // This would be an actual API call in production
+      // const response = await fetch(`${API_BASE_URL}/agencies`);
+      // const data = await response.json();
+      // return data;
+      return [
+        { id: 1, name: 'Destiny Home Health', branches: ['Branch A', 'Branch B'], managers: ['Manager 1', 'Manager 2'] },
+        { id: 2, name: 'Unison Health Services', branches: ['Branch C', 'Branch D'], managers: ['Manager 3', 'Manager 4'] },
+        { id: 3, name: 'Supportive Home Health', branches: ['Branch E', 'Branch F'], managers: ['Manager 5', 'Manager 6'] }
+      ];
+    } catch (error) {
+      console.error('Error fetching agencies:', error);
+      return [];
+    }
+  };
+
+  const fetchTherapists = async () => {
+    try {
+      // This would be an actual API call in production
+      // const response = await fetch(`${API_BASE_URL}/therapists`);
+      // const data = await response.json();
+      // return data;
+      return {
+        PT: [{ id: 1, name: 'Willie Blackwell' }, { id: 2, name: 'Emily Rounds' }],
+        PTA: [{ id: 3, name: 'Carlo Gianzon' }, { id: 4, name: 'Anna Lamport' }],
+        OT: [{ id: 5, name: 'James Lee' }, { id: 6, name: 'Richard Lai' }],
+        COTA: [{ id: 7, name: 'Carla Gianzon' }, { id: 8, name: 'Michelle De La Cruz' }],
+        ST: [{ id: 9, name: 'Junni Smith' }, { id: 10, name: 'Arya Patel' }],
+        STA: [{ id: 11, name: 'Thomas Garcia' }, { id: 12, name: 'Elizabeth Taylor' }]
+      };
+    } catch (error) {
+      console.error('Error fetching therapists:', error);
+      return {
+        PT: [], PTA: [], OT: [], COTA: [], ST: [], STA: []
+      };
+    }
+  };
+  
+  // State for data from APIs
+  const [physicians, setPhysicians] = useState([]);
+  const [agencies, setAgencies] = useState([]);
+  const [therapists, setTherapists] = useState({
+    PT: [], PTA: [], OT: [], COTA: [], ST: [], STA: []
+  });
+
+  // Fetch data on component mount
+  useEffect(() => {
+    const loadInitialData = async () => {
+      const [physicianData, agencyData, therapistData] = await Promise.all([
+        fetchPhysicians(),
+        fetchAgencies(),
+        fetchTherapists()
+      ]);
+      
+      setPhysicians(physicianData);
+      setAgencies(agencyData);
+      setTherapists(therapistData);
+    };
+    
+    loadInitialData();
+  }, []);
   
   // Effect for simulating loading state
   useEffect(() => {
@@ -272,7 +347,7 @@ const DevReferralsPage = () => {
     }));
   };
   
-  // Handle contact number changes-started here
+  // Handle contact number changes
   const handleContactNumberChange = (index, value) => {
     if (isLoggingOut) return;
     
@@ -428,73 +503,170 @@ const DevReferralsPage = () => {
   const getSelectedAgency = () => {
     return agencies.find(agency => agency.id.toString() === formData.agencyId);
   };
-  
-  // Handle form submission
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    if (isLoggingOut) return;
-    
-    // Validate that at least one discipline is selected
-    if (!validateDisciplines()) {
-      alert('Please select at least one discipline (PT, PTA, OT, COTA, ST, or STA)');
-      return;
-    }
-    
-    // Validate that therapists are selected for all selected disciplines
-    const hasAllTherapistsSelected = Object.keys(selectedDisciplines)
-      .filter(discipline => selectedDisciplines[discipline])
-      .every(discipline => selectedTherapists[discipline] !== null);
-    
-    if (!hasAllTherapistsSelected) {
-      alert('Please select a therapist for each selected discipline');
-      return;
-    }
-    
-    // Validate weight and height
-    if (formData.weight && isNaN(formData.weight)) {
-      alert('Please enter a valid number for Weight');
-      return;
-    }
-    if (formData.height && isNaN(formData.height)) {
-      alert('Please enter a valid number for Height');
-      return;
-    }
-    
-    // Show loading screen
-    setFormSubmitting(true);
-    
-    // Simulate backend processing
-    console.log('Form data:', formData);
-    console.log('Selected therapists:', selectedTherapists);
-    console.log('Uploaded PDF files:', uploadedFiles);
-    
-    // Handle form submission success
-    setTimeout(() => {
-      setFormSubmitting(false);
-      setCurrentView('menu');
-    }, 2000);
-  };
 
-  // Cancel creating referral and go back to menu
-  const handleCancelCreateReferral = () => {
-    if (isLoggingOut) return;
-    
-    const hasFormData = Object.values(formData).some(value => {
-      if (typeof value === 'string') return value !== '';
-      if (Array.isArray(value)) return value.length > 0 && value[0] !== '';
-      if (typeof value === 'object') return Object.values(value).some(v => v !== false && v !== '');
-      return false;
+  // Prepare data for API submission
+  const preparePatientData = () => {
+    // Get selected therapists with names
+    const selectedTherapistsWithNames = {};
+    Object.keys(selectedTherapists).forEach(discipline => {
+      if (selectedTherapists[discipline]) {
+        const therapistId = selectedTherapists[discipline];
+        const therapist = therapists[discipline].find(t => t.id.toString() === therapistId.toString());
+        if (therapist) {
+          selectedTherapistsWithNames[discipline] = {
+            id: therapistId,
+            name: therapist.name
+          };
+        }
+      }
     });
-    
-    if (hasFormData && !window.confirm('Are you sure you want to cancel? All entered data will be lost.')) {
-      return;
+
+    // Convert homebound options to array
+    const homeboundReasons = Object.keys(formData.homebound)
+      .filter(key => formData.homebound[key])
+      .map(key => {
+        if (key === 'other' && formData.homebound.otherReason) {
+          return `Other: ${formData.homebound.otherReason}`;
+        }
+        return key;
+      });
+
+    // Convert reasons for referral to array
+    const referralReasons = Object.keys(formData.reasonsForReferral)
+      .filter(key => key !== 'additional' && formData.reasonsForReferral[key])
+      .map(key => {
+        switch(key) {
+          case 'strength_balance': return 'Decreased Strength / Balance';
+          case 'gait': return 'Decreased Gait Ability';
+          case 'adls': return 'ADLs';
+          case 'orthopedic': return 'Orthopedic Operation';
+          case 'neurological': return 'Neurological / Cognitive';
+          case 'wheelchair': return 'Wheelchair Evaluation';
+          default: return key;
+        }
+      });
+
+    // Add additional reasons if any
+    if (formData.reasonsForReferral.additional) {
+      referralReasons.push(`Additional: ${formData.reasonsForReferral.additional}`);
     }
-    
-    // Reset form and go back to menu
-    setCurrentView('menu');
-    
-    // Reset form data
+
+    // Prepare physician data
+    let physicianData = null;
+    if (formData.newPhysician && formData.newPhysicianName) {
+      physicianData = {
+        isNew: true,
+        name: formData.newPhysicianName
+      };
+    } else if (formData.physicianId) {
+      const physician = physicians.find(p => p.id.toString() === formData.physicianId.toString());
+      if (physician) {
+        physicianData = {
+          isNew: false,
+          id: physician.id,
+          name: physician.name
+        };
+      }
+    }
+
+    // Prepare agency data
+    let agencyData = null;
+    if (formData.agencyId) {
+      const agency = agencies.find(a => a.id.toString() === formData.agencyId.toString());
+      if (agency) {
+        agencyData = {
+          id: agency.id,
+          name: agency.name,
+          branch: formData.agencyBranch || null
+        };
+      }
+    }
+
+    // Prepare nurse manager data
+    let nurseManagerData = null;
+    if (addingNewManager && formData.newNurseManager) {
+      nurseManagerData = {
+        isNew: true,
+        name: formData.newNurseManager
+      };
+    } else if (formData.nurseManager && formData.nurseManager !== 'new') {
+      nurseManagerData = {
+        isNew: false,
+        name: formData.nurseManager
+      };
+    }
+
+    // Format height and weight with units
+    const formattedWeight = formData.weight ? `${formData.weight} ${formData.weightUnit}` : null;
+    const formattedHeight = formData.height ? `${formData.height} ${formData.heightUnit}` : null;
+
+    // Build the complete patient data object
+    return {
+      personal_info: {
+        first_name: formData.firstName,
+        last_name: formData.lastName,
+        date_of_birth: formData.dob,
+        gender: formData.gender,
+        address: formData.address,
+        city: formData.city,
+        zip_code: formData.zipCode,
+        contact_numbers: formData.contactNumbers.filter(num => num.trim() !== '')
+      },
+      care_period: {
+        payor_type: formData.payorType,
+        cert_period_start: formData.certPeriodStart,
+        cert_period_end: formData.certPeriodEnd,
+        urgency_level: formData.urgencyLevel
+      },
+      medical_info: {
+        physician: physicianData,
+        agency: agencyData,
+        nurse_manager: nurseManagerData,
+        nursing_diagnosis: formData.nursingDiagnosis,
+        past_medical_history: formData.pmh,
+        prior_level_of_function: formData.priorLevelOfFunction,
+        homebound_reasons: homeboundReasons,
+        weight_bearing_status: formData.wbs,
+        weight: formattedWeight,
+        height: formattedHeight
+      },
+      therapy_info: {
+        reasons_for_referral: referralReasons,
+        disciplines: formData.disciplines,
+        assigned_therapists: selectedTherapistsWithNames
+      }
+    };
+  };
+  
+  // Upload files to the server
+  const uploadFiles = async (files) => {
+    try {
+      const formData = new FormData();
+      files.forEach((file, index) => {
+        formData.append(`files`, file);
+      });
+      
+      const response = await fetch(`${API_BASE_URL}/documents/upload`, {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || 'Failed to upload documents');
+      }
+      
+      const data = await response.json();
+      return data.document_ids || [];
+    } catch (error) {
+      console.error('Error uploading files:', error);
+      return [];
+    }
+  };
+  
+  // Reset form to initial state
+  const resetForm = () => {
+    // Reset all form data to initial values
     setFormData({
       firstName: '',
       lastName: '',
@@ -536,6 +708,7 @@ const DevReferralsPage = () => {
       disciplines: []
     });
     
+    // Reset discipline selections
     setSelectedDisciplines({
       PT: false,
       PTA: false,
@@ -545,6 +718,7 @@ const DevReferralsPage = () => {
       STA: false
     });
     
+    // Reset therapist selections
     setSelectedTherapists({
       PT: null,
       PTA: null,
@@ -554,7 +728,130 @@ const DevReferralsPage = () => {
       STA: null
     });
     
+    // Reset uploaded files
     setUploadedFiles([]);
+    
+    // Reset adding new manager state
+    setAddingNewManager(false);
+    
+    // Log para confirmar que el formulario se ha limpiado
+    console.log('Form has been reset completely');
+  };
+  
+  // Handle form submission
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    if (isLoggingOut) return;
+    
+    // Validate that at least one discipline is selected
+    if (!validateDisciplines()) {
+      toast.error('Please select at least one discipline (PT, PTA, OT, COTA, ST, or STA)');
+      return;
+    }
+    
+    // Validate that therapists are selected for all selected disciplines
+    const hasAllTherapistsSelected = Object.keys(selectedDisciplines)
+      .filter(discipline => selectedDisciplines[discipline])
+      .every(discipline => selectedTherapists[discipline] !== null);
+    
+    if (!hasAllTherapistsSelected) {
+      toast.error('Please select a therapist for each selected discipline');
+      return;
+    }
+    
+    // Validate weight and height
+    if (formData.weight && isNaN(formData.weight)) {
+      toast.error('Please enter a valid number for Weight');
+      return;
+    }
+    if (formData.height && isNaN(formData.height)) {
+      toast.error('Please enter a valid number for Height');
+      return;
+    }
+    
+    // Show loading screen
+    setFormSubmitting(true);
+
+    try {
+      // Prepare data for API
+      const patientData = preparePatientData();
+      
+      // Upload any files if needed
+      let documentIds = [];
+      if (uploadedFiles.length > 0) {
+        try {
+          documentIds = await uploadFiles(uploadedFiles);
+        } catch (fileError) {
+          console.error('Error uploading files:', fileError);
+          // Continue with patient creation even if file upload fails
+        }
+      }
+      
+      // Add document IDs to patient data if files were uploaded
+      if (documentIds.length > 0) {
+        patientData.documents = documentIds;
+      }
+      
+      // Send data to patient creation API endpoint
+      const response = await fetch(`${API_BASE_URL}/patients`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(patientData)
+      });
+      
+      // Always clean the form regardless of the API response
+      resetForm();
+      
+      if (response.ok) {
+        toast.success('Patient referral created successfully!');
+        setTimeout(() => {
+          setFormSubmitting(false);
+          setCurrentView('menu');
+        }, 1500);
+      } else {
+        const errorData = await response.json();
+        setFormSubmitting(false);
+        throw new Error(errorData.detail || 'Failed to create patient referral');
+      }
+    } catch (error) {
+      console.error('Error submitting patient data:', error);
+      
+      // IMPORTANTE: Asegurar que el formulario se limpie aunque haya error
+      resetForm();
+      setFormSubmitting(false);
+      
+      // Mostrar toast de error pero ya con formulario limpio
+      toast.error(`Error: ${error.message || 'Failed to create patient referral. Please try again.'}`);
+    } finally {
+      // Garantizar que el formulario se limpie incluso si hay un error no controlado
+      setTimeout(() => {
+        resetForm();
+        setFormSubmitting(false);
+      }, 1000);
+    }
+  };
+
+  // Cancel creating referral and go back to menu
+  const handleCancelCreateReferral = () => {
+    if (isLoggingOut) return;
+    
+    const hasFormData = Object.values(formData).some(value => {
+      if (typeof value === 'string') return value !== '';
+      if (Array.isArray(value)) return value.length > 0 && value[0] !== '';
+      if (typeof value === 'object') return Object.values(value).some(v => v !== false && v !== '');
+      return false;
+    });
+    
+    if (hasFormData && !window.confirm('Are you sure you want to cancel? All entered data will be lost.')) {
+      return;
+    }
+    
+    // Reset form and go back to menu
+    setCurrentView('menu');
+    resetForm();
   };
 
   // Homebound options
@@ -1314,16 +1611,21 @@ const DevReferralsPage = () => {
                   </div>
                   
                   <div className="form-group">
-                    <label htmlFor="wbs">WBS</label>
-                    <input
-                      type="text"
+                    <label htmlFor="wbs">WBS (Weight Bearing Status)</label>
+                    <select
                       id="wbs"
                       name="wbs"
                       value={formData.wbs}
                       onChange={handleInputChange}
-                      placeholder="XX-XXX-X-XXXX (e.g., 01-123-4-5678)"
                       disabled={isLoggingOut}
-                    />
+                      className="wbs-select"
+                    >
+                      {wbsOptions.map((option, index) => (
+                        <option key={index} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   
                   {/* Weight field with unit selection */}
@@ -1737,10 +2039,19 @@ const DevReferralsPage = () => {
                   <button 
                     type="submit" 
                     className="save-referral-btn"
-                    disabled={isLoggingOut}
+                    disabled={isLoggingOut || formSubmitting}
                   >
-                    <i className="fas fa-save"></i>
-                    Save Patient Referral
+                    {formSubmitting ? (
+                      <>
+                        <i className="fas fa-spinner fa-spin"></i>
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <i className="fas fa-save"></i>
+                        Save Patient Referral
+                      </>
+                    )}
                   </button>
                 </div>
               </div>

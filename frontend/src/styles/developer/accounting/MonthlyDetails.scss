@@ -1,0 +1,1425 @@
+@import '../../../styles/_variables.scss';
+@import '../../../styles/_mixins.scss';
+
+// Variables de color
+$primary-color: #00e5ff;
+$secondary-color: #2979ff;
+$primary-gradient: linear-gradient(135deg, #00e5ff, #2979ff);
+$primary-gradient-soft: linear-gradient(135deg, rgba(0, 229, 255, 0.1), rgba(41, 121, 255, 0.1));
+$success-color: #4caf50;
+$warning-color: #ff9800;
+$danger-color: #f44336;
+$text-primary: #ffffff;
+$text-secondary: rgba(255, 255, 255, 0.7);
+$border-color: rgba(255, 255, 255, 0.1);
+$background-card: rgba(30, 41, 59, 0.7);
+$background-card-dark: rgba(15, 23, 42, 0.7);
+$hover-overlay: rgba(255, 255, 255, 0.05);
+
+// Variables para roles de terapeutas
+$pt-color: #36D1DC;
+$pta-color: #5B86E5;
+$ot-color: #FF9966;
+$cota-color: #FF5E62;
+$st-color: #56CCF2;
+$sta-color: #2F80ED;
+
+// Animaciones
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes pulse {
+  0% {
+    box-shadow: 0 0 0 0 rgba(0, 229, 255, 0.4);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(0, 229, 255, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(0, 229, 255, 0);
+  }
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+// Componente principal
+.monthly-details-section {
+  background: $background-card;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid $border-color;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  margin-top: 1.5rem;
+  
+  // Encabezado de la sección
+  .section-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid $border-color;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    
+    .header-left {
+      h2 {
+        font-size: 1.3rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        margin-bottom: 0.5rem;
+        
+        i {
+          margin-right: 0.75rem;
+          color: $primary-color;
+          font-size: 1.1rem;
+        }
+      }
+      
+      .title-underline {
+        height: 3px;
+        width: 80px;
+        background: $primary-gradient;
+        border-radius: 1.5px;
+      }
+    }
+    
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      
+      .tab-buttons {
+        display: flex;
+        background: rgba(15, 23, 42, 0.5);
+        padding: 0.25rem;
+        border-radius: 8px;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        
+        .tab-button {
+          display: flex;
+          align-items: center;
+          padding: 0.5rem 1rem;
+          background: transparent;
+          border: none;
+          border-radius: 6px;
+          color: $text-secondary;
+          font-size: 0.9rem;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          
+          i {
+            margin-right: 0.5rem;
+            font-size: 0.9rem;
+          }
+          
+          &:hover {
+            color: $text-primary;
+            background: rgba(255, 255, 255, 0.05);
+          }
+          
+          &.active {
+            background: $primary-gradient;
+            color: $text-primary;
+            box-shadow: 0 2px 8px rgba(0, 229, 255, 0.3);
+          }
+        }
+      }
+
+      .action-buttons {
+       display: flex;
+       gap: 0.5rem;
+       
+       .action-button {
+         width: 36px;
+         height: 36px;
+         display: flex;
+         align-items: center;
+         justify-content: center;
+         background: rgba(255, 255, 255, 0.05);
+         border: 1px solid rgba(255, 255, 255, 0.1);
+         border-radius: 8px;
+         color: $text-secondary;
+         cursor: pointer;
+         transition: all 0.3s ease;
+         
+         &:hover {
+           background: rgba(255, 255, 255, 0.1);
+           color: $text-primary;
+           transform: translateY(-2px);
+           box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+         }
+       }
+     }
+   }
+ }
+ 
+ // Contenido de los detalles mensuales
+ .monthly-details-content {
+   padding: 1.5rem;
+   
+   // Estilos para la pestaña de resumen
+   .overview-tab {
+     .stats-cards {
+       display: grid;
+       grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+       gap: 1rem;
+       margin-bottom: 2rem;
+       
+       .stat-card {
+         background: rgba(15, 23, 42, 0.6);
+         border: 1px solid rgba(255, 255, 255, 0.05);
+         border-radius: 12px;
+         padding: 1.25rem;
+         display: flex;
+         align-items: center;
+         transition: all 0.3s ease;
+         position: relative;
+         overflow: hidden;
+         
+         &::after {
+           content: '';
+           position: absolute;
+           top: 0;
+           left: 0;
+           width: 100%;
+           height: 100%;
+           background: linear-gradient(90deg, 
+             rgba(255, 255, 255, 0) 25%, 
+             rgba(255, 255, 255, 0.05) 50%, 
+             rgba(255, 255, 255, 0) 75%);
+           background-size: 200% 100%;
+           animation: shimmer 3s infinite;
+           pointer-events: none;
+           opacity: 0;
+           transition: opacity 0.3s ease;
+         }
+         
+         &:hover {
+           background: rgba(15, 23, 42, 0.8);
+           transform: translateY(-3px);
+           box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+           
+           &::after {
+             opacity: 1;
+           }
+         }
+         
+         .stat-icon {
+           width: 42px;
+           height: 42px;
+           border-radius: 10px;
+           display: flex;
+           align-items: center;
+           justify-content: center;
+           margin-right: 1rem;
+           font-size: 1.1rem;
+           background: $primary-gradient-soft;
+           color: $primary-color;
+           flex-shrink: 0;
+         }
+         
+         .stat-content {
+           flex: 1;
+           
+           .stat-title {
+             font-size: 0.9rem;
+             color: $text-secondary;
+             margin-bottom: 0.5rem;
+           }
+           
+           .stat-value {
+             font-size: 1.4rem;
+             font-weight: 700;
+             margin-bottom: 0.5rem;
+             background: $primary-gradient;
+             -webkit-background-clip: text;
+             -webkit-text-fill-color: transparent;
+             background-clip: text;
+           }
+           
+           .stat-change {
+             font-size: 0.85rem;
+             display: flex;
+             align-items: center;
+             
+             i {
+               margin-right: 0.3rem;
+               font-size: 0.8rem;
+             }
+             
+             &.positive {
+               color: $success-color;
+             }
+             
+             &.negative {
+               color: $danger-color;
+             }
+             
+             &.neutral {
+               color: $text-secondary;
+             }
+           }
+         }
+       }
+     }
+     
+     // Calendario de visitas diarias
+     .daily-visits-calendar {
+       background: rgba(15, 23, 42, 0.6);
+       border: 1px solid rgba(255, 255, 255, 0.05);
+       border-radius: 12px;
+       overflow: hidden;
+       margin-bottom: 2rem;
+       
+       .calendar-header {
+         padding: 1.25rem;
+         border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+         display: flex;
+         justify-content: space-between;
+         align-items: center;
+         
+         h3 {
+           font-size: 1.1rem;
+           font-weight: 600;
+           display: flex;
+           align-items: center;
+           
+           i {
+             margin-right: 0.5rem;
+             color: $primary-color;
+           }
+         }
+         
+         .therapist-types {
+           display: flex;
+           gap: 0.75rem;
+           
+           .therapist-type {
+             font-size: 0.85rem;
+             font-weight: 600;
+             padding: 0.25rem 0.5rem;
+             border-radius: 4px;
+             
+             &.pt {
+               background: rgba(54, 209, 220, 0.15);
+               color: $pt-color;
+             }
+             
+             &.pta {
+               background: rgba(91, 134, 229, 0.15);
+               color: $pta-color;
+             }
+             
+             &.ot {
+               background: rgba(255, 153, 102, 0.15);
+               color: $ot-color;
+             }
+             
+             &.cota {
+               background: rgba(255, 94, 98, 0.15);
+               color: $cota-color;
+             }
+             
+             &.st {
+               background: rgba(86, 204, 242, 0.15);
+               color: $st-color;
+             }
+           }
+         }
+       }
+       
+       .calendar-grid {
+         display: grid;
+         grid-template-columns: repeat(7, 1fr);
+         gap: 1px;
+         background: rgba(255, 255, 255, 0.05);
+         padding: 1px;
+         
+         .calendar-header-cell {
+           background: rgba(15, 23, 42, 0.8);
+           text-align: center;
+           padding: 0.75rem;
+           font-weight: 600;
+           font-size: 0.9rem;
+           color: $text-secondary;
+         }
+         
+         .calendar-cell {
+           background: rgba(15, 23, 42, 0.6);
+           aspect-ratio: 1;
+           padding: 0.75rem;
+           display: flex;
+           flex-direction: column;
+           position: relative;
+           cursor: pointer;
+           transition: all 0.3s ease;
+           
+           &:hover {
+             background: rgba(15, 23, 42, 0.8);
+             transform: scale(1.02);
+             z-index: 1;
+             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+           }
+           
+           &.empty {
+             background: rgba(15, 23, 42, 0.3);
+           }
+           
+           &.weekend {
+             background: rgba(15, 23, 42, 0.4);
+             
+             .calendar-day-number {
+               color: rgba(255, 255, 255, 0.5);
+             }
+           }
+           
+           .calendar-day-number {
+             font-size: 1.1rem;
+             font-weight: 600;
+             margin-bottom: 0.5rem;
+           }
+           
+           .calendar-visit-count {
+             font-size: 1.5rem;
+             font-weight: 700;
+             flex: 1;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             color: $primary-color;
+           }
+           
+           .calendar-visit-breakdown {
+             height: 4px;
+             display: flex;
+             margin-top: auto;
+             
+             .breakdown-bar {
+               height: 100%;
+               
+               &.pt {
+                 background-color: $pt-color;
+               }
+               
+               &.pta {
+                 background-color: $pta-color;
+               }
+               
+               &.ot {
+                 background-color: $ot-color;
+               }
+               
+               &.cota {
+                 background-color: $cota-color;
+               }
+               
+               &.st {
+                 background-color: $st-color;
+               }
+             }
+           }
+         }
+       }
+       
+       .calendar-footer {
+         padding: 1rem;
+         border-top: 1px solid rgba(255, 255, 255, 0.05);
+         
+         .calendar-note {
+           font-size: 0.85rem;
+           color: $text-secondary;
+           display: flex;
+           align-items: center;
+           
+           i {
+             margin-right: 0.5rem;
+             color: $primary-color;
+           }
+         }
+       }
+     }
+     
+     // Ranking de visitas de terapeutas
+     .therapist-visits-ranking {
+       background: rgba(15, 23, 42, 0.6);
+       border: 1px solid rgba(255, 255, 255, 0.05);
+       border-radius: 12px;
+       overflow: hidden;
+       
+       .ranking-header {
+         padding: 1.25rem;
+         border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+         display: flex;
+         justify-content: space-between;
+         align-items: center;
+         
+         h3 {
+           font-size: 1.1rem;
+           font-weight: 600;
+           display: flex;
+           align-items: center;
+           
+           i {
+             margin-right: 0.5rem;
+             color: $primary-color;
+           }
+         }
+         
+         .ranking-period {
+           font-size: 0.9rem;
+           color: $text-secondary;
+           padding: 0.25rem 0.75rem;
+           background: rgba(255, 255, 255, 0.05);
+           border-radius: 20px;
+         }
+       }
+       
+       .ranking-list {
+         padding: 1.25rem;
+         display: flex;
+         flex-direction: column;
+         gap: 1rem;
+         
+         .ranking-item {
+           display: flex;
+           align-items: center;
+           padding: 1rem;
+           background: rgba(15, 23, 42, 0.4);
+           border: 1px solid rgba(255, 255, 255, 0.05);
+           border-radius: 12px;
+           transition: all 0.3s ease;
+           
+           &:hover {
+             background: rgba(15, 23, 42, 0.6);
+             transform: translateY(-3px);
+             box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+           }
+           
+           .rank-number {
+             width: 36px;
+             height: 36px;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             background: rgba(255, 255, 255, 0.1);
+             border-radius: 50%;
+             font-weight: 700;
+             font-size: 1.1rem;
+             margin-right: 1rem;
+             flex-shrink: 0;
+           }
+           
+           .therapist-avatar {
+             position: relative;
+             margin-right: 1.25rem;
+             flex-shrink: 0;
+             
+             .avatar-initials {
+               width: 48px;
+               height: 48px;
+               border-radius: 10px;
+               display: flex;
+               align-items: center;
+               justify-content: center;
+               font-weight: 600;
+               font-size: 1.1rem;
+               color: #fff;
+               
+               &.pt, .pt & {
+                 background: rgba(54, 209, 220, 0.2);
+                 color: $pt-color;
+               }
+               
+               &.pta, .pta & {
+                 background: rgba(91, 134, 229, 0.2);
+                 color: $pta-color;
+               }
+               
+               &.ot, .ot & {
+                 background: rgba(255, 153, 102, 0.2);
+                 color: $ot-color;
+               }
+               
+               &.cota, .cota & {
+                 background: rgba(255, 94, 98, 0.2);
+                 color: $cota-color;
+               }
+               
+               &.st, .st & {
+                 background: rgba(86, 204, 242, 0.2);
+                 color: $st-color;
+               }
+             }
+             
+             .therapist-role {
+               position: absolute;
+               bottom: -5px;
+               right: -5px;
+               font-size: 0.7rem;
+               padding: 0.15rem 0.4rem;
+               background: rgba(15, 23, 42, 0.8);
+               border-radius: 4px;
+               font-weight: 600;
+               
+               &.pt, .pt & {
+                 color: $pt-color;
+                 border: 1px solid rgba(54, 209, 220, 0.3);
+               }
+               
+               &.pta, .pta & {
+                 color: $pta-color;
+                 border: 1px solid rgba(91, 134, 229, 0.3);
+               }
+               
+               &.ot, .ot & {
+                 color: $ot-color;
+                 border: 1px solid rgba(255, 153, 102, 0.3);
+               }
+               
+               &.cota, .cota & {
+                 color: $cota-color;
+                 border: 1px solid rgba(255, 94, 98, 0.3);
+               }
+               
+               &.st, .st & {
+                 color: $st-color;
+                 border: 1px solid rgba(86, 204, 242, 0.3);
+               }
+             }
+           }
+           
+           .therapist-info {
+             flex: 1;
+             min-width: 0;
+             
+             .therapist-name {
+               font-weight: 600;
+               font-size: 1.05rem;
+               margin-bottom: 0.35rem;
+               white-space: nowrap;
+               overflow: hidden;
+               text-overflow: ellipsis;
+             }
+             
+             .therapist-metrics {
+               font-size: 0.85rem;
+               color: $text-secondary;
+               display: flex;
+               align-items: center;
+               gap: 0.5rem;
+               
+               .earnings-value {
+                 font-weight: 600;
+                 color: $success-color;
+               }
+               
+               .earnings-divider {
+                 color: rgba(255, 255, 255, 0.2);
+               }
+               
+               .visit-avg {
+                 white-space: nowrap;
+               }
+             }
+           }
+           
+           .visit-count {
+             margin-left: auto;
+             text-align: center;
+             padding-left: 1rem;
+             border-left: 1px solid rgba(255, 255, 255, 0.1);
+             
+             .count-value {
+               font-size: 1.6rem;
+               font-weight: 700;
+               background: $primary-gradient;
+               -webkit-background-clip: text;
+               -webkit-text-fill-color: transparent;
+               background-clip: text;
+             }
+             
+             .count-label {
+               font-size: 0.8rem;
+               color: $text-secondary;
+             }
+           }
+         }
+       }
+     }
+   }
+   
+   // Estilos para la pestaña de visitas
+   .visits-tab {
+     .table-actions {
+       display: flex;
+       justify-content: space-between;
+       align-items: center;
+       margin-bottom: 1.25rem;
+       
+       .search-filter {
+         position: relative;
+         width: 360px;
+         
+         i {
+           position: absolute;
+           left: 1rem;
+           top: 50%;
+           transform: translateY(-50%);
+           color: $text-secondary;
+         }
+         
+         input {
+           width: 100%;
+           padding: 0.65rem 1rem 0.65rem 2.5rem;
+           background: rgba(15, 23, 42, 0.5);
+           border: 1px solid rgba(255, 255, 255, 0.1);
+           border-radius: 8px;
+           color: $text-primary;
+           font-size: 0.95rem;
+           
+           &:focus {
+             outline: none;
+             border-color: rgba(0, 229, 255, 0.3);
+             box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.1);
+           }
+           
+           &::placeholder {
+             color: rgba(255, 255, 255, 0.4);
+           }
+         }
+         
+         .clear-search {
+           position: absolute;
+           right: 0.75rem;
+           top: 50%;
+           transform: translateY(-50%);
+           background: rgba(255, 255, 255, 0.1);
+           border: none;
+           width: 22px;
+           height: 22px;
+           border-radius: 50%;
+           color: $text-secondary;
+           display: flex;
+           align-items: center;
+           justify-content: center;
+           cursor: pointer;
+           transition: all 0.2s ease;
+           
+           &:hover {
+             background: rgba(255, 255, 255, 0.2);
+             color: $text-primary;
+           }
+         }
+       }
+       
+       .table-summary {
+         display: flex;
+         gap: 1.5rem;
+         
+         .summary-item {
+           font-size: 0.9rem;
+           
+           .summary-label {
+             margin-right: 0.5rem;
+             color: $text-secondary;
+           }
+           
+           .summary-value {
+             font-weight: 600;
+           }
+         }
+       }
+     }
+     
+     .visits-table-container {
+       background: rgba(15, 23, 42, 0.5);
+       border: 1px solid rgba(255, 255, 255, 0.05);
+       border-radius: 12px;
+       overflow: hidden;
+       margin-bottom: 1.5rem;
+       
+       .visits-table {
+         width: 100%;
+         border-collapse: separate;
+         border-spacing: 0;
+         
+         th, td {
+           padding: 0.85rem 1rem;
+           text-align: left;
+         }
+         
+         th {
+           background: rgba(15, 23, 42, 0.8);
+           font-weight: 600;
+           color: $text-primary;
+           position: relative;
+           border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+           
+           &.sortable {
+             cursor: pointer;
+             
+             &:hover {
+               background: rgba(30, 41, 59, 0.8);
+             }
+             
+             i {
+               margin-left: 0.5rem;
+               font-size: 0.8rem;
+               opacity: 0.7;
+             }
+           }
+         }
+         
+         tbody {
+           tr {
+             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+             transition: all 0.2s ease;
+             
+             &:hover {
+               background: rgba(30, 41, 59, 0.4);
+             }
+             
+             &:last-child {
+               border-bottom: none;
+             }
+             
+             &.completed {
+               background: rgba(76, 175, 80, 0.05);
+             }
+             
+             &.pending {
+               background: rgba(255, 152, 0, 0.05);
+             }
+             
+             &.cancelled {
+               background: rgba(244, 67, 54, 0.05);
+             }
+             
+             .therapist-cell {
+               .therapist-info {
+                 display: flex;
+                 align-items: center;
+                 
+                 .avatar {
+                   width: 32px;
+                   height: 32px;
+                   border-radius: 8px;
+                   display: flex;
+                   align-items: center;
+                   justify-content: center;
+                   font-size: 0.8rem;
+                   font-weight: 600;
+                   margin-right: 0.75rem;
+                   flex-shrink: 0;
+                   
+                   &.pt {
+                     background: rgba(54, 209, 220, 0.15);
+                     color: $pt-color;
+                   }
+                   
+                   &.pta {
+                     background: rgba(91, 134, 229, 0.15);
+                     color: $pta-color;
+                   }
+                   
+                   &.ot {
+                     background: rgba(255, 153, 102, 0.15);
+                     color: $ot-color;
+                   }
+                   
+                   &.cota {
+                     background: rgba(255, 94, 98, 0.15);
+                     color: $cota-color;
+                   }
+                   
+                   &.st {
+                     background: rgba(86, 204, 242, 0.15);
+                     color: $st-color;
+                   }
+                 }
+                 
+                 .therapist-details {
+                   .name {
+                     display: block;
+                     font-weight: 500;
+                     font-size: 0.9rem;
+                   }
+                   
+                   .role {
+                     display: block;
+                     font-size: 0.75rem;
+                     color: $text-secondary;
+                   }
+                 }
+               }
+             }
+             
+             .patient-cell {
+               .patient-link {
+                 color: $primary-color;
+                 text-decoration: none;
+                 font-weight: 500;
+                 transition: all 0.2s ease;
+                 display: block;
+                 
+                 &:hover {
+                   text-decoration: underline;
+                 }
+               }
+               
+               .patient-id {
+                 font-size: 0.75rem;
+                 color: $text-secondary;
+               }
+             }
+             
+             .status-badge {
+               display: inline-flex;
+               align-items: center;
+               padding: 0.25rem 0.6rem;
+               border-radius: 50px;
+               font-size: 0.85rem;
+               
+               i {
+                 margin-right: 0.4rem;
+                 font-size: 0.8rem;
+               }
+               
+               &.completed {
+                 background: rgba(76, 175, 80, 0.15);
+                 color: $success-color;
+               }
+               
+               &.pending {
+                 background: rgba(255, 152, 0, 0.15);
+                 color: $warning-color;
+               }
+               
+               &.cancelled {
+                 background: rgba(244, 67, 54, 0.15);
+                 color: $danger-color;
+               }
+             }
+             
+             .amount-cell {
+               font-weight: 600;
+               color: $success-color;
+             }
+             
+             .actions-cell {
+               .action-buttons {
+                 display: flex;
+                 gap: 0.5rem;
+                 
+                 .action-btn {
+                   width: 28px;
+                   height: 28px;
+                   display: flex;
+                   align-items: center;
+                   justify-content: center;
+                   border: none;
+                   border-radius: 6px;
+                   background: rgba(255, 255, 255, 0.05);
+                   color: $text-secondary;
+                   cursor: pointer;
+                   transition: all 0.2s ease;
+                   
+                   &:hover {
+                     transform: translateY(-2px);
+                     
+                     &.view {
+                       background: rgba(0, 229, 255, 0.15);
+                       color: $primary-color;
+                     }
+                     
+                     &.notes {
+                       background: rgba(255, 152, 0, 0.15);
+                       color: $warning-color;
+                     }
+                     
+                     &.print {
+                       background: rgba(76, 175, 80, 0.15);
+                       color: $success-color;
+                     }
+                   }
+                 }
+               }
+             }
+           }
+         }
+         
+         .no-results {
+           .no-results-content {
+             padding: 3rem 1rem;
+             text-align: center;
+             
+             i {
+               font-size: 2.5rem;
+               color: rgba(255, 255, 255, 0.1);
+               margin-bottom: 1rem;
+             }
+             
+             p {
+               color: $text-secondary;
+               margin-bottom: 1.5rem;
+             }
+             
+             .reset-search {
+               padding: 0.5rem 1.25rem;
+               background: $primary-gradient-soft;
+               border: 1px solid rgba(0, 229, 255, 0.2);
+               border-radius: 8px;
+               color: $primary-color;
+               font-weight: 500;
+               cursor: pointer;
+               transition: all 0.3s ease;
+               
+               &:hover {
+                 background: rgba(0, 229, 255, 0.15);
+                 transform: translateY(-2px);
+               }
+             }
+           }
+         }
+       }
+     }
+     
+     .pagination-controls {
+       display: flex;
+       justify-content: space-between;
+       align-items: center;
+       flex-wrap: wrap;
+       gap: 1rem;
+       
+       .results-per-page {
+         display: flex;
+         align-items: center;
+         gap: 0.5rem;
+         font-size: 0.9rem;
+         color: $text-secondary;
+         
+         select {
+           padding: 0.3rem 0.5rem;
+           background: rgba(15, 23, 42, 0.6);
+           border: 1px solid rgba(255, 255, 255, 0.1);
+           border-radius: 6px;
+           color: $text-primary;
+           
+           &:focus {
+             outline: none;
+             border-color: rgba(0, 229, 255, 0.3);
+           }
+         }
+       }
+       
+       .pagination {
+         display: flex;
+         align-items: center;
+         gap: 0.5rem;
+         
+         .pagination-btn {
+           display: flex;
+           align-items: center;
+           padding: 0.4rem 0.75rem;
+           background: rgba(15, 23, 42, 0.6);
+           border: 1px solid rgba(255, 255, 255, 0.1);
+           border-radius: 6px;
+           color: $text-primary;
+           cursor: pointer;
+           transition: all 0.2s ease;
+           font-size: 0.9rem;
+           
+           i {
+             font-size: 0.8rem;
+           }
+           
+           &.prev i {
+             margin-right: 0.5rem;
+           }
+           
+           &.next i {
+             margin-left: 0.5rem;
+           }
+           
+           &:hover:not(:disabled) {
+             background: rgba(0, 229, 255, 0.1);
+             border-color: rgba(0, 229, 255, 0.2);
+           }
+           
+           &:disabled {
+             opacity: 0.5;
+             cursor: not-allowed;
+           }
+         }
+         
+         .page-numbers {
+           display: flex;
+           gap: 0.25rem;
+           
+           .page-number {
+             width: 30px;
+             height: 30px;
+             display: flex;
+             align-items: center;
+             justify-content: center;
+             background: rgba(15, 23, 42, 0.6);
+             border: 1px solid rgba(255, 255, 255, 0.1);
+             border-radius: 6px;
+             color: $text-primary;
+             cursor: pointer;
+             transition: all 0.2s ease;
+             font-size: 0.9rem;
+             
+             &.active {
+               background: $primary-gradient;
+               border-color: transparent;
+               font-weight: 600;
+             }
+             
+             &:hover:not(.active) {
+               background: rgba(0, 229, 255, 0.1);
+               border-color: rgba(0, 229, 255, 0.2);
+             }
+           }
+         }
+       }
+       
+       .page-info {
+         font-size: 0.9rem;
+         color: $text-secondary;
+         
+         span {
+           font-weight: 600;
+           color: $text-primary;
+         }
+       }
+     }
+   }
+ }
+ 
+ // Estilos responsivos
+ @media (max-width: 992px) {
+   .section-header {
+     flex-direction: column;
+     align-items: flex-start;
+     gap: 1rem;
+     
+     .header-actions {
+       width: 100%;
+       justify-content: space-between;
+     }
+   }
+   
+   .monthly-details-content {
+     .stats-cards {
+       grid-template-columns: repeat(2, 1fr);
+     }
+     
+     .daily-visits-calendar {
+       .calendar-header {
+         flex-direction: column;
+         align-items: flex-start;
+         gap: 0.75rem;
+       }
+     }
+     
+     .visits-tab {
+       .table-actions {
+         flex-direction: column;
+         align-items: flex-start;
+         gap: 1rem;
+         
+         .search-filter {
+           width: 100%;
+         }
+       }
+       
+       .pagination-controls {
+         flex-direction: column;
+         align-items: flex-start;
+         
+         .pagination {
+           width: 100%;
+           justify-content: center;
+         }
+       }
+     }
+   }
+ }
+ 
+ @media (max-width: 768px) {
+   .monthly-details-content {
+     padding: 1rem;
+     
+     .stats-cards {
+       grid-template-columns: 1fr;
+     }
+     
+     .daily-visits-calendar {
+       .calendar-grid {
+         .calendar-cell {
+           .calendar-day-number {
+             font-size: 0.9rem;
+           }
+           
+           .calendar-visit-count {
+             font-size: 1.2rem;
+           }
+         }
+       }}
+     }
+     
+     .therapist-visits-ranking {
+       .ranking-list {
+         .ranking-item {
+           flex-wrap: wrap;
+           
+           .therapist-info {
+             width: 100%;
+             margin-top: 0.75rem;
+             margin-bottom: 0.75rem;
+           }
+           
+           .visit-count {
+             margin-left: 0;
+             padding-left: 0;
+             border-left: none;
+             width: 100%;
+             display: flex;
+             align-items: center;
+             justify-content: space-between;
+             
+             .count-value {
+               font-size: 1.3rem;
+             }
+           }
+         }
+       }
+     }
+     
+     .visits-tab {
+       .visits-table-container {
+         overflow-x: auto;
+         
+         .visits-table {
+           min-width: 800px;
+         }
+       }
+     }
+   }
+ }
+ 
+ @media (max-width: 576px) {
+   .section-header {
+     .header-left {
+       h2 {
+         font-size: 1.1rem;
+       }
+     }
+     
+     .header-actions {
+       .tab-buttons {
+         .tab-button {
+           padding: 0.4rem 0.75rem;
+           
+           span {
+             display: none;
+           }
+           
+           i {
+             margin-right: 0;
+           }
+         }
+       }
+     }
+   }
+   
+   .monthly-details-content {
+     .daily-visits-calendar {
+       .therapist-types {
+         .therapist-type {
+           font-size: 0.75rem;
+           padding: 0.2rem 0.4rem;
+         }
+       }
+       
+       .calendar-grid {
+         .calendar-header-cell, .calendar-cell {
+           padding: 0.5rem;
+         }
+         
+         .calendar-cell {
+           .calendar-day-number {
+             font-size: 0.85rem;
+             margin-bottom: 0.3rem;
+           }
+           
+           .calendar-visit-count {
+             font-size: 1rem;
+           }
+         }
+       }
+     }
+     
+     .therapist-visits-ranking {
+       .ranking-item {
+         padding: 0.75rem;
+         
+         .rank-number {
+           width: 30px;
+           height: 30px;
+           font-size: 0.9rem;
+           margin-right: 0.75rem;
+         }
+         
+         .therapist-avatar {
+           margin-right: 0.75rem;
+           
+           .avatar-initials {
+             width: 36px;
+             height: 36px;
+             font-size: 0.9rem;
+           }
+         }
+         
+         .therapist-info {
+           .therapist-name {
+             font-size: 0.95rem;
+           }
+           
+           .therapist-metrics {
+             font-size: 0.8rem;
+             flex-wrap: wrap;
+           }
+         }
+       }
+     }
+     
+     .visits-tab {
+       .pagination-controls {
+         .pagination {
+           .page-numbers {
+             .page-number {
+               width: 28px;
+               height: 28px;
+             }
+           }
+         }
+       }
+     }
+   }
+ 
+}
+
+// Animation keyframes
+@keyframes glow {
+ 0%, 100% {
+   box-shadow: 0 0 5px rgba(0, 229, 255, 0.5);
+ }
+ 50% {
+   box-shadow: 0 0 15px rgba(0, 229, 255, 0.8);
+ }
+}
+
+@keyframes fadeInUp {
+ from {
+   opacity: 0;
+   transform: translateY(20px);
+ }
+ to {
+   opacity: 1;
+   transform: translateY(0);
+ }
+}
+
+@keyframes scaleIn {
+ from {
+   opacity: 0;
+   transform: scale(0.8);
+ }
+ to {
+   opacity: 1;
+   transform: scale(1);
+ }
+}
+
+// Variación del modo oscuro y claro
+:root.light-theme {
+ .monthly-details-section {
+   background: rgba(255, 255, 255, 0.9);
+   border-color: rgba(0, 0, 0, 0.1);
+   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+   
+   .section-header {
+     border-bottom-color: rgba(0, 0, 0, 0.05);
+     
+     h2 {
+       color: #1e293b;
+     }
+     
+     .tab-buttons {
+       background: rgba(240, 240, 250, 0.8);
+       border-color: rgba(0, 0, 0, 0.05);
+       
+       .tab-button {
+         color: #64748b;
+         
+         &:hover {
+           background: rgba(0, 0, 0, 0.05);
+         }
+       }
+     }
+     
+     .action-button {
+       background: rgba(0, 0, 0, 0.05);
+       border-color: rgba(0, 0, 0, 0.1);
+       color: #64748b;
+       
+       &:hover {
+         background: rgba(0, 0, 0, 0.1);
+         color: #1e293b;
+       }
+     }
+   }
+   
+   .monthly-details-content {
+     .stats-cards {
+       .stat-card {
+         background: #ffffff;
+         border-color: rgba(0, 0, 0, 0.05);
+         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+         
+         .stat-title {
+           color: #64748b;
+         }
+         
+         .stat-value {
+           color: #1e293b;
+         }
+       }
+     }
+     
+     .daily-visits-calendar, .therapist-visits-ranking, .visits-table-container {
+       background: #ffffff;
+       border-color: rgba(0, 0, 0, 0.05);
+       box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+     }
+   }
+ }
+}

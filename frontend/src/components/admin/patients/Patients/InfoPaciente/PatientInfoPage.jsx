@@ -1,17 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../../../login/AuthContext';
 import logoImg from '../../../../../assets/LogoMHC.jpeg';
+import EmergencyContactsComponent from './EmergencyContactsComponent';
+import CertificationPeriodComponent from './CertificationPeriodComponent';
+import MedicalInfoComponent from './MedicalInfoComponent';
+import DisciplinesComponent from './DisciplinesComponent';
+import ScheduleComponent from './ScheduleComponent';
+import ExercisesComponent from './ExercisesComponent';
+import DocumentsComponent from './DocumentsComponent';
+import NotesComponent from './NotesComponent';
+import LogoutAnimation from '../../../../../components/LogOut/LogOut';
 import '../../../../../styles/developer/Patients/InfoPaciente/PatientInfoPage.scss';
 
 // Patient Info Header Component
-const PatientInfoHeader = ({ patient, activeTab, setActiveTab }) => {
+const PatientInfoHeader = ({ patient, activeTab, setActiveTab, onToggleStatus }) => {
   const navigate = useNavigate();
+  const rolePrefix = window.location.hash.split('/')[1]; // Extract role from URL (developer, admin, etc.)
 
   // Handle back to patients list
   const handleBackToPatients = () => {
-    navigate('/developer/patients');
+    navigate(`/${rolePrefix}/patients`);
   };
+
+  const isActive = patient?.status === 'Active';
 
   return (
     <div className="patient-info-header">
@@ -20,13 +32,19 @@ const PatientInfoHeader = ({ patient, activeTab, setActiveTab }) => {
           <i className="fas fa-arrow-left"></i>
           <span>Back to Patients</span>
         </button>
-        <h1 className="patient-name">{patient?.name || 'Patient Information'}</h1>
+        <h1 className="patient-name">
+          {patient?.name || 'Patient Information'}
+          <span className={`status-indicator ${patient?.status?.toLowerCase()}`}>{patient?.status}</span>
+        </h1>
         <div className="patient-id">#{patient?.id || '0'}</div>
       </div>
       <div className="header-actions">
-        <button className="action-button edit">
-          <i className="fas fa-edit"></i>
-          <span>Edit</span>
+        <button 
+          className={`action-button status-toggle ${isActive ? 'deactivate' : 'activate'}`} 
+          onClick={onToggleStatus}
+        >
+          <i className={`fas ${isActive ? 'fa-user-slash' : 'fa-user-check'}`}></i>
+          <span>{isActive ? 'Deactivate' : 'Activate'}</span>
         </button>
         <button className="action-button print">
           <i className="fas fa-print"></i>
@@ -67,167 +85,233 @@ const TabsNavigation = ({ activeTab, setActiveTab }) => {
   );
 };
 
-// General Information Section Component
-const GeneralInformationSection = ({ patient }) => {
+// Personal Information Card Component
+const PersonalInfoCard = ({ patient }) => {
+  const [isEditing, setIsEditing] = useState(false);
+  
+  const toggleEdit = () => {
+    setIsEditing(!isEditing);
+  };
+  
   return (
-    <div className="general-info-section">
-      <div className="info-card personal-info">
-        <div className="card-header">
-          <h3><i className="fas fa-user-circle"></i> Personal Information</h3>
-        </div>
-        <div className="card-body">
-          <div className="info-row">
-            <div className="info-label">Full Name</div>
-            <div className="info-value">{patient?.name || 'Not available'}</div>
-          </div>
-          <div className="info-row">
-            <div className="info-label">Date of Birth</div>
-            <div className="info-value">{patient?.dob || 'Not available'}</div>
-          </div>
-          <div className="info-row">
-            <div className="info-label">Gender</div>
-            <div className="info-value">{patient?.gender || 'Not available'}</div>
-          </div>
-          <div className="info-row">
-            <div className="info-label">Address</div>
-            <div className="info-value">
-              {patient?.street ? (
-                <>
-                  {patient.street}<br />
-                  {patient.city}, {patient.state} {patient.zip}
-                </>
-              ) : (
-                'Not available'
-              )}
-            </div>
-          </div>
-          <div className="info-row">
-            <div className="info-label">Phone</div>
-            <div className="info-value">{patient?.phone || 'Not available'}</div>
-          </div>
-        </div>
+    <div className="info-card personal-info">
+      <div className="card-header">
+        <h3><i className="fas fa-user-circle"></i> Personal Information</h3>
+        <button className="edit-button" onClick={toggleEdit}>
+          <i className={`fas ${isEditing ? 'fa-check' : 'fa-pen'}`}></i>
+          <span className="tooltip">{isEditing ? 'Save Changes' : 'Edit Information'}</span>
+        </button>
       </div>
-
-      <div className="info-card certification-info">
-        <div className="card-header">
-          <h3><i className="fas fa-certificate"></i> Certification Period</h3>
-          <button className="edit-button">
-            <i className="fas fa-pen"></i>
-          </button>
-        </div>
-        <div className="card-body">
-          <div className="date-range">
-            <div className="date-block">
-              <label>Start Date</label>
-              <div className="date-value">{patient?.certPeriod?.split(' to ')[0] || '00/00/0000'}</div>
+      <div className="card-body">
+        {isEditing ? (
+          // Edit form
+          <div className="edit-form">
+            <div className="form-group">
+              <label>Full Name</label>
+              <input type="text" defaultValue={patient?.name || ''} />
             </div>
-            <div className="progress-separator">
-              <div className="line"></div>
+            <div className="form-group">
+              <label>Date of Birth</label>
+              <input type="text" defaultValue={patient?.dob || ''} />
             </div>
-            <div className="date-block">
-              <label>End Date</label>
-              <div className="date-value">{patient?.certPeriod?.split(' to ')[1] || '00/00/0000'}</div>
+            <div className="form-group">
+              <label>Gender</label>
+              <select defaultValue={patient?.gender || ''}>
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
             </div>
-          </div>
-          
-          <div className="cert-progress">
-            <div className="progress-bar">
-              <div className="progress-fill" style={{ width: calculateCertProgress(patient?.certPeriod) }}></div>
-            </div>
-            <div className="progress-labels">
-              <span>0%</span>
-              <span>50%</span>
-              <span>100%</span>
-            </div>
-          </div>
-
-          <div className="info-row">
-            <div className="info-label">Insurance</div>
-            <div className="info-value">{patient?.insurance || 'Not available'}</div>
-          </div>
-          <div className="info-row">
-            <div className="info-label">Policy Number</div>
-            <div className="info-value">{patient?.policyNumber || 'Not available'}</div>
-          </div>
-          <div className="info-row">
-            <div className="info-label">Healthcare Agency</div>
-            <div className="info-value">{patient?.agency || 'Not available'}</div>
-          </div>
-        </div>
-      </div>
-
-      <div className="info-card emergency-contacts">
-        <div className="card-header">
-          <h3><i className="fas fa-phone-alt"></i> Emergency Contacts</h3>
-          <button className="edit-button">
-            <i className="fas fa-plus"></i>
-          </button>
-        </div>
-        <div className="card-body">
-          {patient?.emergencyContact ? (
-            <div className="contact-row">
-              <div className="contact-name">
-                <i className="fas fa-user"></i>
-                <span>{patient.emergencyContact}</span>
-              </div>
-              <div className="contact-phone">
-                <i className="fas fa-phone"></i>
-                <span>{patient.emergencyPhone}</span>
-              </div>
-              <div className="contact-relation">
-                <i className="fas fa-users"></i>
-                <span>Family Member</span>
-              </div>
-              <div className="contact-actions">
-                <button className="action-btn edit">
-                  <i className="fas fa-edit"></i>
-                </button>
-                <button className="action-btn delete">
-                  <i className="fas fa-trash"></i>
-                </button>
+            <div className="form-group">
+              <label>Address</label>
+              <input type="text" defaultValue={patient?.street || ''} placeholder="Street" />
+              <div className="address-inline">
+                <input type="text" defaultValue={patient?.city || ''} placeholder="City" />
+                <input type="text" defaultValue={patient?.state || ''} placeholder="State" className="state-input" />
+                <input type="text" defaultValue={patient?.zip || ''} placeholder="ZIP Code" className="zip-input" />
               </div>
             </div>
-          ) : (
-            <div className="no-contacts">
-              <i className="fas fa-exclamation-circle"></i>
-              <p>No emergency contacts available</p>
-              <button className="add-contact-btn">
-                <i className="fas fa-plus"></i> Add Contact
-              </button>
+            <div className="form-group">
+              <label>Phone</label>
+              <input type="text" defaultValue={patient?.phone || ''} />
             </div>
-          )}
-        </div>
+            <div className="form-actions">
+              <button className="cancel-btn" onClick={toggleEdit}>Cancel</button>
+              <button className="save-btn" onClick={toggleEdit}>Save Changes</button>
+            </div>
+          </div>
+        ) : (
+          // View mode
+          <>
+            <div className="info-row">
+              <div className="info-label">Full Name</div>
+              <div className="info-value">{patient?.name || 'Not available'}</div>
+            </div>
+            <div className="info-row">
+              <div className="info-label">Date of Birth</div>
+              <div className="info-value">{patient?.dob || 'Not available'}</div>
+            </div>
+            <div className="info-row">
+              <div className="info-label">Gender</div>
+              <div className="info-value">{patient?.gender || 'Not available'}</div>
+            </div>
+            <div className="info-row">
+              <div className="info-label">Address</div>
+              <div className="info-value">
+                {patient?.street ? (
+                  <>
+                    {patient.street}<br />
+                    {patient.city}, {patient.state} {patient.zip}
+                  </>
+                ) : (
+                  'Not available'
+                )}
+              </div>
+            </div>
+            <div className="info-row">
+              <div className="info-label">Phone</div>
+              <div className="info-value">{patient?.phone || 'Not available'}</div>
+            </div>
+          </>
+        )}
       </div>
     </div>
   );
 };
 
-// Utility function to calculate certification period progress percentage
-const calculateCertProgress = (certPeriod) => {
-  if (!certPeriod) return '0%';
-  
+// Format date for input fields
+const formatDateForInput = (dateStr) => {
+  if (!dateStr) return '';
   try {
-    const [startDateStr, endDateStr] = certPeriod.split(' to ');
-    
-    const [startMonth, startDay, startYear] = startDateStr.split('-').map(Number);
-    const [endMonth, endDay, endYear] = endDateStr.split('-').map(Number);
-    
-    const startDate = new Date(startYear, startMonth - 1, startDay);
-    const endDate = new Date(endYear, endMonth - 1, endDay);
-    const currentDate = new Date();
-    
-    if (currentDate < startDate) return '0%';
-    if (currentDate > endDate) return '100%';
-    
-    const totalDuration = endDate - startDate;
-    const elapsedDuration = currentDate - startDate;
-    
-    const progressPercentage = Math.round((elapsedDuration / totalDuration) * 100);
-    return `${progressPercentage}%`;
+    const [month, day, year] = dateStr.split('-').map(Number);
+    return `${year}-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}`;
   } catch (error) {
-    console.error('Error calculating certification progress:', error);
-    return '0%';
+    console.error('Error formatting date:', error);
+    return '';
   }
+};
+
+// General Information Section Component
+const GeneralInformationSection = ({ patient, setCertPeriodDates }) => {
+  // Handler for certification period updates
+  const handleUpdateCertPeriod = (updatedCertData) => {
+    console.log('Certification period updated:', updatedCertData);
+    if (updatedCertData.startDate && updatedCertData.endDate) {
+      setCertPeriodDates({ 
+        startDate: updatedCertData.startDate, 
+        endDate: updatedCertData.endDate 
+      });
+    }
+  };
+  
+  return (
+    <div className="general-info-section">
+      <PersonalInfoCard patient={patient} />
+      <CertificationPeriodComponent 
+        patient={patient} 
+        onUpdateCertPeriod={handleUpdateCertPeriod}
+      />
+      <EmergencyContactsComponent patient={patient} />
+    </div>
+  );
+};
+
+// Medical Information Section Component
+const MedicalInformationSection = ({ patient }) => {
+  // Handler for medical info updates
+  const handleUpdateMedicalInfo = (updatedMedicalData) => {
+    console.log('Medical information updated:', updatedMedicalData);
+    // Here you would typically update the state or send data to an API
+  };
+  
+  return (
+    <div className="medical-info-section">
+      <MedicalInfoComponent patient={patient} onUpdateMedicalInfo={handleUpdateMedicalInfo} />
+    </div>
+  );
+};
+
+// Disciplines Section Component
+const DisciplinesSection = ({ patient, setPatient }) => {
+  // Handler for disciplines updates
+  const handleUpdateDisciplines = (updatedDisciplines) => {
+    console.log('Disciplines updated in PatientInfoPage:', updatedDisciplines);
+    // Actualizar el estado del paciente con las nuevas disciplinas
+    setPatient((prevPatient) => ({
+      ...prevPatient,
+      disciplines: updatedDisciplines
+    }));
+  };
+  
+  return (
+    <div className="disciplines-section">
+      <DisciplinesComponent patient={patient} onUpdateDisciplines={handleUpdateDisciplines} />
+    </div>
+  );
+};
+
+// Schedule Section Component
+const ScheduleSection = ({ patient, certPeriodDates }) => {
+  // Handler for schedule updates
+  const handleUpdateSchedule = (updatedSchedule) => {
+    console.log('Schedule updated:', updatedSchedule);
+    // Here you would typically update the state or send data to an API
+  };
+  
+  return (
+    <div className="schedule-section">
+      <ScheduleComponent 
+        patient={patient} 
+        onUpdateSchedule={handleUpdateSchedule} 
+        certPeriodDates={certPeriodDates}
+      />
+    </div>
+  );
+};
+
+// Exercises Section Component
+const ExercisesSection = ({ patient }) => {
+  // Handler for exercises updates
+  const handleUpdateExercises = (updatedExercises) => {
+    console.log('Exercises updated:', updatedExercises);
+    // Here you would typically update the state or send data to an API
+  };
+  
+  return (
+    <div className="exercises-section">
+      <ExercisesComponent patient={patient} onUpdateExercises={handleUpdateExercises} />
+    </div>
+  );
+};
+
+// Documents Section Component
+const DocumentsSection = ({ patient }) => {
+  // Handler for documents updates
+  const handleUpdateDocuments = (updatedDocuments) => {
+    console.log('Documents updated:', updatedDocuments);
+    // Here you would typically update the state or send data to an API
+  };
+  
+  return (
+    <div className="documents-section">
+      <DocumentsComponent patient={patient} onUpdateDocuments={handleUpdateDocuments} />
+    </div>
+  );
+};
+
+// Notes Section Component
+const NotesSection = ({ patient }) => {
+  // Handler for notes updates
+  const handleUpdateNotes = (updatedNotes) => {
+    console.log('Notes updated:', updatedNotes);
+    // Here you would typically update the state or send data to an API
+  };
+  
+  return (
+    <div className="notes-section">
+      <NotesComponent patient={patient} onUpdateNotes={handleUpdateNotes} />
+    </div>
+  );
 };
 
 // Main Patient Information Page Component
@@ -236,8 +320,100 @@ const PatientInfoPage = () => {
   const [activeTab, setActiveTab] = useState('general');
   const [patient, setPatient] = useState(null);
   const [loading, setLoading] = useState(true);
-  const { currentUser } = useAuth();
+  const { currentUser, logout } = useAuth();
   const navigate = useNavigate();
+  const rolePrefix = window.location.hash.split('/')[1]; // Extract role from URL (developer, admin, etc.)
+  const [showUserMenu, setShowUserMenu] = useState(false);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [notificationCount, setNotificationCount] = useState(5);
+  const [isMobile, setIsMobile] = useState(false);
+  const userMenuRef = useRef(null);
+  const [certPeriodDates, setCertPeriodDates] = useState({ startDate: '', endDate: '' });
+
+  // Detect device size
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    
+    handleResize(); // Initial check
+    window.addEventListener('resize', handleResize);
+    
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+  
+  // Function to get initials from name
+  function getInitials(name) {
+    if (!name) return "U";
+    const parts = name.split(' ');
+    if (parts.length >= 2) {
+      return (parts[0][0] + parts[1][0]).toUpperCase();
+    }
+    return name.substring(0, 2).toUpperCase();
+  }
+  
+  // Use user data from auth context
+  const userData = currentUser ? {
+    name: currentUser.fullname || currentUser.username,
+    avatar: getInitials(currentUser.fullname || currentUser.username),
+    email: currentUser.email,
+    role: currentUser.role,
+    status: 'online'
+  } : {
+    name: '',
+    avatar: '',
+    email: '',
+    role: '',
+    status: 'online'
+  };
+
+  // Handle logout
+  const handleLogout = () => {
+    setIsLoggingOut(true);
+    setShowUserMenu(false);
+    
+    // Add logout classes to body
+    document.body.classList.add('logging-out');
+  };
+  
+  // Handle logout animation completion
+  const handleLogoutAnimationComplete = () => {
+    // Execute the logout from auth context
+    logout();
+    // Navigate to the login page
+    navigate('/');
+  };
+
+  // Close user menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (userMenuRef.current && !userMenuRef.current.contains(event.target)) {
+        setShowUserMenu(false);
+      }
+    };
+    
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Handle patient status toggle (activate/deactivate)
+  const handleToggleStatus = () => {
+    if (patient) {
+      const newStatus = patient.status === 'Active' ? 'Inactive' : 'Active';
+      setPatient({
+        ...patient,
+        status: newStatus
+      });
+      
+      // In a real app, you would make an API call to update the patient status
+      console.log(`Patient ${patient.id} status updated to ${newStatus}`);
+      
+      // You could also show a notification to the user
+      // Example: toast.success(`Patient ${patient.name} has been ${newStatus.toLowerCase()}`);
+    }
+  };
 
   // Fetch patient data
   useEffect(() => {
@@ -266,7 +442,121 @@ const PatientInfoPage = () => {
           policyNumber: "BCB-123456789",
           emergencyContact: "Mohammed Ali",
           emergencyPhone: "(310) 555-7890",
-          notes: "Patient recovering well. Following exercise regimen as prescribed."
+          notes: "Patient recovering well. Following exercise regimen as prescribed.",
+          // Medical data
+          medicalInfo: {
+            weight: 185.5,
+            nursingDiagnosis: "Chronic Obstructive Pulmonary Disease (COPD) with decreased exercise tolerance",
+            pmh: "Hypertension, Type 2 Diabetes (controlled), COPD diagnosed 2018, Right knee replacement (2020)",
+            wbs: "No active wounds present",
+            clinicalGrouping: "MMTA - Respiratory",
+            homebound: "Patient experiences significant dyspnea with minimal exertion requiring intermittent rest periods"
+          },
+          // Disciplines data
+          disciplines: {
+            PT: {
+              isActive: true,
+              therapist: { 
+                id: 'pt1', 
+                name: 'Dr. James Wilson', 
+                type: 'PT', 
+                phone: '(310) 555-1234', 
+                email: 'jwilson@therapysync.com', 
+                licenseNumber: 'PT12345' 
+              },
+              assistant: { 
+                id: 'pta1', 
+                name: 'Carlos Rodriguez', 
+                type: 'PTA', 
+                phone: '(310) 555-8901', 
+                email: 'crodriguez@therapysync.com', 
+                licenseNumber: 'PTA12345' 
+              },
+              frequency: '2w3'
+            },
+            OT: {
+              isActive: false,
+              therapist: null,
+              assistant: null,
+              frequency: ''
+            },
+            ST: {
+              isActive: false,
+              therapist: null,
+              assistant: null,
+              frequency: ''
+            }
+          },
+          // Exercises data
+          exercises: [
+            {
+              id: 1,
+              name: 'Forward Lunge in Standing',
+              description: 'Lower body strengthening exercise for hip and knee muscles.',
+              bodyPart: 'Hip',
+              category: 'Strengthening',
+              subCategory: 'Functional',
+              discipline: 'PT',
+              imageUrl: '/exercise-images/forward-lunge.jpg',
+              sets: 3,
+              reps: 10,
+              sessions: 1,
+              isHEP: true
+            },
+            {
+              id: 2,
+              name: 'Arm Chair Push',
+              description: 'Upper body strengthening exercise using a chair for support.',
+              bodyPart: 'Shoulder',
+              category: 'Strengthening',
+              subCategory: 'Functional',
+              discipline: 'PT',
+              imageUrl: '/exercise-images/arm-chair-push.jpg',
+              sets: 3,
+              reps: 15,
+              sessions: 1,
+              isHEP: true
+            },
+            {
+              id: 3,
+              name: 'Deep Squat',
+              description: 'Lower body strengthening exercise for multiple muscle groups.',
+              bodyPart: 'Knee',
+              category: 'Strengthening',
+              subCategory: 'Functional',
+              discipline: 'PT',
+              imageUrl: '/exercise-images/deep-squat.jpg',
+              sets: 3,
+              reps: 10,
+              sessions: 1,
+              isHEP: true
+            }
+          ],
+          // Documents data
+          documents: [
+            {
+              id: 1,
+              name: 'Evaluation Report.pdf',
+              type: 'pdf',
+              size: 2456000,
+              category: 'Medical Reports',
+              uploadedBy: 'Dr. James Wilson',
+              uploadDate: '2025-02-15T14:30:00',
+              description: 'Initial evaluation report by PT',
+              url: '/documents/eval-report.pdf'
+            },
+            {
+              id: 2,
+              name: 'Insurance Approval.pdf',
+              type: 'pdf',
+              size: 1240000,
+              category: 'Insurance',
+              uploadedBy: 'Admin Staff',
+              uploadDate: '2025-02-10T09:15:00',
+              description: 'Insurance approval for therapy sessions',
+              url: '/documents/insurance-approval.pdf'
+            }
+          ]
         },
         {
           id: 2,
@@ -279,7 +569,7 @@ const PatientInfoPage = () => {
           state: "CA",
           zip: "90025",
           phone: "(310) 808-5631",
-          certPeriod: "04-19-2023 to 04-19-2025",
+          certPeriod: "04-05-2025 to 06-04-2025",
           status: "Active",
           dob: "05/12/1965",
           gender: "Male",
@@ -287,7 +577,132 @@ const PatientInfoPage = () => {
           policyNumber: "BCB-123456789",
           emergencyContact: "Rick Grimes",
           emergencyPhone: "(310) 555-7890",
-          notes: "Patient recovering well. Following exercise regimen as prescribed."
+          notes: "Patient recovering well. Following exercise regimen as prescribed.",
+          // Medical data
+          medicalInfo: {
+            weight: 172.0,
+            nursingDiagnosis: "Left CVA with right-sided hemiparesis",
+            pmh: "Cerebrovascular accident (03/2023), Hypertension, Hyperlipidemia",
+            wbs: "No wounds present",
+            clinicalGrouping: "Neuro Rehabilitation",
+            homebound: "Patient requires maximum assistance for transfers and ambulation due to right-sided weakness and balance deficits"
+          },
+          // Disciplines data
+          disciplines: {
+            PT: {
+              isActive: true,
+              therapist: { 
+                id: 'pt3', 
+                name: 'Dr. Michael Chen', 
+                type: 'PT', 
+                phone: '(310) 555-3456', 
+                email: 'mchen@therapysync.com', 
+                licenseNumber: 'PT34567' 
+              },
+              assistant: { 
+                id: 'pta2', 
+                name: 'Maria Gonzalez', 
+                type: 'PTA', 
+                phone: '(310) 555-9012', 
+                email: 'mgonzalez@therapysync.com', 
+                licenseNumber: 'PTA23456' 
+              },
+              frequency: '1w2'
+            },
+            OT: {
+              isActive: true,
+              therapist: { 
+                id: 'ot1', 
+                name: 'Dr. Emily Parker', 
+                type: 'OT', 
+                phone: '(310) 555-4567', 
+                email: 'eparker@therapysync.com', 
+                licenseNumber: 'OT12345' 
+              },
+              assistant: { 
+                id: 'cota1', 
+                name: 'Thomas Smith', 
+                type: 'COTA', 
+                phone: '(310) 555-0123', 
+                email: 'tsmith@therapysync.com', 
+                licenseNumber: 'COTA12345' 
+              },
+              frequency: '1w3'
+            },
+            ST: {
+              isActive: false,
+              therapist: null,
+              assistant: null,
+              frequency: ''
+            }
+          },
+          // Exercises data for OT
+          exercises: [
+            {
+              id: 4,
+              name: 'Shoulder Flexion',
+              description: 'Range of motion exercise for the shoulder joint.',
+              bodyPart: 'Shoulder',
+              category: 'Range of Motion',
+              subCategory: 'Active',
+              discipline: 'OT',
+              imageUrl: '/exercise-images/shoulder-flexion.jpg',
+              sets: 2,
+              reps: 15,
+              sessions: 2,
+              isHEP: true
+            },
+            {
+              id: 5,
+              name: 'Wrist Extension',
+              description: 'Stretching exercise for the wrist extensors.',
+              bodyPart: 'Wrist',
+              category: 'Stretching',
+              subCategory: 'Static',
+              discipline: 'OT',
+              imageUrl: '/exercise-images/wrist-extension.jpg',
+              sets: 3,
+              reps: 10,
+              sessions: 2,
+              isHEP: true
+            }
+          ],
+          // Documents data for second patient
+          documents: [
+            {
+              id: 3,
+              name: 'Progress Notes - Week 1.docx',
+              type: 'docx',
+              size: 350000,
+              category: 'Progress Notes',
+              uploadedBy: 'Dr. Michael Chen',
+              uploadDate: '2025-02-20T16:45:00',
+              description: 'Weekly progress notes after first week of therapy',
+              url: '/documents/progress-notes-w1.docx'
+            },
+            {
+              id: 4,
+              name: 'Exercise Program.jpg',
+              type: 'jpg',
+              size: 1750000,
+              category: 'Assessments',
+              uploadedBy: 'Maria Gonzalez',
+              uploadDate: '2025-02-25T10:20:00',
+              description: 'Custom exercise program illustration',
+              url: '/documents/exercise-program.jpg'
+            },
+            {
+              id: 5,
+              name: 'Medical History.pdf',
+              type: 'pdf',
+              size: 3200000,
+              category: 'Medical Reports',
+              uploadedBy: 'Dr. Emily Parker',
+              uploadDate: '2025-03-05T09:30:00',
+              description: 'Complete medical history including past treatments',
+              url: '/documents/medical-history.pdf'
+            }
+          ]
         }
       ];
       
@@ -311,9 +726,16 @@ const PatientInfoPage = () => {
     return (
       <div className="patient-info-loading">
         <div className="loading-spinner">
-          <i className="fas fa-circle-notch fa-spin"></i>
+          <div className="spinner-animation">
+            <i className="fas fa-circle-notch fa-spin"></i>
+          </div>
+          <div className="loading-text">
+            <span>Loading patient information</span>
+            <div className="loading-dots">
+              <span>.</span><span>.</span><span>.</span>
+            </div>
+          </div>
         </div>
-        <p>Loading patient information...</p>
       </div>
     );
   }
@@ -329,7 +751,7 @@ const PatientInfoPage = () => {
         <p>The patient you are looking for does not exist or you don't have permission to view it.</p>
         <button 
           className="back-button"
-          onClick={() => navigate('/developer/patients')}
+          onClick={() => navigate(`/${rolePrefix}/patients`)}
         >
           <i className="fas fa-arrow-left"></i> Back to Patients List
         </button>
@@ -338,7 +760,15 @@ const PatientInfoPage = () => {
   }
 
   return (
-    <div className="patient-info-page">
+    <div className={`patient-info-page ${isLoggingOut ? 'logging-out' : ''}`}>
+      {/* Logout Animation Component - Only show when logging out */}
+      {isLoggingOut && (
+        <LogoutAnimation 
+          isMobile={isMobile} 
+          onAnimationComplete={handleLogoutAnimationComplete} 
+        />
+      )}
+      
       {/* Page header */}
       <header className="main-header">
         <div className="header-container">
@@ -353,7 +783,7 @@ const PatientInfoPage = () => {
             <div className="menu-navigation">
               <button 
                 className="nav-button main-menu" 
-                onClick={() => navigate('/developer/homePage')}
+                onClick={() => navigate(`/${rolePrefix}/homePage`)}
                 title="Back to main menu"
               >
                 <i className="fas fa-th-large"></i>
@@ -363,7 +793,7 @@ const PatientInfoPage = () => {
               
               <button 
                 className="nav-button patients-menu" 
-                onClick={() => navigate('/developer/patients')}
+                onClick={() => navigate(`/${rolePrefix}/patients`)}
                 title="Patients Menu"
               >
                 <i className="fas fa-user-injured"></i>
@@ -373,29 +803,126 @@ const PatientInfoPage = () => {
             </div>
           </div>
           
-          {/* User profile - simplified version */}
-          <div className="user-profile">
-            <div className="profile-button">
-              <div className="avatar">
-                {currentUser?.fullname?.[0] || 'U'}
+          {/* User profile with dropdown menu */}
+          <div className="support-user-profile" ref={userMenuRef}>
+            <div 
+              className={`support-profile-button ${showUserMenu ? 'active' : ''}`} 
+              onClick={() => !isLoggingOut && setShowUserMenu(!showUserMenu)}
+              data-tooltip="Your profile and settings"
+            >
+              <div className="support-avatar">
+                <div className="support-avatar-text">{userData.avatar}</div>
+                <div className={`support-avatar-status ${userData.status}`}></div>
               </div>
-              <div className="profile-info">
-                <span className="user-name">{currentUser?.fullname || 'User'}</span>
-                <span className="user-role">{currentUser?.role || 'Developer'}</span>
+              
+              <div className="support-profile-info">
+                <span className="support-user-name">{userData.name}</span>
+                <span className="support-user-role">{userData.role}</span>
               </div>
+              
+              <i className={`fas fa-chevron-${showUserMenu ? 'up' : 'down'}`}></i>
             </div>
+            
+            {/* Enhanced dropdown menu */}
+            {showUserMenu && !isLoggingOut && (
+              <div className="support-user-menu">
+                <div className="support-menu-header">
+                  <div className="support-user-info">
+                    <div className="support-user-avatar">
+                      <span>{userData.avatar}</span>
+                      <div className={`avatar-status ${userData.status}`}></div>
+                    </div>
+                    <div className="support-user-details">
+                      <h4>{userData.name}</h4>
+                      <span className="support-user-email">{userData.email}</span>
+                      <span className={`support-user-status ${userData.status}`}>
+                        <i className="fas fa-circle"></i> 
+                        {userData.status.charAt(0).toUpperCase() + userData.status.slice(1)}
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="support-menu-section">
+                  <div className="section-title">Account</div>
+                  <div className="support-menu-items">
+                    <div 
+                      className="support-menu-item"
+                      onClick={() => navigate(`/${rolePrefix}/profile`)}
+                    >
+                      <i className="fas fa-user-circle"></i>
+                      <span>My Profile</span>
+                    </div>
+                    <div className="support-menu-item">
+                      <i className="fas fa-cog"></i>
+                      <span>Settings</span>
+                    </div>
+                    <div className="support-menu-item">
+                      <i className="fas fa-calendar-alt"></i>
+                      <span>My Schedule</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="support-menu-section">
+                  <div className="section-title">Preferences</div>
+                  <div className="support-menu-items">
+                    <div className="support-menu-item">
+                      <i className="fas fa-bell"></i>
+                      <span>Notifications</span>
+                      <div className="support-notification-badge">{notificationCount}</div>
+                    </div>
+                    <div className="support-menu-item toggle-item">
+                      <div className="toggle-item-content">
+                        <i className="fas fa-volume-up"></i>
+                        <span>Sound Alerts</span>
+                      </div>
+                      <div className="toggle-switch">
+                        <div className="toggle-handle"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="support-menu-section">
+                  <div className="section-title">Support</div>
+                  <div className="support-menu-items">
+                    <div className="support-menu-item">
+                      <i className="fas fa-headset"></i>
+                      <span>Contact Support</span>
+                    </div>
+                    <div className="support-menu-item">
+                      <i className="fas fa-bug"></i>
+                      <span>Report Issue</span>
+                    </div>
+                  </div>
+                </div>
+                
+                <div className="support-menu-footer">
+                  <div className="support-menu-item logout" onClick={handleLogout}>
+                    <i className="fas fa-sign-out-alt"></i>
+                    <span>Log Out</span>
+                  </div>
+                  <div className="version-info">
+                    <span>TherapySync™ Support</span>
+                    <span>v2.7.0</span>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </header>
 
       {/* Main content */}
-      <main className="patient-info-content">
+      <main className={`patient-info-content ${isLoggingOut ? 'fade-out' : ''}`}>
         <div className="patient-info-container">
           {/* Patient header with back button and actions */}
           <PatientInfoHeader 
             patient={patient} 
             activeTab={activeTab} 
             setActiveTab={setActiveTab}
+            onToggleStatus={handleToggleStatus}
           />
           
           {/* Tabs navigation */}
@@ -404,66 +931,35 @@ const PatientInfoPage = () => {
           {/* Tab content */}
           <div className="tab-content">
             {activeTab === 'general' && (
-              <GeneralInformationSection patient={patient} />
+              <GeneralInformationSection 
+                patient={patient} 
+                setCertPeriodDates={setCertPeriodDates}
+              />
             )}
             {activeTab === 'medical' && (
-              <div className="medical-info-placeholder">
-                <div className="placeholder-content">
-                  <i className="fas fa-notes-medical"></i>
-                  <p>Medical Information Section</p>
-                  <span>This section will be developed in the next phase</span>
-                </div>
-              </div>
+              <MedicalInformationSection patient={patient} />
             )}
             {activeTab === 'disciplines' && (
-              <div className="disciplines-placeholder">
-                <div className="placeholder-content">
-                  <i className="fas fa-user-md"></i>
-                  <p>Disciplines Section</p>
-                  <span>This section will be developed in the next phase</span>
-                </div>
-              </div>
+              <DisciplinesSection patient={patient} setPatient={setPatient} />
             )}
             {activeTab === 'schedule' && (
-              <div className="schedule-placeholder">
-                <div className="placeholder-content">
-                  <i className="fas fa-calendar-alt"></i>
-                  <p>Schedule Section</p>
-                  <span>This section will be developed in the next phase</span>
-                </div>
-              </div>
+              <ScheduleSection 
+                patient={patient} 
+                certPeriodDates={certPeriodDates} 
+              />
             )}
             {activeTab === 'exercises' && (
-              <div className="exercises-placeholder">
-                <div className="placeholder-content">
-                  <i className="fas fa-dumbbell"></i>
-                  <p>Exercises Section</p>
-                  <span>This section will be developed in the next phase</span>
-                </div>
-              </div>
+              <ExercisesSection patient={patient} />
             )}
             {activeTab === 'documents' && (
-              <div className="documents-placeholder">
-                <div className="placeholder-content">
-                  <i className="fas fa-file-alt"></i>
-                  <p>Documents Section</p>
-                  <span>This section will be developed in the next phase</span>
-                </div>
-              </div>
+              <DocumentsSection patient={patient} />
             )}
             {activeTab === 'notes' && (
-              <div className="notes-placeholder">
-                <div className="placeholder-content">
-                  <i className="fas fa-sticky-note"></i>
-                  <p>Notes Section</p>
-                  <span>This section will be developed in the next phase</span>
-                </div>
-              </div>
+              <NotesSection patient={patient} />
             )}
           </div>
         </div>
       </main>
-
     </div>
   );
 };
