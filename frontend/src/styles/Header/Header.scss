@@ -1314,3 +1314,59 @@ body.logging-out {
     }
   }
 }
+
+top-carousel .carousel-options {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Asegurar que los elementos ocupen el espacio correctamente */
+.carousel-option {
+  position: absolute;
+  transition: all 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Posición central */
+.carousel-option.center {
+  z-index: 3;
+  transform: translateX(0) scale(1);
+  opacity: 1;
+}
+
+/* Posición izquierda siempre visible (sin espacio) */
+.carousel-option.left {
+  z-index: 2;
+  transform: translateX(-100%) scale(0.85);
+  opacity: 0.8;
+}
+
+/* Posición derecha siempre visible */
+.carousel-option.right {
+  z-index: 2;
+  transform: translateX(100%) scale(0.85);
+  opacity: 0.8;
+}
+
+/* Eliminar el uso de far-left y far-right para evitar espacios vacíos */
+.carousel-option.far-left,
+.carousel-option.far-right {
+  display: none;
+}
+
+/* En móvil, ajustar las posiciones para un mejor encaje */
+@media (max-width: 768px) {
+  .carousel-option.left {
+    transform: translateX(-80%) scale(0.8);
+    opacity: 0.7;
+  }
+  
+  .carousel-option.right {
+    transform: translateX(80%) scale(0.8);
+    opacity: 0.7;
+  }
+}

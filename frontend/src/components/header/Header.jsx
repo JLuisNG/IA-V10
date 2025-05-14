@@ -7,10 +7,10 @@ import '../../styles/Header/Header.scss';
 
 const Header = ({ onLogout }) => {
   const navigate = useNavigate();
-  const location = useLocation(); // Para detectar la ruta actual
+  const location = useLocation();
   const { currentUser } = useAuth();
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [activeMenuIndex, setActiveMenuIndex] = useState(0);
+  const [activeMenuIndex, setActiveMenuIndex] = useState(1); // Comenzamos con Referrals activo
   const [menuTransitioning, setMenuTransitioning] = useState(false);
   const [headerGlow, setHeaderGlow] = useState(false);
   const [parallaxPosition, setParallaxPosition] = useState({ x: 0, y: 0 });
@@ -54,9 +54,9 @@ const Header = ({ onLogout }) => {
     return { baseRole, roleType };
   }
   
-  // Función para filtrar menú según el rol del usuario - MODIFICADA PARA QUITAR SYSTEM MANAGEMENT
+  // Función para filtrar menú según el rol del usuario
   function getFilteredMenuOptions() {
-    // Opciones completas del menú (sin System Management)
+    // Opciones completas del menú
     const allMenuOptions = [
       { id: 1, name: "Patients", icon: "fa-user-injured", route: `/${baseRole}/patients`, color: "#36D1DC" },
       { id: 2, name: "Referrals", icon: "fa-file-medical", route: `/${baseRole}/referrals`, color: "#FF9966" },
@@ -65,7 +65,7 @@ const Header = ({ onLogout }) => {
     
     // Filtrar según el tipo de rol
     if (roleType === 'developer' || roleType === 'admin') {
-      // Developer y Admin ven todas las opciones excepto Support
+      // Developer y Admin ven todas las opciones
       return allMenuOptions;
     } else if (roleType === 'therapist' || roleType === 'support') {
       // Terapistas y support solo ven Patients y Referrals
@@ -83,8 +83,7 @@ const Header = ({ onLogout }) => {
   // Opciones del menú principal filtradas por rol
   const defaultMenuOptions = getFilteredMenuOptions();
   
-  // Opciones del menú de referrals con iconos y colores personalizados
-  // Solo se mostrarán si el usuario tiene acceso a referrals
+  // Opciones del menú de referrals
   const referralsMenuOptions = [
     { id: 1, name: "Admin Referral Inbox", icon: "fa-inbox", route: `/${baseRole}/referrals/inbox`, color: "#4facfe" },
     { id: 2, name: "Create New Referral", icon: "fa-file-medical", route: `/${baseRole}/createNewReferral`, color: "#ff9966" },
@@ -98,39 +97,7 @@ const Header = ({ onLogout }) => {
     ? referralsMenuOptions 
     : defaultMenuOptions;
   
-  // Configurar el índice activo basado en la ruta actual
-  useEffect(() => {
-    if (isReferralsPage && (roleType === 'developer' || roleType === 'admin')) {
-      // Encontrar qué opción del menú de referrals coincide mejor con la ruta actual
-      const matchingOptionIndex = referralsMenuOptions.findIndex(option => 
-        location.pathname.includes(option.route) || 
-        (option.name === "Create New Referral" && location.pathname.includes('createNewReferral'))
-      );
-      
-      if (matchingOptionIndex !== -1) {
-        setActiveMenuIndex(matchingOptionIndex);
-      } else {
-        // Si no hay coincidencia, establecer "Create New Referral" como activo por defecto
-        const createNewReferralIndex = referralsMenuOptions.findIndex(option => 
-          option.name === "Create New Referral"
-        );
-        setActiveMenuIndex(createNewReferralIndex !== -1 ? createNewReferralIndex : 0);
-      }
-    } else {
-      // Para el menú principal, encontrar qué opción coincide con la ruta actual
-      const matchingOptionIndex = defaultMenuOptions.findIndex(option => 
-        location.pathname.includes(option.route.split('/').pop())
-      );
-      
-      if (matchingOptionIndex !== -1) {
-        setActiveMenuIndex(matchingOptionIndex);
-      } else {
-        setActiveMenuIndex(0); // Default para página principal
-      }
-    }
-  }, [location.pathname, isReferralsPage, baseRole, roleType]);
-  
-  // Usar datos de usuario del contexto de autenticación
+  // Datos de usuario
   const userData = currentUser ? {
     name: currentUser.fullname || currentUser.username,
     avatar: getInitials(currentUser.fullname || currentUser.username),
@@ -170,7 +137,6 @@ const Header = ({ onLogout }) => {
   
   // Auto-rotation carousel effect with responsive timing
   useEffect(() => {
-    // Slower rotation on mobile for better readability
     const interval = setInterval(() => {
       if (!isLoggingOut && !menuTransitioning && menuOptions.length > 1) {
         setActiveMenuIndex((prevIndex) => 
@@ -182,23 +148,20 @@ const Header = ({ onLogout }) => {
     return () => clearInterval(interval);
   }, [menuOptions.length, menuTransitioning, isLoggingOut, isMobile]);
   
-  // Parallax effect with performance optimizations for mobile
+  // Parallax effect with performance optimizations
   useEffect(() => {
     const handleMouseMove = (e) => {
-      if (!isMobile && !isLoggingOut) { // Disable parallax on mobile and during logout
+      if (!isMobile && !isLoggingOut) {
         const { clientX, clientY } = e;
-        // Para obtener el width y height correctamente, usamos document.body
         const width = window.innerWidth;
         const height = window.innerHeight;
         
-        // Calculate position relative to center with reduced movement
         const multiplier = isTablet ? 15 : 20;
         const xPos = (clientX / width - 0.5) * multiplier;
         const yPos = (clientY / height - 0.5) * (isTablet ? 10 : 15);
         
         setParallaxPosition({ x: xPos, y: yPos });
         
-        // Activate header glow when mouse is near the top
         if (clientY < 100) {
           setHeaderGlow(true);
         } else {
@@ -207,7 +170,6 @@ const Header = ({ onLogout }) => {
       }
     };
     
-    // Only add event listener if not on mobile and not during logout
     if (!isMobile && !isLoggingOut) {
       window.addEventListener('mousemove', handleMouseMove);
     }
@@ -231,7 +193,7 @@ const Header = ({ onLogout }) => {
   
   // Handle left carousel navigation
   const handlePrevious = () => {
-    if (isLoggingOut || menuOptions.length <= 1) return; // No permitir cambios durante el cierre de sesión o si solo hay 1 opción
+    if (isLoggingOut || menuOptions.length <= 1) return;
     
     setActiveMenuIndex((prevIndex) => 
       prevIndex <= 0 ? menuOptions.length - 1 : prevIndex - 1
@@ -240,36 +202,33 @@ const Header = ({ onLogout }) => {
   
   // Handle right carousel navigation
   const handleNext = () => {
-    if (isLoggingOut || menuOptions.length <= 1) return; // No permitir cambios durante el cierre de sesión o si solo hay 1 opción
+    if (isLoggingOut || menuOptions.length <= 1) return;
     
     setActiveMenuIndex((prevIndex) => 
       prevIndex >= menuOptions.length - 1 ? 0 : prevIndex + 1
     );
   };
   
-  // Handle logout - ahora delegamos al componente padre
+  // Handle logout
   const handleLogout = () => {
     setIsLoggingOut(true);
     setShowUserMenu(false);
     setShowAIAssistant(false);
     
-    // Agregar clases de cierre de sesión al header
     document.body.classList.add('logging-out');
     
-    // Llamar a la función onLogout que recibimos como prop
     if (onLogout && typeof onLogout === 'function') {
       onLogout();
     }
   };
   
-  // Handle menu option click with responsive transitions
+  // Handle menu option click
   const handleMenuOptionClick = (option) => {
-    if (isLoggingOut) return; // No permitir cambios durante el cierre de sesión
+    if (isLoggingOut) return;
     
     setActiveMenuIndex(menuOptions.findIndex(o => o.id === option.id));
     setMenuTransitioning(true);
     
-    // Faster transition on mobile for better UX
     setTimeout(() => {
       navigate(option.route);
     }, isMobile ? 300 : 500);
@@ -277,18 +236,17 @@ const Header = ({ onLogout }) => {
   
   // Handle navigation to profile page
   const handleNavigateToProfile = () => {
-    if (isLoggingOut) return; // No permitir cambios durante el cierre de sesión
+    if (isLoggingOut) return;
     
     setShowUserMenu(false);
     setMenuTransitioning(true);
     
-    // Add transition effect before navigation
     setTimeout(() => {
       navigate(`/${baseRole}/profile`);
     }, isMobile ? 300 : 500);
   };
   
-  // Handle navigation to settings page (nueva función)
+  // Handle navigation to settings page
   const handleNavigateToSettings = () => {
     if (isLoggingOut) return;
     
@@ -305,42 +263,53 @@ const Header = ({ onLogout }) => {
     navigate(`/${baseRole}/homePage`);
   };
   
-  // Get visible menu options for carousel with responsive considerations
-  const getVisibleMenuOptions = () => {
+  // Función para calcular qué posiciones mostrar para cada elemento
+  // Esta es la clave para eliminar el espacio a la izquierda
+  const getCarouselPositions = () => {
+    // Para 3 opciones, mostramos todas a la vez con un orden específico
+    if (menuOptions.length === 3) {
+      // Arreglo para mapear índices a posiciones de visualización
+      // Usamos: left, center, right (sin far-left ni far-right)
+      const positions = ['left', 'center', 'right'];
+      
+      // Rotate positions based on activeMenuIndex
+      // Esto asegura que el elemento activo siempre esté en el centro
+      // y los otros elementos estén a los lados correspondientes
+      let rotatedPositions = [...positions];
+      for (let i = 0; i < activeMenuIndex; i++) {
+        rotatedPositions.unshift(rotatedPositions.pop());
+      }
+      
+      // Retornar mapeo de índices a posiciones visuales
+      return menuOptions.map((option, index) => {
+        return {
+          ...option,
+          position: rotatedPositions[index]
+        };
+      });
+    }
+    
+    // Para otros números de opciones, usamos el sistema original
+    // (pero esto no debería ocurrir en tu caso específico)
     const result = [];
     const totalOptions = menuOptions.length;
     
-    // Si solo hay una opción, solo mostrar esa
-    if (totalOptions === 1) {
-      return [{ ...menuOptions[0], position: 'center' }];
-    }
-    
-    // For mobile, show only 3 elements; for tablets and up, show 5
-    const visibleItems = isMobile ? 3 : 5;
-    const offset = Math.floor(visibleItems / 2);
-    
-    // Get indices with the active in the center
-    for (let i = -offset; i <= offset; i++) {
-      // Skip far elements on mobile
-      if (isMobile && (i === -2 || i === 2)) continue;
+    for (let i = 0; i < totalOptions; i++) {
+      let position;
+      const relativePos = (i - activeMenuIndex + totalOptions) % totalOptions;
       
-      // Si no hay suficientes opciones, no mostrar espacios vacíos
-      if (totalOptions <= visibleItems && (activeMenuIndex + i < 0 || activeMenuIndex + i >= totalOptions)) {
-        continue;
+      if (relativePos === 0) {
+        position = "center";
+      } else if (relativePos === 1 || (relativePos === totalOptions - 1 && totalOptions === 2)) {
+        position = "right";
+      } else if (relativePos === totalOptions - 1) {
+        position = "left";
+      } else {
+        position = relativePos < totalOptions / 2 ? "far-right" : "far-left";
       }
       
-      const actualIndex = (activeMenuIndex + i + totalOptions) % totalOptions;
-      
-      // Determine position based on distance to active element
-      let position;
-      if (i === -2) position = 'far-left';
-      else if (i === -1) position = 'left';
-      else if (i === 0) position = 'center';
-      else if (i === 1) position = 'right';
-      else position = 'far-right';
-      
       result.push({
-        ...menuOptions[actualIndex],
+        ...menuOptions[i],
         position
       });
     }
@@ -363,7 +332,7 @@ const Header = ({ onLogout }) => {
             <div className="logo-glow"></div>
             <img src={logoImg} alt="TherapySync Logo" className="logo" onClick={() => !isLoggingOut && handleMainMenuTransition()} />
             
-            {/* Mostrar botones de navegación en la página de referrals si el usuario tiene acceso */}
+            {/* Botones de navegación en página de referrals */}
             {isReferralsPage && (roleType === 'developer' || roleType === 'admin') && (
               <div className="menu-navigation">
                 <button 
@@ -386,7 +355,7 @@ const Header = ({ onLogout }) => {
             )}
           </div>
           
-          {/* Enhanced carousel with responsive layout */}
+          {/* Carousel mejorado sin espacios vacíos */}
           <div className="top-carousel" ref={menuRef}>
             {showCarouselArrows && (
               <button className="carousel-arrow left" onClick={handlePrevious} aria-label="Previous" disabled={isLoggingOut}>
@@ -397,7 +366,7 @@ const Header = ({ onLogout }) => {
             )}
             
             <div className="carousel-options">
-              {getVisibleMenuOptions().map((item) => (
+              {getCarouselPositions().map((item) => (
                 <div 
                   key={item.id} 
                   className={`carousel-option ${item.position}`}
@@ -533,6 +502,8 @@ const Header = ({ onLogout }) => {
           </div>
         </div>
       </header>
+      
+     
     </>
   );
 };

@@ -19,6 +19,15 @@ const PremiumTabs = ({ activeTab, onChangeTab }) => {
         {activeTab === 'Patients' && <div className="active-indicator"></div>}
         <div className="tab-hover-effect"></div>
       </div>
+      <div 
+        className={`tab-button ${activeTab === 'Staffing' ? 'active' : ''}`}
+        onClick={() => onChangeTab('Staffing')}
+      >
+        <div className="tab-icon"><i className="fas fa-user-md"></i></div>
+        <span>Staffing</span>
+        {activeTab === 'Staffing' && <div className="active-indicator"></div>}
+        <div className="tab-hover-effect"></div>
+      </div>
     </div>
   );
 };
@@ -117,8 +126,8 @@ const TPPatientsPage = () => {
   const [showMenuSwitch, setShowMenuSwitch] = useState(false);
   const [showAIAssistant, setShowAIAssistant] = useState(true);
   const [showFilterMenu, setShowFilterMenu] = useState(false);
-  const [currentView, setCurrentView] = useState('list');
-  const [showFilters, setShowFilters] = useState(true);
+  const [currentView, setCurrentView] = useState('grid');
+  const [showFilters, setShowFilters] = useState(false);
   const [sortOption, setSortOption] = useState('nameAsc');
   const [showQuickTour, setShowQuickTour] = useState(false);
   const [activePage, setActivePage] = useState(1);
@@ -521,12 +530,31 @@ const TPPatientsPage = () => {
         }, 300);
         break;
       case 'edit':
-        // Logic for editing patient
-        console.log('Edit patient:', patient);
+        // Navigate to patient info page in edit mode
+        setMenuTransitioning(true);
+        
+        setTimeout(() => {
+          // Navigate to patient info page and pass state to indicate edit mode
+          navigate(`/${baseRole}/paciente/${patient.id}`, { 
+            state: { 
+              initialTab: 'general',
+              initialMode: 'edit' 
+            }
+          });
+        }, 300);
         break;
       case 'notes':
-        // Logic for viewing/editing patient notes
-        console.log('Patient notes:', patient);
+        // Navigate directly to the notes tab
+        setMenuTransitioning(true);
+        
+        setTimeout(() => {
+          // Navigate to patient info page with the notes tab selected
+          navigate(`/${baseRole}/paciente/${patient.id}`, { 
+            state: { 
+              initialTab: 'notes'
+            }
+          });
+        }, 300);
         break;
       default:
         break;
@@ -570,6 +598,12 @@ const TPPatientsPage = () => {
   // Toggle quick tour
   const toggleQuickTour = () => {
     setShowQuickTour(!showQuickTour);
+  };
+
+  // Handle navigation to create patient page
+  const handleNavigateToCreatePatient = () => {
+    if (isLoggingOut) return;
+    navigate('/developer/referrals', { state: { initialView: 'createReferral' } });
   };
 
   return (
@@ -767,12 +801,12 @@ const TPPatientsPage = () => {
                 Streamline your therapy workflow with complete patient information at your fingertips
               </p>
               <div className="header-actions">
-                <button className="header-action-btn" onClick={toggleQuickTour} disabled={isLoggingOut}>
-                  <i className="fas fa-info-circle"></i> Quick Tour
-                </button>
-                <button className="header-action-btn" disabled={isLoggingOut}>
-                  <i className="fas fa-plus"></i> New Patient
-                </button>
+                <button 
+                  className="header-action-btn" 
+                  onClick={handleNavigateToCreatePatient}
+                  disabled={isLoggingOut}
+                >
+                  <i className="fas fa-plus"></i> New Patient </button>
               </div>
             </div>
             
@@ -800,136 +834,104 @@ const TPPatientsPage = () => {
           
           {/* Filter container */}
           <div className={`filter-container ${showFilters ? 'expanded' : 'collapsed'}`}>
-            <div className="filter-card">
-              <div className="filter-header">
-                <h3><i className="fas fa-filter"></i> Advanced Filters</h3>
-                <div className="filter-header-actions">
-                  <span className="filter-count">
-                    Showing <strong>{filteredPatients.length}</strong> of <strong>{patients.length}</strong> patients
-                  </span>
-                  <button 
-                    className="toggle-filters-btn" 
-                    onClick={toggleFilters}
-                    title={showFilters ? "Collapse filters" : "Expand filters"}
-                    disabled={isLoggingOut}
-                  >
-                    <i className={`fas fa-chevron-${showFilters ? 'up' : 'down'}`}></i>
-                  </button>
-                </div>
+  <div className="filter-card">
+    {/* Make the entire header clickable to toggle filters */}
+    <div className="filter-header" onClick={toggleFilters} style={{ cursor: 'pointer' }}>
+      <h3><i className="fas fa-filter"></i> Advanced Filters</h3>
+      <div className="filter-header-actions">
+        <span className="filter-count">
+          Showing <strong>{filteredPatients.length}</strong> of <strong>{patients.length}</strong> patients
+        </span>
+        <button 
+          className="toggle-filters-btn" 
+          onClick={(e) => {
+            e.stopPropagation(); // Prevent triggering parent onClick
+            toggleFilters();
+          }}
+          title={showFilters ? "Collapse filters" : "Expand filters"}
+          disabled={isLoggingOut}
+        >
+          <i className={`fas fa-chevron-${showFilters ? 'up' : 'down'}`}></i>
+        </button>
+      </div>
+    </div>
+    
+    {showFilters && (
+      <>
+        <div className="filter-section">
+          <div className="agency-filter">
+            <h4>Healthcare Agencies</h4>
+            <div className="search-box">
+              <i className="fas fa-search"></i>
+              <input 
+                type="text" 
+                placeholder="Search agencies..." 
+                value={agencySearchTerm}
+                onChange={(e) => setAgencySearchTerm(e.target.value)}
+                disabled={isLoggingOut}
+              />
+            </div>
+            
+            <div className="agency-list">
+              <div 
+                className={`agency-item ${selectedAgency === 'all' ? 'active' : ''}`}
+                onClick={() => !isLoggingOut && handleAgencySelect('all')}
+              >
+                <i className="fas fa-hospital-alt"></i> All Agencies
               </div>
-              
-              {showFilters && (
-                <>
-                  <div className="filter-section">
-                    <div className="agency-filter">
-                      <h4>Healthcare Agencies</h4>
-                      <div className="search-box">
-                        <i className="fas fa-search"></i>
-                        <input 
-                          type="text" 
-                          placeholder="Search agencies..." 
-                          value={agencySearchTerm}
-                          onChange={(e) => setAgencySearchTerm(e.target.value)}
-                          disabled={isLoggingOut}
-                        />
-                      </div>
-                      
-                      <div className="agency-list">
-                        <div 
-                          className={`agency-item ${selectedAgency === 'all' ? 'active' : ''}`}
-                          onClick={() => !isLoggingOut && handleAgencySelect('all')}
-                        >
-                          <i className="fas fa-hospital-alt"></i> All Agencies
-                        </div>
-                        {filteredAgencies.map((agency, index) => (
-                          <div 
-                            key={index} 
-                            className={`agency-item ${selectedAgency === agency ? 'active' : ''}`}
-                            onClick={() => !isLoggingOut && handleAgencySelect(agency)}
-                          >
-                            <i className="fas fa-building"></i> {agency}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    <div className="therapist-filter">
-                      <h4>Therapist Filters</h4>
-                      <div className="therapist-type-filter">
-                        <p>Filter by qualification:</p>
-                        <div className="type-buttons">
-                          {therapistTypes.map((type, index) => (
-                            <button 
-                              key={index} 
-                              className={`type-button ${selectedTherapistType === type ? 'active' : ''}`}
-                              onClick={() => !isLoggingOut && handleTherapistTypeSelect(type)}
-                              disabled={isLoggingOut}
-                            >
-                              {type === 'all' ? 'All' : type}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                      
-                      <div className="therapist-list">
-                        <div 
-                          className={`therapist-item ${selectedTherapist === 'all' ? 'active' : ''}`}
-                          onClick={() => !isLoggingOut && handleTherapistSelect('all')}
-                        >
-                          <i className="fas fa-user-md"></i> All Therapists
-                        </div>
-                        {filteredTherapists.map((therapist, index) => (
-                          <div 
-                            key={index} 
-                            className={`therapist-item ${selectedTherapist === therapist ? 'active' : ''}`}
-                            onClick={() => !isLoggingOut && handleTherapistSelect(therapist)}
-                          >
-                            <i className="fas fa-user"></i> {therapist}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    
-                    <div className="status-filter">
-                      <h4>Patient Status</h4>
-                      <div className="status-buttons">
-                        {statusOptions.map((status, index) => (
-                          <button 
-                            key={index} 
-                            className={`status-button ${selectedStatus === status ? 'active' : ''} ${status.toLowerCase()}`}
-                            onClick={() => !isLoggingOut && handleStatusSelect(status)}
-                            disabled={isLoggingOut}
-                          >
-                            {status === 'all' ? 'All Statuses' : status}
-                            {status !== 'all' && (
-                              <span className="status-count">
-                                {patients.filter(p => p.status === status).length}
-                              </span>
-                            )}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <div className="filter-footer">
-                    <button 
-                      className="clear-filters" 
-                      onClick={handleClearFilters}
-                      disabled={isLoggingOut}
-                    >
-                      <i className="fas fa-times-circle"></i> Clear Filters
-                    </button>
-                    
-                    <div className="filter-tips">
-                      <div className="tip-icon"><i className="fas fa-lightbulb"></i></div>
-                      <p>Tip: Press <kbd>Ctrl</kbd> + <kbd>F</kbd> to quickly search patients</p>
-                    </div>
-                  </div>
-                </>
-              )}
+              {filteredAgencies.map((agency, index) => (
+                <div 
+                  key={index} 
+                  className={`agency-item ${selectedAgency === agency ? 'active' : ''}`}
+                  onClick={() => !isLoggingOut && handleAgencySelect(agency)}
+                >
+                  <i className="fas fa-building"></i> {agency}
+                </div>
+              ))}
             </div>
           </div>
+          
+          
+          <div className="status-filter">
+            <h4>Patient Status</h4>
+            <div className="status-buttons">
+              {statusOptions.map((status, index) => (
+                <button 
+                  key={index} 
+                  className={`status-button ${selectedStatus === status ? 'active' : ''} ${status.toLowerCase()}`}
+                  onClick={() => !isLoggingOut && handleStatusSelect(status)}
+                  disabled={isLoggingOut}
+                >
+                  {status === 'all' ? 'All Statuses' : status}
+                  {status !== 'all' && (
+                    <span className="status-count">
+                      {patients.filter(p => p.status === status).length}
+                    </span>
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+        </div>
+        
+        <div className="filter-footer">
+          <button 
+            className="clear-filters" 
+            onClick={handleClearFilters}
+            disabled={isLoggingOut}
+          >
+            <i className="fas fa-times-circle"></i> Clear Filters
+          </button>
+          
+          <div className="filter-tips">
+            <div className="tip-icon"><i className="fas fa-lightbulb"></i></div>
+            <p>Tip: Press <kbd>Ctrl</kbd> + <kbd>F</kbd> to quickly search patients</p>
+          </div>
+        </div>
+      </>
+    )}
+  </div>
+</div>
           {/* Patients table area with improved views */}
           <div className="patients-table-area">
             <div className="table-header">
@@ -1169,7 +1171,10 @@ const TPPatientsPage = () => {
       {/* Floating Quick Action Button with Menu */}
       {!isLoggingOut && (
         <div className="quick-action-btn">
-          <button className="add-patient-btn">
+          <button 
+            className="add-patient-btn"
+            onClick={handleNavigateToCreatePatient}
+          >
             <i className="fas fa-plus"></i>
             <span className="btn-tooltip">Add New Patient</span>
           </button>

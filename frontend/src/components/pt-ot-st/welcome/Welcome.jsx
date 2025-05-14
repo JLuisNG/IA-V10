@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../../../styles/developer/Welcome/Welcome.scss';
-import LogoutAnimation from '../../LogOut/LogOut';
+import LogoutAnimation from '../../LogOut/LogOut'; 
 import InfoWelcome from './infoWelcome';
+import FloatingSupportButton from '../support/FloatingSupportButton';
 import { useAuth } from '../../login/AuthContext';
 import Header from '../../header/Header';
 
@@ -16,10 +17,8 @@ const TPHomePage = () => {
   const [welcomeAnimComplete, setWelcomeAnimComplete] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const [isTablet, setIsTablet] = useState(false);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   
   const containerRef = useRef(null);
-  const cursorRef = useRef(null);
   
   // Check device size on mount and resize
   useEffect(() => {
@@ -34,93 +33,63 @@ const TPHomePage = () => {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
   
-  // Generate optimized particles for background effect
+  // Generate random particles for background effect with responsive count
   const generateParticles = () => {
     const particlesArray = [];
-    // Adjust particle count based on device for better performance
-    const particleCount = isMobile ? 15 : isTablet ? 25 : 35;
+    // Adjust particle count based on device performance capabilities
+    const particleCount = isMobile ? 15 : isTablet ? 20 : 25;
     
     for (let i = 0; i < particleCount; i++) {
-      // Create more sophisticated particles with varied properties
       particlesArray.push({
         id: i,
         x: Math.random() * 100,
         y: Math.random() * 100,
-        size: Math.random() * (isMobile ? 2 : 4) + (isMobile ? 1 : 2),
-        speed: Math.random() * 0.6 + 0.2,
+        size: Math.random() * (isMobile ? 3 : 5) + (isMobile ? 2 : 3),
+        speed: Math.random() * 0.8 + 0.2,
         opacity: Math.random() * 0.5 + 0.1,
-        color: `rgba(${Math.floor(Math.random() * 200 + 55)}, ${Math.floor(Math.random() * 200 + 55)}, ${Math.floor(Math.random() * 255)}, ${Math.random() * 0.2 + 0.1})`,
-        delay: Math.random() * 5,
-        blurAmount: Math.random() * 2 + 1
+        color: `rgba(255, 255, 255, ${Math.random() * 0.3 + 0.1})`,
+        delay: Math.random() * 5
       });
     }
     
     setParticles(particlesArray);
   };
   
-  // Custom cursor effect - only for desktop
-  useEffect(() => {
-    const handleMouseMove = (e) => {
-      if (!isMobile && cursorRef.current) {
-        // Smooth cursor following with slight delay
-        const { clientX, clientY } = e;
-        setMousePosition({ x: clientX, y: clientY });
-      }
-    };
-    
-    if (!isMobile) {
-      window.addEventListener('mousemove', handleMouseMove);
-    }
-    
-    return () => window.removeEventListener('mousemove', handleMouseMove);
-  }, [isMobile]);
-  
-  // Apply cursor position with smooth animation
-  useEffect(() => {
-    if (cursorRef.current && !isMobile) {
-      cursorRef.current.style.transform = `translate(${mousePosition.x}px, ${mousePosition.y}px)`;
-    }
-  }, [mousePosition, isMobile]);
-  
-  // Load animations and components with optimized timing
+  // Load assistant after page is fully loaded with performance optimizations
   useEffect(() => {
     // Generate particles
     generateParticles();
     
-    // Complete entrance animation with responsive timing
+    // Complete entrance animation
     setTimeout(() => {
       setWelcomeAnimComplete(true);
-    }, isMobile ? 800 : 1200);
+    }, isMobile ? 1000 : 1500);
     
-    // Staggered loading for better perceived performance
+    // Delay to ensure page loads first - shorter delay on mobile for better UX
     const timer = setTimeout(() => {
       setShowAIAssistant(true);
-    }, isMobile ? 1200 : 1800);
+    }, isMobile ? 1500 : 2000);
     
     return () => clearTimeout(timer);
   }, [isMobile]);
   
-  // Enhanced parallax effect with performance optimizations
+  // Parallax effect with performance optimizations for mobile
   useEffect(() => {
     const handleMouseMove = (e) => {
-      if (containerRef.current && !isMobile) {
+      if (containerRef.current && !isMobile) { // Disable parallax on mobile for performance
         const { clientX, clientY } = e;
         const { width, height } = containerRef.current.getBoundingClientRect();
         
-        // Dynamic parallax intensity based on device capability
-        const multiplier = isTablet ? 10 : 15;
+        // Calculate position relative to center with reduced movement on lower-power devices
+        const multiplier = isTablet ? 15 : 20;
         const xPos = (clientX / width - 0.5) * multiplier;
-        const yPos = (clientY / height - 0.5) * (isTablet ? 8 : 12);
+        const yPos = (clientY / height - 0.5) * (isTablet ? 10 : 15);
         
-        // Smooth transition for parallax movement
-        setParallaxPosition({ 
-          x: xPos, 
-          y: yPos 
-        });
+        setParallaxPosition({ x: xPos, y: yPos });
       }
     };
     
-    // Only enable parallax on capable devices
+    // Only add event listener if not on mobile
     if (!isMobile) {
       window.addEventListener('mousemove', handleMouseMove);
     }
@@ -128,50 +97,44 @@ const TPHomePage = () => {
     return () => window.removeEventListener('mousemove', handleMouseMove);
   }, [isMobile, isTablet]);
 
-  // Handle logout with enhanced animation
+  // Handle logout with animation
   const handleLogout = () => {
-    // Show the logout animation
+    // Mostrar la animación de cierre de sesión
     setIsLoggingOut(true);
     
-    // Hide AI assistant during logout
+    // Ocultar el asistente AI durante el cierre de sesión
     setShowAIAssistant(false);
     
-    // Add logout classes to entire document
+    // Agregar clases de cierre de sesión a todo el documento
     document.body.classList.add('logging-out');
+    
+    // No necesitamos más código aquí, ya que LogoutAnimation manejará la animación
+    // y llamará al callback cuando termine
   };
   
-  // Callback for when the logout animation completes
+  // Callback para cuando la animación de cierre de sesión se complete
   const handleLogoutAnimationComplete = () => {
-    // Execute actual logout
+    // Ejecutar el cierre de sesión real
     logout();
-    // Redirect to login page
+    // Redireccionar a la página de inicio de sesión
     navigate('/');
   };
 
   return (
     <div 
-      className={`dashboard premium ${welcomeAnimComplete ? 'anim-complete' : ''} ${isMobile ? 'mobile' : ''} ${isTablet ? 'tablet' : ''}`}
+      className={`dashboard ${welcomeAnimComplete ? 'anim-complete' : ''} ${isMobile ? 'mobile' : ''} ${isTablet ? 'tablet' : ''}`}
       ref={containerRef}
     >
-      {/* Custom cursor for desktop only */}
-      {!isMobile && (
-        <div className="custom-cursor" ref={cursorRef}>
-          <div className="cursor-dot"></div>
-          <div className="cursor-ring"></div>
-        </div>
-      )}
-      
-      {/* Enhanced parallax background with dynamic behavior */}
+      {/* Parallax background with responsive behavior */}
       <div 
         className="parallax-background"
         style={{ 
-          transform: isMobile ? 'scale(1.05)' : `translate3d(${parallaxPosition.x}px, ${parallaxPosition.y}px, 0) scale(1.1)` 
+          transform: isMobile ? 'scale(1.05)' : `scale(1.1) translate(${parallaxPosition.x}px, ${parallaxPosition.y}px)` 
         }}
       >
-        {/* Gradient overlay with enhanced depth */}
         <div className="gradient-overlay"></div>
         
-        {/* Premium floating particles with varied properties */}
+        {/* Floating particles with responsive count */}
         <div className="particles-container">
           {particles.map(particle => (
             <div 
@@ -184,28 +147,15 @@ const TPHomePage = () => {
                 height: `${particle.size}px`,
                 opacity: particle.opacity,
                 backgroundColor: particle.color,
-                filter: `blur(${particle.blurAmount}px)`,
-                animationDuration: `${15 + particle.speed * 25}s`,
+                animationDuration: `${10 + particle.speed * 20}s`,
                 animationDelay: `${particle.delay}s`
               }}
             ></div>
           ))}
         </div>
-        
-        {/* Enhanced nebula effects for depth */}
-        <div className="nebula-effect nebula-1"></div>
-        <div className="nebula-effect nebula-2"></div>
-        <div className="nebula-effect nebula-3"></div>
       </div>
       
-      {/* Animated gradient mesh for added depth */}
-      <div className="gradient-mesh">
-        {[...Array(6)].map((_, i) => (
-          <div key={i} className={`mesh-line mesh-line-${i + 1}`}></div>
-        ))}
-      </div>
-      
-      {/* Logout animation component */}
+      {/* Usando el componente LogoutAnimation reutilizable con callback */}
       {isLoggingOut && (
         <LogoutAnimation 
           isMobile={isMobile} 
@@ -213,20 +163,17 @@ const TPHomePage = () => {
         />
       )}
       
-      {/* Header component */}
+      {/* Componente Header reutilizable con función de logout */}
       <Header onLogout={handleLogout} />
       
-      {/* Enhanced main content with premium animations */}
+      {/* Enhanced main content with responsive layout */}
       <main className="main-content">
-        {/* Welcome container with dynamic typography */}
+        {/* Welcome container with responsive typography */}
         <div className="welcome-container welcome-container-top">
-          <div className="title-container">
-            <h1 className="welcome-title">
-              <span className="highlight">Welcome</span> to TherapySync
-              <div className="title-decoration"></div>
-            </h1>
-            <div className="title-glow"></div>
-          </div>
+          <h1 className="welcome-title">
+            <span className="highlight">Welcome</span> to TherapySync
+            <div className="title-decoration"></div>
+          </h1>
           <p className="welcome-subtitle">
             Select an option from the navigation menu to get started
             <span className="cursor-blink">_</span>
@@ -237,8 +184,8 @@ const TPHomePage = () => {
         <InfoWelcome isMobile={isMobile} isTablet={isTablet} />
       </main>
       
-      {/* AI Assistant component with conditional loading */}
-      {/* {showAIAssistant && <AIAssistant isMobile={isMobile} />} */}
+      {/* Premium floating support button */}
+      <FloatingSupportButton />
     </div>
   );
 };

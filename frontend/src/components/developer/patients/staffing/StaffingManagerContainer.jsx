@@ -23,13 +23,6 @@ const DevStaffingManagerContainer = () => {
     setSelectedContent('view-staff');
   };
 
-  const handleEditStaffClick = () => {
-    setShowStaffEdit(true);
-    setShowAddStaffForm(false);
-    setShowStaffList(false);
-    setSelectedContent('edit-staff');
-  };
-
   const handleCancelForm = () => {
     setShowAddStaffForm(false);
     setShowStaffList(false);
@@ -76,9 +69,6 @@ const DevStaffingManagerContainer = () => {
                     </button>
                     <button className="action-btn view" onClick={handleViewAllStaffClick}>
                       <i className="fas fa-list"></i> View All Staff
-                    </button>
-                    <button className="action-btn edit" onClick={handleEditStaffClick}>
-                      <i className="fas fa-user-edit"></i> Edit Existing Staff
                     </button>
                   </div>
                 </div>

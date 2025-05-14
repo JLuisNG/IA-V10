@@ -1,0 +1,594 @@
+@import '../../../styles/_variables.scss';
+@import '../../../styles/_mixins.scss';
+
+// Variables principales
+$primary-color: #00e5ff;
+$secondary-color: #2979ff;
+$tertiary-color: #5e35b1;
+$background-dark: #1e293b;
+$background-darker: #0f172a;
+$text-primary: #ffffff;
+$text-secondary: rgba(255, 255, 255, 0.7);
+$text-tertiary: rgba(255, 255, 255, 0.5);
+$border-color: rgba(255, 255, 255, 0.1);
+$card-background: rgba(30, 41, 59, 0.7);
+$card-hover-background: rgba(30, 41, 59, 0.9);
+
+// Variables de colores para roles de terapeutas
+$pt-color: #36D1DC;
+$pta-color: #5B86E5;
+$ot-color: #FF9966;
+$cota-color: #FF5E62;
+$st-color: #56CCF2;
+$sta-color: #2F80ED;
+
+// Variables de estado
+$positive-color: #10b981;
+$medium-color: #f59e0b;
+$negative-color: #ef4444;
+
+// Variables de eficiencia
+$high-efficiency: #10b981;
+$medium-efficiency: #f59e0b;
+$low-efficiency: #ef4444;
+
+// Animaciones
+@keyframes pulsar {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-5px);
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes progressFill {
+  from {
+    width: 0;
+  }
+  to {
+    width: var(--fill-width);
+  }
+}
+
+// Componente principal
+.top-performers-section {
+  margin-bottom: 2.5rem;
+  background: rgba(15, 23, 42, 0.3);
+  border-radius: 12px;
+  backdrop-filter: blur(20px);
+  padding: 1.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  
+  // Encabezado con título y filtros
+  .section-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1.5rem;
+    
+    h2 {
+      font-size: 1.5rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      letter-spacing: -0.03em;
+      
+      i {
+        margin-right: 0.75rem;
+        color: $primary-color;
+        font-size: 1.4rem;
+        background: linear-gradient(120deg, $primary-color, $secondary-color);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+      }
+    }
+    
+    // Botones de filtros
+    .view-toggles {
+      display: flex;
+      gap: 0.5rem;
+      
+      .toggle-btn {
+        background: rgba(15, 23, 42, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        color: $text-secondary;
+        border-radius: 8px;
+        padding: 0.5rem 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.9rem;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        
+        i {
+          font-size: 0.9rem;
+        }
+        
+        &:hover {
+          background: rgba(30, 41, 59, 0.6);
+          border-color: rgba(255, 255, 255, 0.1);
+          color: $text-primary;
+        }
+        
+        &.active {
+          background: linear-gradient(120deg, rgba($primary-color, 0.2), rgba($secondary-color, 0.2));
+          border: 1px solid rgba($primary-color, 0.3);
+          color: $text-primary;
+          box-shadow: 0 2px 10px rgba($primary-color, 0.15);
+          
+          i {
+            color: $primary-color;
+          }
+        }
+      }
+    }
+  }
+  
+  // Grid para mostrar los 9 terapeutas
+  .performers-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+    margin-top: 1rem;
+    
+    // Tarjeta de terapeuta
+    .performer-card {
+      background-color: $card-background;
+      border-radius: 12px;
+      padding: 1.5rem;
+      position: relative;
+      border: 1px solid $border-color;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+      
+      &:hover {
+        border-color: rgba($primary-color, 0.3);
+        background-color: $card-hover-background;
+        transform: translateY(-5px);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.25);
+        
+        .performer-avatar {
+          .avatar-placeholder {
+            transform: scale(1.05);
+          }
+        }
+        
+        .visit-progress {
+          .progress-bar {
+            filter: brightness(1.2);
+          }
+        }
+      }
+      
+      // Insignia de posición
+      .rank-badge {
+        position: absolute;
+        top: -10px;
+        left: -10px;
+        width: 36px;
+        height: 36px;
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #fff;
+        font-weight: 700;
+        font-size: 1rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        z-index: 2;
+        transform: rotate(-5deg);
+        
+        i.position-first {
+          position: absolute;
+          top: -8px;
+          right: -8px;
+          font-size: 0.9rem;
+          color: #FFD700;
+          animation: pulsar 2s infinite;
+        }
+        
+        i.position-second {
+          position: absolute;
+          top: -8px;
+          right: -8px;
+          font-size: 0.9rem;
+          color: #C0C0C0;
+        }
+        
+        i.position-third {
+          position: absolute;
+          top: -8px;
+          right: -8px;
+          font-size: 0.9rem;
+          color: #CD7F32;
+        }
+      }
+      
+      // Encabezado con info del terapeuta
+      .performer-header {
+        display: flex;
+        margin-bottom: 1.25rem;
+        
+        .performer-avatar {
+          flex-shrink: 0;
+          margin-right: 1rem;
+          position: relative;
+          
+          .avatar-placeholder {
+            width: 54px;
+            height: 54px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.25rem;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+            transition: all 0.3s ease;
+          }
+          
+          .role-badge {
+            position: absolute;
+            bottom: -8px;
+            right: -8px;
+            padding: 0.25rem 0.4rem;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            border: 1px solid;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+            
+            i {
+              font-size: 0.65rem;
+            }
+          }
+        }
+        
+        .performer-info {
+          flex: 1;
+          
+          .performer-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 0.6rem;
+            letter-spacing: -0.01em;
+          }
+          
+          .performer-metrics {
+            display: flex;
+            gap: 1rem;
+            
+            .metric {
+              display: flex;
+              align-items: center;
+              font-size: 0.9rem;
+              
+              i {
+                margin-right: 0.4rem;
+                color: $text-tertiary;
+                font-size: 0.8rem;
+              }
+              
+              .value {
+                font-weight: 600;
+                
+                &.high {
+                  color: $high-efficiency;
+                }
+                
+                &.medium {
+                  color: $medium-efficiency;
+                }
+                
+                &.low {
+                  color: $low-efficiency;
+                }
+              }
+              
+              &.missed {
+                i {
+                  color: rgba($negative-color, 0.7);
+                }
+                
+                .value {
+                  color: rgba($negative-color, 0.7);
+                }
+              }
+            }
+          }
+        }
+      }
+      
+      // Métricas de rendimiento
+      .performance-metrics {
+        background: rgba(15, 23, 42, 0.5);
+        border-radius: 10px;
+        padding: 1rem;
+        margin-bottom: 1.25rem;
+        display: flex;
+        justify-content: space-between;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        
+        .primary-metric {
+          .metric-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+            
+            &.earnings {
+              background: linear-gradient(120deg, $primary-color, $secondary-color);
+              -webkit-background-clip: text;
+              -webkit-text-fill-color: transparent;
+              background-clip: text;
+            }
+            
+            &.visits {
+              .completed {
+                color: $high-efficiency;
+              }
+                
+              .separator {
+                margin: 0 0.2rem;
+                color: $text-tertiary;
+              }
+                
+              .total {
+                color: $text-secondary;
+              }
+            }
+            
+            &.efficiency {
+              &.high {
+                color: $high-efficiency;
+              }
+              
+              &.medium {
+                color: $medium-efficiency;
+              }
+              
+              &.low {
+                color: $low-efficiency;
+              }
+            }
+          }
+          
+          .metric-label {
+            font-size: 0.8rem;
+            color: $text-tertiary;
+          }
+        }
+        
+        .growth-indicator {
+          text-align: right;
+          
+          .growth-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            margin-bottom: 0.3rem;
+            
+            &.positive {
+              color: $positive-color;
+            }
+            
+            &.negative {
+              color: $negative-color;
+            }
+            
+            i {
+              margin-right: 0.4rem;
+              font-size: 0.9rem;
+            }
+          }
+          
+          .growth-label {
+            font-size: 0.8rem;
+            color: $text-tertiary;
+          }
+        }
+      }
+      
+      // Barra de progreso de visitas
+      .visit-progress {
+        margin-bottom: 1.25rem;
+        
+        .progress-label {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 0.4rem;
+          font-size: 0.85rem;
+          
+          span {
+            color: $text-secondary;
+          }
+          
+          .progress-percentage {
+            font-weight: 600;
+          }
+        }
+        
+        .progress-bar-container {
+          height: 6px;
+          background: rgba(15, 23, 42, 0.5);
+          border-radius: 3px;
+          overflow: hidden;
+          
+          .progress-bar {
+            height: 100%;
+            border-radius: 3px;
+            transition: width 1s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.3s ease;
+            animation: progressFill 1s ease-out forwards;
+          }
+        }
+      }
+      
+      // Mini-gráfico de distribución semanal
+      .weekly-distribution {
+        .distribution-label {
+          font-size: 0.85rem;
+          color: $text-secondary;
+          margin-bottom: 0.4rem;
+        }
+        
+        .mini-chart {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-end;
+          height: 40px;
+          
+          .bar-column {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            height: 100%;
+            padding: 0 3px;
+            
+            .bar {
+              width: 100%;
+              min-height: 2px;
+              border-radius: 2px 2px 0 0;
+              transition: all 0.3s ease;
+              
+              &:hover {
+                filter: brightness(1.2);
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  // Estilos para tooltip personalizado
+  .performer-details-tooltip {
+    padding: 0.75rem;
+    max-width: 300px;
+    
+    .tooltip-header {
+      font-weight: 600;
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+    
+    .tooltip-stats {
+      font-size: 0.9rem;
+      display: grid;
+      gap: 0.3rem;
+    }
+  }
+  
+  // Ajustes responsivos
+  @media (max-width: 1400px) {
+    .performers-grid {
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  
+  @media (max-width: 1200px) {
+    .performers-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .section-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+      
+      .view-toggles {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+    
+    .performers-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    padding: 1rem;
+    
+    .section-header {
+      h2 {
+        font-size: 1.3rem;
+      }
+      
+      .view-toggles {
+        .toggle-btn {
+          padding: 0.4rem 0.75rem;
+          font-size: 0.8rem;
+        }
+      }
+    }
+    
+    .performer-card {
+      .performer-header {
+        flex-direction: column;
+        
+        .performer-avatar {
+          margin-right: 0;
+          margin-bottom: 1rem;
+          align-self: center;
+        }
+        
+        .performer-info {
+          text-align: center;
+          
+          .performer-metrics {
+            justify-content: center;
+          }
+        }
+      }
+      
+      .performance-metrics {
+        flex-direction: column;
+        gap: 1rem;
+        
+        .primary-metric, .growth-indicator {
+          text-align: center;
+        }
+        
+        .growth-indicator {
+          .growth-value {
+            justify-content: center;
+          }
+        }
+      }
+    }
+  }
+}

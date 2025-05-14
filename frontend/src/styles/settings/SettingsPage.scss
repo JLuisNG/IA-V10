@@ -1,57 +1,62 @@
-// Premium TherapySync Settings Page SCSS
+// Enhanced TherapySync Settings Page SCSS
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
 
 // Main Variables
-$font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+$font-family-primary: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+$font-family-secondary: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 $base-font-size: 16px;
 
-// Premium Color Palette
-$primary-dark: #020d21;
-$primary-base: #0f2a5c;
-$primary-light: #1a56b1;
-$primary-accent: #45a5ff;
-$primary-glow: #5ab9ff;
+// Premium 2025 Color Palette
+$primary-dark: #040d21;
+$primary-base: #0b2552;
+$primary-light: #1456c0;
+$primary-accent: #3c9fff;
+$primary-glow: #53c5ff;
 
 $secondary-accent: #23cbff;
-$tertiary-accent: #00e5ff;
+$tertiary-accent: #01e0ff;
 
-$success-color: #00c853;
-$warning-color: #ffab00;
-$danger-color: #ff3d71;
+$success-color: #00d868;
+$warning-color: #ffb400;
+$danger-color: #ff3a66;
 $info-color: #2986cc;
 
 // Status Colors
-$active-color: #00d68f;
-$deactive-color: #ff3d71;
-$pending-color: #ffaa00;
-$review-color: #ab47bc;
+$active-color: #00d993;
+$deactive-color: #ff4060;
+$pending-color: #ffb800;
+$review-color: #b347cc;
 
-// Gradients
-$primary-gradient: linear-gradient(135deg, #0f2a5c, #1a56b1);
-$primary-gradient-subtle: linear-gradient(135deg, rgba(15, 42, 92, 0.8), rgba(26, 86, 177, 0.8));
+// Enhanced Gradients
+$primary-gradient: linear-gradient(135deg, #0c2552, #1863db);
+$primary-gradient-subtle: linear-gradient(135deg, rgba(11, 37, 82, 0.8), rgba(26, 86, 192, 0.8));
 $primary-gradient-active: linear-gradient(135deg, $primary-accent, $secondary-accent);
-$primary-gradient-hover: linear-gradient(135deg, $secondary-accent, $tertiary-accent);
+$primary-gradient-hover: linear-gradient(135deg, #3c9fff, #01e0ff);
+$blue-purple-gradient: linear-gradient(135deg, #3c9fff, #9747ff);
+$blue-turquoise-gradient: linear-gradient(135deg, #1456c0, #01e0ff);
 
-$positive-gradient: linear-gradient(135deg, #00c853, #00e676);
-$warning-gradient: linear-gradient(135deg, #ffab00, #ffd740);
-$danger-gradient: linear-gradient(135deg, #ff3d71, #ff708d);
+$positive-gradient: linear-gradient(135deg, #00d868, #6aeca0);
+$warning-gradient: linear-gradient(135deg, #ffb400, #ffd94c);
+$danger-gradient: linear-gradient(135deg, #ff3a66, #ff738c);
 
 // Card and UI Effects
 $card-bg: rgba(255, 255, 255, 0.98);
 $card-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
-$card-shadow-hover: 0 12px 48px rgba(0, 0, 0, 0.16);
+$card-shadow-hover: 0 15px 35px rgba(0, 0, 0, 0.16);
 $card-border-radius: 16px;
 
-// Glass Effect
-$glass-bg: rgba(255, 255, 255, 0.08);
+// Enhanced Glass Effect
+$glass-bg: rgba(255, 255, 255, 0.06);
 $glass-border: 1px solid rgba(255, 255, 255, 0.08);
-$glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
-$glass-backdrop-filter: blur(20px);
+$glass-shadow: 0 10px 36px rgba(0, 0, 0, 0.1);
+$glass-backdrop-filter: blur(24px);
 
 // Text Colors
 $text-primary: rgba(255, 255, 255, 0.95);
 $text-secondary: rgba(255, 255, 255, 0.7);
 $text-disabled: rgba(255, 255, 255, 0.5);
+$text-accent: rgba(60, 159, 255, 1);
 
 $text-dark-primary: rgba(10, 15, 30, 0.95);
 $text-dark-secondary: rgba(10, 15, 30, 0.7);
@@ -62,6 +67,7 @@ $transition-quick: 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 $transition-medium: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 $transition-slow: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 $transition-bounce: 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+$transition-spring: 0.6s cubic-bezier(0.68, -0.6, 0.32, 1.6);
 
 // Breakpoints
 $breakpoints: (
@@ -115,7 +121,7 @@ $breakpoints: (
   font-weight: 600;
   cursor: pointer;
   transition: all $transition-medium;
-  box-shadow: 0 5px 15px rgba($primary-base, 0.3);
+  box-shadow: 0 8px 20px rgba($primary-base, 0.3);
   position: relative;
   overflow: hidden;
   display: flex;
@@ -124,12 +130,13 @@ $breakpoints: (
   
   &:hover {
     background: $primary-gradient-hover;
-    box-shadow: 0 8px 25px rgba($primary-light, 0.4);
+    box-shadow: 0 12px 28px rgba($primary-light, 0.4);
+    transform: translateY(-2px);
   }
   
   &:active {
-    transform: translateY(2px);
-    box-shadow: 0 3px 10px rgba($primary-base, 0.3);
+    transform: translateY(1px);
+    box-shadow: 0 5px 15px rgba($primary-base, 0.3);
   }
   
   .button-content {
@@ -139,7 +146,7 @@ $breakpoints: (
     align-items: center;
     
     i {
-      margin-right: 0.5rem;
+      margin-right: 0.75rem;
       font-size: 1rem;
     }
   }
@@ -150,7 +157,7 @@ $breakpoints: (
     left: 0;
     width: 100%;
     height: 100%;
-    background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    background: linear-gradient(135deg, transparent, rgba(255, 255, 255, 0.3), transparent);
     transform: translateX(-100%);
     transition: transform 1s;
   }
@@ -161,16 +168,16 @@ $breakpoints: (
   
   &.danger {
     background: $danger-gradient;
-    box-shadow: 0 5px 15px rgba($danger-color, 0.3);
+    box-shadow: 0 8px 20px rgba($danger-color, 0.3);
     
     &:hover {
-      background: $danger-gradient;
-      box-shadow: 0 8px 25px rgba($danger-color, 0.4);
+      background: linear-gradient(135deg, darken($danger-color, 5%), darken($danger-color, 2%));
+      box-shadow: 0 12px 28px rgba($danger-color, 0.4);
     }
   }
 }
 
-// Keyframes
+// Enhanced Keyframes
 @keyframes pulse {
   0% {
     box-shadow: 0 0 0 0 rgba($primary-accent, 0.7);
@@ -188,7 +195,7 @@ $breakpoints: (
     transform: translateY(0px);
   }
   50% {
-    transform: translateY(-10px);
+    transform: translateY(-12px);
   }
   100% {
     transform: translateY(0px);
@@ -197,13 +204,13 @@ $breakpoints: (
 
 @keyframes glow {
   0% {
-    box-shadow: 0 0 5px rgba($primary-accent, 0.5);
+    box-shadow: 0 0 8px rgba($primary-accent, 0.5);
   }
   50% {
-    box-shadow: 0 0 20px rgba($primary-accent, 0.8);
+    box-shadow: 0 0 25px rgba($primary-accent, 0.8);
   }
   100% {
-    box-shadow: 0 0 5px rgba($primary-accent, 0.5);
+    box-shadow: 0 0 8px rgba($primary-accent, 0.5);
   }
 }
 
@@ -258,16 +265,39 @@ $breakpoints: (
   }
 }
 
+@keyframes slide-up {
+  0% {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  100% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
 // Main Styles
 .settings-page {
-  font-family: $font-family;
+  font-family: $font-family-primary;
   color: $text-primary;
   min-height: 100vh;
   background: $primary-dark;
   position: relative;
   overflow-x: hidden;
   
-  // Background elements
+  // Enhanced Background elements
   &::before {
     content: '';
     position: fixed;
@@ -276,13 +306,13 @@ $breakpoints: (
     width: 100%;
     height: 100%;
     background: 
-      radial-gradient(circle at 20% 10%, rgba($primary-light, 0.15) 0%, transparent 60%),
-      radial-gradient(circle at 80% 30%, rgba($secondary-accent, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 10% 80%, rgba($tertiary-accent, 0.1) 0%, transparent 50%);
+      radial-gradient(circle at 20% 10%, rgba($primary-light, 0.2) 0%, transparent 60%),
+      radial-gradient(circle at 85% 25%, rgba($secondary-accent, 0.15) 0%, transparent 60%),
+      radial-gradient(circle at 10% 85%, rgba($tertiary-accent, 0.15) 0%, transparent 60%);
     z-index: 0;
   }
   
-  // Background particles
+  // Background particles and effects
   .settings-backdrop {
     position: fixed;
     top: 0;
@@ -290,31 +320,31 @@ $breakpoints: (
     width: 100%;
     height: 100%;
     opacity: 0;
-    transition: opacity 1s ease;
+    transition: opacity 1.2s ease;
     z-index: 0;
     
     &::before,
     &::after {
       content: '';
       position: absolute;
-      width: 200px;
-      height: 200px;
+      width: 250px;
+      height: 250px;
       border-radius: 50%;
-      filter: blur(60px);
+      filter: blur(80px);
     }
     
     &::before {
       top: 10%;
       left: 5%;
-      background: rgba($primary-accent, 0.15);
-      animation: float 10s ease-in-out infinite;
+      background: rgba($primary-accent, 0.18);
+      animation: float 18s ease-in-out infinite;
     }
     
     &::after {
       bottom: 10%;
       right: 5%;
-      background: rgba($secondary-accent, 0.15);
-      animation: float 13s ease-in-out 1s infinite;
+      background: rgba($secondary-accent, 0.18);
+      animation: float 22s ease-in-out 1.5s infinite;
     }
     
     &.animate {
@@ -335,25 +365,25 @@ $breakpoints: (
     &::after {
       content: '';
       position: absolute;
-      width: 2px;
-      height: 2px;
+      width: 3px;
+      height: 3px;
       background: $primary-accent;
-      box-shadow: 0 0 10px 2px rgba($primary-accent, 0.3);
+      box-shadow: 0 0 15px 3px rgba($primary-accent, 0.4);
       border-radius: 50%;
       opacity: 0;
-      transition: opacity 0.5s ease;
+      transition: opacity 0.8s ease;
     }
     
     &::before {
       top: 20%;
       left: 30%;
-      animation: float 15s ease-in-out infinite;
+      animation: float 25s ease-in-out infinite;
     }
     
     &::after {
       bottom: 30%;
       right: 20%;
-      animation: float 18s ease-in-out 2s infinite;
+      animation: float 28s ease-in-out 3s infinite;
     }
     
     &.active::before,
@@ -369,10 +399,10 @@ $breakpoints: (
     transition: all 0.4s ease;
   }
   
-  // Header
+  // Enhanced Header
   .settings-header {
     position: relative;
-    padding: 3rem 2rem 2rem;
+    padding: 3.5rem 2.5rem 2.5rem;
     text-align: center;
     z-index: 1;
     opacity: 0;
@@ -380,7 +410,7 @@ $breakpoints: (
     transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.1s;
     
     @include respond-to(md) {
-      padding: 2rem 1.5rem 1.5rem;
+      padding: 2.5rem 1.5rem 1.5rem;
     }
     
     &.animate {
@@ -390,38 +420,39 @@ $breakpoints: (
     
     .back-button {
       position: absolute;
-      left: 2rem;
-      top: 2.5rem;
+      left: 2.5rem;
+      top: 3rem;
       display: flex;
       align-items: center;
-      padding: 0.5rem 1rem;
+      padding: 0.6rem 1.2rem;
       border-radius: 30px;
-      background: rgba($primary-base, 0.5);
-      backdrop-filter: blur(10px);
-      border: 1px solid rgba($primary-light, 0.2);
+      background: rgba($primary-base, 0.6);
+      backdrop-filter: blur(12px);
+      border: 1px solid rgba($primary-light, 0.25);
       color: $text-primary;
       cursor: pointer;
       transition: all $transition-medium;
       
       @include respond-to(md) {
-        left: 1rem;
-        top: 1.5rem;
-        padding: 0.4rem 0.8rem;
+        left: 1.2rem;
+        top: 1.8rem;
+        padding: 0.5rem 0.9rem;
       }
       
       i {
         font-size: 0.9rem;
-        margin-right: 0.5rem;
+        margin-right: 0.6rem;
       }
       
       .back-text {
         font-weight: 500;
-        font-size: 0.9rem;
+        font-size: 0.95rem;
       }
       
       &:hover {
-        background: rgba($primary-light, 0.5);
+        background: rgba($primary-light, 0.6);
         transform: translateX(-5px);
+        box-shadow: 0 5px 15px rgba($primary-dark, 0.3);
       }
     }
     
@@ -430,74 +461,90 @@ $breakpoints: (
       margin: 0 auto;
       
       h1 {
-        font-size: 3rem;
+        font-size: 3.2rem;
         font-weight: 700;
-        margin-bottom: 0.5rem;
-        @include premium-gradient-text;
-        text-shadow: 0 2px 10px rgba($primary-accent, 0.3);
+        margin-bottom: 0.8rem;
+        background: linear-gradient(135deg, $primary-accent, $secondary-accent);
+        -webkit-background-clip: text;
+        background-clip: text;
+        color: transparent;
+        text-shadow: 0 2px 15px rgba($primary-accent, 0.4);
         
         @include respond-to(md) {
-          font-size: 2.2rem;
+          font-size: 2.4rem;
         }
         
         i {
-          margin-right: 0.5rem;
-          animation: float 3s ease-in-out infinite;
+          margin-right: 0.7rem;
+          animation: float 4s ease-in-out infinite;
+          display: inline-block;
         }
       }
       
       p {
-        font-size: 1.2rem;
+        font-size: 1.25rem;
         color: $text-secondary;
         max-width: 600px;
         margin: 0 auto 1rem;
+        line-height: 1.5;
         
         @include respond-to(md) {
-          font-size: 1rem;
+          font-size: 1.05rem;
         }
       }
       
       .header-decoration {
         display: flex;
         justify-content: center;
-        margin-top: 1.5rem;
+        margin-top: 2rem;
         
         .header-line {
-          width: 80px;
+          width: 100px;
           height: 4px;
           background: $primary-gradient-active;
           border-radius: 2px;
           position: relative;
+          overflow: hidden;
           
-          &::before,
+          &::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 200%;
+            height: 100%;
+            background: linear-gradient(
+              90deg,
+              transparent,
+              rgba(255, 255, 255, 0.6),
+              transparent
+            );
+            animation: shine 3s infinite;
+          }
+          
           &::after {
             content: '';
             position: absolute;
             top: 0;
-            width: 4px;
+            width: 6px;
             height: 4px;
             border-radius: 50%;
-            background: $primary-accent;
-          }
-          
-          &::before {
-            left: -8px;
-          }
-          
-          &::after {
-            right: -8px;
+            background: white;
+            left: 46px;
+            opacity: 0;
+            animation: pulse 4s infinite;
           }
         }
       }
     }
   }
   
-  // Main container
+  // Enhanced Container
   .settings-container {
     display: flex;
     max-width: 1400px;
     margin: 0 auto;
-    padding: 0 2rem 2rem;
+    padding: 0 2.5rem 2.5rem;
     position: relative;
     z-index: 1;
     
@@ -506,21 +553,21 @@ $breakpoints: (
       padding: 0 1.5rem 1.5rem;
     }
     
-    // Sidebar
+    // Enhanced Sidebar
     .settings-sidebar {
-      width: 320px;
+      width: 340px;
       position: sticky;
       top: 2rem;
-      height: calc(100vh - 200px);
-      padding: 1.5rem;
-      margin-right: 2.5rem;
+      height: calc(100vh - 220px);
+      padding: 1.8rem;
+      margin-right: 2.8rem;
       @include glass-effect;
       border-radius: $card-border-radius;
       display: flex;
       flex-direction: column;
       opacity: 0;
       transform: translateX(-20px);
-      transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.2s;
+      transition: all 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.2s;
       
       @include respond-to(lg) {
         width: 100%;
@@ -539,36 +586,53 @@ $breakpoints: (
       .sidebar-avatar {
         display: flex;
         align-items: center;
-        padding-bottom: 1.5rem;
-        margin-bottom: 1.5rem;
-        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        padding-bottom: 1.8rem;
+        margin-bottom: 1.8rem;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.12);
         
         .avatar-image {
-          width: 50px;
-          height: 50px;
-          background: $primary-gradient;
-          border-radius: 15px;
+          width: 60px;
+          height: 60px;
+          background: $blue-purple-gradient;
+          border-radius: 16px;
           display: flex;
           align-items: center;
           justify-content: center;
-          margin-right: 1rem;
+          margin-right: 1.2rem;
+          box-shadow: 0 8px 20px rgba($primary-dark, 0.25);
+          position: relative;
+          overflow: hidden;
+          
+          &::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0));
+          }
           
           i {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
             color: white;
+            position: relative;
           }
         }
         
         .avatar-info {
           .avatar-name {
             font-weight: 600;
-            font-size: 1rem;
-            margin-bottom: 0.2rem;
+            font-size: 1.15rem;
+            margin-bottom: 0.3rem;
+            color: $text-primary;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
           }
           
           .avatar-role {
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: $text-secondary;
+            background: rgba($primary-accent, 0.2);
+            display: inline-block;
+            padding: 0.25rem 0.8rem;
+            border-radius: 20px;
           }
         }
       }
@@ -579,44 +643,45 @@ $breakpoints: (
         margin: 0 0 auto;
         
         li {
-          margin-bottom: 0.5rem;
+          margin-bottom: 0.6rem;
           
           a {
             display: flex;
             align-items: center;
-            padding: 0.75rem 1rem;
-            border-radius: 12px;
+            padding: 0.85rem 1.2rem;
+            border-radius: 14px;
             color: $text-secondary;
             text-decoration: none;
-            transition: all $transition-medium;
+            transition: all $transition-spring;
             font-weight: 500;
             position: relative;
             overflow: hidden;
             
             i {
-              font-size: 1.1rem;
-              width: 24px;
-              margin-right: 0.75rem;
+              font-size: 1.15rem;
+              width: 26px;
+              margin-right: 0.85rem;
               transition: all $transition-medium;
             }
             
             &:hover {
-              background: rgba(255, 255, 255, 0.05);
+              background: rgba(255, 255, 255, 0.08);
               color: $text-primary;
               
               i {
                 color: $primary-accent;
-                transform: scale(1.1);
+                transform: scale(1.15) rotate(-5deg);
               }
             }
             
             &.active {
               background: $primary-gradient-subtle;
               color: $text-primary;
-              box-shadow: 0 5px 15px rgba($primary-base, 0.2);
+              box-shadow: 0 6px 16px rgba($primary-base, 0.25);
               
               i {
                 color: $primary-accent;
+                transform: scale(1.15);
               }
               
               &::after {
@@ -625,9 +690,18 @@ $breakpoints: (
                 right: 0;
                 top: 0;
                 height: 100%;
-                width: 4px;
+                width: 5px;
                 background: $primary-accent;
-                border-radius: 2px 0 0 2px;
+                border-radius: 3px 0 0 3px;
+                box-shadow: 0 0 10px rgba($primary-accent, 0.7);
+              }
+              
+              &::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1));
+                animation: shine 4s infinite;
               }
             }
           }
@@ -635,34 +709,36 @@ $breakpoints: (
       }
       
       .sidebar-footer {
-        margin-top: 1.5rem;
-        padding-top: 1.5rem;
-        border-top: 1px solid rgba(255, 255, 255, 0.1);
+        margin-top: 1.8rem;
+        padding-top: 1.8rem;
+        border-top: 1px solid rgba(255, 255, 255, 0.12);
         
         .reset-button {
           @include premium-button;
           width: 100%;
-          padding: 0.7rem 1rem;
-          background: rgba(255, 255, 255, 0.05);
+          padding: 0.8rem 1.2rem;
+          background: rgba(255, 255, 255, 0.08);
           color: $text-secondary;
           box-shadow: none;
-          border: 1px solid rgba(255, 255, 255, 0.1);
+          border: 1px solid rgba(255, 255, 255, 0.12);
+          font-weight: 500;
           
           &:hover {
-            background: rgba($danger-color, 0.1);
-            color: $danger-color;
-            border-color: rgba($danger-color, 0.3);
+            background: rgba($danger-color, 0.15);
+            color: lighten($danger-color, 10%);
+            border-color: rgba($danger-color, 0.4);
+            box-shadow: 0 8px 15px rgba($danger-color, 0.15);
           }
         }
       }
     }
     
-    // Content Area
+    // Enhanced Content Area
     .settings-content {
       flex: 1;
       opacity: 0;
       transform: translateY(20px);
-      transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.3s;
+      transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.3s;
       
       &.animate {
         opacity: 1;
@@ -673,12 +749,12 @@ $breakpoints: (
         animation: scaleIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
       }
       
-      // Section Styles
+      // Enhanced Section Styles
       .settings-section {
-        margin-bottom: 3rem;
+        margin-bottom: 3.5rem;
         opacity: 0;
         transform: translateY(30px);
-        transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        transition: all 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         
         &.animate-in {
           opacity: 1;
@@ -688,70 +764,89 @@ $breakpoints: (
         .section-header {
           display: flex;
           align-items: center;
-          margin-bottom: 1.5rem;
+          margin-bottom: 1.8rem;
           
           .section-icon {
-            width: 48px;
-            height: 48px;
-            background: $primary-gradient;
-            border-radius: 15px;
+            width: 56px;
+            height: 56px;
+            background: $blue-purple-gradient;
+            border-radius: 16px;
             display: flex;
             align-items: center;
             justify-content: center;
-            margin-right: 1rem;
+            margin-right: 1.2rem;
+            box-shadow: 0 8px 20px rgba($primary-dark, 0.25);
+            position: relative;
+            overflow: hidden;
             flex-shrink: 0;
             
             @include respond-to(md) {
-              width: 40px;
-              height: 40px;
-              border-radius: 12px;
+              width: 46px;
+              height: 46px;
+              border-radius: 14px;
+            }
+            
+            &::before {
+              content: '';
+              position: absolute;
+              inset: 0;
+              background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0));
             }
             
             i {
-              font-size: 1.3rem;
+              font-size: 1.5rem;
               color: white;
+              position: relative;
               
               @include respond-to(md) {
-                font-size: 1.1rem;
+                font-size: 1.3rem;
               }
             }
           }
           
           .section-title {
             h2 {
-              font-size: 1.8rem;
+              font-size: 2rem;
               font-weight: 600;
-              margin-bottom: 0.3rem;
+              margin-bottom: 0.4rem;
+              color: $text-primary;
               
               @include respond-to(md) {
-                font-size: 1.5rem;
+                font-size: 1.7rem;
               }
             }
             
             p {
               color: $text-secondary;
               margin: 0;
-              font-size: 1rem;
+              font-size: 1.05rem;
+              line-height: 1.5;
               
               @include respond-to(md) {
-                font-size: 0.9rem;
+                font-size: 0.95rem;
               }
             }
           }
         }
         
-        // Card Styles
+        // Enhanced Card Styles
         .settings-card {
           background: white;
           border-radius: $card-border-radius;
-          padding: 2rem;
-          margin-bottom: 2rem;
+          padding: 2.2rem;
+          margin-bottom: 2.5rem;
           box-shadow: $card-shadow;
           position: relative;
           overflow: hidden;
+          transition: all $transition-medium;
+          border: 1px solid rgba(255, 255, 255, 0.08);
+          
+          &:hover {
+            box-shadow: 0 12px 36px rgba(0, 0, 0, 0.15);
+          }
           
           @include respond-to(md) {
-            padding: 1.5rem;
+            padding: 1.8rem;
           }
           
           .card-glass-effect {
@@ -760,60 +855,63 @@ $breakpoints: (
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0));
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.18), rgba(255, 255, 255, 0));
             z-index: 0;
           }
           
           .card-header {
             position: relative;
             z-index: 1;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1.8rem;
             
             &.mt-4 {
-              margin-top: 2rem;
+              margin-top: 2.2rem;
             }
             
             h3 {
-              font-size: 1.3rem;
+              font-size: 1.4rem;
               font-weight: 600;
-              margin-bottom: 0.5rem;
+              margin-bottom: 0.6rem;
               color: $text-dark-primary;
               
               @include respond-to(md) {
-                font-size: 1.2rem;
+                font-size: 1.3rem;
               }
             }
             
             .card-subtitle {
               color: $text-dark-secondary;
-              font-size: 0.95rem;
+              font-size: 1rem;
+              line-height: 1.5;
               
               @include respond-to(md) {
-                font-size: 0.85rem;
+                font-size: 0.9rem;
               }
             }
           }
           
-          // Settings Options Styles
+          // Enhanced Settings Options Styles
           .settings-options {
             position: relative;
             z-index: 1;
-            margin-bottom: 2rem;
+            margin-bottom: 2.2rem;
             
-            // Toggle Option
+            // Enhanced Toggle Option
             .toggle-option {
               display: flex;
               align-items: center;
               justify-content: space-between;
               margin-bottom: 1.5rem;
-              padding: 0.8rem 1rem;
-              border-radius: 12px;
+              padding: 1rem 1.2rem;
+              border-radius: 14px;
               transition: all $transition-medium;
-              background: rgba($primary-dark, 0.02);
-              border: 1px solid rgba($primary-dark, 0.05);
+              background: rgba($primary-dark, 0.03);
+              border: 1px solid rgba($primary-dark, 0.06);
               
               &:hover {
-                background: rgba($primary-dark, 0.04);
+                background: rgba($primary-dark, 0.05);
+                transform: translateY(-3px);
+                box-shadow: 0 8px 20px rgba($primary-dark, 0.05);
               }
               
               &:last-child {
@@ -824,44 +922,46 @@ $breakpoints: (
                 display: flex;
                 align-items: center;
                 flex: 1;
-                padding-right: 1rem;
+                padding-right: 1.5rem;
                 
                 i {
-                  font-size: 1.1rem;
-                  min-width: 20px;
+                  font-size: 1.2rem;
+                  min-width: 24px;
                   text-align: center;
-                  margin-right: 0.75rem;
+                  margin-right: 1rem;
                   color: $primary-light;
                 }
                 
                 .label-text {
                   .label-title {
-                    font-weight: 500;
+                    font-weight: 600;
                     color: $text-dark-primary;
                     display: block;
+                    font-size: 1.05rem;
+                    margin-bottom: 0.3rem;
                   }
                   
                   .label-description {
-                    font-size: 0.85rem;
+                    font-size: 0.9rem;
                     color: $text-dark-secondary;
                     display: block;
-                    margin-top: 0.2rem;
+                    line-height: 1.5;
                   }
                 }
               }
               
               .toggle-switch {
                 position: relative;
-                width: 56px;
-                height: 28px;
+                width: 60px;
+                height: 32px;
                 flex-shrink: 0;
                 cursor: pointer;
                 
                 .toggle-track {
                   width: 100%;
                   height: 100%;
-                  background: rgba($primary-dark, 0.1);
-                  border-radius: 14px;
+                  background: rgba($primary-dark, 0.12);
+                  border-radius: 16px;
                   transition: all $transition-medium;
                   position: relative;
                   
@@ -870,19 +970,19 @@ $breakpoints: (
                     position: absolute;
                     top: 2px;
                     left: 2px;
-                    width: 24px;
-                    height: 24px;
+                    width: 28px;
+                    height: 28px;
                     border-radius: 50%;
                     background: white;
-                    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+                    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
                     transition: all $transition-bounce;
                   }
                 }
                 
                 .toggle-indicator {
                   position: absolute;
-                  top: 4px;
-                  left: 4px;
+                  top: 6px;
+                  left: 6px;
                   width: 20px;
                   height: 20px;
                   border-radius: 50%;
@@ -931,18 +1031,18 @@ $breakpoints: (
               }
             }
             
-            // Radio Group
+            // Enhanced Radio Group
             .radio-group {
               display: flex;
               flex-direction: column;
-              gap: 1rem;
+              gap: 1.2rem;
               
               &.layout-radio {
                 .radio-option {
-                  padding: 1rem 1.25rem;
+                  padding: 1.2rem 1.4rem;
                   
                   .radio-label {
-                    margin-bottom: 0.3rem;
+                    margin-bottom: 0.4rem;
                   }
                 }
               }
@@ -950,23 +1050,25 @@ $breakpoints: (
               .radio-option {
                 display: flex;
                 align-items: flex-start;
-                padding: 1.25rem;
-                border-radius: 12px;
-                background: rgba($primary-dark, 0.02);
-                border: 1px solid rgba($primary-dark, 0.05);
+                padding: 1.4rem;
+                border-radius: 14px;
+                background: rgba($primary-dark, 0.03);
+                border: 1px solid rgba($primary-dark, 0.06);
                 cursor: pointer;
                 transition: all $transition-medium;
                 position: relative;
                 overflow: hidden;
                 
                 &:hover {
-                  background: rgba($primary-dark, 0.04);
+                  background: rgba($primary-dark, 0.05);
+                  transform: translateY(-3px);
+                  box-shadow: 0 8px 20px rgba($primary-dark, 0.05);
                 }
                 
                 &.active {
-                  background: rgba($primary-light, 0.05);
-                  border-color: rgba($primary-light, 0.2);
-                  box-shadow: 0 5px 15px rgba($primary-light, 0.1);
+                  background: rgba($primary-light, 0.06);
+                  border-color: rgba($primary-light, 0.25);
+                  box-shadow: 0 8px 20px rgba($primary-light, 0.12);
                 }
                 
                 &.animating {
@@ -977,22 +1079,22 @@ $breakpoints: (
                 
                 .radio-button {
                   flex-shrink: 0;
-                  margin-right: 1rem;
+                  margin-right: 1.2rem;
                   margin-top: 0.2rem;
                   
                   .radio-outer {
-                    width: 22px;
-                    height: 22px;
+                    width: 24px;
+                    height: 24px;
                     border-radius: 50%;
-                    border: 2px solid rgba($primary-dark, 0.2);
+                    border: 2px solid rgba($primary-dark, 0.25);
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     transition: all $transition-medium;
                     
                     .radio-inner {
-                      width: 12px;
-                      height: 12px;
+                      width: 14px;
+                      height: 14px;
                       border-radius: 50%;
                       background: transparent;
                       transition: all $transition-bounce;
@@ -1020,19 +1122,20 @@ $breakpoints: (
                     align-items: center;
                     font-weight: 600;
                     color: $text-dark-primary;
-                    margin-bottom: 0.5rem;
+                    margin-bottom: 0.6rem;
+                    font-size: 1.05rem;
                     
                     i {
-                      margin-right: 0.5rem;
+                      margin-right: 0.7rem;
                       color: $primary-light;
-                      font-size: 1.1rem;
+                      font-size: 1.2rem;
                     }
                   }
                   
                   .radio-description {
                     color: $text-dark-secondary;
-                    font-size: 0.9rem;
-                    line-height: 1.5;
+                    font-size: 0.95rem;
+                    line-height: 1.6;
                   }
                 }
                 
@@ -1044,17 +1147,17 @@ $breakpoints: (
                   width: 120%;
                   height: 120%;
                   border-radius: 50%;
-                  background: rgba($primary-accent, 0.1);
+                  background: rgba($primary-accent, 0.12);
                   opacity: 0;
                 }
               }
             }
             
-            // Checkbox Grid
+            // Enhanced Checkbox Grid
             .checkbox-grid {
               display: grid;
-              grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-              gap: 1rem;
+              grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+              gap: 1.2rem;
               
               @include respond-to(sm) {
                 grid-template-columns: 1fr;
@@ -1063,34 +1166,36 @@ $breakpoints: (
               .checkbox-option {
                 display: flex;
                 align-items: center;
-                padding: 1rem;
-                border-radius: 12px;
-                background: rgba($primary-dark, 0.02);
-                border: 1px solid rgba($primary-dark, 0.05);
+                padding: 1.2rem;
+                border-radius: 14px;
+                background: rgba($primary-dark, 0.03);
+                border: 1px solid rgba($primary-dark, 0.06);
                 cursor: pointer;
                 transition: all $transition-medium;
                 position: relative;
                 overflow: hidden;
                 
                 &:hover {
-                  background: rgba($primary-dark, 0.04);
+                  background: rgba($primary-dark, 0.05);
+                  transform: translateY(-3px);
+                  box-shadow: 0 8px 20px rgba($primary-dark, 0.05);
                 }
                 
                 &.active {
-                  background: rgba($primary-light, 0.05);
-                  border-color: rgba($primary-light, 0.2);
-                  box-shadow: 0 5px 15px rgba($primary-light, 0.1);
+                  background: rgba($primary-light, 0.06);
+                  border-color: rgba($primary-light, 0.25);
+                  box-shadow: 0 8px 20px rgba($primary-light, 0.12);
                 }
                 
                 .checkbox {
                   flex-shrink: 0;
-                  margin-right: 0.75rem;
+                  margin-right: 1rem;
                   
                   .checkbox-outer {
-                    width: 22px;
-                    height: 22px;
-                    border-radius: 6px;
-                    border: 2px solid rgba($primary-dark, 0.2);
+                    width: 24px;
+                    height: 24px;
+                    border-radius: 8px;
+                    border: 2px solid rgba($primary-dark, 0.25);
                     display: flex;
                     align-items: center;
                     justify-content: center;
@@ -1098,7 +1203,7 @@ $breakpoints: (
                     
                     i {
                       color: transparent;
-                      font-size: 0.8rem;
+                      font-size: 0.9rem;
                       transition: all $transition-bounce;
                     }
                   }
@@ -1108,6 +1213,7 @@ $breakpoints: (
                   .checkbox-outer {
                     background: $primary-accent;
                     border-color: $primary-accent;
+                    box-shadow: 0 3px 8px rgba($primary-accent, 0.4);
                     
                     i {
                       color: white;
@@ -1120,37 +1226,38 @@ $breakpoints: (
                   
                   .status-badge {
                     display: inline-block;
-                    padding: 0.25rem 0.75rem;
+                    padding: 0.3rem 0.8rem;
                     border-radius: 20px;
-                    font-size: 0.8rem;
+                    font-size: 0.85rem;
                     font-weight: 600;
-                    margin-bottom: 0.25rem;
+                    margin-bottom: 0.3rem;
                     
                     &.active {
-                      background: rgba($active-color, 0.1);
+                      background: rgba($active-color, 0.12);
                       color: $active-color;
                     }
                     
                     &.deactive {
-                      background: rgba($deactive-color, 0.1);
+                      background: rgba($deactive-color, 0.12);
                       color: $deactive-color;
                     }
                     
                     &.pending {
-                      background: rgba($pending-color, 0.1);
+                      background: rgba($pending-color, 0.12);
                       color: $pending-color;
                     }
                     
                     &.review {
-                      background: rgba($review-color, 0.1);
+                      background: rgba($review-color, 0.12);
                       color: $review-color;
                     }
                   }
                   
                   .checkbox-description {
                     display: block;
-                    font-size: 0.85rem;
+                    font-size: 0.9rem;
                     color: $text-dark-secondary;
+                    line-height: 1.5;
                   }
                 }
                 
@@ -1162,16 +1269,16 @@ $breakpoints: (
                   width: 120%;
                   height: 120%;
                   border-radius: 50%;
-                  background: rgba($primary-accent, 0.1);
+                  background: rgba($primary-accent, 0.12);
                   opacity: 0;
                 }
               }
             }
             
-            // View Mode Options
+            // Enhanced View Mode Options
             .view-mode-options {
               display: flex;
-              gap: 1rem;
+              gap: 1.2rem;
               
               @include respond-to(md) {
                 flex-direction: column;
@@ -1182,25 +1289,25 @@ $breakpoints: (
                 display: flex;
                 flex-direction: column;
                 align-items: center;
-                padding: 1.5rem 1rem;
-                border-radius: 12px;
-                background: rgba($primary-dark, 0.02);
-                border: 1px solid rgba($primary-dark, 0.05);
+                padding: 1.8rem 1.2rem;
+                border-radius: 14px;
+                background: rgba($primary-dark, 0.03);
+                border: 1px solid rgba($primary-dark, 0.06);
                 cursor: pointer;
                 transition: all $transition-medium;
                 position: relative;
                 overflow: hidden;
                 
                 &:hover {
-                  background: rgba($primary-dark, 0.04);
-                  transform: translateY(-3px);
-                  box-shadow: 0 5px 15px rgba($primary-dark, 0.05);
+                  background: rgba($primary-dark, 0.05);
+                  transform: translateY(-5px);
+                  box-shadow: 0 8px 25px rgba($primary-dark, 0.08);
                 }
                 
                 &.active {
-                  background: rgba($primary-light, 0.05);
-                  border-color: rgba($primary-light, 0.2);
-                  box-shadow: 0 5px 15px rgba($primary-light, 0.1);
+                  background: rgba($primary-light, 0.06);
+                  border-color: rgba($primary-light, 0.25);
+                  box-shadow: 0 8px 25px rgba($primary-light, 0.12);
                 }
                 
                 &.animating {
@@ -1210,19 +1317,20 @@ $breakpoints: (
                 }
                 
                 .option-icon-container {
-                  width: 60px;
-                  height: 60px;
-                  border-radius: 18px;
-                  background: $primary-gradient;
+                  width: 70px;
+                  height: 70px;
+                  border-radius: 20px;
+                  background: $blue-turquoise-gradient;
                   display: flex;
                   align-items: center;
                   justify-content: center;
-                  margin-bottom: 1rem;
+                  margin-bottom: 1.2rem;
                   position: relative;
                   overflow: hidden;
+                  box-shadow: 0 6px 18px rgba($primary-dark, 0.15);
                   
                   .option-icon {
-                    font-size: 1.8rem;
+                    font-size: 2rem;
                     color: white;
                     z-index: 2;
                   }
@@ -1236,10 +1344,10 @@ $breakpoints: (
                     background: linear-gradient(
                       90deg,
                       transparent,
-                      rgba(255, 255, 255, 0.3),
+                      rgba(255, 255, 255, 0.4),
                       transparent
                     );
-                    transition: all 0.6s;
+                    transition: all 0.8s;
                   }
                 }
                 
@@ -1250,54 +1358,58 @@ $breakpoints: (
                 .option-label {
                   font-weight: 600;
                   color: $text-dark-primary;
-                  margin-bottom: 0.5rem;
+                  margin-bottom: 0.6rem;
+                  font-size: 1.1rem;
                 }
                 
                 .option-description {
-                  font-size: 0.85rem;
+                  font-size: 0.9rem;
                   color: $text-dark-secondary;
                   text-align: center;
+                  line-height: 1.5;
                 }
               }
             }
           }
           
-          // Example Preview Section
+          // Enhanced Example Preview Section
           .example-display {
             position: relative;
             z-index: 1;
             background: rgba($primary-dark, 0.03);
-            border-radius: 12px;
-            padding: 1.5rem;
+            border-radius: 14px;
+            padding: 1.8rem;
+            border: 1px solid rgba($primary-dark, 0.06);
             
             .example-header {
               display: flex;
               align-items: center;
               justify-content: space-between;
-              margin-bottom: 1.2rem;
+              margin-bottom: 1.5rem;
               
               h4 {
-                font-size: 1rem;
+                font-size: 1.1rem;
                 font-weight: 600;
                 color: $text-dark-secondary;
                 margin: 0;
               }
               
               .example-badge {
-                font-size: 0.75rem;
-                padding: 0.25rem 0.5rem;
+                font-size: 0.8rem;
+                padding: 0.3rem 0.8rem;
                 border-radius: 20px;
-                background: $primary-gradient;
+                background: $blue-purple-gradient;
                 color: white;
                 font-weight: 500;
+                box-shadow: 0 3px 8px rgba($primary-dark, 0.15);
               }
             }
             
-            // Example Metrics Cards
+            // Enhanced Example Metrics Cards
             .example-metrics {
               display: grid;
-              grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
-              gap: 1rem;
+              grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+              gap: 1.2rem;
               
               @include respond-to(sm) {
                 grid-template-columns: repeat(2, 1fr);
@@ -1309,17 +1421,18 @@ $breakpoints: (
               
               .metric-card {
                 position: relative;
-                border-radius: 15px;
-                padding: 1.5rem;
+                border-radius: 16px;
+                padding: 1.6rem;
                 overflow: hidden;
                 display: flex;
                 flex-direction: column;
-                transition: all $transition-medium;
-                box-shadow: 0 4px 15px rgba($primary-dark, 0.05);
+                transition: all $transition-spring;
+                box-shadow: 0 5px 15px rgba($primary-dark, 0.08);
                 animation: fadeIn 0.5s ease-out;
+                border: 1px solid rgba($primary-dark, 0.06);
                 
                 @include respond-to(sm) {
-                  padding: 1.2rem;
+                  padding: 1.4rem;
                 }
                 
                 &:hover {
@@ -1328,8 +1441,8 @@ $breakpoints: (
                 
                 // Card colors
                 &.total {
-                  background: linear-gradient(135deg, rgba($primary-base, 0.03), rgba($primary-light, 0.05));
-                  border: 1px solid rgba($primary-light, 0.1);
+                  background: linear-gradient(135deg, rgba($primary-base, 0.04), rgba($primary-light, 0.06));
+                  border: 1px solid rgba($primary-light, 0.12);
                   
                   .metric-icon {
                     background: $primary-gradient;
@@ -1352,8 +1465,8 @@ $breakpoints: (
                 }
                 
                 &.active {
-                  background: linear-gradient(135deg, rgba($active-color, 0.03), rgba($active-color, 0.05));
-                  border: 1px solid rgba($active-color, 0.1);
+                  background: linear-gradient(135deg, rgba($active-color, 0.04), rgba($active-color, 0.06));
+                  border: 1px solid rgba($active-color, 0.12);
                   
                   .metric-icon {
                     background: linear-gradient(135deg, rgba($active-color, 0.8), $active-color);
@@ -1376,8 +1489,8 @@ $breakpoints: (
                 }
                 
                 &.deactive {
-                  background: linear-gradient(135deg, rgba($deactive-color, 0.03), rgba($deactive-color, 0.05));
-                  border: 1px solid rgba($deactive-color, 0.1);
+                  background: linear-gradient(135deg, rgba($deactive-color, 0.04), rgba($deactive-color, 0.06));
+                  border: 1px solid rgba($deactive-color, 0.12);
                   
                   .metric-icon {
                     background: linear-gradient(135deg, rgba($deactive-color, 0.8), $deactive-color);
@@ -1400,8 +1513,8 @@ $breakpoints: (
                 }
                 
                 &.pending {
-                  background: linear-gradient(135deg, rgba($pending-color, 0.03), rgba($pending-color, 0.05));
-                  border: 1px solid rgba($pending-color, 0.1);
+                  background: linear-gradient(135deg, rgba($pending-color, 0.04), rgba($pending-color, 0.06));
+                  border: 1px solid rgba($pending-color, 0.12);
                   
                   .metric-icon {
                     background: linear-gradient(135deg, rgba($pending-color, 0.8), $pending-color);
@@ -1430,26 +1543,27 @@ $breakpoints: (
                 }
                 
                 .metric-icon {
-                  width: 50px;
-                  height: 50px;
-                  border-radius: 15px;
+                  width: 54px;
+                  height: 54px;
+                  border-radius: 16px;
                   display: flex;
                   align-items: center;
                   justify-content: center;
-                  margin-right: 1rem;
+                  margin-right: 1.2rem;
                   flex-shrink: 0;
+                  box-shadow: 0 5px 15px rgba($primary-dark, 0.15);
                   
                   @include respond-to(sm) {
-                    width: 45px;
-                    height: 45px;
-                    border-radius: 12px;
+                    width: 48px;
+                    height: 48px;
+                    border-radius: 14px;
                   }
                   
                   i {
-                    font-size: 1.5rem;
+                    font-size: 1.6rem;
                     
                     @include respond-to(sm) {
-                      font-size: 1.3rem;
+                      font-size: 1.4rem;
                     }
                   }
                 }
@@ -1458,22 +1572,22 @@ $breakpoints: (
                   flex: 1;
                   
                   .metric-value {
-                    font-size: 2rem;
+                    font-size: 2.2rem;
                     font-weight: 700;
                     line-height: 1.1;
                     
                     @include respond-to(sm) {
-                      font-size: 1.8rem;
+                      font-size: 2rem;
                     }
                   }
                   
                   .metric-label {
-                    font-size: 0.9rem;
+                    font-size: 0.95rem;
                     color: $text-dark-secondary;
-                    margin-top: 0.25rem;
+                    margin-top: 0.3rem;
                     
                     @include respond-to(sm) {
-                      font-size: 0.8rem;
+                      font-size: 0.85rem;
                     }
                   }
                 }
@@ -1482,8 +1596,8 @@ $breakpoints: (
                   position: absolute;
                   right: -20px;
                   bottom: -20px;
-                  width: 100px;
-                  height: 100px;
+                  width: 110px;
+                  height: 110px;
                   border-radius: 50%;
                   opacity: 0.1;
                   z-index: 1;
@@ -1491,20 +1605,20 @@ $breakpoints: (
               }
             }
 
-            // Financial Cards Preview
+            // Enhanced Financial Cards Preview
             .financial-preview {
               .financial-card {
                 position: relative;
-                border-radius: 15px;
+                border-radius: 16px;
                 background: white;
-                padding: 1.5rem;
+                padding: 1.8rem;
                 overflow: hidden;
-                box-shadow: 0 5px 20px rgba($primary-dark, 0.05);
+                box-shadow: 0 5px 20px rgba($primary-dark, 0.08);
                 animation: fadeIn 0.5s ease-out;
-                border: 1px solid rgba($primary-dark, 0.05);
+                border: 1px solid rgba($primary-dark, 0.06);
                 
                 @include respond-to(sm) {
-                  padding: 1.2rem;
+                  padding: 1.5rem;
                 }
                 
                 &:hover {
@@ -1516,7 +1630,7 @@ $breakpoints: (
                   border-left: 5px solid $primary-accent;
                   
                   .card-decoration {
-                    background: linear-gradient(135deg, rgba($primary-accent, 0.1), transparent);
+                    background: linear-gradient(135deg, rgba($primary-accent, 0.15), transparent);
                   }
                 }
                 
@@ -1524,7 +1638,7 @@ $breakpoints: (
                   border-left: 5px solid $success-color;
                   
                   .card-decoration {
-                    background: linear-gradient(135deg, rgba($success-color, 0.1), transparent);
+                    background: linear-gradient(135deg, rgba($success-color, 0.15), transparent);
                   }
                   
                   .detail-value.positive {
@@ -1536,7 +1650,7 @@ $breakpoints: (
                   border-left: 5px solid $warning-color;
                   
                   .card-decoration {
-                    background: linear-gradient(135deg, rgba($warning-color, 0.1), transparent);
+                    background: linear-gradient(135deg, rgba($warning-color, 0.15), transparent);
                   }
                   
                   .detail-value.warning {
@@ -1553,49 +1667,49 @@ $breakpoints: (
                   position: absolute;
                   top: 0;
                   right: 0;
-                  width: 200px;
-                  height: 200px;
+                  width: 250px;
+                  height: 250px;
                   border-radius: 50%;
                   z-index: 1;
                   opacity: 0.6;
                 }
                 
                 .financial-header {
-                  margin-bottom: 1.25rem;
+                  margin-bottom: 1.5rem;
                   
                   .financial-title {
-                    font-size: 1.2rem;
+                    font-size: 1.3rem;
                     font-weight: 600;
                     color: $text-dark-primary;
-                    margin-bottom: 0.25rem;
+                    margin-bottom: 0.3rem;
                   }
                   
                   .financial-period {
-                    font-size: 0.85rem;
+                    font-size: 0.9rem;
                     color: $text-dark-secondary;
                   }
                 }
                 
                 .financial-amount {
-                  margin-bottom: 1.5rem;
+                  margin-bottom: 1.8rem;
                   
                   .currency {
-                    font-size: 1.5rem;
+                    font-size: 1.7rem;
                     font-weight: 600;
                     vertical-align: top;
                     line-height: 1;
-                    margin-right: 2px;
+                    margin-right: 3px;
                     color: $text-dark-secondary;
                   }
                   
                   .value {
-                    font-size: 2.5rem;
+                    font-size: 2.8rem;
                     font-weight: 700;
                     color: $text-dark-primary;
                     line-height: 1;
                     
                     @include respond-to(sm) {
-                      font-size: 2.2rem;
+                      font-size: 2.4rem;
                     }
                   }
                 }
@@ -1603,11 +1717,11 @@ $breakpoints: (
                 .financial-details {
                   display: grid;
                   grid-template-columns: repeat(3, 1fr);
-                  gap: 1rem;
+                  gap: 1.2rem;
                   
                   @include respond-to(sm) {
                     grid-template-columns: 1fr;
-                    gap: 0.75rem;
+                    gap: 1rem;
                   }
                   
                   .detail-item {
@@ -1615,30 +1729,30 @@ $breakpoints: (
                     align-items: center;
                     
                     .detail-icon {
-                      width: 36px;
-                      height: 36px;
-                      border-radius: 10px;
-                      background: rgba($primary-dark, 0.05);
+                      width: 40px;
+                      height: 40px;
+                      border-radius: 12px;
+                      background: rgba($primary-dark, 0.06);
                       display: flex;
                       align-items: center;
                       justify-content: center;
-                      margin-right: 0.75rem;
+                      margin-right: 0.9rem;
                       
                       i {
-                        font-size: 1rem;
+                        font-size: 1.1rem;
                         color: $primary-base;
                       }
                     }
                     
                     .detail-content {
                       .detail-label {
-                        font-size: 0.8rem;
+                        font-size: 0.85rem;
                         color: $text-dark-secondary;
-                        margin-bottom: 0.2rem;
+                        margin-bottom: 0.25rem;
                       }
                       
                       .detail-value {
-                        font-size: 1rem;
+                        font-size: 1.1rem;
                         font-weight: 600;
                         color: $text-dark-primary;
                         
@@ -1658,7 +1772,7 @@ $breakpoints: (
                     
                     &.urgent {
                       .detail-icon {
-                        background: rgba($warning-color, 0.1);
+                        background: rgba($warning-color, 0.12);
                         
                         i {
                           color: $warning-color;
@@ -1670,30 +1784,30 @@ $breakpoints: (
               }
             }
             
-            // Filters Preview
+            // Enhanced Filters Preview
             .filters-preview {
               .filters-container {
                 background: white;
-                border-radius: 15px;
-                padding: 1rem;
-                box-shadow: 0 5px 20px rgba($primary-dark, 0.05);
-                border: 1px solid rgba($primary-dark, 0.05);
+                border-radius: 16px;
+                padding: 1.2rem;
+                box-shadow: 0 5px 20px rgba($primary-dark, 0.08);
+                border: 1px solid rgba($primary-dark, 0.06);
                 
                 .filters-toolbar {
                   display: flex;
                   align-items: center;
                   justify-content: space-between;
-                  margin-bottom: 1rem;
+                  margin-bottom: 1.2rem;
                   
                   .toolbar-title {
                     display: flex;
                     align-items: center;
                     font-weight: 600;
-                    font-size: 0.95rem;
+                    font-size: 1rem;
                     color: $text-dark-primary;
                     
                     i {
-                      margin-right: 0.5rem;
+                      margin-right: 0.6rem;
                       color: $primary-accent;
                     }
                   }
@@ -1705,10 +1819,10 @@ $breakpoints: (
                     .action-button {
                       display: flex;
                       align-items: center;
-                      font-size: 0.8rem;
-                      padding: 0.35rem 0.75rem;
+                      font-size: 0.85rem;
+                      padding: 0.4rem 0.8rem;
                       border-radius: 20px;
-                      margin-left: 0.5rem;
+                      margin-left: 0.6rem;
                       background: none;
                       border: none;
                       cursor: pointer;
@@ -1716,31 +1830,32 @@ $breakpoints: (
                       color: $text-dark-secondary;
                       
                       i {
-                        margin-right: 0.35rem;
+                        margin-right: 0.4rem;
                       }
                       
                       &.clear {
                         &:hover {
-                          background: rgba($danger-color, 0.1);
+                          background: rgba($danger-color, 0.12);
                           color: $danger-color;
                         }
                       }
                       
                       &.expand {
-                        width: 28px;
-                        height: 28px;
+                        width: 32px;
+                        height: 32px;
                         padding: 0;
                         margin: 0;
                         display: flex;
                         align-items: center;
                         justify-content: center;
+                        border-radius: 50%;
                         
                         i {
                           margin: 0;
                         }
                         
                         &:hover {
-                          background: rgba($primary-dark, 0.05);
+                          background: rgba($primary-dark, 0.06);
                         }
                       }
                     }
@@ -1750,21 +1865,21 @@ $breakpoints: (
                 .filters-body {
                   display: flex;
                   flex-wrap: wrap;
-                  gap: 0.5rem;
+                  gap: 0.6rem;
                   
                   .filter-pill {
                     display: flex;
                     align-items: center;
-                    padding: 0.35rem 0.75rem;
+                    padding: 0.4rem 0.9rem;
                     border-radius: 20px;
-                    font-size: 0.8rem;
+                    font-size: 0.85rem;
                     font-weight: 500;
                     cursor: pointer;
                     transition: all $transition-medium;
                     
                     i {
-                      margin-left: 0.5rem;
-                      font-size: 0.7rem;
+                      margin-left: 0.6rem;
+                      font-size: 0.75rem;
                       opacity: 0.7;
                       
                       &:hover {
@@ -1773,38 +1888,42 @@ $breakpoints: (
                     }
                     
                     &.active {
-                      background: rgba($active-color, 0.1);
+                      background: rgba($active-color, 0.12);
                       color: $active-color;
                       
                       &:hover {
-                        background: rgba($active-color, 0.15);
+                        background: rgba($active-color, 0.18);
+                        box-shadow: 0 3px 8px rgba($active-color, 0.15);
                       }
                     }
                     
                     &.deactive {
-                      background: rgba($deactive-color, 0.1);
+                      background: rgba($deactive-color, 0.12);
                       color: $deactive-color;
                       
                       &:hover {
-                        background: rgba($deactive-color, 0.15);
+                        background: rgba($deactive-color, 0.18);
+                        box-shadow: 0 3px 8px rgba($deactive-color, 0.15);
                       }
                     }
                     
                     &.pending {
-                      background: rgba($pending-color, 0.1);
+                      background: rgba($pending-color, 0.12);
                       color: $pending-color;
                       
                       &:hover {
-                        background: rgba($pending-color, 0.15);
+                        background: rgba($pending-color, 0.18);
+                        box-shadow: 0 3px 8px rgba($pending-color, 0.15);
                       }
                     }
                     
                     &.review {
-                      background: rgba($review-color, 0.1);
+                      background: rgba($review-color, 0.12);
                       color: $review-color;
                       
                       &:hover {
-                        background: rgba($review-color, 0.15);
+                        background: rgba($review-color, 0.18);
+                        box-shadow: 0 3px 8px rgba($review-color, 0.15);
                       }
                     }
                   }
@@ -1812,55 +1931,57 @@ $breakpoints: (
               }
               
               .filters-expanded {
-                margin-top: 1rem;
+                margin-top: 1.2rem;
                 background: white;
-                border-radius: 15px;
-                padding: 1.25rem;
-                box-shadow: 0 5px 20px rgba($primary-dark, 0.05);
-                border: 1px solid rgba($primary-dark, 0.05);
-                animation: fadeIn 0.3s ease-out;
+                border-radius: 16px;
+                padding: 1.5rem;
+                box-shadow: 0 5px 20px rgba($primary-dark, 0.08);
+                border: 1px solid rgba($primary-dark, 0.06);
+                animation: fadeIn 0.4s ease-out;
                 
                 .expanded-header {
                   font-weight: 600;
-                  font-size: 0.95rem;
+                  font-size: 1rem;
                   color: $text-dark-primary;
-                  margin-bottom: 1rem;
-                  padding-bottom: 0.75rem;
+                  margin-bottom: 1.2rem;
+                  padding-bottom: 0.9rem;
                   border-bottom: 1px solid rgba($primary-dark, 0.08);
                 }
                 
                 .expanded-content {
                   .filter-group {
-                    margin-bottom: 1.25rem;
+                    margin-bottom: 1.5rem;
                     
                     &:last-child {
                       margin-bottom: 0;
                     }
                     
                     .filter-label {
-                      font-size: 0.85rem;
+                      font-size: 0.9rem;
                       font-weight: 500;
                       color: $text-dark-secondary;
-                      margin-bottom: 0.5rem;
+                      margin-bottom: 0.6rem;
                     }
                     
                     .filter-options {
                       display: flex;
                       flex-wrap: wrap;
-                      gap: 0.5rem;
+                      gap: 0.6rem;
                       
                       .option-chip {
-                        padding: 0.35rem 0.75rem;
+                        padding: 0.4rem 0.9rem;
                         border-radius: 20px;
-                        font-size: 0.8rem;
-                        background: rgba($primary-dark, 0.05);
+                        font-size: 0.85rem;
+                        background: rgba($primary-dark, 0.06);
                         color: $text-dark-primary;
                         cursor: pointer;
                         transition: all $transition-medium;
                         
                         &:hover {
-                          background: rgba($primary-light, 0.1);
+                          background: rgba($primary-light, 0.12);
                           color: $primary-light;
+                          transform: translateY(-2px);
+                          box-shadow: 0 3px 8px rgba($primary-light, 0.15);
                         }
                       }
                     }
@@ -1869,12 +1990,12 @@ $breakpoints: (
               }
             }
             
-            // Layout Preview
+            // Enhanced Layout Preview
             .layout-preview {
               .cards-preview {
                 display: grid;
-                grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
-                gap: 1rem;
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 1.2rem;
                 
                 @include respond-to(sm) {
                   grid-template-columns: 1fr;
@@ -1882,11 +2003,11 @@ $breakpoints: (
                 
                 .patient-card {
                   background: white;
-                  border-radius: 15px;
+                  border-radius: 16px;
                   overflow: hidden;
-                  box-shadow: 0 5px 20px rgba($primary-dark, 0.05);
-                  transition: all $transition-medium;
-                  border: 1px solid rgba($primary-dark, 0.05);
+                  box-shadow: 0 5px 20px rgba($primary-dark, 0.08);
+                  transition: all $transition-spring;
+                  border: 1px solid rgba($primary-dark, 0.06);
                   animation: fadeIn 0.5s ease-out;
                   
                   &:hover {
@@ -1896,22 +2017,23 @@ $breakpoints: (
                   .patient-card-header {
                     display: flex;
                     align-items: center;
-                    padding: 1rem;
-                    background: rgba($primary-dark, 0.02);
-                    border-bottom: 1px solid rgba($primary-dark, 0.05);
+                    padding: 1.2rem;
+                    background: rgba($primary-dark, 0.03);
+                    border-bottom: 1px solid rgba($primary-dark, 0.06);
                     
                     .patient-avatar {
-                      width: 36px;
-                      height: 36px;
+                      width: 40px;
+                      height: 40px;
                       border-radius: 12px;
-                      background: $primary-gradient;
+                      background: $blue-purple-gradient;
                       display: flex;
                       align-items: center;
                       justify-content: center;
-                      margin-right: 0.75rem;
+                      margin-right: 0.9rem;
+                      box-shadow: 0 3px 8px rgba($primary-dark, 0.15);
                       
                       i {
-                        font-size: 1.1rem;
+                        font-size: 1.2rem;
                         color: white;
                       }
                     }
@@ -1921,25 +2043,25 @@ $breakpoints: (
                       
                       .patient-name {
                         font-weight: 600;
-                        font-size: 0.95rem;
+                        font-size: 1.05rem;
                         color: $text-dark-primary;
-                        margin-bottom: 0.2rem;
+                        margin-bottom: 0.25rem;
                       }
                       
                       .patient-status {
                         display: inline-block;
-                        font-size: 0.75rem;
-                        padding: 0.2rem 0.5rem;
-                        border-radius: 10px;
+                        font-size: 0.8rem;
+                        padding: 0.25rem 0.6rem;
+                        border-radius: 12px;
                         font-weight: 500;
                         
                         &.active {
-                          background: rgba($active-color, 0.1);
+                          background: rgba($active-color, 0.12);
                           color: $active-color;
                         }
                         
                         &.pending {
-                          background: rgba($pending-color, 0.1);
+                          background: rgba($pending-color, 0.12);
                           color: $pending-color;
                         }
                       }
@@ -1947,9 +2069,9 @@ $breakpoints: (
                     
                     .patient-actions {
                       .action-icon {
-                        width: 28px;
-                        height: 28px;
-                        border-radius: 8px;
+                        width: 32px;
+                        height: 32px;
+                        border-radius: 10px;
                         display: flex;
                         align-items: center;
                         justify-content: center;
@@ -1960,7 +2082,7 @@ $breakpoints: (
                         transition: all $transition-medium;
                         
                         &:hover {
-                          background: rgba($primary-dark, 0.05);
+                          background: rgba($primary-dark, 0.06);
                           color: $text-dark-primary;
                         }
                       }
@@ -1968,27 +2090,27 @@ $breakpoints: (
                   }
                   
                   .patient-card-body {
-                    padding: 1rem;
+                    padding: 1.2rem;
                     
                     .patient-details {
                       .detail {
                         display: flex;
                         align-items: center;
-                        margin-bottom: 0.75rem;
+                        margin-bottom: 0.8rem;
                         
                         &:last-child {
                           margin-bottom: 0;
                         }
                         
                         i {
-                          width: 20px;
-                          margin-right: 0.75rem;
+                          width: 22px;
+                          margin-right: 0.8rem;
                           color: $primary-light;
-                          font-size: 0.9rem;
+                          font-size: 0.95rem;
                         }
                         
                         .detail-text {
-                          font-size: 0.9rem;
+                          font-size: 0.95rem;
                           color: $text-dark-secondary;
                         }
                       }
@@ -1997,31 +2119,33 @@ $breakpoints: (
                   
                   .patient-card-footer {
                     display: flex;
-                    gap: 0.5rem;
-                    padding: 0 1rem 1rem;
+                    gap: 0.6rem;
+                    padding: 0 1.2rem 1.2rem;
                     
                     .action-button {
                       flex: 1;
                       display: flex;
                       align-items: center;
                       justify-content: center;
-                      padding: 0.5rem;
-                      border-radius: 8px;
+                      padding: 0.6rem;
+                      border-radius: 10px;
                       border: none;
-                      background: rgba($primary-dark, 0.05);
+                      background: rgba($primary-dark, 0.06);
                       color: $text-dark-primary;
-                      font-size: 0.85rem;
+                      font-size: 0.9rem;
+                      font-weight: 500;
                       cursor: pointer;
                       transition: all $transition-medium;
                       
                       i {
-                        margin-right: 0.35rem;
-                        font-size: 0.8rem;
+                        margin-right: 0.4rem;
+                        font-size: 0.85rem;
                       }
                       
                       &:hover {
-                        background: rgba($primary-light, 0.1);
+                        background: rgba($primary-light, 0.12);
                         color: $primary-light;
+                        box-shadow: 0 3px 8px rgba($primary-light, 0.15);
                       }
                     }
                   }
@@ -2030,10 +2154,10 @@ $breakpoints: (
               
               .list-preview {
                 background: white;
-                border-radius: 15px;
+                border-radius: 16px;
                 overflow: hidden;
-                box-shadow: 0 5px 20px rgba($primary-dark, 0.05);
-                border: 1px solid rgba($primary-dark, 0.05);
+                box-shadow: 0 5px 20px rgba($primary-dark, 0.08);
+                border: 1px solid rgba($primary-dark, 0.06);
                 animation: fadeIn 0.5s ease-out;
                 
                 .patient-table {
@@ -2042,19 +2166,19 @@ $breakpoints: (
                   border-spacing: 0;
                   
                   th, td {
-                    padding: 0.75rem 1rem;
+                    padding: 0.9rem 1.2rem;
                     text-align: left;
                     
                     @include respond-to(sm) {
-                      padding: 0.6rem 0.75rem;
+                      padding: 0.7rem 0.8rem;
                       font-size: 0.9rem;
                     }
                   }
                   
                   th {
-                    background: rgba($primary-dark, 0.02);
+                    background: rgba($primary-dark, 0.03);
                     color: $text-dark-secondary;
-                    font-size: 0.85rem;
+                    font-size: 0.9rem;
                     font-weight: 600;
                     border-bottom: 1px solid rgba($primary-dark, 0.08);
                     
@@ -2066,7 +2190,7 @@ $breakpoints: (
                   }
                   
                   td {
-                    border-bottom: 1px solid rgba($primary-dark, 0.05);
+                    border-bottom: 1px solid rgba($primary-dark, 0.06);
                     color: $text-dark-primary;
                     
                     &:last-child {
@@ -2078,17 +2202,18 @@ $breakpoints: (
                       align-items: center;
                       
                       .patient-avatar {
-                        width: 32px;
-                        height: 32px;
-                        border-radius: 10px;
-                        background: $primary-gradient;
+                        width: 36px;
+                        height: 36px;
+                        border-radius: 12px;
+                        background: $blue-purple-gradient;
                         display: flex;
                         align-items: center;
                         justify-content: center;
-                        margin-right: 0.75rem;
+                        margin-right: 0.9rem;
+                        box-shadow: 0 3px 8px rgba($primary-dark, 0.15);
                         
                         i {
-                          font-size: 1rem;
+                          font-size: 1.1rem;
                           color: white;
                         }
                       }
@@ -2096,30 +2221,30 @@ $breakpoints: (
                     
                     .status {
                       display: inline-block;
-                      padding: 0.25rem 0.5rem;
+                      padding: 0.3rem 0.7rem;
                       border-radius: 20px;
-                      font-size: 0.75rem;
+                      font-size: 0.8rem;
                       font-weight: 500;
                       
                       &.active {
-                        background: rgba($active-color, 0.1);
+                        background: rgba($active-color, 0.12);
                         color: $active-color;
                       }
                       
                       &.pending {
-                        background: rgba($pending-color, 0.1);
+                        background: rgba($pending-color, 0.12);
                         color: $pending-color;
                       }
                     }
                     
                     .action-buttons {
                       display: flex;
-                      gap: 0.35rem;
+                      gap: 0.4rem;
                       
                       .action-icon {
-                        width: 28px;
-                        height: 28px;
-                        border-radius: 8px;
+                        width: 32px;
+                        height: 32px;
+                        border-radius: 10px;
                         display: flex;
                         align-items: center;
                         justify-content: center;
@@ -2130,7 +2255,7 @@ $breakpoints: (
                         transition: all $transition-medium;
                         
                         &:hover {
-                          background: rgba($primary-dark, 0.05);
+                          background: rgba($primary-dark, 0.06);
                           color: $text-dark-primary;
                         }
                       }
@@ -2141,7 +2266,7 @@ $breakpoints: (
                     transition: all $transition-medium;
                     
                     &:hover td {
-                      background: rgba($primary-dark, 0.01);
+                      background: rgba($primary-dark, 0.02);
                     }
                     
                     &:last-child td {
@@ -2151,635 +2276,91 @@ $breakpoints: (
                 }
               }
             }
+          }
+          
+          // Advanced Section Maintenance Message
+          .maintenance-message {
+            text-align: center;
+            padding: 3rem 2rem;
+            position: relative;
+            z-index: 1;
             
-            // Accessibility Preview
-            .accessibility-preview {
-              .preview-card {
-                background: white;
-                border-radius: 15px;
-                padding: 1.5rem;
-                box-shadow: 0 5px 20px rgba($primary-dark, 0.05);
-                border: 1px solid rgba($primary-dark, 0.05);
-                transition: all $transition-medium;
-                animation: fadeIn 0.5s ease-out;
-                
-                // Accessibility Variations
-                &.large-text {
-                  .preview-header {
-                    h5 {
-                      font-size: 1.4rem;
-                    }
-                    
-                    p {
-                      font-size: 1.1rem;
-                    }
-                  }
-                  
-                  .preview-content {
-                    .metric-number {
-                      font-size: 2.5rem;
-                    }
-                    
-                    .metric-label {
-                      font-size: 1.1rem;
-                    }
-                    
-                    .preview-button {
-                      span {
-                        font-size: 1.1rem;
-                      }
-                    }
-                    
-                    .menu-item {
-                      span {
-                        font-size: 1.1rem;
-                      }
-                    }
-                  }
-                  
-                  .preview-footer {
-                    p {
-                      font-size: 1rem;
-                    }
-                  }
-                }
-                
-                &.high-contrast {
-                  background: $primary-dark;
-                  border-color: white;
-                  
-                  .preview-header {
-                    h5 {
-                      color: white;
-                    }
-                    
-                    p {
-                      color: rgba(255, 255, 255, 0.8);
-                    }
-                  }
-                  
-                  .preview-content {
-                    .metric-number {
-                      color: white;
-                    }
-                    
-                    .metric-label {
-                      color: rgba(255, 255, 255, 0.8);
-                    }
-                    
-                    .preview-button {
-                      background: white;
-                      color: $primary-dark;
-                      
-                      &:hover {
-                        background: $primary-accent;
-                      }
-                    }
-                    
-                    .menu-item {
-                      background: rgba(255, 255, 255, 0.2);
-                      color: white;
-                      
-                      &:hover {
-                        background: white;
-                        color: $primary-dark;
-                      }
-                    }
-                  }
-                  
-                  .preview-footer {
-                    p {
-                      color: rgba(255, 255, 255, 0.8);
-                    }
-                  }
-                }
-                
-                .preview-header {
-                  margin-bottom: 1.5rem;
-                  
-                  h5 {
-                    font-size: 1.2rem;
-                    font-weight: 600;
-                    margin-bottom: 0.25rem;
-                    color: $text-dark-primary;
-                  }
-                  
-                  p {
-                    font-size: 0.9rem;
-                    color: $text-dark-secondary;
-                    margin: 0;
-                  }
-                }
-                
-                .preview-content {
-                  display: flex;
-                  flex-direction: column;
-                  gap: 1rem;
-                  margin-bottom: 1.5rem;
-                  
-                  .preview-metric {
-                    text-align: center;
-                    
-                    .metric-number {
-                      font-size: 2rem;
-                      font-weight: 700;
-                      color: $text-dark-primary;
-                    }
-                    
-                    .metric-label {
-                      font-size: 0.9rem;
-                      color: $text-dark-secondary;
-                    }
-                  }
-                  
-                  .preview-button {
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    padding: 0.75rem 1rem;
-                    border-radius: 10px;
-                    background: $primary-gradient;
-                    color: white;
-                    font-weight: 500;
-                    border: none;
-                    cursor: pointer;
-                    transition: all $transition-medium;
-                    
-                    i {
-                      margin-right: 0.5rem;
-                    }
-                    
-                    &:hover {
-                      box-shadow: 0 5px 15px rgba($primary-light, 0.2);
-                      transform: translateY(-2px);
-                    }
-                    
-                    &.reduced-motion {
-                      transition: none;
-                      
-                      &:hover {
-                        transform: none;
-                      }
-                    }
-                  }
-                  
-                  .preview-menu {
-                    display: flex;
-                    flex-direction: column;
-                    gap: 0.5rem;
-                    
-                    .menu-item {
-                      display: flex;
-                      align-items: center;
-                      padding: 0.75rem 1rem;
-                      border-radius: 10px;
-                      background: rgba($primary-dark, 0.05);
-                      color: $text-dark-primary;
-                      cursor: pointer;
-                      transition: all $transition-medium;
-                      outline: none;
-                      
-                      i {
-                        margin-right: 0.75rem;
-                        color: $primary-light;
-                      }
-                      
-                      &:hover {
-                        background: rgba($primary-light, 0.1);
-                      }
-                      
-                      &:focus {
-                        box-shadow: 0 0 0 2px $primary-light;
-                      }
-                    }
-                    
-                    &.keyboard-enhanced {
-                      .menu-item {
-                        &:focus {
-                          box-shadow: 0 0 0 3px $primary-accent;
-                          background: rgba($primary-light, 0.1);
-                        }
-                        
-                        &:focus-visible {
-                          outline: 2px solid $primary-accent;
-                          outline-offset: 2px;
-                        }
-                      }
-                    }
-                  }
-                }
-                
-                .preview-footer {
-                  text-align: center;
-                  padding-top: 1rem;
-                  border-top: 1px solid rgba($primary-dark, 0.08);
-                  
-                  p {
-                    font-size: 0.85rem;
-                    color: $text-dark-secondary;
-                    margin: 0;
-                  }
-                }
-              }
-            }
-            
-            // Advanced Section Styles
-            .advanced-options {
+            .maintenance-icon {
+              width: 80px;
+              height: 80px;
+              background: $blue-purple-gradient;
+              border-radius: 24px;
               display: flex;
-              flex-direction: column;
-              gap: 1.25rem;
+              align-items: center;
+              justify-content: center;
+              margin: 0 auto 1.5rem;
+              box-shadow: 0 8px 25px rgba($primary-light, 0.2);
+              position: relative;
               
-              .advanced-option {
-                background: rgba($primary-dark, 0.02);
-                border-radius: 12px;
-                padding: 1.25rem;
-                border: 1px solid rgba($primary-dark, 0.05);
-                transition: all $transition-medium;
-                
-                &:hover {
-                  background: rgba($primary-dark, 0.03);
-                  box-shadow: 0 5px 15px rgba($primary-dark, 0.03);
-                }
-                
-                .option-header {
-                  display: flex;
-                  align-items: center;
-                  margin-bottom: 0.5rem;
-                  
-                  .option-icon {
-                    width: 36px;
-                    height: 36px;
-                    border-radius: 10px;
-                    background: rgba($primary-light, 0.1);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    margin-right: 0.75rem;
-                    
-                    i {
-                      font-size: 1rem;
-                      color: $primary-light;
-                    }
-                    
-                    &.danger {
-                      background: rgba($danger-color, 0.1);
-                      
-                      i {
-                        color: $danger-color;
-                      }
-                    }
-                  }
-                  
-                  .option-title {
-                    font-weight: 600;
-                    font-size: 1rem;
-                    color: $text-dark-primary;
-                  }
-                }
-                
-                .option-description {
-                  font-size: 0.9rem;
-                  color: $text-dark-secondary;
-                  margin-bottom: 1rem;
-                  padding-left: calc(36px + 0.75rem);
-                }
-                
-                .option-action {
-                  padding-left: calc(36px + 0.75rem);
-                  
-                  .action-button {
-                    display: inline-flex;
-                    align-items: center;
-                    padding: 0.6rem 1rem;
-                    border-radius: 8px;
-                    border: 1px solid rgba($primary-light, 0.2);
-                    background: rgba($primary-light, 0.05);
-                    color: $primary-light;
-                    font-size: 0.9rem;
-                    font-weight: 500;
-                    cursor: pointer;
-                    transition: all $transition-medium;
-                    
-                    i {
-                      margin-right: 0.5rem;
-                      font-size: 0.9rem;
-                    }
-                    
-                    &:hover {
-                      background: rgba($primary-light, 0.1);
-                      border-color: rgba($primary-light, 0.3);
-                    }
-                    
-                    &.danger {
-                      background: rgba($danger-color, 0.05);
-                      border-color: rgba($danger-color, 0.2);
-                      color: $danger-color;
-                      
-                      &:hover {
-                        background: rgba($danger-color, 0.1);
-                        border-color: rgba($danger-color, 0.3);
-                      }
-                    }
-                  }
-                  
-                  .select-container {
-                    position: relative;
-                    display: inline-block;
-                    
-                    .sync-select {
-                      display: inline-block;
-                      padding: 0.6rem 2.5rem 0.6rem 1rem;
-                      border-radius: 8px;
-                      border: 1px solid rgba($primary-light, 0.2);
-                      background: rgba($primary-light, 0.05);
-                      color: $primary-light;
-                      font-size: 0.9rem;
-                      font-weight: 500;
-                      cursor: pointer;
-                      transition: all $transition-medium;
-                      appearance: none;
-                      
-                      &:hover {
-                        background: rgba($primary-light, 0.1);
-                        border-color: rgba($primary-light, 0.3);
-                      }
-                      
-                      &:focus {
-                        outline: none;
-                        box-shadow: 0 0 0 2px rgba($primary-light, 0.3);
-                      }
-                    }
-                    
-                    .select-arrow {
-                      position: absolute;
-                      top: 50%;
-                      right: 1rem;
-                      transform: translateY(-50%);
-                      color: $primary-light;
-                      pointer-events: none;
-                    }
-                  }
-                }
+              &::before {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(135deg, rgba(255,255,255,0.2), rgba(255,255,255,0));
+                border-radius: 24px;
+              }
+              
+              i {
+                font-size: 2.5rem;
+                color: white;
+                animation: float 4s ease-in-out infinite;
               }
             }
             
-            // Developer Options
-            .developer-options {
-              margin-top: 1.5rem;
+            h3 {
+              font-size: 1.8rem;
+              font-weight: 600;
+              margin-bottom: 1rem;
+              background: $blue-purple-gradient;
+              -webkit-background-clip: text;
+              background-clip: text;
+              color: transparent;
+            }
+            
+            p {
+              font-size: 1.1rem;
+              color: $text-dark-secondary;
+              max-width: 600px;
+              margin: 0 auto 1.5rem;
+              line-height: 1.6;
+            }
+            
+            .estimated-time {
+              display: inline-flex;
+              align-items: center;
+              padding: 0.8rem 1.5rem;
+              background: rgba($primary-dark, 0.05);
+              border-radius: 50px;
+              border: 1px solid rgba($primary-dark, 0.08);
               
-              // Terminal
-              .terminal-container {
-                background: #1e1e1e;
-                border-radius: 12px;
-                overflow: hidden;
-                margin-bottom: 1.5rem;
-                box-shadow: 0 5px 20px rgba($primary-dark, 0.1);
-                
-                .terminal-header {
-                  display: flex;
-                  align-items: center;
-                  justify-content: space-between;
-                  padding: 0.6rem 1rem;
-                  background: #333;
-                  border-bottom: 1px solid #444;
-                  
-                  .terminal-title {
-                    display: flex;
-                    align-items: center;
-                    color: white;
-                    font-size: 0.9rem;
-                    
-                    i {
-                      margin-right: 0.5rem;
-                      font-size: 0.85rem;
-                    }
-                  }
-                  
-                  .terminal-controls {
-                    display: flex;
-                    gap: 0.5rem;
-                    
-                    .control {
-                      width: 12px;
-                      height: 12px;
-                      border-radius: 50%;
-                      
-                      &.close {
-                        background: #ff5f57;
-                      }
-                      
-                      &.minimize {
-                        background: #febc2e;
-                      }
-                      
-                      &.maximize {
-                        background: #28c840;
-                      }
-                    }
-                  }
-                }
-                
-                .terminal-body {
-                  padding: 1rem;
-                  font-family: "Courier New", monospace;
-                  font-size: 0.85rem;
-                  line-height: 1.5;
-                  color: #ddd;
-                  
-                  .terminal-line {
-                    display: flex;
-                    margin-bottom: 0.5rem;
-                    
-                    .prompt {
-                      color: #7ecb4d;
-                      margin-right: 0.5rem;
-                    }
-                    
-                    .command {
-                      color: #ddd;
-                      
-                      &.blink {
-                        animation: blink 1s infinite;
-                      }
-                    }
-                  }
-                  
-                  .terminal-output {
-                    margin-bottom: 1rem;
-                    padding-left: 1rem;
-                    
-                    .output-line {
-                      margin-bottom: 0.25rem;
-                      color: #64d6ff;
-                      
-                      &:last-child {
-                        margin-bottom: 0;
-                      }
-                    }
-                  }
-                }
+              i {
+                color: $primary-light;
+                margin-right: 0.8rem;
+                font-size: 1.1rem;
               }
               
-              // API Keys
-              .api-keys-container {
-                background: white;
-                border-radius: 12px;
-                box-shadow: 0 5px 20px rgba($primary-dark, 0.05);
-                border: 1px solid rgba($primary-dark, 0.05);
-                overflow: hidden;
-                
-                .api-keys-header {
-                  display: flex;
-                  align-items: center;
-                  justify-content: space-between;
-                  padding: 1rem;
-                  background: rgba($primary-dark, 0.02);
-                  border-bottom: 1px solid rgba($primary-dark, 0.05);
-                  
-                  .header-title {
-                    display: flex;
-                    align-items: center;
-                    font-weight: 600;
-                    font-size: 1rem;
-                    color: $text-dark-primary;
-                    
-                    i {
-                      margin-right: 0.5rem;
-                      color: $primary-light;
-                    }
-                  }
-                  
-                  .generate-key-button {
-                    display: flex;
-                    align-items: center;
-                    padding: 0.5rem 0.75rem;
-                    border-radius: 8px;
-                    background: rgba($primary-light, 0.1);
-                    color: $primary-light;
-                    border: none;
-                    font-size: 0.85rem;
-                    font-weight: 500;
-                    cursor: pointer;
-                    transition: all $transition-medium;
-                    
-                    i {
-                      margin-right: 0.35rem;
-                      font-size: 0.85rem;
-                    }
-                    
-                    &:hover {
-                      background: rgba($primary-light, 0.15);
-                    }
-                  }
-                }
-                
-                .api-keys-list {
-                  .api-key-item {
-                    display: flex;
-                    align-items: center;
-                    padding: 1rem;
-                    border-bottom: 1px solid rgba($primary-dark, 0.05);
-                    
-                    &:last-child {
-                      border-bottom: none;
-                    }
-                    
-                    .key-info {
-                      flex: 1;
-                      
-                      .key-name {
-                        font-weight: 600;
-                        font-size: 0.95rem;
-                        color: $text-dark-primary;
-                        margin-bottom: 0.35rem;
-                      }
-                      
-                      .key-value {
-                        display: flex;
-                        align-items: center;
-                        margin-bottom: 0.35rem;
-                        
-                        .key-mask {
-                          font-family: "Courier New", monospace;
-                          font-size: 0.9rem;
-                          color: $text-dark-secondary;
-                          background: rgba($primary-dark, 0.05);
-                          padding: 0.25rem 0.5rem;
-                          border-radius: 4px;
-                          margin-right: 0.5rem;
-                        }
-                        
-                        .show-key-button {
-                          background: none;
-                          border: none;
-                          color: $text-dark-secondary;
-                          cursor: pointer;
-                          font-size: 0.9rem;
-                          padding: 0.25rem;
-                          border-radius: 4px;
-                          transition: all $transition-medium;
-                          
-                          &:hover {
-                            color: $primary-light;
-                            background: rgba($primary-dark, 0.05);
-                          }
-                        }
-                      }
-                      
-                      .key-created {
-                        font-size: 0.8rem;
-                        color: $text-dark-secondary;
-                      }
-                    }
-                    
-                    .key-actions {
-                      display: flex;
-                      gap: 0.5rem;
-                      
-                      .key-action {
-                        width: 32px;
-                        height: 32px;
-                        border-radius: 8px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        background: none;
-                        border: none;
-                        cursor: pointer;
-                        transition: all $transition-medium;
-                        
-                        i {
-                          font-size: 0.9rem;
-                        }
-                        
-                        &.copy {
-                          color: $info-color;
-                          
-                          &:hover {
-                            background: rgba($info-color, 0.1);
-                          }
-                        }
-                        
-                        &.regenerate {
-                          color: $pending-color;
-                          
-                          &:hover {
-                            background: rgba($pending-color, 0.1);
-                          }
-                        }
-                        
-                        &.revoke {
-                          color: $danger-color;
-                          
-                          &:hover {
-                            background: rgba($danger-color, 0.1);
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
+              span {
+                font-weight: 500;
+                color: $text-dark-primary;
               }
+            }
+            
+            .maintenance-decoration {
+              position: absolute;
+              top: 50%;
+              left: 50%;
+              transform: translate(-50%, -50%);
+              width: 400px;
+              height: 400px;
+              border-radius: 50%;
+              background: linear-gradient(135deg, rgba($primary-light, 0.03), rgba($primary-accent, 0.03));
+              z-index: -1;
+              opacity: 0.6;
             }
           }
         }
@@ -2787,20 +2368,21 @@ $breakpoints: (
     }
   }
   
-  // Footer
+  // Enhanced Footer
   .settings-footer {
     position: sticky;
     bottom: 0;
     left: 0;
     width: 100%;
-    background: linear-gradient(to top, rgba($primary-dark, 0.95), rgba($primary-dark, 0.8));
-    backdrop-filter: blur(10px);
-    padding: 1rem 2rem;
+    background: linear-gradient(to top, rgba($primary-dark, 0.95), rgba($primary-dark, 0.85));
+    backdrop-filter: blur(15px);
+    padding: 1.2rem 2.5rem;
     z-index: 10;
-    border-top: 1px solid rgba(255, 255, 255, 0.05);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: 0 -10px 30px rgba(0, 0, 0, 0.2);
     
     @include respond-to(md) {
-      padding: 1rem;
+      padding: 1.2rem;
     }
     
     .footer-content {
@@ -2819,16 +2401,18 @@ $breakpoints: (
         display: flex;
         align-items: center;
         color: $text-secondary;
-        font-size: 0.9rem;
+        font-size: 0.95rem;
         
         i {
-          margin-right: 0.5rem;
+          margin-right: 0.6rem;
+          color: rgba($primary-accent, 0.8);
         }
       }
       
       .save-button {
         @include premium-button;
-        padding: 0.9rem 2rem;
+        padding: 1rem 2.2rem;
+        box-shadow: 0 8px 25px rgba($primary-accent, 0.25);
         
         @include respond-to(md) {
           width: 100%;
@@ -2841,69 +2425,75 @@ $breakpoints: (
     }
   }
   
-  // Modals
+  // Enhanced Modals
   .settings-confirm-modal {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba($primary-dark, 0.8);
-    backdrop-filter: blur(5px);
+    background: rgba($primary-dark, 0.85);
+    backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
     justify-content: center;
     z-index: 100;
     opacity: 0;
     visibility: hidden;
-    transition: all 0.3s ease;
+    transition: all 0.4s ease;
     
     &.visible {
       opacity: 1;
       visibility: visible;
+      
+      .modal-content {
+        transform: scale(1);
+      }
     }
     
     .modal-content {
       background: white;
-      border-radius: 15px;
-      padding: 1.5rem;
-      width: 400px;
+      border-radius: 20px;
+      padding: 2rem;
+      width: 450px;
       max-width: 90%;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+      box-shadow: 0 15px 50px rgba(0, 0, 0, 0.25);
       transform: scale(0.9);
-      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      border: 1px solid rgba(255, 255, 255, 0.1);
       
       h3 {
-        font-size: 1.3rem;
+        font-size: 1.5rem;
         font-weight: 600;
-        margin-bottom: 0.75rem;
+        margin-bottom: 1rem;
         color: $text-dark-primary;
         display: flex;
         align-items: center;
         
         i {
           color: $warning-color;
-          margin-right: 0.5rem;
+          margin-right: 0.7rem;
+          font-size: 1.4rem;
         }
       }
       
       p {
         color: $text-dark-secondary;
-        margin-bottom: 1.5rem;
-        font-size: 0.95rem;
-        line-height: 1.5;
+        margin-bottom: 1.8rem;
+        font-size: 1rem;
+        line-height: 1.6;
       }
       
       .modal-actions {
         display: flex;
-        gap: 1rem;
+        gap: 1.2rem;
         
         button {
           flex: 1;
-          padding: 0.75rem 0;
-          border-radius: 8px;
+          padding: 0.9rem 0;
+          border-radius: 12px;
           font-weight: 500;
-          font-size: 0.95rem;
+          font-size: 1rem;
           cursor: pointer;
           transition: all $transition-medium;
           display: flex;
@@ -2911,12 +2501,12 @@ $breakpoints: (
           justify-content: center;
           
           i {
-            margin-right: 0.5rem;
+            margin-right: 0.6rem;
             font-size: 0.9rem;
           }
           
           &.cancel-button {
-            background: rgba($primary-dark, 0.05);
+            background: rgba($primary-dark, 0.06);
             color: $text-dark-secondary;
             border: 1px solid rgba($primary-dark, 0.1);
             
@@ -2930,29 +2520,27 @@ $breakpoints: (
             background: $danger-gradient;
             color: white;
             border: none;
+            box-shadow: 0 5px 15px rgba($danger-color, 0.25);
             
             &:hover {
-              box-shadow: 0 5px 15px rgba($danger-color, 0.3);
+              box-shadow: 0 8px 20px rgba($danger-color, 0.4);
+              transform: translateY(-2px);
             }
           }
         }
       }
     }
-    
-    &.visible .modal-content {
-      transform: scale(1);
-    }
   }
   
-  // Notification
+  // Enhanced Notification
   .save-notification {
     position: fixed;
-    top: 20px;
-    right: 20px;
+    top: 25px;
+    right: 25px;
     z-index: 1000;
-    transform: translateY(-20px);
+    transform: translateY(-30px);
     opacity: 0;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     
     &.visible {
       transform: translateY(0);
@@ -2962,19 +2550,20 @@ $breakpoints: (
     .notification-content {
       background: $success-color;
       color: white;
-      padding: 0.75rem 1.25rem;
-      border-radius: 30px;
-      box-shadow: 0 5px 20px rgba($success-color, 0.3);
+      padding: 0.9rem 1.5rem;
+      border-radius: 50px;
+      box-shadow: 0 8px 25px rgba($success-color, 0.35);
       display: flex;
       align-items: center;
       
       i {
-        font-size: 1.1rem;
-        margin-right: 0.5rem;
+        font-size: 1.2rem;
+        margin-right: 0.7rem;
       }
       
       span {
         font-weight: 500;
+        font-size: 0.95rem;
       }
     }
   }
@@ -2982,31 +2571,27 @@ $breakpoints: (
 
 // Helper Classes
 .mt-4 {
-  margin-top: 2rem !important;
+  margin-top: 2.2rem !important;
 }
 
-// Animations
-.blink {
-  animation: blink 1s infinite;
-}
-
-// Stylized Scrollbar
+// Enhanced Scrollbar
 ::-webkit-scrollbar {
-  width: 10px;
-  height: 10px;
+  width: 12px;
+  height: 12px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 6px;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 5px;
+  background: rgba(255, 255, 255, 0.25);
+  border-radius: 6px;
+  border: 3px solid rgba(0, 0, 0, 0.05);
   transition: all 0.3s ease;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.35);
 }

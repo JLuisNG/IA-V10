@@ -408,18 +408,6 @@ const AdminStaffingPage = () => {
               <p className="staffing-subtitle">
                 Manage your therapy team, track performance and optimize schedules
               </p>
-              <div className="header-actions">
-                <button className="header-action-btn" disabled={isLoggingOut}>
-                  <i className="fas fa-info-circle"></i> Quick Tour
-                </button>
-                <button 
-                  className="header-action-btn"
-                  onClick={handleAddStaffClick}
-                  disabled={isLoggingOut}
-                >
-                  <i className="fas fa-plus"></i> New Staff Member
-                </button>
-              </div>
             </div>
             
             <div className="assistant-message">
@@ -582,13 +570,6 @@ const AdminStaffingPage = () => {
                             disabled={isLoggingOut}
                           >
                             <i className="fas fa-list"></i> View All Staff
-                          </button>
-                          <button 
-                            className="action-btn edit" 
-                            onClick={(e) => handleEditStaffClick(e)}
-                            disabled={isLoggingOut}
-                          >
-                            <i className="fas fa-user-edit"></i> Edit Existing Staff
                           </button>
                         </div>
                       )}

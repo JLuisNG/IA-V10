@@ -1,0 +1,1484 @@
+@import '../../../styles/_variables.scss';
+@import '../../../styles/_mixins.scss';
+
+// Variables de color con un esquema premium
+$primary-color: #00e5ff;
+$secondary-color: #2979ff;
+$primary-gradient: linear-gradient(135deg, #00e5ff, #2979ff);
+$success-color: #4caf50;
+$warning-color: #ff9800;
+$danger-color: #f44336;
+$text-primary: #ffffff;
+$text-secondary: rgba(255, 255, 255, 0.7);
+$border-color: rgba(255, 255, 255, 0.1);
+$background-card: rgba(30, 41, 59, 0.7);
+$card-bg: rgba(15, 23, 42, 0.6);
+$hover-bg: rgba(41, 58, 82, 0.6);
+$backdrop: rgba(0, 0, 0, 0.75);
+
+// Variables para roles
+$pt-color: #36D1DC;
+$pta-color: #5B86E5;
+$ot-color: #FF9966;
+$cota-color: #FF5E62;
+$st-color: #56CCF2;
+$sta-color: #2F80ED;
+
+// Animaciones refinadas
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes scaleIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+@keyframes scaleOut {
+  to {
+    opacity: 0;
+    transform: scale(0.95) translateY(20px);
+  }
+}
+
+@keyframes rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes circleProgress {
+  0% { stroke-dashoffset: 100; }
+  100% { stroke-dashoffset: calc(100 - var(--progress, 0)); }
+}
+
+@keyframes pulseGlow {
+  0%, 100% { box-shadow: 0 0 20px rgba(0, 229, 255, 0.5); }
+  50% { box-shadow: 0 0 30px rgba(0, 229, 255, 0.8); }
+}
+
+// Mixins útiles
+@mixin glassmorphism {
+  background: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+@mixin hover-lift {
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  }
+}
+
+// Modal principal
+.therapist-detail-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: $backdrop;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 2rem;
+  opacity: 0;
+  
+  // Estados de animación
+  &.entering {
+    animation: fadeIn 0.3s ease forwards;
+    
+    .therapist-detail-modal-content {
+      opacity: 0;
+      transform: scale(0.95) translateY(20px);
+    }
+  }
+  
+  &.active {
+    opacity: 1;
+    
+    .therapist-detail-modal-content {
+      animation: scaleIn 0.5s cubic-bezier(0.19, 1, 0.22, 1) forwards;
+    }
+  }
+  
+  &.exiting {
+    animation: fadeIn 0.3s ease forwards reverse;
+    
+    .therapist-detail-modal-content {
+      animation: scaleOut 0.3s ease forwards;
+    }
+  }
+  
+  // Contenedor del modal
+  .therapist-detail-modal-container {
+    width: 100%;
+    max-width: 1100px;
+    max-height: 90vh;
+    position: relative;
+    
+    // Contenido del modal
+    .therapist-detail-modal-content {
+      @include glassmorphism;
+      border-radius: 16px;
+      display: flex;
+      flex-direction: column;
+      max-height: 90vh;
+      overflow: hidden;
+      
+      // Botón de cierre
+      .therapist-detail-modal-close-button {
+        position: absolute;
+        top: 1.25rem;
+        right: 1.25rem;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.1);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: rgba(255, 255, 255, 0.7);
+        cursor: pointer;
+        transition: all 0.3s ease;
+        z-index: 10;
+        border: none;
+        
+        &:hover {
+          background: rgba(255, 255, 255, 0.2);
+          color: #ffffff;
+          transform: rotate(90deg);
+          box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
+        }
+        
+        &:focus {
+          outline: none;
+          box-shadow: 0 0 0 2px rgba(0, 229, 255, 0.4);
+        }
+      }
+      
+      // Encabezado del modal
+      .therapist-detail-modal-header {
+        padding: 1.75rem;
+        border-bottom: 1px solid $border-color;
+        
+        // Perfil del terapeuta
+        .therapist-detail-profile {
+          display: flex;
+          align-items: center;
+          margin-bottom: 1.5rem;
+          
+          // Avatar
+          .therapist-detail-avatar {
+            width: 76px;
+            height: 76px;
+            border-radius: 16px;
+            background: rgba(15, 23, 42, 0.7);
+            margin-right: 1.5rem;
+            position: relative;
+            flex-shrink: 0;
+            border: 2px solid var(--border-color, rgba(0, 229, 255, 0.4));
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2), 0 0 10px rgba(0, 229, 255, 0.2);
+            
+            &:hover {
+              transform: translateY(-2px);
+              animation: pulseGlow 2s infinite;
+            }
+            
+            .therapist-detail-avatar-placeholder {
+              width: 100%;
+              height: 100%;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-size: 1.8rem;
+              font-weight: 600;
+              color: $text-primary;
+              text-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+            }
+            
+            .therapist-detail-role-badge {
+              position: absolute;
+              bottom: -8px;
+              right: -8px;
+              padding: 0.3rem 0.6rem;
+              border-radius: 8px;
+              font-size: 0.8rem;
+              font-weight: 600;
+              background: var(--background, rgba(15, 23, 42, 0.9));
+              color: var(--color, $primary-color);
+              box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+              border: 1px solid rgba(255, 255, 255, 0.1);
+              
+              i {
+                margin-right: 0.35rem;
+                font-size: 0.7rem;
+              }
+            }
+          }
+          
+          // Información del terapeuta
+          .therapist-detail-info {
+            flex: 1;
+            
+            h2 {
+              font-size: 1.8rem;
+              font-weight: 700;
+              margin-bottom: 0.75rem;
+              letter-spacing: -0.02em;
+              text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            }
+            
+            .therapist-detail-stats {
+              display: flex;
+              gap: 1rem;
+              flex-wrap: wrap;
+              
+              .therapist-detail-stat-badge {
+                display: inline-flex;
+                align-items: center;
+                padding: 0.4rem 0.9rem;
+                border-radius: 50px;
+                font-size: 0.9rem;
+                font-weight: 500;
+                transition: all 0.3s ease;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                
+                &:hover {
+                  transform: translateY(-2px);
+                  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
+                }
+                
+                i {
+                  margin-right: 0.5rem;
+                  font-size: 0.8rem;
+                }
+                
+                &.visits {
+                  background: rgba(0, 229, 255, 0.1);
+                  color: $primary-color;
+                }
+                
+                &.growth {
+                  &.positive {
+                    background: rgba(76, 175, 80, 0.1);
+                    color: $success-color;
+                  }
+                  
+                  &.negative {
+                    background: rgba(244, 67, 54, 0.1);
+                    color: $danger-color;
+                  }
+                }
+                
+                &.status {
+                  &.verified {
+                    background: rgba(76, 175, 80, 0.1);
+                    color: $success-color;
+                  }
+                  
+                  &.pending {
+                    background: rgba(255, 152, 0, 0.1);
+                    color: $warning-color;
+                  }
+                }
+              }
+            }
+          }
+          
+          // Resumen de ganancias
+          .therapist-detail-earnings-summary {
+            text-align: right;
+            margin-left: 2rem;
+            background: rgba(15, 23, 42, 0.6);
+            padding: 1rem 1.25rem;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            
+            &:hover {
+              transform: translateY(-3px);
+              box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15), 0 0 15px rgba(0, 229, 255, 0.1);
+            }
+            
+            .therapist-detail-earnings-amount {
+              font-size: 2rem;
+              font-weight: 800;
+              margin-bottom: 0.5rem;
+              background: $primary-gradient;
+              -webkit-background-clip: text;
+              -webkit-text-fill-color: transparent;
+              background-clip: text;
+              letter-spacing: -0.02em;
+            }
+            
+            .therapist-detail-earnings-period {
+              font-size: 0.9rem;
+              color: $text-secondary;
+            }
+          }
+        }
+        
+        // Navegación por pestañas
+        .therapist-detail-tab-navigation {
+          display: flex;
+          gap: 0.75rem;
+          border-bottom: 1px solid $border-color;
+          padding-bottom: 1rem;
+          
+          .therapist-detail-tab-button {
+            display: flex;
+            align-items: center;
+            padding: 0.7rem 1.5rem;
+            background: transparent;
+            border: none;
+            border-radius: 10px;
+            color: $text-secondary;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            
+            i {
+              margin-right: 0.6rem;
+              font-size: 0.9rem;
+            }
+            
+            &:hover {
+              background: rgba(255, 255, 255, 0.05);
+              color: $text-primary;
+              transform: translateY(-2px);
+            }
+            
+            &:focus {
+              outline: none;
+              box-shadow: 0 0 0 2px rgba(0, 229, 255, 0.4);
+            }
+            
+            &.active {
+              background: rgba(0, 229, 255, 0.12);
+              color: $primary-color;
+              border: 1px solid rgba(0, 229, 255, 0.25);
+              box-shadow: 0 5px 15px rgba(0, 229, 255, 0.1);
+              font-weight: 600;
+            }
+          }
+        }
+      }
+      
+      // Cuerpo del modal
+      .therapist-detail-modal-body {
+        padding: 1.75rem;
+        overflow-y: auto;
+        flex: 1;
+        
+        // Personalizar scrollbar
+        &::-webkit-scrollbar {
+          width: 8px;
+        }
+        
+        &::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: 4px;
+        }
+        
+        &::-webkit-scrollbar-thumb {
+          background: rgba(0, 229, 255, 0.2);
+          border-radius: 4px;
+          
+          &:hover {
+            background: rgba(0, 229, 255, 0.3);
+          }
+        }
+        
+        // Pestaña de resumen
+        .therapist-detail-summary-tab {
+          // Fila de métricas
+          .therapist-detail-metrics-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 1.25rem;
+            margin-bottom: 1.75rem;
+            
+            .therapist-detail-metric-card {
+              background: $card-bg;
+              border: 1px solid rgba(255, 255, 255, 0.05);
+              border-radius: 12px;
+              padding: 1.25rem;
+              display: flex;
+              align-items: center;
+              transition: all 0.3s ease;
+              
+              &:hover {
+                background: $hover-bg;
+                transform: translateY(-4px);
+                box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2), 0 0 10px rgba(0, 229, 255, 0.1);
+              }
+              
+              .therapist-detail-metric-icon {
+                width: 48px;
+                height: 48px;
+                border-radius: 12px;
+                background: rgba(0, 229, 255, 0.1);
+                color: $primary-color;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin-right: 1.25rem;
+                font-size: 1.2rem;
+                flex-shrink: 0;
+                transition: all 0.3s ease;
+                border: 1px solid rgba(0, 229, 255, 0.2);
+                
+                &:hover {
+                  background: rgba(0, 229, 255, 0.15);
+                  transform: rotate(5deg);
+                }
+              }
+              
+              .therapist-detail-metric-content {
+                .therapist-detail-metric-value {
+                  font-size: 1.5rem;
+                  font-weight: 700;
+                  margin-bottom: 0.35rem;
+                  letter-spacing: -0.02em;
+                }
+                
+                .therapist-detail-metric-label {
+                  font-size: 0.9rem;
+                  color: $text-secondary;
+                  font-weight: 500;
+                }
+              }
+            }
+          }
+          
+          // Tarjeta de estadísticas
+          .therapist-detail-stats-card {
+            background: $card-bg;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+            margin-bottom: 1.75rem;
+            
+            &:hover {
+              transform: translateY(-4px);
+              box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2), 0 0 15px rgba(0, 229, 255, 0.1);
+            }
+            
+            h3 {
+              padding: 1.25rem;
+              font-size: 1.2rem;
+              font-weight: 600;
+              border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+              display: flex;
+              align-items: center;
+              
+              i {
+                margin-right: 0.75rem;
+                color: $primary-color;
+                font-size: 1rem;
+              }
+            }
+            
+            .therapist-detail-stats-content {
+              padding: 1.5rem;
+              display: flex;
+              align-items: center;
+              gap: 2rem;
+              
+              // Gráfico circular
+              .therapist-detail-stats-progress {
+                flex-shrink: 0;
+                
+                .therapist-detail-stats-circular-chart {
+                  width: 140px;
+                  height: 140px;
+                  
+                  .therapist-detail-stats-circle-bg {
+                    fill: none;
+                    stroke: rgba(255, 255, 255, 0.1);
+                    stroke-width: 3;
+                  }
+                  
+                  .therapist-detail-stats-circle {
+                    fill: none;
+                    stroke-width: 4;
+                    stroke-linecap: round;
+                    stroke-dasharray: 100, 100;
+                    stroke-dashoffset: 100;
+                    animation: circleProgress 1.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+                    filter: drop-shadow(0 0 6px rgba(0, 229, 255, 0.5));
+                  }
+                  
+                  .therapist-detail-stats-percentage {
+                    fill: $text-primary;
+                    font-size: 0.28rem;
+                    font-weight: 700;
+                    text-anchor: middle;
+                    dominant-baseline: middle;
+                    font-family: 'Inter', 'Poppins', sans-serif;
+                    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+                  }
+                }
+              }
+              
+              // Detalles de estadísticas
+              .therapist-detail-stats-details {
+                flex: 1;
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+                gap: 1.25rem;
+                
+                .therapist-detail-stats-item {
+                  .therapist-detail-stats-label {
+                    font-size: 0.9rem;
+                    color: $text-secondary;
+                    margin-bottom: 0.35rem;
+                    font-weight: 500;
+                  }
+                  
+                  .therapist-detail-stats-value {
+                    font-size: 1.3rem;
+                    font-weight: 700;
+                    color: $text-primary;
+                    letter-spacing: -0.01em;
+                  }
+                }
+              }
+            }
+          }
+          
+          // Tarjeta de rendimiento
+          .therapist-detail-performance-card {
+            background: $card-bg;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            
+            &:hover {
+              transform: translateY(-4px);
+              box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2), 0 0 15px rgba(0, 229, 255, 0.1);
+            }
+            
+            h3 {
+              font-size: 1.2rem;
+              font-weight: 600;
+              margin-bottom: 1.25rem;
+              display: flex;
+              align-items: center;
+              
+              i {
+                margin-right: 0.75rem;
+                color: $primary-color;
+              }
+            }
+            
+            .therapist-detail-performance-content {
+              display: flex;
+              align-items: center;
+              
+              .therapist-detail-performance-indicator {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0.8rem 1.5rem;
+                margin-right: 2rem;
+                border-radius: 12px;
+                font-size: 1.6rem;
+                font-weight: 800;
+                min-width: 120px;
+                
+                i {
+                  margin-right: 0.75rem;
+                  font-size: 1.4rem;
+                }
+                
+                &.positive {
+                  background: rgba(76, 175, 80, 0.15);
+                  color: $success-color;
+                  border: 1px solid rgba(76, 175, 80, 0.3);
+                  box-shadow: 0 5px 15px rgba(76, 175, 80, 0.15);
+                }
+                
+                &.negative {
+                  background: rgba(244, 67, 54, 0.15);
+                  color: $danger-color;
+                  border: 1px solid rgba(244, 67, 54, 0.3);
+                  box-shadow: 0 5px 15px rgba(244, 67, 54, 0.15);
+                }
+              }
+              
+              .therapist-detail-performance-description {
+                flex: 1;
+                font-size: 1.05rem;
+                line-height: 1.6;
+                color: $text-secondary;
+                font-weight: 500;
+              }
+            }
+          }
+        }
+        
+        // Pestaña de pacientes
+        .therapist-detail-patients-tab {
+          .therapist-detail-patients-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            
+            h3 {
+              font-size: 1.3rem;
+              font-weight: 600;
+              display: flex;
+              align-items: center;
+              
+              i {
+                margin-right: 0.75rem;
+                color: $primary-color;
+              }
+            }
+            
+            .therapist-detail-patients-count {
+              background: rgba(15, 23, 42, 0.5);
+              padding: 0.6rem 1.25rem;
+              border-radius: 50px;
+              color: $text-secondary;
+              font-weight: 500;
+              border: 1px solid rgba(255, 255, 255, 0.05);
+              
+              strong {
+                color: $text-primary;
+                font-weight: 700;
+              }
+            }
+          }
+          
+          .therapist-detail-patients-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.25rem;
+            
+            .therapist-detail-patient-card {
+              background: $card-bg;
+              border: 1px solid rgba(255, 255, 255, 0.05);
+              border-radius: 16px;
+              padding: 1.25rem;
+              display: flex;
+              flex-wrap: wrap;
+              position: relative;
+              transition: all 0.3s ease;
+              cursor: pointer;
+              
+              &:hover {
+                background: $hover-bg;
+                transform: translateY(-4px);
+                box-shadow: 0 15px 25px rgba(0, 0, 0, 0.25), 0 0 15px rgba(0, 229, 255, 0.1);
+                
+                .therapist-detail-patient-profile-link {
+                  opacity: 1;
+                  transform: translateY(0);
+                }
+              }
+              
+              .therapist-detail-patient-avatar {
+                margin-right: 1rem;
+                flex-shrink: 0;
+                
+                .therapist-detail-patient-avatar-placeholder {
+                  width: 48px;
+                  height: 48px;
+                  border-radius: 12px;
+                  background: rgba(0, 229, 255, 0.1);
+                  color: $primary-color;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  font-weight: 600;
+                  font-size: 1rem;
+                  border: 1px solid rgba(0, 229, 255, 0.2);
+                }
+              }
+              
+              .therapist-detail-patient-info {
+                flex: 1;
+                margin-right: 1rem;
+                
+                .therapist-detail-patient-name {
+                  font-weight: 600;
+                  font-size: 1.1rem;
+                  margin-bottom: 0.3rem;
+                }
+                
+                .therapist-detail-patient-id {
+                  font-size: 0.85rem;
+                  color: $text-secondary;
+                  background: rgba(255, 255, 255, 0.05);
+                  display: inline-block;
+                  padding: 0.25rem 0.5rem;
+                  border-radius: 4px;
+                }
+              }
+              
+              .therapist-detail-patient-stats {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 1.25rem;
+                width: 100%;
+                margin-top: 1.25rem;
+                
+                .therapist-detail-patient-stat-item {
+                  display: flex;
+                  align-items: center;
+                  font-size: 0.9rem;
+                  color: $text-secondary;
+                  background: rgba(255, 255, 255, 0.05);
+                  padding: 0.4rem 0.75rem;
+                  border-radius: 6px;
+                  transition: all 0.3s ease;
+                  
+                  &:hover {
+                    background: rgba(255, 255, 255, 0.1);
+                    transform: translateY(-2px);
+                  }
+                  
+                  i {
+                    margin-right: 0.5rem;
+                    font-size: 0.85rem;
+                    color: $primary-color;
+                  }
+                }
+              }
+              
+              .therapist-detail-patient-trend-badge {
+                position: absolute;
+                top: 1.25rem;
+                right: 1.25rem;
+                display: inline-flex;
+                align-items: center;
+                padding: 0.3rem 0.6rem;
+                border-radius: 6px;
+                font-size: 0.85rem;
+                font-weight: 500;
+                
+                i {
+                  margin-right: 0.4rem;
+                  font-size: 0.75rem;
+                }
+                
+                &.increasing {
+                  background: rgba(76, 175, 80, 0.1);
+                  color: $success-color;
+                  border: 1px solid rgba(76, 175, 80, 0.2);
+                }
+                
+                &.decreasing {
+                  background: rgba(244, 67, 54, 0.1);
+                  color: $danger-color;
+                  border: 1px solid rgba(244, 67, 54, 0.2);
+                }
+                
+                &.stable {
+                  background: rgba(158, 158, 158, 0.1);
+                  color: rgba(255, 255, 255, 0.7);
+                  border: 1px solid rgba(158, 158, 158, 0.2);
+                }
+              }
+              
+              .therapist-detail-patient-profile-link {
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                right: 0;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 0.6rem;
+                background: linear-gradient(to top, rgba(41, 58, 82, 0.95), rgba(41, 58, 82, 0.5));
+                color: $text-primary;
+                border-bottom-left-radius: 15px;
+                border-bottom-right-radius: 15px;
+                font-weight: 500;
+                font-size: 0.9rem;
+                opacity: 0;
+                transform: translateY(10px);
+                transition: all 0.3s ease;
+                
+                i {
+                  margin-right: 0.5rem;
+                  font-size: 0.85rem;
+                  color: $primary-color;
+                }
+              }
+            }
+          }
+          
+          .therapist-detail-no-data {
+            background: $card-bg;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            padding: 3rem;
+            text-align: center;
+            
+            .therapist-detail-no-data-icon {
+              font-size: 3rem;
+              color: rgba(255, 255, 255, 0.2);
+              margin-bottom: 1.25rem;
+            }
+            
+            p {
+              color: $text-secondary;
+              font-size: 1.1rem;
+            }
+          }
+        }
+        
+        // Pestaña de visitas
+        .therapist-detail-visits-tab {
+          .therapist-detail-visits-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            
+            .therapist-detail-visits-search {
+              position: relative;
+              width: 400px;
+              
+              i {
+                position: absolute;
+                left: 1.25rem;
+                top: 50%;
+                transform: translateY(-50%);
+                color: $text-secondary;
+              }
+              
+              input {
+                width: 100%;
+                padding: 0.8rem 1.25rem 0.8rem 3rem;
+                background: rgba(15, 23, 42, 0.5);
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                border-radius: 10px;
+                color: $text-primary;
+                font-size: 1rem;
+                
+                &:focus {
+                  outline: none;
+                  border-color: rgba(0, 229, 255, 0.3);
+                  box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.1);
+                }
+                
+                &::placeholder {
+                  color: rgba(255, 255, 255, 0.4);
+                }
+              }
+              
+              .therapist-detail-visits-clear-search {
+                position: absolute;
+                right: 1rem;
+                top: 50%;
+                transform: translateY(-50%);
+                background: rgba(255, 255, 255, 0.1);
+                border: none;
+                width: 24px;
+                height: 24px;
+                border-radius: 50%;
+                color: $text-secondary;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                cursor: pointer;
+                transition: all 0.2s ease;
+                
+                &:hover {
+                  background: rgba(255, 255, 255, 0.2);
+                  color: $text-primary;
+                  transform: translateY(-50%) rotate(90deg);
+                }
+                
+                &:focus {
+                  outline: none;
+                  box-shadow: 0 0 0 2px rgba(0, 229, 255, 0.3);
+                }
+              }
+            }
+            
+            .therapist-detail-visits-summary {
+              display: flex;
+              gap: 1.5rem;
+              
+              .therapist-detail-visits-summary-item {
+                padding: 0.6rem 1.25rem;
+                background: rgba(15, 23, 42, 0.5);
+                border-radius: 10px;
+                border: 1px solid rgba(255, 255, 255, 0.05);
+                color: $text-secondary;
+                font-weight: 500;
+                
+                strong {
+                  color: $text-primary;
+                  font-weight: 700;
+                }
+              }
+            }
+          }
+          
+          .therapist-detail-visits-table-wrapper {
+            background: $card-bg;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 16px;
+            overflow: hidden;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            
+            .therapist-detail-visits-table {
+              width: 100%;
+              border-collapse: separate;
+              border-spacing: 0;
+              
+              th, td {
+                padding: 1rem 1.25rem;
+                text-align: left;
+              }
+              
+              th {
+                background: rgba(15, 23, 42, 0.8);
+                font-weight: 600;
+                color: $text-primary;
+                position: sticky;
+                top: 0;
+                z-index: 10;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+                font-size: 0.95rem;
+                
+                &.therapist-detail-visits-sortable {
+                  cursor: pointer;
+                  transition: all 0.2s ease;
+                  
+                  &:hover {
+                    background: rgba(30, 41, 59, 0.8);
+                  }
+                  
+                  i {
+                    margin-left: 0.5rem;
+                    font-size: 0.8rem;
+                    opacity: 0.7;
+                  }
+                }
+              }
+              
+              tbody {
+                tr {
+                  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+                  transition: all 0.2s ease;
+                  
+                  &:hover {
+                    background: $hover-bg;
+                  }
+                  
+                  &:last-child {
+                    border-bottom: none;
+                  }
+                  
+                  &.therapist-detail-visits-pending-row {
+                    background: rgba(255, 152, 0, 0.05);
+                    
+                    &:hover {
+                      background: rgba(255, 152, 0, 0.1);
+                    }
+                  }
+                  
+                  .therapist-detail-visits-patient-cell {
+                    display: flex;
+                    align-items: center;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    color: $text-primary;
+                    
+                    span {
+                      margin-right: 0.5rem;
+                    }
+                    
+                    i {
+                      opacity: 0;
+                      font-size: 0.8rem;
+                      color: $primary-color;
+                      transition: all 0.2s ease;
+                    }
+                    
+                    &:hover {
+                      color: $primary-color;
+                      
+                      i {
+                        opacity: 1;
+                      }
+                    }
+                  }
+                  
+                  .therapist-detail-visits-type-badge {
+                    display: inline-block;
+                    padding: 0.35rem 0.7rem;
+                    background: rgba(0, 229, 255, 0.1);
+                    color: $primary-color;
+                    border-radius: 6px;
+                    font-size: 0.85rem;
+                    border: 1px solid rgba(0, 229, 255, 0.2);
+                    font-weight: 500;
+                  }
+                  
+                  .therapist-detail-visits-status-badge {
+                    display: inline-flex;
+                    align-items: center;
+                    padding: 0.35rem 0.7rem;
+                    border-radius: 50px;
+                    font-size: 0.85rem;
+                    font-weight: 500;
+                    
+                    i {
+                      margin-right: 0.4rem;
+                      font-size: 0.8rem;
+                    }
+                    
+                    &.completed {
+                      background: rgba(76, 175, 80, 0.15);
+                      color: $success-color;
+                      border: 1px solid rgba(76, 175, 80, 0.2);
+                    }
+                    
+                    &.pending {
+                      background: rgba(255, 152, 0, 0.15);
+                      color: $warning-color;
+                      border: 1px solid rgba(255, 152, 0, 0.2);
+                    }
+                  }
+                  
+                  .therapist-detail-visits-amount-cell {
+                    font-weight: 700;
+                    color: $success-color;
+                  }
+                  
+                  .therapist-detail-visits-notes-cell {
+                    position: relative;
+                    max-width: 300px;
+                    
+                    .therapist-detail-visits-notes-content {
+                      font-size: 0.9rem;
+                      color: $text-secondary;
+                      white-space: nowrap;
+                      overflow: hidden;
+                      text-overflow: ellipsis;
+                    }
+                    
+                    .therapist-detail-visits-notes-expand {
+                      position: absolute;
+                      right: 0;
+                      top: 50%;
+                      transform: translateY(-50%);
+                      background: linear-gradient(to left, $card-bg 30%, transparent);
+                      border: none;
+                      padding: 0.25rem 0.5rem;
+                      display: flex;
+                      align-items: center;
+                      color: $text-secondary;
+                      cursor: pointer;
+                      
+                      &:hover {
+                        color: $primary-color;
+                      }
+                      
+                      &:focus {
+                        outline: none;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+            
+            .therapist-detail-no-results {
+              padding: 3rem 1.5rem;
+              text-align: center;
+              
+              .therapist-detail-no-results-icon {
+                margin-bottom: 1.25rem;
+                font-size: 3rem;
+                color: rgba(255, 255, 255, 0.2);
+              }
+              
+              p {
+                color: $text-secondary;
+                margin-bottom: 1.5rem;
+                font-size: 1.1rem;
+              }
+              
+              .therapist-detail-clear-filters-btn {
+                display: inline-flex;
+                align-items: center;
+                padding: 0.7rem 1.5rem;
+                background: rgba(0, 229, 255, 0.1);
+                border: 1px solid rgba(0, 229, 255, 0.2);
+                border-radius: 10px;
+                color: $primary-color;
+                font-weight: 500;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                
+                i {
+                  margin-right: 0.6rem;
+                }
+                
+                &:hover {
+                  background: rgba(0, 229, 255, 0.15);
+                  transform: translateY(-2px);
+                  box-shadow: 0 5px 15px rgba(0, 229, 255, 0.2);
+                }
+                
+                &:focus {
+                  outline: none;
+                  box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.3);
+                }
+              }
+            }
+          }
+        }
+      }
+      
+      // Pie del modal
+      .therapist-detail-modal-footer {
+        padding: 1.5rem 1.75rem;
+        border-top: 1px solid $border-color;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: rgba(15, 23, 42, 0.5);
+        
+        .therapist-detail-period-info {
+          display: flex;
+          align-items: center;
+          color: $text-secondary;
+          font-weight: 500;
+          background: rgba(15, 23, 42, 0.5);
+          padding: 0.6rem 1.25rem;
+          border-radius: 10px;
+          border: 1px solid rgba(255, 255, 255, 0.05);
+          
+          i {
+            margin-right: 0.75rem;
+            color: $primary-color;
+          }
+        }
+        
+        .therapist-detail-modal-actions {
+          display: flex;
+          gap: 1rem;
+          
+          button {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.7rem 1.5rem;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            
+            i {
+              margin-right: 0.75rem;
+            }
+            
+            &:focus {
+              outline: none;
+              box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.3);
+            }
+          }
+          
+          .therapist-detail-refresh-btn {
+            background: rgba(0, 229, 255, 0.1);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            color: $primary-color;
+            
+            i {
+              transition: transform 0.5s ease;
+            }
+            
+            &:hover {
+              background: rgba(0, 229, 255, 0.15);
+              transform: translateY(-2px);
+              box-shadow: 0 5px 15px rgba(0, 229, 255, 0.2);
+              
+              i {
+                transform: rotate(180deg);
+              }
+            }
+            
+            &.refreshing {
+              i {
+                animation: rotate 1s linear infinite;
+              }
+            }
+            
+            &:disabled {
+              opacity: 0.7;
+              cursor: not-allowed;
+              
+              &:hover {
+                transform: none;
+                box-shadow: none;
+              }
+            }
+          }
+          
+          .therapist-detail-close-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: $text-primary;
+            
+            &:hover {
+              background: rgba(255, 255, 255, 0.1);
+              transform: translateY(-2px);
+              box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
+            }
+            
+            &:active {
+              transform: translateY(0);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Estilos responsivos
+@media (max-width: 1200px) {
+  .therapist-detail-modal-backdrop {
+    padding: 1.5rem;
+    
+    .therapist-detail-modal-container {
+      .therapist-detail-modal-content {
+        .therapist-detail-modal-header {
+          .therapist-detail-profile {
+            flex-direction: column;
+            align-items: flex-start;
+            
+            .therapist-detail-avatar {
+              margin-bottom: 1rem;
+            }
+            
+            .therapist-detail-earnings-summary {
+              margin-left: 0;
+              margin-top: 1rem;
+              width: 100%;
+            }
+          }
+          
+          .therapist-detail-tab-navigation {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            
+            &::-webkit-scrollbar {
+              height: 0;
+            }
+          }
+        }
+        
+        .therapist-detail-modal-body {
+          .therapist-detail-summary-tab {
+            .therapist-detail-stats-card {
+              .therapist-detail-stats-content {
+                flex-direction: column;
+                gap: 1.5rem;
+                
+                .therapist-detail-stats-progress {
+                  margin: 0 auto;
+                }
+              }
+            }
+            
+            .therapist-detail-performance-card {
+              .therapist-detail-performance-content {
+                flex-direction: column;
+                
+                .therapist-detail-performance-indicator {
+                  margin-right: 0;
+                  margin-bottom: 1rem;
+                }
+              }
+            }
+          }
+          
+          .therapist-detail-patients-tab {
+            .therapist-detail-patients-grid {
+              grid-template-columns: 1fr;
+            }
+          }
+          
+          .therapist-detail-visits-tab {
+            .therapist-detail-visits-header {
+              flex-direction: column;
+              gap: 1rem;
+              align-items: flex-start;
+              
+              .therapist-detail-visits-search {
+                width: 100%;
+              }
+            }
+            
+            .therapist-detail-visits-table-wrapper {
+              overflow-x: auto;
+              
+              .therapist-detail-visits-table {
+                min-width: 900px;
+              }
+            }
+          }
+        }
+        
+        .therapist-detail-modal-footer {
+          flex-direction: column;
+          gap: 1rem;
+          
+          .therapist-detail-period-info {
+            margin-bottom: 0.5rem;
+          }
+          
+          .therapist-detail-modal-actions {
+            width: 100%;
+            justify-content: space-between;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .therapist-detail-modal-backdrop {
+    padding: 1rem;
+    
+    .therapist-detail-modal-container {
+      .therapist-detail-modal-content {
+        .therapist-detail-modal-header {
+          padding: 1.25rem;
+          
+          .therapist-detail-profile {
+            .therapist-detail-info {
+              h2 {
+                font-size: 1.5rem;
+              }
+              
+              .therapist-detail-stats {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+              }
+            }
+          }
+          
+          .therapist-detail-tab-navigation {
+            .therapist-detail-tab-button {
+              padding: 0.5rem 0.75rem;
+              
+              span {
+                display: none;
+              }
+              
+              i {
+                margin-right: 0;
+                font-size: 1.1rem;
+              }
+            }
+          }
+        }
+        
+        .therapist-detail-modal-body {
+          padding: 1.25rem;
+          
+          .therapist-detail-summary-tab {
+            .therapist-detail-metrics-row {
+              grid-template-columns: 1fr;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Efectos visuales especiales
+.therapist-detail-modal-content {
+  overflow: hidden;
+  position: relative;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    background: radial-gradient(circle at top right, rgba(0, 229, 255, 0.15), transparent 70%);
+    opacity: 0;
+    transition: opacity 0.8s ease;
+  }
+  
+  &:hover::before {
+    opacity: 1;
+  }
+}
+
+// Animaciones para elementos interactivos
+.therapist-detail-tab-button,
+.therapist-detail-patient-card,
+.therapist-detail-metric-card,
+.therapist-detail-stats-card,
+.therapist-detail-performance-card {
+  position: relative;
+  overflow: hidden;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      to right,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(255, 255, 255, 0.1) 50%,
+      rgba(255, 255, 255, 0) 100%
+    );
+    transform: rotate(30deg);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+  }
+  
+  &:hover::after {
+    opacity: 1;
+    animation: shimmer 2s infinite;
+  }
+}

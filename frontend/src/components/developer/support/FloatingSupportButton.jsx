@@ -27,25 +27,22 @@ const FloatingSupportButton = () => {
     }
   }, [isModalOpen]);
   
-  // Open the support modal
-  const handleOpenModal = () => {
-    setIsModalOpen(true);
+  // Toggle the support modal
+  const handleToggleModal = () => {
+    setIsModalOpen(prev => !prev);
+    
     // Reset unread count when opening modal
-    // In a real app, this would be handled via API
-    setUnreadCount(0);
-  };
-  
-  // Close the support modal
-  const handleCloseModal = () => {
-    setIsModalOpen(false);
+    if (!isModalOpen) {
+      setUnreadCount(0);
+    }
   };
   
   return (
     <>
       <button 
         className={`floating-support-button ${isAnimating ? 'animate' : ''}`}
-        onClick={handleOpenModal}
-        aria-label="Open Support"
+        onClick={handleToggleModal}
+        aria-label="Toggle Support"
       >
         <div className="button-icon">
           <i className="fas fa-headset"></i>
@@ -60,10 +57,7 @@ const FloatingSupportButton = () => {
         </div>
       </button>
       
-      <SupportModal 
-        isOpen={isModalOpen} 
-        onClose={handleCloseModal} 
-      />
+      {isModalOpen && <SupportModal onClose={() => setIsModalOpen(false)} />}
     </>
   );
 };

@@ -1,802 +1,432 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import '../../../styles/developer/accounting/AccountingDashboard.scss';
-import { Chart, registerables } from 'chart.js';
-Chart.register(...registerables);
+import '../../../styles/developer/accounting/EnhancedAccountingDashboard.scss';
+import FinancialOverview from './FinancialOverview.jsx';
+import MonthlyRevenueStats from './MonthlyRevenueStats.jsx';
+import TherapistEarnings from './TherapistEarnings.jsx';
+import TherapistDetailModal from './TherapistDetailModal.jsx';
+import TopPerformers from './TopPerformers.jsx';
+import DisciplineStatistics from './DisciplineStatistics.jsx';
+import MonthlyDetails from './MonthlyDetails.jsx';
 
-const AccountingDashboard = ({ stats, selectedPeriod }) => {
-  const [animateMetrics, setAnimateMetrics] = useState(false);
-  const [activeTab, setActiveTab] = useState('overview');
-  const [revenueChartType, setRevenueChartType] = useState('bar');
-  const [animatedValues, setAnimatedValues] = useState({
-    totalBilled: 0,
-    pendingPayments: 0,
-    completedPayments: 0,
-    averagePerVisit: 0
-  });
-  
-  // Referencias para los gráficos
-  const revenueChartRef = useRef(null);
-  const revenueChartInstance = useRef(null);
-  const disciplineChartRef = useRef(null);
-  const disciplineChartInstance = useRef(null);
-  
-  // Activar animaciones al montar el componente
+const EnhancedAccountingDashboard = () => {
+  // State for dashboard data
+  const [isLoading, setIsLoading] = useState(true);
+  const [financialStats, setFinancialStats] = useState(null);
+  const [selectedPeriod, setSelectedPeriod] = useState(null);
+  const [therapists, setTherapists] = useState([]);
+  const [disciplineStats, setDisciplineStats] = useState(null);
+  const [monthlyRevenue, setMonthlyRevenue] = useState([]);
+  const [topPerformers, setTopPerformers] = useState([]);
+  const [selectedTherapist, setSelectedTherapist] = useState(null);
+  const [showTherapistModal, setShowTherapistModal] = useState(false);
+  const [selectedMonth, setSelectedMonth] = useState(null);
+  const [monthlyDetails, setMonthlyDetails] = useState(null);
+  const [selectedDiscipline, setSelectedDiscipline] = useState(null);
+  const [disciplineDetails, setDisciplineDetails] = useState(null);
+
+  // Load mock data
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setAnimateMetrics(true);
-    }, 300);
+    setIsLoading(true);
     
-    return () => clearTimeout(timer);
-  }, []);
-  
-  // Animar valores de las métricas con efecto de contador gradual
-  useEffect(() => {
-    if (animateMetrics && stats) {
-      const duration = 1500; // Duración total de la animación
-      const steps = 60; // Número de pasos de la animación (para 60fps)
-      const stepTime = duration / steps;
-      let step = 0;
+    // Simulate API fetching
+    setTimeout(() => {
+      // Financial overview data
+      setFinancialStats({
+        totalBilled: 127850.75,
+        pendingPayments: 42500.25,
+        completedPayments: 85350.50
+      });
       
-      const interval = setInterval(() => {
-        step++;
-        const progress = step / steps;
-        
-        // Función de easing para hacer la animación más natural (cubic-bezier)
-        const easedProgress = 1 - Math.pow(1 - progress, 3);
-        
-        setAnimatedValues({
-          totalBilled: Math.round(easedProgress * stats.totalBilled * 100) / 100,
-          pendingPayments: Math.round(easedProgress * stats.pendingPayments * 100) / 100,
-          completedPayments: Math.round(easedProgress * stats.completedPayments * 100) / 100,
-          averagePerVisit: Math.round(easedProgress * stats.averagePerVisit * 100) / 100
-        });
-        
-        if (step >= steps) {
-          clearInterval(interval);
+      // Selected period
+      setSelectedPeriod({
+        id: 5,
+        period: "Mar 1 to 15, 2025",
+        paymentDate: "Apr 15, 2025",
+        status: "pending",
+        amount: 45670.25
+      });
+      
+      // Therapists data
+      setTherapists([
+        {
+          id: 1,
+          name: "Regina Araquel",
+          role: "PT",
+          visits: 45,
+          pendingVisits: 3,
+          earnings: 4050.75,
+          status: "verified",
+          completionRate: 97,
+          growth: 15.2,
+          patients: [
+            { id: 101, name: "Soheila Adhami", visits: 8, revenue: 680.00, lastVisit: "2025-03-14" },
+            { id: 102, name: "James Smith", visits: 12, revenue: 1020.00, lastVisit: "2025-03-15" },
+            { id: 103, name: "Maria Rodriguez", visits: 10, revenue: 850.00, lastVisit: "2025-03-12" }
+          ],
+          visitDetails: [
+            { id: 1001, patientId: 101, patientName: "Soheila Adhami", date: "2025-03-14", time: "09:30 AM", type: "Standard", duration: 45, status: "completed", amount: 85.00 },
+            { id: 1002, patientId: 102, patientName: "James Smith", date: "2025-03-15", time: "11:00 AM", type: "Standard", duration: 60, status: "completed", amount: 85.00 },
+            { id: 1003, patientId: 103, patientName: "Maria Rodriguez", date: "2025-03-12", time: "02:30 PM", type: "Follow-up", duration: 30, status: "completed", amount: 85.00 }
+          ]
+        },
+        {
+          id: 2,
+          name: "Jacob Staffey",
+          role: "PTA",
+          visits: 38,
+          pendingVisits: 5,
+          earnings: 3230.00,
+          status: "pending",
+          completionRate: 92,
+          growth: -2.1,
+          patients: [
+            { id: 104, name: "Linda Johnson", visits: 10, revenue: 850.00, lastVisit: "2025-03-10" },
+            { id: 105, name: "Robert Garcia", visits: 9, revenue: 765.00, lastVisit: "2025-03-13" }
+          ],
+          visitDetails: [
+            { id: 2001, patientId: 104, patientName: "Linda Johnson", date: "2025-03-10", time: "10:00 AM", type: "Standard", duration: 45, status: "completed", amount: 85.00 },
+            { id: 2002, patientId: 105, patientName: "Robert Garcia", date: "2025-03-13", time: "01:30 PM", type: "Standard", duration: 45, status: "completed", amount: 85.00 }
+          ]
+        },
+        {
+          id: 3,
+          name: "Justin Shimane",
+          role: "OT",
+          visits: 42,
+          pendingVisits: 0,
+          earnings: 3780.00,
+          status: "verified",
+          completionRate: 100,
+          growth: 12.8,
+          patients: [
+            { id: 106, name: "Susan Wilson", visits: 7, revenue: 595.00, lastVisit: "2025-03-14" },
+            { id: 107, name: "Michael Brown", visits: 8, revenue: 680.00, lastVisit: "2025-03-15" }
+          ],
+          visitDetails: [
+            { id: 3001, patientId: 106, patientName: "Susan Wilson", date: "2025-03-14", time: "10:30 AM", type: "Standard", duration: 45, status: "completed", amount: 85.00 },
+            { id: 3002, patientId: 107, patientName: "Michael Brown", date: "2025-03-15", time: "01:00 PM", type: "Standard", duration: 45, status: "completed", amount: 85.00 }
+          ]
+        },
+        {
+          id: 4,
+          name: "April Kim",
+          role: "COTA",
+          visits: 35,
+          pendingVisits: 2,
+          earnings: 2975.00,
+          status: "pending",
+          completionRate: 95,
+          growth: 8.7,
+          patients: [
+            { id: 108, name: "David Anderson", visits: 6, revenue: 510.00, lastVisit: "2025-03-11" },
+            { id: 109, name: "Jennifer Lopez", visits: 7, revenue: 595.00, lastVisit: "2025-03-13" }
+          ],
+          visitDetails: [
+            { id: 4001, patientId: 108, patientName: "David Anderson", date: "2025-03-11", time: "09:00 AM", type: "Standard", duration: 45, status: "completed", amount: 85.00 },
+            { id: 4002, patientId: 109, patientName: "Jennifer Lopez", date: "2025-03-13", time: "10:45 AM", type: "Standard", duration: 45, status: "completed", amount: 85.00 }
+          ]
+        },
+        {
+          id: 5,
+          name: "Elena Martinez",
+          role: "ST",
+          visits: 40,
+          pendingVisits: 1,
+          earnings: 3600.00,
+          status: "verified",
+          completionRate: 98,
+          growth: 10.5,
+          patients: [
+            { id: 110, name: "Thomas White", visits: 9, revenue: 765.00, lastVisit: "2025-03-12" },
+            { id: 111, name: "Jessica Taylor", visits: 8, revenue: 680.00, lastVisit: "2025-03-15" }
+          ],
+          visitDetails: [
+            { id: 5001, patientId: 110, patientName: "Thomas White", date: "2025-03-12", time: "11:00 AM", type: "Standard", duration: 45, status: "completed", amount: 85.00 },
+            { id: 5002, patientId: 111, patientName: "Jessica Taylor", date: "2025-03-15", time: "02:00 PM", type: "Standard", duration: 45, status: "completed", amount: 85.00 }
+          ]
         }
-      }, stepTime);
+      ]);
       
-      return () => clearInterval(interval);
-    }
-  }, [animateMetrics, stats]);
-  
-  // Renderizar gráfico de ingresos cuando cambian los datos o el canvas
-  useEffect(() => {
-    if (revenueChartRef.current && stats?.revenueByMonth && activeTab === 'overview') {
-      renderRevenueChart();
-    }
-    
-    return () => {
-      if (revenueChartInstance.current) {
-        revenueChartInstance.current.destroy();
-      }
-    };
-  }, [stats, revenueChartRef.current, activeTab, revenueChartType]);
-  
-  // Renderizar gráfico de disciplinas
-  useEffect(() => {
-    if (disciplineChartRef.current && stats?.visitsByDiscipline && activeTab === 'overview') {
-      renderDisciplineChart();
-    }
-    
-    return () => {
-      if (disciplineChartInstance.current) {
-        disciplineChartInstance.current.destroy();
-      }
-    };
-  }, [stats, disciplineChartRef.current, activeTab]);
-  
-  // Función para renderizar gráfico de ingresos mejorado
-  const renderRevenueChart = () => {
-    const canvas = revenueChartRef.current;
-    const ctx = canvas.getContext('2d');
-    
-    // Limpiar canvas y destruir instancia anterior si existe
-    if (revenueChartInstance.current) {
-      revenueChartInstance.current.destroy();
-    }
-    
-    // Preparar datos para el gráfico
-    const labels = stats.revenueByMonth.map(item => item.month);
-    const currentData = stats.revenueByMonth.map(item => item.revenue);
-    const previousData = stats.revenueByMonth.map(item => item.previousRevenue);
-    const growthData = stats.revenueByMonth.map(item => item.growth);
-    
-    // Crear configuración para el gráfico
-    const chartConfig = {
-      type: revenueChartType,
-      data: {
-        labels: labels,
-        datasets: [
-          {
-            label: 'Current Period',
-            data: currentData,
-            backgroundColor: function(context) {
-              const chart = context.chart;
-              const {ctx, chartArea} = chart;
-              if (!chartArea) {
-                return null;
-              }
-              const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-              gradient.addColorStop(0, 'rgba(0, 229, 255, 0.6)');
-              gradient.addColorStop(1, 'rgba(41, 121, 255, 0.6)');
-              return gradient;
-            },
-            borderColor: 'rgba(0, 229, 255, 1)',
-            borderWidth: 2,
-            borderRadius: 6,
-            hoverBackgroundColor: function(context) {
-              const chart = context.chart;
-              const {ctx, chartArea} = chart;
-              if (!chartArea) {
-                return null;
-              }
-              const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-              gradient.addColorStop(0, 'rgba(0, 229, 255, 0.8)');
-              gradient.addColorStop(1, 'rgba(41, 121, 255, 0.8)');
-              return gradient;
-            },
-            hoverBorderColor: 'rgba(0, 229, 255, 1)',
-            tension: 0.4
-          },
-          {
-            label: 'Previous Period',
-            data: previousData,
-            backgroundColor: 'rgba(160, 174, 192, 0.2)',
-            borderColor: 'rgba(160, 174, 192, 0.6)',
-            borderWidth: 2,
-            borderRadius: 6,
-            borderDash: [5, 5],
-            tension: 0.4
-          }
+      // Discipline statistics
+      setDisciplineStats({
+        PT: { count: 650, percentage: 33, therapists: 12 },
+        OT: { count: 420, percentage: 21, therapists: 8 },
+        ST: { count: 310, percentage: 16, therapists: 7 },
+        PTA: { count: 280, percentage: 14, therapists: 6 },
+        COTA: { count: 175, percentage: 9, therapists: 5 },
+        STA: { count: 120, percentage: 6, therapists: 4 }
+      });
+      
+      // Monthly revenue
+      setMonthlyRevenue([
+        { 
+          month: 'Jan', 
+          year: 2025,
+          revenue: 38420.50, 
+          previousRevenue: 34210.25, 
+          growth: 12.3,
+          visits: 452,
+          completedVisits: 445,
+          pendingVisits: 7
+        },
+        { 
+          month: 'Feb', 
+          year: 2025,
+          revenue: 42850.75, 
+          previousRevenue: 36580.50, 
+          growth: 17.1,
+          visits: 504,
+          completedVisits: 498,
+          pendingVisits: 6
+        },
+        { 
+          month: 'Mar', 
+          year: 2025,
+          revenue: 46580.25, 
+          previousRevenue: 40120.75, 
+          growth: 16.1,
+          visits: 548,
+          completedVisits: 541,
+          pendingVisits: 7
+        },
+        { 
+          month: 'Apr', 
+          year: 2025,
+          projected: true, 
+          revenue: 45200.00, 
+          previousRevenue: 41850.25, 
+          growth: 8.0,
+          visits: 532,
+          completedVisits: 520,
+          pendingVisits: 12
+        }
+      ]);
+      
+      // Top performers
+      setTopPerformers([
+        { id: 1, name: "Regina Araquel", role: "PT", visits: 45, earnings: 4050.75, growth: 15.2 },
+        { id: 3, name: "Justin Shimane", role: "OT", visits: 42, earnings: 3780.00, growth: 12.8 },
+        { id: 5, name: "Elena Martinez", role: "ST", visits: 40, earnings: 3600.00, growth: 10.5 }
+      ]);
+      
+      // April monthly details (shown by default)
+      const aprilDetails = {
+        month: 'Apr',
+        year: 2025,
+        revenue: 45200.00,
+        visits: 532,
+        therapists: [
+          { id: 1, name: "Regina Araquel", role: "PT", visits: 45, earnings: 4050.75 },
+          { id: 2, name: "Jacob Staffey", role: "PTA", visits: 38, earnings: 3230.00 },
+          { id: 3, name: "Justin Shimane", role: "OT", visits: 42, earnings: 3780.00 },
+          { id: 4, name: "April Kim", role: "COTA", visits: 35, earnings: 2975.00 },
+          { id: 5, name: "Elena Martinez", role: "ST", visits: 40, earnings: 3600.00 }
+        ],
+        visitsByDay: [
+          { day: '2025-04-01', count: 18 },
+          { day: '2025-04-02', count: 22 },
+          { day: '2025-04-03', count: 24 },
+          { day: '2025-04-04', count: 17 },
+          { day: '2025-04-05', count: 12 },
+          { day: '2025-04-06', count: 0 },
+          { day: '2025-04-07', count: 27 },
+          { day: '2025-04-08', count: 25 },
+          { day: '2025-04-09', count: 23 },
+          { day: '2025-04-10', count: 26 },
+          { day: '2025-04-11', count: 21 },
+          { day: '2025-04-12', count: 14 },
+          { day: '2025-04-13', count: 0 },
+          { day: '2025-04-14', count: 28 },
+          { day: '2025-04-15', count: 24 }
+        ],
+        visitDetails: [
+          { id: 1, therapistId: 1, therapistName: "Regina Araquel", patientName: "James Smith", date: "2025-04-02", time: "09:30 AM", status: "completed", amount: 85.00 },
+          { id: 2, therapistId: 1, therapistName: "Regina Araquel", patientName: "Maria Rodriguez", date: "2025-04-02", time: "11:00 AM", status: "completed", amount: 85.00 },
+          { id: 3, therapistId: 3, therapistName: "Justin Shimane", patientName: "Susan Wilson", date: "2025-04-02", time: "10:30 AM", status: "completed", amount: 85.00 },
+          { id: 4, therapistId: 5, therapistName: "Elena Martinez", patientName: "Thomas White", date: "2025-04-02", time: "02:15 PM", status: "completed", amount: 85.00 },
+          { id: 5, therapistId: 2, therapistName: "Jacob Staffey", patientName: "Linda Johnson", date: "2025-04-02", time: "03:30 PM", status: "completed", amount: 85.00 },
+          // More visits would be here
         ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        animation: {
-          duration: 1500,
-          easing: 'easeOutQuart'
-        },
-        interaction: {
-          mode: 'index',
-          intersect: false
-        },
-        plugins: {
-          legend: {
-            position: 'top',
-            labels: {
-              boxWidth: 12,
-              usePointStyle: true,
-              pointStyle: 'circle',
-              padding: 20,
-              color: 'rgba(255, 255, 255, 0.8)'
-            }
-          },
-          tooltip: {
-            backgroundColor: 'rgba(15, 23, 42, 0.9)',
-            titleColor: 'rgba(255, 255, 255, 0.9)',
-            bodyColor: 'rgba(255, 255, 255, 0.7)',
-            borderColor: 'rgba(255, 255, 255, 0.1)',
-            borderWidth: 1,
-            padding: 12,
-            cornerRadius: 8,
-            displayColors: true,
-            usePointStyle: true,
-            boxWidth: 8,
-            boxHeight: 8,
-            boxPadding: 4,
-            callbacks: {
-              label: function(context) {
-                let label = context.dataset.label || '';
-                if (label) {
-                  label += ': ';
-                }
-                if (context.parsed.y !== null) {
-                  label += new Intl.NumberFormat('en-US', {
-                    style: 'currency',
-                    currency: 'USD',
-                    minimumFractionDigits: 2
-                  }).format(context.parsed.y);
-                }
-                return label;
-              },
-              afterBody: function(tooltipItems) {
-                const dataIndex = tooltipItems[0].dataIndex;
-                return `Growth: ${growthData[dataIndex]}%`;
-              }
-            }
-          }
-        },
-        scales: {
-          x: {
-            grid: {
-              color: 'rgba(255, 255, 255, 0.05)',
-              drawBorder: false
-            },
-            ticks: {
-              color: 'rgba(255, 255, 255, 0.7)'
-            }
-          },
-          y: {
-            beginAtZero: true,
-            grid: {
-              color: 'rgba(255, 255, 255, 0.05)',
-              drawBorder: false
-            },
-            ticks: {
-              color: 'rgba(255, 255, 255, 0.7)',
-              callback: function(value) {
-                return new Intl.NumberFormat('en-US', {
-                  style: 'currency',
-                  currency: 'USD',
-                  minimumFractionDigits: 0,
-                  maximumFractionDigits: 0
-                }).format(value);
-              }
-            }
-          }
-        }
-      }
-    };
-    
-    // Ajustes específicos según el tipo de gráfico
-    if (revenueChartType === 'line') {
-      // Para gráfico de línea, ajustar el fill y el orden
-      chartConfig.data.datasets[0].fill = true;
-      chartConfig.data.datasets[0].backgroundColor = function(context) {
-        const chart = context.chart;
-        const {ctx, chartArea} = chart;
-        if (!chartArea) {
-          return null;
-        }
-        const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
-        gradient.addColorStop(0, 'rgba(0, 229, 255, 0.1)');
-        gradient.addColorStop(1, 'rgba(41, 121, 255, 0.3)');
-        return gradient;
       };
       
-      // Mover el conjunto de datos anterior al fondo
-      chartConfig.data.datasets.reverse();
-    }
-    
-    // Crear instancia del gráfico
-    revenueChartInstance.current = new Chart(ctx, chartConfig);
+      setMonthlyDetails(aprilDetails);
+      setSelectedMonth({ month: 'Apr', year: 2025 });
+      
+      setIsLoading(false);
+    }, 1500);
+  }, []);
+
+  // Handle therapist click for modal
+  const handleTherapistClick = (therapist) => {
+    setSelectedTherapist(therapist);
+    setShowTherapistModal(true);
   };
-  
-  // Función para renderizar gráfico de disciplinas (gráfico circular)
-  const renderDisciplineChart = () => {
-    const canvas = disciplineChartRef.current;
-    const ctx = canvas.getContext('2d');
+
+  // Handle month selection for detailed view
+  const handleMonthSelect = (monthData) => {
+    setSelectedMonth({ month: monthData.month, year: monthData.year });
     
-    // Limpiar canvas y destruir instancia anterior si existe
-    if (disciplineChartInstance.current) {
-      disciplineChartInstance.current.destroy();
-    }
-    
-    // Preparar datos para el gráfico
-    const disciplines = Object.keys(stats.visitsByDiscipline);
-    const values = Object.values(stats.visitsByDiscipline);
-    const total = values.reduce((acc, val) => acc + val, 0);
-    const percentages = values.map(value => ((value / total) * 100).toFixed(1));
-    
-    // Colores para cada disciplina
-    const disciplineColors = {
-      PT: {
-        backgroundColor: 'rgba(54, 209, 220, 0.8)',
-        borderColor: '#36D1DC'
-      },
-      PTA: {
-        backgroundColor: 'rgba(91, 134, 229, 0.8)',
-        borderColor: '#5B86E5'
-      },
-      OT: {
-        backgroundColor: 'rgba(255, 153, 102, 0.8)',
-        borderColor: '#FF9966'
-      },
-      COTA: {
-        backgroundColor: 'rgba(255, 94, 98, 0.8)',
-        borderColor: '#FF5E62'
-      },
-      ST: {
-        backgroundColor: 'rgba(86, 204, 242, 0.8)',
-        borderColor: '#56CCF2'
-      },
-      STA: {
-        backgroundColor: 'rgba(47, 128, 237, 0.8)',
-        borderColor: '#2F80ED'
-      }
+    // In a real app, you would fetch the monthly details from the API
+    // Here we're just using the same mock data for April
+    const mockMonthlyDetails = {
+      month: monthData.month,
+      year: monthData.year,
+      revenue: monthData.revenue,
+      visits: monthData.visits,
+      therapists: therapists,
+      visitsByDay: [
+        // Mock data for the selected month
+        { day: `2025-${monthData.month === 'Jan' ? '01' : monthData.month === 'Feb' ? '02' : monthData.month === 'Mar' ? '03' : '04'}-01`, count: 18 },
+        { day: `2025-${monthData.month === 'Jan' ? '01' : monthData.month === 'Feb' ? '02' : monthData.month === 'Mar' ? '03' : '04'}-02`, count: 22 },
+        { day: `2025-${monthData.month === 'Jan' ? '01' : monthData.month === 'Feb' ? '02' : monthData.month === 'Mar' ? '03' : '04'}-03`, count: 24 }
+        // More days would be here
+      ],
+      visitDetails: therapists.flatMap(therapist => 
+        therapist.visitDetails.map(visit => ({
+          id: visit.id,
+          therapistId: therapist.id,
+          therapistName: therapist.name,
+          patientName: visit.patientName,
+          date: visit.date.replace('03', monthData.month === 'Jan' ? '01' : monthData.month === 'Feb' ? '02' : monthData.month === 'Mar' ? '03' : '04'),
+          time: visit.time,
+          status: visit.status,
+          amount: visit.amount
+        }))
+      )
     };
     
-    // Preparar colores
-    const backgroundColors = disciplines.map(discipline => disciplineColors[discipline]?.backgroundColor || 'rgba(160, 174, 192, 0.8)');
-    const borderColors = disciplines.map(discipline => disciplineColors[discipline]?.borderColor || 'rgba(160, 174, 192, 1)');
+    setMonthlyDetails(mockMonthlyDetails);
+  };
+
+  // Handle discipline selection for detailed view
+  const handleDisciplineSelect = (discipline) => {
+    setSelectedDiscipline(discipline);
     
-    // Crear configuración para el gráfico
-    const chartConfig = {
-      type: 'doughnut',
-      data: {
-        labels: disciplines,
-        datasets: [{
-          data: values,
-          backgroundColor: backgroundColors,
-          borderColor: borderColors,
-          borderWidth: 2,
-          hoverBackgroundColor: backgroundColors.map(color => color.replace('0.8', '0.9')),
-          hoverBorderColor: borderColors,
-          hoverBorderWidth: 3
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        cutout: '70%',
-        animation: {
-          animateRotate: true,
-          animateScale: true,
-          duration: 1500,
-          easing: 'easeOutQuart'
-        },
-        plugins: {
-          legend: {
-            position: 'right',
-            labels: {
-              boxWidth: 15,
-              padding: 15,
-              color: 'rgba(255, 255, 255, 0.8)',
-              font: {
-                size: 12
-              },
-              generateLabels: function(chart) {
-                const data = chart.data;
-                if (data.labels.length && data.datasets.length) {
-                  return data.labels.map((label, i) => {
-                    const meta = chart.getDatasetMeta(0);
-                    const style = meta.controller.getStyle(i);
-                    
-                    return {
-                      text: `${label}: ${percentages[i]}%`,
-                      fillStyle: style.backgroundColor,
-                      strokeStyle: style.borderColor,
-                      lineWidth: style.borderWidth,
-                      hidden: false,
-                      index: i
-                    };
-                  });
-                }
-                return [];
-              }
-            }
-          },
-          tooltip: {
-            backgroundColor: 'rgba(15, 23, 42, 0.9)',
-            titleColor: 'rgba(255, 255, 255, 0.9)',
-            bodyColor: 'rgba(255, 255, 255, 0.7)',
-            borderColor: 'rgba(255, 255, 255, 0.1)',
-            borderWidth: 1,
-            padding: 12,
-            cornerRadius: 8,
-            callbacks: {
-              label: function(context) {
-                const label = context.label || '';
-                const value = context.raw || 0;
-                const percentage = percentages[context.dataIndex];
-                return `${label}: ${value} visits (${percentage}%)`;
-              }
-            }
-          }
-        },
-      }
+    // In a real app, you would fetch the discipline details from the API
+    // Here we're just filtering therapists by role
+    const therapistsByDiscipline = therapists.filter(
+      therapist => therapist.role === discipline
+    );
+    
+    const disciplineDetails = {
+      discipline,
+      count: disciplineStats[discipline].count,
+      percentage: disciplineStats[discipline].percentage,
+      therapists: therapistsByDiscipline,
+      visitDetails: therapistsByDiscipline.flatMap(therapist => 
+        therapist.visitDetails.map(visit => ({
+          id: visit.id,
+          therapistId: therapist.id,
+          therapistName: therapist.name,
+          patientName: visit.patientName,
+          date: visit.date,
+          time: visit.time,
+          status: visit.status,
+          amount: visit.amount
+        }))
+      )
     };
     
-    // Crear instancia del gráfico
-    disciplineChartInstance.current = new Chart(ctx, chartConfig);
+    setDisciplineDetails(disciplineDetails);
   };
-  
-  // Función para formatear valores monetarios
-  const formatCurrency = (value) => {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD',
-      minimumFractionDigits: 2,
-      maximumFractionDigits: 2
-    }).format(value);
+
+  // Handle verification of therapist payment
+  const handleVerifyPayment = (therapistId) => {
+    setTherapists(
+      therapists.map(therapist => 
+        therapist.id === therapistId 
+          ? { ...therapist, status: 'verified' } 
+          : therapist
+      )
+    );
   };
-  
-  // Calcular porcentaje completado
-  const calculateCompletionPercentage = () => {
-    const total = stats.totalBilled;
-    return total > 0 ? (stats.completedPayments / total * 100).toFixed(1) : 0;
-  };
-  
-  // Animación de entrada secuencial
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: { 
-      opacity: 1,
-      transition: { 
-        staggerChildren: 0.1
-      }
-    }
-  };
-  
-  const itemVariants = {
-    hidden: { y: 20, opacity: 0 },
-    visible: { 
-      y: 0, 
-      opacity: 1,
-      transition: { duration: 0.5, ease: "easeOut" }
-    }
+
+  // Reset discipline selection
+  const handleResetDiscipline = () => {
+    setSelectedDiscipline(null);
+    setDisciplineDetails(null);
   };
 
   return (
-    <motion.div 
-      className={`accounting-dashboard ${animateMetrics ? 'animate-in' : ''}`}
-      initial="hidden"
-      animate="visible"
-      variants={containerVariants}
-    >
-      <div className="dashboard-header">
-        <h2>Financial Overview</h2>
-        
-        <div className="dashboard-tabs">
-          <button
-            className={`tab-button ${activeTab === 'overview' ? 'active' : ''}`}
-            onClick={() => setActiveTab('overview')}
-          >
-            <i className="fas fa-chart-line"></i>
-            <span>Overview</span>
-          </button>
-          <button
-            className={`tab-button ${activeTab === 'revenue' ? 'active' : ''}`}
-            onClick={() => setActiveTab('revenue')}
-          >
-            <i className="fas fa-dollar-sign"></i>
-            <span>Revenue</span>
-          </button>
-          <button
-            className={`tab-button ${activeTab === 'visits' ? 'active' : ''}`}
-            onClick={() => setActiveTab('visits')}
-          >
-            <i className="fas fa-calendar-check"></i>
-            <span>Visits</span>
-          </button>
-          <button
-            className={`tab-button ${activeTab === 'therapists' ? 'active' : ''}`}
-            onClick={() => setActiveTab('therapists')}
-          >
-            <i className="fas fa-user-md"></i>
-            <span>Therapists</span>
-          </button>
+    <div className="enhanced-accounting-dashboard">
+      {isLoading ? (
+        <div className="loading-container">
+          <div className="loading-spinner"></div>
+          <h3>Loading Financial Data...</h3>
         </div>
-        
-        {selectedPeriod && (
-          <div className="period-badge">
-            <i className="fas fa-calendar-alt"></i>
-            <span>{selectedPeriod.period}</span>
-          </div>
-        )}
-      </div>
-      
-      <div className="dashboard-content">
-        {/* Métricas principales mejoradas */}
-        <motion.div 
-          className="metrics-section"
-          variants={containerVariants}
-        >
-          <motion.div className="metric-card total-billed" variants={itemVariants}>
-            <div className="metric-icon">
-              <i className="fas fa-file-invoice-dollar"></i>
-            </div>
-            <div className="metric-content">
-              <h3 className="metric-title">Total Billed</h3>
-              <div className="metric-value">
-                {formatCurrency(animatedValues.totalBilled)}
-              </div>
-              <div className="metric-footer">
-                {selectedPeriod && (
-                  <span>Period: {selectedPeriod.period}</span>
-                )}
-              </div>
-            </div>
-            <div className="metric-decoration"></div>
-          </motion.div>
-          
-          <motion.div className="metric-card pending-payments" variants={itemVariants}>
-            <div className="metric-icon">
-              <i className="fas fa-hourglass-half"></i>
-            </div>
-            <div className="metric-content">
-              <h3 className="metric-title">Pending Payments</h3>
-              <div className="metric-value">
-                {formatCurrency(animatedValues.pendingPayments)}
-              </div>
-              <div className="metric-footer">
-                <div className="badge awaiting">
-                <i className="fas fa-clock"></i>
-                  <span>Awaiting Verification</span>
-                </div>
-              </div>
-            </div>
-            <div className="metric-decoration"></div>
-          </motion.div>
-          
-          <motion.div className="metric-card completed-payments" variants={itemVariants}>
-            <div className="metric-icon">
-              <i className="fas fa-check-circle"></i>
-            </div>
-            <div className="metric-content">
-              <h3 className="metric-title">Completed Payments</h3>
-              <div className="metric-value">
-                {formatCurrency(animatedValues.completedPayments)}
-              </div>
-              <div className="metric-footer">
-                <div className="completion-progress">
-                  <div className="progress-bar">
-                    <div 
-                      className="progress-fill"
-                      style={{ width: `${calculateCompletionPercentage()}%` }}
-                    ></div>
-                  </div>
-                  <span className="progress-text">{calculateCompletionPercentage()}% of total</span>
-                </div>
-              </div>
-            </div>
-            <div className="metric-decoration"></div>
-          </motion.div>
-          
-          <motion.div className="metric-card average-visit" variants={itemVariants}>
-            <div className="metric-icon">
-              <i className="fas fa-calculator"></i>
-            </div>
-            <div className="metric-content">
-              <h3 className="metric-title">Average Per Visit</h3>
-              <div className="metric-value">
-                {formatCurrency(animatedValues.averagePerVisit)}
-              </div>
-              <div className="metric-footer">
-                <span>Based on all completed visits</span>
-              </div>
-            </div>
-            <div className="metric-decoration"></div>
-          </motion.div>
-        </motion.div>
-        
-        {/* Gráfico de ingresos mejorado con opciones de visualización */}
-        <motion.div 
-          className="chart-section revenue-chart-section"
-          variants={itemVariants}
-        >
-          <div className="chart-header">
-            <h3>
-              <i className="fas fa-chart-bar"></i>
-              Revenue by Month
-            </h3>
-            <div className="chart-controls">
-              <div className="chart-type-selector">
-                <button 
-                  className={`chart-type-btn ${revenueChartType === 'bar' ? 'active' : ''}`}
-                  onClick={() => setRevenueChartType('bar')}
-                  title="Bar Chart"
-                >
-                  <i className="fas fa-chart-bar"></i>
-                </button>
-                <button 
-                  className={`chart-type-btn ${revenueChartType === 'line' ? 'active' : ''}`}
-                  onClick={() => setRevenueChartType('line')}
-                  title="Line Chart"
-                >
-                  <i className="fas fa-chart-line"></i>
-                </button>
-              </div>
-              <div className="chart-actions">
-                <button className="chart-action" title="Download Chart">
-                  <i className="fas fa-download"></i>
-                </button>
-                <button className="chart-action" title="Refresh Data">
-                  <i className="fas fa-sync-alt"></i>
-                </button>
-                <button className="chart-action" title="View Full Screen">
-                  <i className="fas fa-expand"></i>
-                </button>
-              </div>
-            </div>
-          </div>
-          
-          <div className="chart-container">
-            <canvas 
-              ref={revenueChartRef}
-              className="revenue-chart"
-            ></canvas>
-          </div>
-          
-          <div className="chart-insights">
-            <div className="insight-item positive">
-              <i className="fas fa-arrow-up"></i>
-              <span>Revenue increased by <strong>16.1%</strong> compared to previous period</span>
-            </div>
-            <div className="insight-item neutral">
-              <i className="fas fa-info-circle"></i>
-              <span>Projected April revenue: <strong>{formatCurrency(45200.00)}</strong></span>
-            </div>
-          </div>
-        </motion.div>
-        
-        {/* Contenedor flexible para los gráficos de disciplina y tendencias */}
-        <div className="charts-flex-container">
-          {/* Gráfico de disciplinas mejorado */}
-          <motion.div 
-            className="chart-section discipline-chart-section"
-            variants={itemVariants}
-          >
-            <div className="chart-header">
-              <h3>
-                <i className="fas fa-users"></i>
-                Visits by Discipline
-              </h3>
-              <div className="chart-actions">
-                <button className="chart-action" title="Download Chart">
-                  <i className="fas fa-download"></i>
-                </button>
-                <button className="chart-action" title="Refresh Data">
-                  <i className="fas fa-sync-alt"></i>
-                </button>
-              </div>
-            </div>
-            
-            <div className="chart-container">
-              <canvas 
-                ref={disciplineChartRef}
-                className="discipline-chart"
-              ></canvas>
-            </div>
-            
-            <div className="chart-insights">
-              <div className="insight-item positive">
-                <i className="fas fa-arrow-up"></i>
-                <span><strong>PT</strong> visits have the highest volume this period</span>
-              </div>
-            </div>
-          </motion.div>
-          
-          {/* Nueva sección de tendencias mensuales */}
-          <motion.div 
-            className="chart-section trends-section"
-            variants={itemVariants}
-          >
-            <div className="chart-header">
-              <h3>
+      ) : (
+        <>
+          <div className="dashboard-header">
+            <div className="title-section">
+              <h1>
                 <i className="fas fa-chart-line"></i>
-                Monthly Trends
-              </h3>
-              <div className="chart-actions">
-                <button className="chart-action" title="View Details">
-                  <i className="fas fa-eye"></i>
-                </button>
-              </div>
+                Financial Management
+              </h1>
+              <p className="subtitle">
+                Track earnings, manage payments, and view financial metrics across your practice
+              </p>
             </div>
+            <div className="period-badge">
+              <i className="fas fa-calendar-alt"></i>
+              <span>Current Period: {selectedPeriod?.period}</span>
+            </div>
+          </div>
+
+          <div className="dashboard-body">
+            {/* Financial Overview Section */}
+            <FinancialOverview stats={financialStats} />
             
-            <div className="trends-container">
-              {stats.revenueByMonth && stats.revenueByMonth.map((month, index) => (
-                <div key={month.month} className="trend-item">
-                  <div className="trend-header">
-                    <div className="trend-month">{month.month}</div>
-                    <div className={`trend-growth ${month.growth >= 0 ? 'positive' : 'negative'}`}>
-                      <i className={`fas fa-arrow-${month.growth >= 0 ? 'up' : 'down'}`}></i>
-                      {month.growth}%
-                    </div>
-                  </div>
-                  
-                  <div className="trend-value">
-                    {formatCurrency(month.revenue)}
-                  </div>
-                  
-                  <div className="trend-progress-bar">
-                    <div 
-                      className="trend-progress-fill"
-                      style={{ 
-                        width: `${(month.revenue / Math.max(...stats.revenueByMonth.map(m => m.revenue))) * 100}%`,
-                        backgroundColor: month.projected 
-                          ? 'linear-gradient(90deg, rgba(99, 102, 241, 0.8), rgba(99, 102, 241, 0.4))'
-                          : undefined
-                      }}
-                    ></div>
-                  </div>
-                  
-                  {month.projected && (
-                    <div className="trend-projected">
-                      <i className="fas fa-calendar-alt"></i>
-                      <span>Projected</span>
-                    </div>
-                  )}
-                </div>
-              ))}
-            </div>
-          </motion.div>
-        </div>
-        
-        {/* Estadísticas por disciplina mejoradas */}
-        {stats.visitsByDiscipline && (
-          <motion.div 
-            className="discipline-breakdown"
-            variants={containerVariants}
-          >
-            <h3>
-              <i className="fas fa-stethoscope"></i>
-              Discipline Statistics
-            </h3>
-            <div className="discipline-cards">
-              {Object.entries(stats.visitsByDiscipline).map(([discipline, count], index) => {
-                const total = Object.values(stats.visitsByDiscipline).reduce((sum, val) => sum + val, 0);
-                const percentage = Math.round((count / total) * 100);
-                
-                let icon, title;
-                switch(discipline) {
-                  case 'PT':
-                    icon = 'fa-walking';
-                    title = 'Physical Therapy';
-                    break;
-                  case 'PTA':
-                    icon = 'fa-walking';
-                    title = 'Physical Therapy Assistant';
-                    break;
-                  case 'OT':
-                    icon = 'fa-hands';
-                    title = 'Occupational Therapy';
-                    break;
-                  case 'COTA':
-                    icon = 'fa-hands';
-                    title = 'OT Assistant';
-                    break;
-                  case 'ST':
-                    icon = 'fa-comment-medical';
-                    title = 'Speech Therapy';
-                    break;
-                  case 'STA':
-                    icon = 'fa-comment-medical';
-                    title = 'Speech Therapy Assistant';
-                    break;
-                  default:
-                    icon = 'fa-user-md';
-                    title = discipline;
-                }
-                
-                return (
-                  <motion.div 
-                    key={discipline}
-                    className={`discipline-card ${discipline.toLowerCase()}`}
-                    variants={itemVariants}
-                  >
-                    <div className="discipline-icon">
-                      <i className={`fas ${icon}`}></i>
-                    </div>
-                    <div className="discipline-content">
-                      <h4>{title}</h4>
-                      <div className="discipline-count">
-                        {count} <span>visits</span>
-                      </div>
-                      <div className="discipline-progress">
-                        <div className="progress-bar">
-                          <div 
-                            className="progress-fill"
-                            style={{ width: `${percentage}%` }}
-                          ></div>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="discipline-percentage">
-                      {percentage}%
-                    </div>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </motion.div>
-        )}
-      </div>
-    </motion.div>
+            {/* Monthly Revenue Statistics */}
+            <MonthlyRevenueStats 
+              data={monthlyRevenue} 
+              onMonthSelect={handleMonthSelect}
+              selectedMonth={selectedMonth}
+            />
+            
+            {/* Monthly Detailed View */}
+            {selectedMonth && monthlyDetails && (
+              <MonthlyDetails 
+                data={monthlyDetails} 
+                onTherapistClick={handleTherapistClick} 
+              />
+            )}
+            
+            {/* Top Performers */}
+            <TopPerformers performers={topPerformers} onTherapistClick={handleTherapistClick} />
+            
+            {/* Discipline Statistics */}
+            <DisciplineStatistics 
+              stats={disciplineStats} 
+              onDisciplineSelect={handleDisciplineSelect}
+              selectedDiscipline={selectedDiscipline}
+              disciplineDetails={disciplineDetails}
+              onResetDiscipline={handleResetDiscipline}
+              onTherapistClick={handleTherapistClick}
+            />
+            
+            {/* Therapist Earnings Table */}
+            <TherapistEarnings 
+              therapists={therapists} 
+              selectedPeriod={selectedPeriod} 
+              onTherapistClick={handleTherapistClick}
+              onVerifyPayment={handleVerifyPayment}
+            />
+          </div>
+          
+          {/* Therapist Detail Modal */}
+          {showTherapistModal && selectedTherapist && (
+            <TherapistDetailModal 
+              therapist={selectedTherapist} 
+              period={selectedPeriod} 
+              onClose={() => setShowTherapistModal(false)}
+              onVerifyPayment={handleVerifyPayment}
+            />
+          )}
+        </>
+      )}
+    </div>
   );
 };
 
-export default AccountingDashboard;
+export default EnhancedAccountingDashboard;
