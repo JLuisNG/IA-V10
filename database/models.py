@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Date, DateTime, Boolean, ForeignKey, Text
+from sqlalchemy import Column, Integer, String, Date, DateTime, Boolean, ForeignKey, Text, JSON
 from sqlalchemy.orm import relationship
 from database.connection import Base
 from datetime import datetime
@@ -16,18 +16,18 @@ class Staff(Base):
     alt_phone = Column(String, nullable=True)
     username = Column(String, unique=True, index=True, nullable=False)
     password = Column(String, nullable=False)
-    rol = Column(String, nullable=False)
-    activo = Column(Boolean, default=True)
+    role = Column(String, nullable=False)
+    is_active = Column(Boolean, default=True)
 
     visits = relationship("Visit", back_populates="staff")
     assigned_patients = relationship("StaffAssignment", back_populates="staff")
-    documentos = relationship("Documentos", back_populates="staff")
+    documents = relationship("Document", back_populates="staff")
 
-class Pacientes(Base):
-    __tablename__ = "pacientes"
+class Patient(Base):
+    __tablename__ = "patients"
 
-    id_paciente = Column(Integer, primary_key=True, index=True)
-    patient_name = Column(String, nullable=False)
+    id = Column(Integer, primary_key=True, index=True)
+    full_name = Column(String, nullable=False)
     birthday = Column(Date, nullable=False)
     gender = Column(String, nullable=False)
     address = Column(String, nullable=False)
@@ -35,60 +35,61 @@ class Pacientes(Base):
     payor_type = Column(String, nullable=True)
     physician = Column(String, nullable=True)
     agency_id = Column(Integer, nullable=False)
-    nursing_diagnostic = Column(Text, nullable=True)
+    nursing_diagnosis = Column(Text, nullable=True)
     urgency_level = Column(String, nullable=True)
     prior_level_of_function = Column(Text, nullable=True)
-    homebound = Column(String, nullable=True)
+    homebound_status = Column(String, nullable=True)
     weight_bearing_status = Column(String, nullable=True)
-    reason_for_referral = Column(Text, nullable=True)
+    referral_reason = Column(Text, nullable=True)
     weight = Column(String, nullable=True)
     height = Column(String, nullable=True)
-    pmh = Column(Text, nullable=True)
+    past_medical_history = Column(Text, nullable=True)
     clinical_grouping = Column(String, nullable=True)
-    disciplines_needed = Column(Text, nullable=True)
-    activo = Column(Boolean, default=True)
+    required_disciplines = Column(Text, nullable=True)
+    is_active = Column(Boolean, default=True)
 
-    exercise_assignments = relationship("PacienteExerciseAssignment", back_populates="paciente", primaryjoin="Pacientes.id_paciente == PacienteExerciseAssignment.paciente_id")
-    cert_periods = relationship("CertificationPeriod", back_populates="paciente")
-    visits = relationship("Visit", back_populates="paciente")
-    documentos = relationship("Documentos", back_populates="paciente")
-    staff_assignments = relationship("StaffAssignment", back_populates="paciente")
+    exercise_assignments = relationship("PatientExerciseAssignment", back_populates="patient", primaryjoin="Patient.id == PatientExerciseAssignment.patient_id")
+    certification_periods = relationship("CertificationPeriod", back_populates="patient")
+    visits = relationship("Visit", back_populates="patient")
+    documents = relationship("Document", back_populates="patient")
+    staff_assignments = relationship("StaffAssignment", back_populates="patient")
 
-class Documentos(Base):
-    __tablename__ = "documentos"
+class Document(Base):
+    __tablename__ = "documents"
 
     id = Column(Integer, primary_key=True, index=True)
-    paciente_id = Column(Integer, ForeignKey("pacientes.id_paciente"), nullable=True)
+    patient_id = Column(Integer, ForeignKey("patients.id"), nullable=True)
     staff_id = Column(Integer, ForeignKey("staff.id"), nullable=True)
     file_name = Column(String, nullable=False)
-    file_data_base64 = Column(Text, nullable=False)
+    file_path = Column(String)
+    uploaded_at = Column(DateTime, default=datetime.utcnow)
 
-    paciente = relationship("Pacientes", back_populates="documentos")
-    staff = relationship("Staff", back_populates="documentos")
+    patient = relationship("Patient", back_populates="documents")
+    staff = relationship("Staff", back_populates="documents")
 
 class StaffAssignment(Base):
     __tablename__ = "staff_assignments"
 
     id = Column(Integer, primary_key=True, index=True)
-    paciente_id = Column(Integer, ForeignKey("pacientes.id_paciente"))
+    patient_id = Column(Integer, ForeignKey("patients.id"))
     staff_id = Column(Integer, ForeignKey("staff.id"))
-    rol_asignado = Column(String, nullable=False)  # PT, PTA, etc.
-    fecha_asignacion = Column(DateTime, default=datetime.utcnow)
+    assigned_role = Column(String, nullable=False)
+    assigned_at = Column(DateTime, default=datetime.utcnow)
 
-    paciente = relationship("Pacientes", back_populates="staff_assignments")
+    patient = relationship("Patient", back_populates="staff_assignments")
     staff = relationship("Staff", back_populates="assigned_patients")
-    
+
 class CertificationPeriod(Base):
     __tablename__ = "certification_periods"
 
     id = Column(Integer, primary_key=True, index=True)
-    paciente_id = Column(Integer, ForeignKey("pacientes.id_paciente"))
+    patient_id = Column(Integer, ForeignKey("patients.id"))
     start_date = Column(Date, nullable=False)
     end_date = Column(Date, nullable=False)
     is_active = Column(Boolean, default=True)
 
-    paciente = relationship("Pacientes", back_populates="cert_periods")
-    visits = relationship("Visit", back_populates="cert_period")
+    patient = relationship("Patient", back_populates="certification_periods")
+    visits = relationship("Visit", back_populates="certification_period")
 
 class Exercise(Base):
     __tablename__ = "exercises"
@@ -101,41 +102,42 @@ class Exercise(Base):
     default_reps = Column(Integer, nullable=True)
     default_sessions_per_day = Column(Integer, nullable=True)
     hep_required = Column(Boolean, default=True)
-    discipline = Column(String, nullable=False)  
-    focus_area = Column(String, nullable=True)  
+    discipline = Column(String, nullable=False)
+    focus_area = Column(String, nullable=True)
+    is_active = Column(Boolean, default=True)
 
-class PacienteExerciseAssignment(Base):
-    __tablename__ = "paciente_exercise_assignments"
+class PatientExerciseAssignment(Base):
+    __tablename__ = "patient_exercise_assignments"
 
     id = Column(Integer, primary_key=True, index=True)
-    paciente_id = Column(Integer, ForeignKey("pacientes.id_paciente"), nullable=False)
+    patient_id = Column(Integer, ForeignKey("patients.id"), nullable=False)
     exercise_id = Column(Integer, ForeignKey("exercises.id"), nullable=False)
     sets = Column(Integer, nullable=True)
     reps = Column(Integer, nullable=True)
     sessions_per_day = Column(Integer, nullable=True)
     hep_required = Column(Boolean, default=True)
 
-    paciente = relationship("Pacientes", back_populates="exercise_assignments")
+    patient = relationship("Patient", back_populates="exercise_assignments")
     exercise = relationship("Exercise")
 
 class Visit(Base):
     __tablename__ = "visits"
 
     id = Column(Integer, primary_key=True, index=True)
-    paciente_id = Column(Integer, ForeignKey("pacientes.id_paciente"), nullable=False)
+    patient_id = Column(Integer, ForeignKey("patients.id"), nullable=False)
     staff_id = Column(Integer, ForeignKey("staff.id"), nullable=False)
     certification_period_id = Column(Integer, ForeignKey("certification_periods.id"), nullable=False)
     visit_date = Column(Date, nullable=False)
-    visit_type = Column(String, nullable=False) 
-    therapy_type = Column(String, nullable=False)  
-    status = Column(String, default="Scheduled")       
+    visit_type = Column(String, nullable=False)
+    therapy_type = Column(String, nullable=False)
+    status = Column(String, default="Scheduled")
     scheduled_time = Column(String, nullable=True)
-    is_hidden = Column(Boolean, default=False)      
-    
-    paciente = relationship("Pacientes", back_populates="visits")
+    is_hidden = Column(Boolean, default=False)
+
+    patient = relationship("Patient", back_populates="visits")
     staff = relationship("Staff", back_populates="visits")
     note = relationship("VisitNote", back_populates="visit", uselist=False)
-    cert_period = relationship("CertificationPeriod", back_populates="visits")
+    certification_period = relationship("CertificationPeriod", back_populates="visits")
 
 class VisitNote(Base):
     __tablename__ = "visit_notes"
@@ -143,34 +145,45 @@ class VisitNote(Base):
     id = Column(Integer, primary_key=True)
     visit_id = Column(Integer, ForeignKey("visits.id"), nullable=False)
     status = Column(String, default="Scheduled")
-    discipline = Column(String, nullable=False)    
-    note_type = Column(String, nullable=False)     
+    discipline = Column(String, nullable=False)
+    note_type = Column(String, nullable=False)
 
     therapist_signature = Column(Text, nullable=True)
     patient_signature = Column(Text, nullable=True)
     visit_date_signature = Column(Date, nullable=True)
 
+    sections_data = Column(JSON, nullable=True)
+
     visit = relationship("Visit", back_populates="note")
-    sections = relationship("NoteSection", back_populates="note", cascade="all, delete-orphan")
 
 class NoteSection(Base):
     __tablename__ = "note_sections"
 
     id = Column(Integer, primary_key=True)
-    note_id = Column(Integer, ForeignKey("visit_notes.id"), nullable=False)
-    section_name = Column(String, nullable=False)
-    content = Column(Text, nullable=True)
-
-    note = relationship("VisitNote", back_populates="sections")
+    section_name = Column(String, nullable=False, unique=True)
+    description = Column(Text, nullable=True)
+    is_required = Column(Boolean, default=False)
+    has_static_image = Column(Boolean, default=False)
+    static_image_url = Column(String, nullable=True)
+    form_schema = Column(JSON, nullable=True)
 
 class NoteTemplate(Base):
     __tablename__ = "note_templates"
 
     id = Column(Integer, primary_key=True)
     discipline = Column(String, nullable=False)
-    note_type = Column(String, nullable=False)    
-    section_name = Column(String, nullable=False)
+    note_type = Column(String, nullable=False)
     is_active = Column(Boolean, default=True)
-    is_required = Column(Boolean, default=False)
-    has_image = Column(Boolean, default=False)
-    image_url = Column(String, nullable=True)
+
+    sections = relationship("NoteTemplateSection", back_populates="template", cascade="all, delete-orphan")
+
+class NoteTemplateSection(Base):
+    __tablename__ = "note_template_sections"
+
+    id = Column(Integer, primary_key=True)
+    template_id = Column(Integer, ForeignKey("note_templates.id"), nullable=False)
+    section_id = Column(Integer, ForeignKey("note_sections.id"), nullable=False)
+    position = Column(Integer, nullable=True)
+
+    template = relationship("NoteTemplate", back_populates="sections")
+    section = relationship("NoteSection")

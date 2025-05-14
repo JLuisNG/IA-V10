@@ -23,13 +23,13 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
       - .:/app
+      - E:/documents_uploaded:/app/storage/docs
     depends_on:
       db:
         condition: service_healthy
     
     extra_hosts:
       - "host.docker.internal:host-gateway"
-
 
   db:
     container_name: database-container

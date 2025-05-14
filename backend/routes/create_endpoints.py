@@ -1,40 +1,33 @@
-from fastapi import APIRouter, HTTPException, Depends
+import os, shutil, re
+from fastapi import APIRouter, HTTPException, Depends, UploadFile, File, Form
 from sqlalchemy.orm import Session
-from typing import List
+from typing import Optional, List
 from datetime import datetime, timedelta, date
 from database.connection import get_db
 from database.models import (
-    Staff, 
-    Pacientes, 
+    Staff, StaffAssignment, 
+    Patient, 
     CertificationPeriod, 
-    Documentos, Exercise, 
-    PacienteExerciseAssignment, 
+    Document, 
+    PatientExerciseAssignment, Exercise,
     Visit,
-    StaffAssignment, 
-    NoteSection,
-    VisitNote)
+    NoteSection, VisitNote,
+    NoteTemplate, NoteTemplateSection)
 from schemas import (
-    StaffCreate, 
-    StaffResponse, 
-    PacienteCreate, 
-    PacienteResponse, 
-    DocumentoCreate, 
-    DocumentoResponse, 
-    ExerciseCreate, 
-    ExerciseResponse, 
-    PacienteExerciseAssignmentCreate, 
-    VisitCreate, 
-    StaffAssignmentResponse,
-    NoteSectionCreate,
-    NoteSectionResponse,
-    NoteTemplateCreate,
-    NoteTemplateResponse,
-    VisitNoteCreate,
-    VisitNoteResponse)
+    StaffCreate, StaffResponse, StaffAssignmentResponse,
+    PatientCreate, PatientResponse,
+    DocumentResponse, 
+    ExerciseCreate, ExerciseResponse, PatientExerciseAssignmentCreate, 
+    VisitCreate, VisitResponse,
+    VisitNoteResponse,
+    NoteSectionCreate, NoteSectionResponse,
+    NoteTemplateCreate, NoteTemplateResponse)
 
 router = APIRouter()
 
-#////////////////////////// STAFF //////////////////////////#
+BASE_STORAGE_PATH = "/app/storage/docs"
+
+#====================== STAFF ======================#
 
 @router.post("/staff/", response_model=StaffResponse)
 def create_staff(staff: StaffCreate, db: Session = Depends(get_db)):
@@ -42,121 +35,129 @@ def create_staff(staff: StaffCreate, db: Session = Depends(get_db)):
     existing_username = db.query(Staff).filter(Staff.username == staff.username).first()
 
     if existing_email:
-        raise HTTPException(status_code=400, detail="Email ya registrado.")
+        raise HTTPException(status_code=400, detail="Email already registered.")
     if existing_username:
-        raise HTTPException(status_code=400, detail="Username ya registrado.")
+        raise HTTPException(status_code=400, detail="Username already registered.")
     
-    new_staff = Staff(
-        name=staff.name,
-        birthday=staff.birthday,
-        gender=staff.gender,
-        postal_code=staff.postal_code,
-        email=staff.email,
-        phone=staff.phone,
-        alt_phone=staff.alt_phone,
-        username=staff.username,
-        password=staff.password,  # Hasear en un futuro 
-        rol=staff.rol
-    )
+    new_staff = Staff(**staff.dict())
     db.add(new_staff)
     db.commit()
     db.refresh(new_staff)
-
     return new_staff
 
 @router.post("/assign-staff", response_model=StaffAssignmentResponse)
-def assign_staff_to_patient(paciente_id: int, staff_id: int, rol_asignado: str, db: Session = Depends(get_db)):
+def assign_staff_to_patient(patient_id: int, staff_id: int, db: Session = Depends(get_db)):
+    staff = db.query(Staff).filter(Staff.id == staff_id).first()
+    if not staff:
+        raise HTTPException(status_code=404, detail="Staff not found.")
+
+    assigned_role = staff.role
     existing_assignment = db.query(StaffAssignment).filter(
-        StaffAssignment.paciente_id == paciente_id,
-        StaffAssignment.rol_asignado == rol_asignado
+        StaffAssignment.patient_id == patient_id,
+        StaffAssignment.assigned_role == assigned_role
     ).first()
+
+    if existing_assignment and existing_assignment.staff_id == staff_id:
+        return existing_assignment
 
     if existing_assignment:
         existing_assignment.staff_id = staff_id
-        existing_assignment.fecha_asignacion = datetime.utcnow()
-    else:
-        new_assignment = StaffAssignment(
-            paciente_id=paciente_id,
-            staff_id=staff_id,
-            rol_asignado=rol_asignado,
-            fecha_asignacion=datetime.utcnow()
-        )
-        db.add(new_assignment)
+        existing_assignment.assigned_at = datetime.utcnow()
+        db.commit()
+        db.refresh(existing_assignment)
+        return existing_assignment
 
-    db.commit()
-
-    return existing_assignment if existing_assignment else new_assignment
-
-#////////////////////////// PACIENTES //////////////////////////#
-
-@router.post("/pacientes/", response_model=PacienteResponse)
-def create_paciente(paciente: PacienteCreate, db: Session = Depends(get_db)):
-    existing_paciente = db.query(Pacientes).filter(
-        Pacientes.patient_name == paciente.patient_name,
-        Pacientes.birthday == paciente.birthday
-    ).first()
-
-    if existing_paciente:
-        raise HTTPException(status_code=400, detail="Paciente ya registrado.")
-
-    new_paciente = Pacientes(
-        patient_name=paciente.patient_name,
-        birthday=paciente.birthday,
-        gender=paciente.gender,
-        address=paciente.address,
-        contact_info=paciente.contact_info,
-        payor_type=paciente.payor_type,
-        physician=paciente.physician,
-        agency_id=paciente.agency_id,
-        nursing_diagnostic=paciente.nursing_diagnostic,
-        urgency_level=paciente.urgency_level,
-        prior_level_of_function=paciente.prior_level_of_function,
-        homebound=paciente.homebound,
-        weight_bearing_status=paciente.weight_bearing_status,
-        reason_for_referral=paciente.reason_for_referral,
-        weight=paciente.weight,
-        height=paciente.height,
-        pmh=paciente.pmh,
-        clinical_grouping=paciente.clinical_grouping,
-        disciplines_needed=paciente.disciplines_needed,
-        activo=paciente.activo
+    new_assignment = StaffAssignment(
+        patient_id=patient_id,
+        staff_id=staff_id,
+        assigned_role=assigned_role,
+        assigned_at=datetime.utcnow()
     )
-
-    db.add(new_paciente)
+    db.add(new_assignment)
     db.commit()
-    db.refresh(new_paciente)
+    db.refresh(new_assignment)
+    return new_assignment
 
-    start_date = paciente.initial_cert_start_date
-    end_date = start_date + timedelta(days=60)
+#====================== PATIENTS ======================#
+
+@router.post("/patients/", response_model=PatientResponse)
+def create_patient(patient: PatientCreate, db: Session = Depends(get_db)):
+    existing = db.query(Patient).filter(
+        Patient.full_name == patient.full_name,
+        Patient.birthday == patient.birthday
+    ).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Patient already registered.")
+
+    agency = db.query(Staff).filter(Staff.id == patient.agency_id).first()
+    if not agency:
+        raise HTTPException(status_code=404, detail="Agency does not exist.")
+    if agency.role.lower() != "agency":
+        raise HTTPException(status_code=400, detail="Provided ID does not belong to a valid agency.")
+
+    new_patient = Patient(**patient.dict(exclude={"initial_cert_start_date"}))
+    db.add(new_patient)
+    db.commit()
+    db.refresh(new_patient)
+
+    cert_start = patient.initial_cert_start_date
+    cert_end = cert_start + timedelta(days=60)
 
     cert_period = CertificationPeriod(
-        paciente_id=new_paciente.id_paciente,
-        start_date=start_date,
-        end_date=end_date,
+        patient_id=new_patient.id,
+        start_date=cert_start,
+        end_date=cert_end,
         is_active=True
     )
-
     db.add(cert_period)
     db.commit()
 
-    return PacienteResponse.model_validate(new_paciente)
+    return PatientResponse.model_validate(new_patient)
 
-#////////////////////////// DOCUMENTS //////////////////////////#
+#====================== DOCUMENTS ======================#
 
-@router.post("/documentos/", response_model=DocumentoResponse)
-def upload_document(documento: DocumentoCreate, db: Session = Depends(get_db)):
-    new_documento = Documentos(
-        paciente_id=documento.paciente_id,
-        file_name=documento.file_name,
-        file_data_base64=documento.file_data_base64
+def sanitize_filename(filename: str) -> str:
+    name, ext = os.path.splitext(filename)
+    name = re.sub(r'[^\w\d-]', '_', name)  
+    return f"{name}{ext.lower()}"
+
+@router.post("/documents/upload", response_model=DocumentResponse)
+def upload_document(
+    file: UploadFile = File(...),
+    patient_id: int = Form(None),
+    staff_id: int = Form(None),
+    db: Session = Depends(get_db)
+):
+    if patient_id and staff_id:
+        raise HTTPException(status_code=400, detail="Provide only patient_id or staff_id, not both.")
+    if not patient_id and not staff_id:
+        raise HTTPException(status_code=400, detail="You must specify either patient_id or staff_id.")
+    if not file.filename.lower().endswith(".pdf"):
+        raise HTTPException(status_code=400, detail="Only PDF files are allowed.")
+
+    clean_name = sanitize_filename(file.filename)
+    entity = "patients" if patient_id else "staff"
+    entity_id = patient_id or staff_id
+    folder_path = os.path.join(BASE_STORAGE_PATH, entity, str(entity_id))
+    os.makedirs(folder_path, exist_ok=True)
+    file_path = os.path.join(folder_path, clean_name)
+
+    with open(file_path, "wb") as buffer:
+        shutil.copyfileobj(file.file, buffer)
+
+    new_doc = Document(
+        patient_id=patient_id,
+        staff_id=staff_id,
+        file_name=clean_name,
+        file_path=file_path,
+        uploaded_at=datetime.utcnow()
     )
-    db.add(new_documento)
+    db.add(new_doc)
     db.commit()
-    db.refresh(new_documento)
+    db.refresh(new_doc)
+    return new_doc
 
-    return new_documento
-
-#////////////////////////// EJERCICIOS //////////////////////////#
+#====================== EXERCISES ======================#
 
 @router.post("/exercises/", response_model=ExerciseResponse)
 def create_exercise(exercise: ExerciseCreate, db: Session = Depends(get_db)):
@@ -164,115 +165,134 @@ def create_exercise(exercise: ExerciseCreate, db: Session = Depends(get_db)):
     db.add(new_exercise)
     db.commit()
     db.refresh(new_exercise)
-
     return new_exercise
 
-@router.post("/pacientes/exercises/")
-def assign_exercises_to_paciente(assignments: List[PacienteExerciseAssignmentCreate], db: Session = Depends(get_db)):
-    for assignment in assignments:
-        new_assignment = PacienteExerciseAssignment(
-            paciente_id=assignment.paciente_id,
-            exercise_id=assignment.exercise_id,
-            sets=assignment.sets,
-            reps=assignment.reps,
-            sessions_per_day=assignment.sessions_per_day,
-            hep_required=assignment.hep_required,
-        )
-        db.add(new_assignment)
-
+@router.post("/patients/exercises/")
+def assign_exercises_to_patient(assignments: List[PatientExerciseAssignmentCreate], db: Session = Depends(get_db)):
+    for a in assignments:
+        db.add(PatientExerciseAssignment(**a.dict()))
     db.commit()
-    return {"message": "Ejercicios asignados exitosamente."}
+    return {"message": "Exercises assigned successfully."}
 
-#////////////////////////// CERT PERIODS //////////////////////////#
+#====================== CERTIFICATION PERIODS ======================#
 
-@router.post("/pacientes/{paciente_id}/certification-period")
+@router.post("/patients/{patient_id}/certification-period")
 def create_certification_period(
-    paciente_id: int,
+    patient_id: int,
     start_date: date,
     db: Session = Depends(get_db)
 ):
-    paciente = db.query(Pacientes).filter(Pacientes.id_paciente == paciente_id).first()
-
-    if not paciente:
-        raise HTTPException(status_code=404, detail="Paciente no encontrado.")
+    patient = db.query(Patient).filter(Patient.id == patient_id).first()
+    if not patient:
+        raise HTTPException(status_code=404, detail="Patient not found.")
 
     end_date = start_date + timedelta(days=60)
+    today = date.today()
+
+    is_active = patient.is_active and (start_date <= today <= end_date)
 
     new_cert = CertificationPeriod(
-        paciente_id=paciente_id,
+        patient_id=patient_id,
         start_date=start_date,
         end_date=end_date,
-        is_active=True
+        is_active=is_active
     )
 
     db.add(new_cert)
     db.commit()
     db.refresh(new_cert)
-
     return {
-        "message": "Nuevo Certification Period creado exitosamente.",
+        "message": "New certification period created successfully.",
         "certification_period_id": new_cert.id
     }
 
-#////////////////////////// VISITS //////////////////////////#
+#====================== VISITS ======================#
 
-@router.post("/visits/assign")
+@router.post("/visits/assign", response_model=VisitResponse)
 def create_visit(data: VisitCreate, db: Session = Depends(get_db)):
-    visit = Visit(**data.dict())
+    staff = db.query(Staff).filter(Staff.id == data.staff_id).first()
+    if not staff:
+        raise HTTPException(status_code=404, detail="Staff not found")
+
+    cert = db.query(CertificationPeriod).filter(
+        CertificationPeriod.patient_id == data.patient_id,
+        CertificationPeriod.start_date <= data.visit_date,
+        CertificationPeriod.end_date >= data.visit_date
+    ).first()
+    if not cert:
+        raise HTTPException(status_code=404, detail="No certification period found for given date")
+
+    visit = Visit(
+        patient_id=data.patient_id,
+        staff_id=data.staff_id,
+        certification_period_id=cert.id,
+        visit_date=data.visit_date,
+        visit_type=data.visit_type,
+        therapy_type=staff.role.upper(), 
+        status=data.status,
+        scheduled_time=data.scheduled_time
+    )
     db.add(visit)
+    db.flush()
+
+    template = db.query(NoteTemplate).filter_by(
+        discipline=staff.role.upper(),
+        note_type=data.visit_type,
+        is_active=True
+    ).first()
+    if not template:
+        raise HTTPException(status_code=404, detail="No active template for this visit type and discipline")
+
+    sections = db.query(NoteTemplateSection).filter(
+        NoteTemplateSection.template_id == template.id
+    ).order_by(NoteTemplateSection.position.asc()).all()
+
+    sections_data = [{"section_id": s.section_id, "content": {}} for s in sections]
+
+    note = VisitNote(
+        visit_id=visit.id,
+        discipline=template.discipline,
+        note_type=template.note_type,
+        status="Scheduled",
+        sections_data=sections_data
+    )
+    db.add(note)
     db.commit()
     db.refresh(visit)
     return visit
 
-#////////////////////////// NOTAS //////////////////////////#
+#====================== NOTES ======================#
 
 @router.post("/note-templates", response_model=NoteTemplateResponse)
-def create_template_section(template_data: NoteTemplateCreate, db: Session = Depends(get_db)):
-    new_section = NoteTemplate(**template_data.dict())
-    db.add(new_section)
-    db.commit()
-    db.refresh(new_section)
-    return new_section
-
-@router.post("/visit-notes", response_model=VisitNoteResponse)
-def create_visit_note(data: VisitNoteCreate, db: Session = Depends(get_db)):
-    # Verifica que la visita exista
-    visit = db.query(Visit).filter(Visit.id == data.visit_id).first()
-    if not visit:
-        raise HTTPException(status_code=404, detail="Visit not found")
-
-    # Crea la nota
-    new_note = VisitNote(
-        visit_id=data.visit_id,
-        discipline=data.discipline,
-        note_type=data.note_type,
-        status=data.status or "In Progress"
+def create_template(template_data: NoteTemplateCreate, db: Session = Depends(get_db)):
+    existing = db.query(NoteTemplate).filter_by(
+        discipline=template_data.discipline,
+        note_type=template_data.note_type
+    ).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Template already exists for this discipline and note type.")
+        
+    new_template = NoteTemplate(
+        discipline=template_data.discipline,
+        note_type=template_data.note_type,
+        is_active=template_data.is_active
     )
-    db.add(new_note)
-    db.flush()  # para obtener el ID antes de agregar las secciones
-
-    # Busca plantilla por disciplina y tipo
-    template_sections = db.query(NoteTemplate).filter(
-        NoteTemplate.discipline == data.discipline,
-        NoteTemplate.note_type == data.note_type,
-        NoteTemplate.is_active == True
-    ).all()
-
-    # Crea cada sección basada en plantilla
-    for template in template_sections:
-        section = NoteSection(
-            note_id=new_note.id,
-            section_name=template.section_name,
-            content=""
-        )
-        db.add(section)
-
+    db.add(new_template)
     db.commit()
-    db.refresh(new_note)
-    return new_note
+    db.refresh(new_template)
+
+    for i, section_id in enumerate(template_data.section_ids):
+        db.add(NoteTemplateSection(template_id=new_template.id, section_id=section_id, position=i))
+    
+    db.commit()
+    return new_template
 
 @router.post("/note-sections", response_model=NoteSectionResponse)
 def create_section(data: NoteSectionCreate, db: Session = Depends(get_db)):
+    existing = db.query(NoteSection).filter_by(section_name=data.section_name).first()
+    if existing:
+        raise HTTPException(status_code=400, detail="Section with this name already exists")
+
     section = NoteSection(**data.dict())
     db.add(section)
     db.commit()

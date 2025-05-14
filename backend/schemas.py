@@ -1,10 +1,10 @@
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional, List, Dict
 from datetime import datetime, date
 
-#/////////////////////////////// STAFF ////////////////////////////////#
+#========================= STAFF =========================#
 
-class StaffBase(BaseModel):
+class StaffCreate(BaseModel):
     name: str
     birthday: Optional[date] = None
     gender: Optional[str] = None
@@ -14,53 +14,31 @@ class StaffBase(BaseModel):
     alt_phone: Optional[str] = None
     username: str
     password: str
-    rol: str
-    activo: bool
-
-class StaffCreate(StaffBase):
-    pass
-
-class StaffUpdate(StaffBase):
-    name: Optional[str] = None
-    email: Optional[str] = None
-    username: Optional[str] = None
-    password: Optional[str] = None
-    rol: Optional[str] = None
-    activo: Optional[bool] = None
-
-    class Config:
-        from_attributes = True
+    role: str
+    is_active: bool
 
 class StaffResponse(BaseModel):
     id: int
     name: str
     email: str
-    rol: str
+    role: str
 
     class Config:
         from_attributes = True
 
-class StaffAssignmentBase(BaseModel):
-    paciente_id: int
-    staff_id: int
-    rol_asignado: str
-
-class StaffAssignmentCreate(StaffAssignmentBase):
-    pass
-
 class StaffAssignmentResponse(BaseModel):
     id: int
-    fecha_asignacion: datetime
-    rol_asignado: str
+    assigned_at: datetime
+    assigned_role: str
     staff: StaffResponse
 
     class Config:
         from_attributes = True
 
-#/////////////////////////////// PACIENTES ////////////////////////////////#
+#========================= PATIENTS =========================#
 
-class PacienteBase(BaseModel):
-    patient_name: str
+class PatientCreate(BaseModel):
+    full_name: str
     birthday: date
     gender: str
     address: str
@@ -68,58 +46,47 @@ class PacienteBase(BaseModel):
     payor_type: Optional[str] = None
     physician: Optional[str] = None
     agency_id: int
-    nursing_diagnostic: Optional[str] = None
+    nursing_diagnosis: Optional[str] = None
     urgency_level: Optional[str] = None
     prior_level_of_function: Optional[str] = None
-    homebound: Optional[str] = None
+    homebound_status: Optional[str] = None
     weight_bearing_status: Optional[str] = None
-    reason_for_referral: Optional[str] = None
+    referral_reason: Optional[str] = None
     weight: Optional[str] = None
     height: Optional[str] = None
-    pmh: Optional[str] = None
+    past_medical_history: Optional[str] = None
     clinical_grouping: Optional[str] = None
-    disciplines_needed: Optional[str] = None 
-    activo: Optional[bool] = True
-
-class PacienteCreate(PacienteBase):
+    required_disciplines: Optional[str] = None 
+    is_active: Optional[bool] = True
     initial_cert_start_date: date
 
-class PacienteUpdate(PacienteBase):
-    patient_name: Optional[str] = None
-    birthday: Optional[date] = None
-    gender: Optional[str] = None
-    address: Optional[str] = None
-    agency_id: Optional[int] = None
+class PatientResponse(BaseModel):
+    id: int
+    full_name: str
+    agency_id: int
+    gender: str
+    address: str
+    is_active: Optional[bool] = True
 
     class Config:
         from_attributes = True
 
-class PacienteResponse(PacienteBase):
-    id_paciente: int
+#========================= DOCUMENTS =========================#
 
-    class Config:
-        from_attributes = True
-
-#//////////////////////////// DOCUMENTOS //////////////////////////#
-
-class DocumentoBase(BaseModel):
-    paciente_id: int
+class DocumentResponse(BaseModel):
+    id: int
+    patient_id: Optional[int] = None
     staff_id: Optional[int] = None
     file_name: str
-    file_data_base64: str
-
-class DocumentoCreate(DocumentoBase):
-    pass
-
-class DocumentoResponse(DocumentoBase):
-    id: int
+    file_path: str
+    uploaded_at: datetime
 
     class Config:
         from_attributes = True
 
-#//////////////////////////// EJERCICIOS //////////////////////////#
+#========================= EXERCISES =========================#
 
-class ExerciseBase(BaseModel):
+class ExerciseCreate(BaseModel):
     name: str
     description: Optional[str] = None
     image_url: Optional[str] = None
@@ -129,130 +96,178 @@ class ExerciseBase(BaseModel):
     hep_required: Optional[bool] = True
     discipline: str  
     focus_area: Optional[str] = None
+    is_active: Optional[bool] = True
 
-class ExerciseCreate(ExerciseBase):
-    pass
-
-class ExerciseUpdate(ExerciseBase):
-    name: Optional[str] = None
-    discipline: Optional[str] = None
+class ExerciseResponse(ExerciseCreate):
+    id: int
 
     class Config:
         from_attributes = True
 
-class ExerciseResponse(ExerciseBase):
-    id: int
-
-    class Config:
-        from_attributes = True      
-
-class PacienteExerciseAssignmentBase(BaseModel):
-    paciente_id: int
+class PatientExerciseAssignmentCreate(BaseModel):
+    patient_id: int
     exercise_id: int
     sets: Optional[int] = None
     reps: Optional[int] = None
     sessions_per_day: Optional[int] = None
     hep_required: Optional[bool] = True
 
-class PacienteExerciseAssignmentCreate(PacienteExerciseAssignmentBase):
-    pass
-
-class PacienteExerciseAssignmentResponse(PacienteExerciseAssignmentBase):
+class PatientExerciseAssignmentResponse(PatientExerciseAssignmentCreate):
     id: int
 
     class Config:
         from_attributes = True
 
-#//////////////////////////// VISITAS y NOTAS //////////////////////////#
+#========================= VISITS =========================#
 
-class VisitBase(BaseModel):
-    paciente_id: int
+class VisitCreate(BaseModel):
+    patient_id: int
+    staff_id: int
+    visit_date: date
+    visit_type: str
+    status: Optional[str] = "Scheduled"
+    scheduled_time: Optional[str] = None
+
+class VisitUpdate(BaseModel):
+    patient_id: Optional[int] = None
+    staff_id: Optional[int] = None
+    certification_period_id: Optional[int] = None
+    visit_date: Optional[date] = None
+    visit_type: Optional[str] = None
+    therapy_type: Optional[str] = None
+    status: Optional[str] = None
+    scheduled_time: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+class VisitResponse(BaseModel):
+    id: int
+    patient_id: int
     staff_id: int
     certification_period_id: int
     visit_date: date
     visit_type: str
     therapy_type: str
-    status: Optional[str] = "Scheduled"
-    scheduled_time: Optional[str] = None
-
-class VisitCreate(VisitBase):
-    pass
-
-class VisitResponse(VisitBase):
-    id: int
+    status: Optional[str]
+    scheduled_time: Optional[str]
     note_id: Optional[int] = None
 
     class Config:
         from_attributes = True
 
-class VisitNoteBase(BaseModel):
-    visit_id: int
-    status: Optional[str] = "Scheduled"
-    discipline: str 
-    note_type: str     
+#========================= CERTIFICATION PERIODS =========================#
+
+class CertificationPeriodResponse(BaseModel):
+    id: int
+    patient_id: int
+    start_date: date
+    end_date: date
+    is_active: bool
+
+    class Config:
+        from_attributes = True
+
+class CertificationPeriodUpdate(BaseModel):
+    start_date: Optional[date] = None
+    end_date: Optional[date] = None
+
+    class Config:
+        from_attributes = True
+
+#========================= NOTESECTIONS =========================#
+
+class NoteSectionCreate(BaseModel):
+    section_name: str
+    description: Optional[str] = None
+    is_required: Optional[bool] = False
+    has_static_image: Optional[bool] = False
+    static_image_url: Optional[str] = None
+    form_schema: Optional[Dict] = None 
+
+class NoteSectionUpdate(BaseModel):
+    section_name: Optional[str] = None
+    description: Optional[str] = None
+    is_required: Optional[bool] = None
+    has_static_image: Optional[bool] = None
+    static_image_url: Optional[str] = None
+    form_schema: Optional[Dict] = None
+
+    class Config:
+        from_attributes = True
+
+class NoteSectionResponse(NoteSectionCreate):
+    id: int
+
+    class Config:
+        from_attributes = True
+
+#========================= NOTES =========================#
+
+class VisitNoteSectionData(BaseModel):
+    section_id: int
+    content: dict
+
+class VisitNoteSectionUpdate(BaseModel):
+    section_id: int
+    content: Dict
+
+class VisitNoteUpdate(BaseModel):
+    status: Optional[str] = None
     therapist_signature: Optional[str] = None
     patient_signature: Optional[str] = None
     visit_date_signature: Optional[str] = None
+    updated_sections: Optional[List[VisitNoteSectionUpdate]] = None
 
-class VisitNoteCreate(VisitNoteBase):
-    pass
-
-class VisitNoteResponse(VisitNoteBase):
+class VisitNoteResponse(BaseModel):
     id: int
-
-    class Config:
-        from_attributes = True
-        
-class NoteSectionBase(BaseModel):
-    note_id: int
-    section_name: str
-    content: Optional[str] = None
-
-class NoteSectionCreate(NoteSectionBase):
-    pass
-
-class NoteSectionResponse(NoteSectionBase):
-    id: int
-
-    class Config:
-        from_attributes = True
-
-class NoteTemplateBase(BaseModel):
-    visit_type: str
+    visit_id: int
+    status: str
     discipline: str
-    section_name: str
-    is_active: bool = True
-    is_required: Optional[bool] = False
-    has_image: Optional[bool] = False
-    image_url: Optional[str] = None
-
-class NoteTemplateCreate(NoteTemplateBase):
-    pass
-
-class NoteTemplateResponse(NoteTemplateBase):
-    id: int
+    note_type: str
+    therapist_signature: Optional[str] = None
+    patient_signature: Optional[str] = None
+    visit_date_signature: Optional[date] = None
+    sections_data: Optional[List[VisitNoteSectionData]] = None
+    template_sections: List[NoteSectionResponse] = []
 
     class Config:
         from_attributes = True
 
-#//////////////////////////// CERT PERIODS //////////////////////////#
+#========================= NOTETEMPLATES =========================#
 
-class CertificationPeriodBase(BaseModel):
-    start_date: date
-    end_date: date
+class NoteTemplateCreate(BaseModel):
+    discipline: str
+    note_type: str
     is_active: bool = True
+    section_ids: List[int]
 
-class CertificationPeriodResponse(CertificationPeriodBase):
-    id: int
-    paciente_id: int
-
-    class Config:
-        from_attributes = True
-
-class CertificationPeriodUpdate(CertificationPeriodBase):
-    start_date: Optional[date] = None
-    end_date: Optional[date] = None
+class NoteTemplateUpdate(BaseModel):
+    discipline: Optional[str] = None
+    note_type: Optional[str] = None
     is_active: Optional[bool] = None
-    
+    replace_section_ids: Optional[List[int]] = None
+    add_section_ids: Optional[List[int]] = None
+    remove_section_ids: Optional[List[int]] = None
+
+    class Config:
+        from_attributes = True
+
+class NoteTemplateResponse(BaseModel):
+    id: int
+    discipline: str
+    note_type: str
+    is_active: bool
+
+    class Config:
+        from_attributes = True
+
+class NoteTemplateWithSectionsResponse(BaseModel):
+    id: int
+    discipline: str
+    note_type: str
+    is_active: bool
+    sections: List[NoteSectionResponse]
+
     class Config:
         from_attributes = True
