@@ -1,8 +1,12 @@
-  import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../../../../styles/developer/Patients/Staffing/AddStaffForm.scss';
 
-const DevAddStaffForm = ({ onCancel }) => {
+const DevAddStaffForm = ({ onCancel, onViewAllStaff }) => {
   const [isLoading, setIsLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [savedStaffName, setSavedStaffName] = useState('');
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -15,7 +19,20 @@ const DevAddStaffForm = ({ onCancel }) => {
     userName: '',
     password: '',
     role: '',
+    // New field for agency affiliation
+    agency: 'motive-home-care' // Default agency
   });
+
+  // List of available agencies
+  const agencies = [
+    {
+      id: 'motive-home-care',
+      name: 'Motive Home Care',
+      address: '1234 Healthcare Blvd, Los Angeles, CA 90001',
+      phone: '(323) 555-7890'
+    },
+    // More agencies can be added here in the future
+  ];
 
   const [documents, setDocuments] = useState({
     covidVaccine: { status: 'pending', file: null },
@@ -28,16 +45,17 @@ const DevAddStaffForm = ({ onCancel }) => {
     businessLicense: { status: 'pending', file: null },
   });
 
-  // Simulación de carga del formulario con mensajes dinámicos
-  const [loadingMessage, setLoadingMessage] = useState('Iniciando módulo de personal...');
+  // Loading simulation with dynamic messages
+  const [loadingMessage, setLoadingMessage] = useState('Initializing staff module...');
+  const [savingMessage, setSavingMessage] = useState('Processing staff data...');
   
   React.useEffect(() => {
     const loadingMessages = [
-      { message: 'Conectando con el sistema...', time: 800 },
-      { message: 'Cargando módulos de documentación...', time: 600 },
-      { message: 'Preparando formulario de registro...', time: 400 },
-      { message: 'Verificando plantillas de documentos...', time: 500 },
-      { message: 'Listo para registrar nuevo terapeuta', time: 1000 }
+      { message: 'Connecting to system...', time: 800 },
+      { message: 'Loading documentation modules...', time: 600 },
+      { message: 'Preparing registration form...', time: 400 },
+      { message: 'Verifying document templates...', time: 500 },
+      { message: 'Ready to register new therapist', time: 1000 }
     ];
     
     loadingMessages.forEach((item, index) => {
@@ -84,19 +102,94 @@ const DevAddStaffForm = ({ onCancel }) => {
     });
   };
 
+  const resetForm = () => {
+    setFormData({
+      firstName: '',
+      lastName: '',
+      dob: '',
+      gender: '',
+      zipCode: '',
+      email: '',
+      phone: '',
+      altPhone: '',
+      userName: '',
+      password: '',
+      role: '',
+      agency: 'motive-home-care'
+    });
+    
+    setDocuments({
+      covidVaccine: { status: 'pending', file: null },
+      tbTest: { status: 'pending', file: null },
+      physicalExam: { status: 'pending', file: null },
+      liabilityInsurance: { status: 'pending', file: null },
+      driversLicense: { status: 'pending', file: null },
+      autoInsurance: { status: 'pending', file: null },
+      cprCertification: { status: 'pending', file: null },
+      businessLicense: { status: 'pending', file: null },
+    });
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
-    // Implementar lógica para enviar los datos
-    console.log('Form data:', formData);
-    console.log('Documents:', documents);
-    // Aquí iría la lógica para enviar al servidor
+    setIsSaving(true);
+    
+    // Save the name for the success message
+    setSavedStaffName(`${formData.firstName} ${formData.lastName}`);
+    
+    // Simulate saving process with dynamic messages
+    const savingMessages = [
+      { message: 'Processing staff data...', time: 600 },
+      { message: 'Validating information...', time: 800 },
+      { message: 'Uploading documents...', time: 1200 },
+      { message: 'Creating user credentials...', time: 700 },
+      { message: 'Linking to Motive Home Care agency...', time: 900 },
+      { message: 'Finalizing registration...', time: 1000 }
+    ];
+    
+    let totalTime = 0;
+    
+    savingMessages.forEach((item, index) => {
+      totalTime += item.time;
+      
+      setTimeout(() => {
+        setSavingMessage(item.message);
+        
+        // When reaching the last message, complete the saving process
+        if (index === savingMessages.length - 1) {
+          setTimeout(() => {
+            // Implement logic for sending data
+            console.log('Form data:', formData);
+            console.log('Documents:', documents);
+            
+            // Simulate API response
+            setIsSaving(false);
+            setShowSuccessModal(true);
+          }, 800);
+        }
+      }, totalTime);
+    });
+  };
+
+  const handleCreateAnother = () => {
+    setShowSuccessModal(false);
+    resetForm();
+  };
+
+  const handleViewAllStaff = () => {
+    if (onViewAllStaff) {
+      onViewAllStaff();
+    } else {
+      // Fallback if the function is not provided
+      onCancel();
+    }
   };
 
   const roles = [
     { value: 'agency', label: 'Agency' },
     { value: 'support', label: 'Support' },
     { value: 'developer', label: 'Developer' },
-    { value: 'administrator', label: 'Administrador' },
+    { value: 'administrator', label: 'Administrator' },
     { value: 'pt', label: 'PT - Physical Therapist' },
     { value: 'pta', label: 'PTA - Physical Therapist Assistant' },
     { value: 'ot', label: 'OT - Occupational Therapist' },
@@ -141,23 +234,70 @@ const DevAddStaffForm = ({ onCancel }) => {
             <div className="loader-status">TherapySync Pro <span className="status-dot"></span></div>
           </div>
         </div>
+      ) : isSaving ? (
+        <div className="loading-screen saving-screen">
+          <div className="loader-container">
+            <div className="loader-hologram">
+              <div className="hologram-ring"></div>
+              <div className="hologram-circle"></div>
+              <div className="hologram-bars">
+                <div className="bar"></div>
+                <div className="bar"></div>
+                <div className="bar"></div>
+                <div className="bar"></div>
+                <div className="bar"></div>
+              </div>
+            </div>
+            <div className="loader-progress">
+              <div className="progress-bar">
+                <div className="progress-fill"></div>
+              </div>
+            </div>
+            <div className="loader-text">{savingMessage}</div>
+            <div className="loader-status">TherapySync Pro <span className="status-dot"></span></div>
+          </div>
+        </div>
       ) : (
         <div className="staff-form-container">
+          {showSuccessModal && (
+            <div className="success-modal-overlay">
+              <div className="success-modal">
+                <div className="success-icon">
+                  <i className="fas fa-check-circle"></i>
+                </div>
+                <h2 className="success-title">Staff Member Added Successfully!</h2>
+                <p className="success-message">
+                  <strong>{savedStaffName}</strong> has been successfully registered in the system and linked to <strong>{agencies.find(a => a.id === formData.agency)?.name}</strong>.
+                </p>
+                <div className="success-actions">
+                  <button className="create-another-btn" onClick={handleCreateAnother}>
+                    <i className="fas fa-plus-circle"></i>
+                    Create Another Staff Member
+                  </button>
+                  <button className="view-all-btn" onClick={handleViewAllStaff}>
+                    <i className="fas fa-users"></i>
+                    View All Staff
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+          
           <div className="form-header">
-            <h2>Añadir Nuevo Miembro al Equipo</h2>
-            <p>Complete la información para registrar un nuevo terapeuta o miembro del personal</p>
+            <h2>Add New Team Member</h2>
+            <p>Complete the information to register a new therapist or staff member</p>
           </div>
           
           <form onSubmit={handleSubmit} className="staff-form">
-            {/* Sección de Información Personal */}
+            {/* Personal Information Section */}
             <div className="form-section">
               <div className="section-header">
                 <i className="fas fa-user-circle"></i>
-                <h3>Información Personal</h3>
+                <h3>Personal Information</h3>
               </div>
               <div className="section-content">
                 <div className="form-group">
-                  <label htmlFor="firstName">Nombre</label>
+                  <label htmlFor="firstName">First Name</label>
                   <input
                     type="text"
                     id="firstName"
@@ -165,11 +305,11 @@ const DevAddStaffForm = ({ onCancel }) => {
                     value={formData.firstName}
                     onChange={handleInputChange}
                     required
-                    placeholder="Ingrese el nombre"
+                    placeholder="Enter first name"
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="lastName">Apellido</label>
+                  <label htmlFor="lastName">Last Name</label>
                   <input
                     type="text"
                     id="lastName"
@@ -177,11 +317,11 @@ const DevAddStaffForm = ({ onCancel }) => {
                     value={formData.lastName}
                     onChange={handleInputChange}
                     required
-                    placeholder="Ingrese el apellido"
+                    placeholder="Enter last name"
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="dob">Fecha de Nacimiento</label>
+                  <label htmlFor="dob">Date of Birth</label>
                   <input
                     type="date"
                     id="dob"
@@ -192,7 +332,7 @@ const DevAddStaffForm = ({ onCancel }) => {
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="gender">Género</label>
+                  <label htmlFor="gender">Gender</label>
                   <select
                     id="gender"
                     name="gender"
@@ -200,14 +340,14 @@ const DevAddStaffForm = ({ onCancel }) => {
                     onChange={handleInputChange}
                     required
                   >
-                    <option value="">Seleccionar género</option>
-                    <option value="male">Masculino</option>
-                    <option value="female">Femenino</option>
-                    <option value="other">Otro</option>
+                    <option value="">Select gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
                   </select>
                 </div>
                 <div className="form-group">
-                  <label htmlFor="zipCode">Código Postal</label>
+                  <label htmlFor="zipCode">Zip Code</label>
                   <input
                     type="text"
                     id="zipCode"
@@ -215,21 +355,21 @@ const DevAddStaffForm = ({ onCancel }) => {
                     value={formData.zipCode}
                     onChange={handleInputChange}
                     required
-                    placeholder="Ingrese código postal"
+                    placeholder="Enter zip code"
                   />
                 </div>
               </div>
             </div>
             
-            {/* Sección de Contacto */}
+            {/* Contact Information Section */}
             <div className="form-section">
               <div className="section-header">
                 <i className="fas fa-address-book"></i>
-                <h3>Información de Contacto</h3>
+                <h3>Contact Information</h3>
               </div>
               <div className="section-content">
                 <div className="form-group">
-                  <label htmlFor="email">Correo electrónico</label>
+                  <label htmlFor="email">Email</label>
                   <input
                     type="email"
                     id="email"
@@ -237,11 +377,11 @@ const DevAddStaffForm = ({ onCancel }) => {
                     value={formData.email}
                     onChange={handleInputChange}
                     required
-                    placeholder="correo@ejemplo.com"
+                    placeholder="email@example.com"
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="phone">Teléfono</label>
+                  <label htmlFor="phone">Phone</label>
                   <input
                     type="tel"
                     id="phone"
@@ -253,7 +393,7 @@ const DevAddStaffForm = ({ onCancel }) => {
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="altPhone">Teléfono Alternativo (Opcional)</label>
+                  <label htmlFor="altPhone">Alternative Phone (Optional)</label>
                   <input
                     type="tel"
                     id="altPhone"
@@ -266,15 +406,15 @@ const DevAddStaffForm = ({ onCancel }) => {
               </div>
             </div>
             
-            {/* Sección de Usuario */}
+            {/* User Information Section */}
             <div className="form-section">
               <div className="section-header">
                 <i className="fas fa-user-lock"></i>
-                <h3>Información de Usuario</h3>
+                <h3>User Information</h3>
               </div>
               <div className="section-content">
                 <div className="form-group">
-                  <label htmlFor="userName">Nombre de Usuario</label>
+                  <label htmlFor="userName">Username</label>
                   <input
                     type="text"
                     id="userName"
@@ -282,11 +422,11 @@ const DevAddStaffForm = ({ onCancel }) => {
                     value={formData.userName}
                     onChange={handleInputChange}
                     required
-                    placeholder="Ingrese nombre de usuario"
+                    placeholder="Enter username"
                   />
                 </div>
                 <div className="form-group">
-                  <label htmlFor="password">Contraseña</label>
+                  <label htmlFor="password">Password</label>
                   <input
                     type="password"
                     id="password"
@@ -294,21 +434,66 @@ const DevAddStaffForm = ({ onCancel }) => {
                     value={formData.password}
                     onChange={handleInputChange}
                     required
-                    placeholder="Ingrese contraseña"
+                    placeholder="Enter password"
                   />
                 </div>
               </div>
             </div>
             
-            {/* Sección de Roles */}
+            {/* Agency Affiliation Section - NEW */}
+            <div className="form-section">
+              <div className="section-header">
+                <i className="fas fa-building"></i>
+                <h3>Agency Affiliation</h3>
+              </div>
+              <div className="section-content">
+                <div className="form-group">
+                  <label htmlFor="agency">Select Agency</label>
+                  <select
+                    id="agency"
+                    name="agency"
+                    value={formData.agency}
+                    onChange={handleInputChange}
+                    required
+                  >
+                    {agencies.map((agency) => (
+                      <option key={agency.id} value={agency.id}>
+                        {agency.name}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+                
+                {/* Display details of the selected agency */}
+                {formData.agency && (
+                  <div className="agency-details">
+                    <h4>Agency Details:</h4>
+                    {agencies.filter(a => a.id === formData.agency).map(agency => (
+                      <div key={agency.id} className="agency-info">
+                        <p><strong>Name:</strong> {agency.name}</p>
+                        <p><strong>Address:</strong> {agency.address}</p>
+                        <p><strong>Phone:</strong> {agency.phone}</p>
+                      </div>
+                    ))}
+                    <div className="agency-confirmation">
+                      <p className="confirmation-text">
+                        <i className="fas fa-info-circle"></i> Staff member will be linked to this agency and can only access its patients and resources.
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            {/* Professional Role Section */}
             <div className="form-section">
               <div className="section-header">
                 <i className="fas fa-user-tag"></i>
-                <h3>Rol Profesional</h3>
+                <h3>Professional Role</h3>
               </div>
               <div className="section-content role-selection">
                 <div className="form-group">
-                  <label htmlFor="role">Seleccionar Rol</label>
+                  <label htmlFor="role">Select Role</label>
                   <select
                     id="role"
                     name="role"
@@ -316,7 +501,7 @@ const DevAddStaffForm = ({ onCancel }) => {
                     onChange={handleInputChange}
                     required
                   >
-                    <option value="">Seleccionar un rol</option>
+                    <option value="">Select a role</option>
                     {roles.map((role) => (
                       <option key={role.value} value={role.value}>
                         {role.label}
@@ -327,12 +512,12 @@ const DevAddStaffForm = ({ onCancel }) => {
               </div>
             </div>
             
-            {/* Sección de Documentos */}
+            {/* Required Documents Section */}
             <div className="form-section documents-section">
               <div className="section-header">
                 <i className="fas fa-file-medical"></i>
-                <h3>Documentos Requeridos</h3>
-                <p className="section-subtitle">Los documentos no son obligatorios para crear el perfil, pero serán necesarios para asignación de pacientes.</p>
+                <h3>Required Documents</h3>
+                <p className="section-subtitle">Documents are not mandatory to create the profile, but will be necessary for patient assignments.</p>
               </div>
               
               <div className="section-content documents-grid">
@@ -348,9 +533,9 @@ const DevAddStaffForm = ({ onCancel }) => {
                         onClick={() => toggleDocumentStatus(doc.id)}
                       >
                         {documents[doc.id].status === 'obtained' ? (
-                          <><i className="fas fa-check-circle"></i> Obtenido</>
+                          <><i className="fas fa-check-circle"></i> Obtained</>
                         ) : (
-                          <><i className="fas fa-clock"></i> Pendiente</>
+                          <><i className="fas fa-clock"></i> Pending</>
                         )}
                       </span>
                     </div>
@@ -362,7 +547,7 @@ const DevAddStaffForm = ({ onCancel }) => {
                     <div className="document-actions">
                       <div className="file-upload">
                         <label htmlFor={`file-${doc.id}`} className="upload-btn">
-                          <i className="fas fa-upload"></i> Cargar documento
+                          <i className="fas fa-upload"></i> Upload document
                         </label>
                         <input
                           type="file"
@@ -382,11 +567,11 @@ const DevAddStaffForm = ({ onCancel }) => {
                   </div>
                 ))}
                 
-                {/* Opción para subir documento adicional */}
+                {/* Option to upload additional document */}
                 <div className="document-card add-document">
                   <div className="add-document-content">
                     <i className="fas fa-plus-circle"></i>
-                    <span>Añadir documento adicional</span>
+                    <span>Add additional document</span>
                   </div>
                 </div>
               </div>
@@ -394,10 +579,10 @@ const DevAddStaffForm = ({ onCancel }) => {
             
             <div className="form-actions">
               <button type="button" className="cancel-btn" onClick={onCancel}>
-                <i className="fas fa-times"></i> Cancelar
+                <i className="fas fa-times"></i> Cancel
               </button>
               <button type="submit" className="submit-btn">
-                <i className="fas fa-save"></i> Guardar miembro
+                <i className="fas fa-save"></i> Save Member
               </button>
             </div>
           </form>

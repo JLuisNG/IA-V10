@@ -16,12 +16,6 @@ const AdminStaffingManagerContainer = () => {
     setSelectedContent('add-staff');
   };
 
-  const handleViewAllStaffClick = () => {
-    setShowStaffList(true);
-    setShowAddStaffForm(false);
-    setShowStaffEdit(false);
-    setSelectedContent('view-staff');
-  };
 
   const handleEditStaffClick = () => {
     setShowStaffEdit(true);
@@ -76,9 +70,6 @@ const AdminStaffingManagerContainer = () => {
                     </button>
                     <button className="action-btn view" onClick={handleViewAllStaffClick}>
                       <i className="fas fa-list"></i> View All Staff
-                    </button>
-                    <button className="action-btn edit" onClick={handleEditStaffClick}>
-                      <i className="fas fa-user-edit"></i> Edit Existing Staff
                     </button>
                   </div>
                 </div>

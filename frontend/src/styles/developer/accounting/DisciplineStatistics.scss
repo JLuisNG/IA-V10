@@ -1,0 +1,949 @@
+@import '../../../styles/_variables.scss';
+@import '../../../styles/_mixins.scss';
+
+// Variables de color
+$primary-color: #00e5ff;
+$secondary-color: #2979ff;
+$primary-gradient: linear-gradient(135deg, #00e5ff, #2979ff);
+$text-primary: #ffffff;
+$text-secondary: rgba(255, 255, 255, 0.7);
+$border-color: rgba(255, 255, 255, 0.1);
+$background-card: rgba(30, 41, 59, 0.7);
+
+// Variables para disciplinas
+$pt-color: #36D1DC;
+$pta-color: #5B86E5;
+$ot-color: #FF9966;
+$cota-color: #FF5E62;
+$st-color: #56CCF2;
+$sta-color: #2F80ED;
+
+// Variables para estados
+$status-completed: #4caf50;
+$status-pending: #ff9800;
+
+// Animaciones
+@keyframes progressFill {
+  from {
+    width: 0;
+  }
+  to {
+    width: var(--width, 100%);
+  }
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Mixins
+@mixin discipline-card($color) {
+  position: relative;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  background: rgba(15, 23, 42, 0.6);
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  
+  &:hover {
+    background: rgba(30, 41, 59, 0.7);
+    border-color: rgba($color, 0.3);
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+    
+    .discipline-icon {
+      background: rgba($color, 0.2);
+      color: $color;
+      transform: scale(1.05);
+    }
+    
+    .progress-bar .progress-fill {
+      background: linear-gradient(to right, rgba($color, 0.7), rgba($color, 0.9));
+    }
+  }
+  
+  &.expanded {
+    background: rgba(30, 41, 59, 0.8);
+    border-color: rgba($color, 0.4);
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    
+    .card-header {
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      
+      .expand-icon i {
+        transform: rotate(180deg);
+      }
+    }
+  }
+  
+  .progress-bar {
+    height: 4px;
+    background: rgba(255, 255, 255, 0.05);
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    overflow: hidden;
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(to right, rgba($color, 0.5), rgba($color, 0.7));
+      width: 0;
+      animation: progressFill 1.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+    }
+  }
+}
+
+// Componente principal
+.discipline-statistics-section {
+  margin-bottom: 2rem;
+  
+  // Encabezado de la sección
+  .section-header {
+    margin-bottom: 1.25rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    
+    h2 {
+      font-size: 1.4rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      
+      i {
+        margin-right: 0.75rem;
+        color: $primary-color;
+        font-size: 1.2rem;
+      }
+    }
+    
+    .header-actions {
+      .header-hint {
+        display: flex;
+        align-items: center;
+        color: $text-secondary;
+        font-size: 0.9rem;
+        
+        i {
+          margin-right: 0.5rem;
+          color: $primary-color;
+        }
+      }
+    }
+  }
+  
+  // Tarjetas de disciplinas
+  .discipline-cards {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 1.25rem;
+    
+    .discipline-card-container {
+      // Tarjeta para PT (Physical Therapy)
+      .discipline-card.pt {
+        @include discipline-card($pt-color);
+      }
+      
+      // Tarjeta para PTA (Physical Therapy Assistant)
+      .discipline-card.pta {
+        @include discipline-card($pta-color);
+      }
+      
+      // Tarjeta para OT (Occupational Therapy)
+      .discipline-card.ot {
+        @include discipline-card($ot-color);
+      }
+      
+      // Tarjeta para COTA (OT Assistant)
+      .discipline-card.cota {
+        @include discipline-card($cota-color);
+      }
+      
+      // Tarjeta para ST (Speech Therapy)
+      .discipline-card.st {
+        @include discipline-card($st-color);
+      }
+      
+      // Tarjeta para STA (Speech Therapy Assistant)
+      .discipline-card.sta {
+        @include discipline-card($sta-color);
+      }
+      
+      .discipline-card {
+        .card-header {
+          padding: 1.25rem;
+          display: flex;
+          align-items: center;
+          cursor: pointer;
+          
+          .discipline-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.25rem;
+            color: $text-primary;
+            margin-right: 1rem;
+            flex-shrink: 0;
+            transition: all 0.3s ease;
+          }
+          
+          .discipline-content {
+            flex: 1;
+            
+            .discipline-title {
+              font-size: 1.1rem;
+              font-weight: 600;
+              margin-bottom: 0.5rem;
+            }
+            
+            .discipline-stats {
+              display: flex;
+              gap: 1.5rem;
+              
+              .discipline-count {
+                font-size: 1.1rem;
+                font-weight: 600;
+                
+                span {
+                  font-size: 0.85rem;
+                  font-weight: normal;
+                  color: $text-secondary;
+                  margin-left: 0.3rem;
+                }
+              }
+              
+              .discipline-therapists {
+                font-size: 1.1rem;
+                font-weight: 600;
+                
+                span {
+                  font-size: 0.85rem;
+                  font-weight: normal;
+                  color: $text-secondary;
+                  margin-left: 0.3rem;
+                }
+              }
+            }
+          }
+          
+          .discipline-percentage {
+            background: rgba(255, 255, 255, 0.1);
+            color: $text-primary;
+            border-radius: 8px;
+            padding: 0.5rem 0.85rem;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin: 0 1rem;
+          }
+          
+          .expand-icon {
+            color: $text-secondary;
+            transition: all 0.3s ease;
+          }
+        }
+        
+        .card-details {
+          padding: 0 1.25rem 1.25rem;
+          
+          .details-summary {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1.25rem;
+            
+            .summary-item {
+              .item-label {
+                font-size: 0.9rem;
+                color: $text-secondary;
+                margin-bottom: 0.25rem;
+              }
+              
+              .item-value {
+                font-size: 1.1rem;
+                font-weight: 600;
+              }
+            }
+          }
+          
+          .view-details-btn {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.75rem;
+            background: rgba(0, 229, 255, 0.1);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            border-radius: 8px;
+            color: $primary-color;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            
+            i {
+              margin-right: 0.75rem;
+            }
+            
+            &:hover {
+              background: rgba(0, 229, 255, 0.15);
+              transform: translateY(-2px);
+              box-shadow: 0 5px 15px rgba(0, 229, 255, 0.2);
+            }
+            
+            &:active {
+              transform: translateY(0);
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Estilos para la vista detallada de disciplina
+.discipline-details-section {
+  background: $background-card;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid $border-color;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  margin-bottom: 2rem;
+  animation: fadeIn 0.4s ease-out;
+  
+  // Encabezado de detalles
+  .section-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid $border-color;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    
+    .header-title {
+      display: flex;
+      align-items: center;
+      
+      .back-button {
+        width: 36px;
+        height: 36px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 50%;
+        color: $text-secondary;
+        margin-right: 1rem;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        
+        &:hover {
+          background: rgba(255, 255, 255, 0.15);
+          color: $text-primary;
+          transform: translateX(-3px);
+        }
+      }
+      
+      h2 {
+        font-size: 1.3rem;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        
+        i {
+          margin-right: 0.75rem;
+          color: $primary-color;
+          font-size: 1.1rem;
+        }
+      }
+    }
+    
+    .header-stats {
+      display: flex;
+      gap: 1.5rem;
+      
+      .stat-item {
+        .stat-label {
+          font-size: 0.9rem;
+          color: $text-secondary;
+          margin-bottom: 0.25rem;
+        }
+        
+        .stat-value {
+          font-size: 1.1rem;
+          font-weight: 600;
+        }
+      }
+    }
+  }
+  
+  // Contenido de detalles
+  .discipline-details-content {
+    padding: 1.5rem;
+    display: grid;
+    grid-template-columns: 1fr 1.5fr;
+    gap: 1.5rem;
+    
+    // Sección de terapeutas
+    .therapists-section {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      overflow: hidden;
+      
+      h3 {
+        padding: 1rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        display: flex;
+        align-items: center;
+        
+        i {
+          margin-right: 0.5rem;
+          color: $primary-color;
+          font-size: 1rem;
+        }
+      }
+      
+      .therapist-list {
+        padding: 1rem;
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+        max-height: 500px;
+        overflow-y: auto;
+        
+        &::-webkit-scrollbar {
+          width: 6px;
+        }
+        
+        &::-webkit-scrollbar-track {
+          background: rgba(255, 255, 255, 0.05);
+          border-radius: 3px;
+        }
+        
+        &::-webkit-scrollbar-thumb {
+          background: rgba(0, 229, 255, 0.2);
+          border-radius: 3px;
+        }
+        
+        .therapist-card {
+          display: flex;
+          align-items: center;
+          background: rgba(30, 41, 59, 0.4);
+          border: 1px solid rgba(255, 255, 255, 0.05);
+          border-radius: 10px;
+          padding: 0.85rem;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          
+          &:hover {
+            background: rgba(30, 41, 59, 0.6);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+          }
+          
+          .therapist-avatar {
+            margin-right: 1rem;
+            flex-shrink: 0;
+            
+            .avatar-placeholder {
+              width: 40px;
+              height: 40px;
+              border-radius: 10px;
+              background: rgba(0, 229, 255, 0.1);
+              color: $primary-color;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              font-weight: 600;
+              font-size: 0.9rem;
+            }
+          }
+          
+          .therapist-info {
+            flex: 1;
+            
+            .therapist-name {
+              font-weight: 600;
+              margin-bottom: 0.35rem;
+            }
+            
+            .therapist-stats {
+              display: flex;
+              flex-wrap: wrap;
+              gap: 0.75rem;
+              
+              .stat-item {
+                display: flex;
+                align-items: center;
+                font-size: 0.85rem;
+                color: $text-secondary;
+                
+                i {
+                  margin-right: 0.35rem;
+                  font-size: 0.8rem;
+                }
+                
+                &.growth {
+                  &.positive {
+                    color: $status-completed;
+                  }
+                  
+                  &.negative {
+                    color: $status-pending;
+                  }
+                }
+              }
+            }
+          }
+          
+          .view-details {
+            color: $text-secondary;
+            margin-left: 0.5rem;
+            transition: all 0.3s ease;
+          }
+        }
+      }
+    }
+    
+    // Sección de visitas recientes
+    .recent-visits-section {
+      background: rgba(15, 23, 42, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      overflow: hidden;
+      
+      h3 {
+        padding: 1rem;
+        font-size: 1.1rem;
+        font-weight: 600;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        display: flex;
+        align-items: center;
+        
+        i {
+          margin-right: 0.5rem;
+          color: $primary-color;
+          font-size: 1rem;
+        }
+      }
+      
+      .visits-table-container {
+        .visits-table {
+          width: 100%;
+          border-collapse: separate;
+          border-spacing: 0;
+          
+          th, td {
+            padding: 0.85rem 1rem;
+            text-align: left;
+          }
+          
+          th {
+            background: rgba(15, 23, 42, 0.8);
+            font-weight: 600;
+            color: $text-primary;
+            position: relative;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+          }
+          
+          tbody {
+            tr {
+              border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+              transition: all 0.2s ease;
+              
+              &:hover {
+                background: rgba(30, 41, 59, 0.4);
+              }
+              
+              &:last-child {
+                border-bottom: none;
+              }
+              
+              .therapist-cell {
+                .therapist-info {
+                  display: flex;
+                  align-items: center;
+                  
+                  .avatar {
+                    width: 28px;
+                    height: 28px;
+                    border-radius: 6px;
+                    background: rgba(0, 229, 255, 0.1);
+                    color: $primary-color;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    font-size: 0.75rem;
+                    font-weight: 600;
+                    margin-right: 0.75rem;
+                  }
+                }
+              }
+              
+              .status-badge {
+                display: inline-flex;
+                align-items: center;
+                padding: 0.25rem 0.5rem;
+                border-radius: 50px;
+                font-size: 0.8rem;
+                
+                i {
+                  margin-right: 0.35rem;
+                  font-size: 0.75rem;
+                }
+                
+                &.completed {
+                  background: rgba(76, 175, 80, 0.15);
+                  color: $status-completed;
+                }
+                
+                &.pending {
+                  background: rgba(255, 152, 0, 0.15);
+                  color: $status-pending;
+                }
+              }
+              
+              .amount-cell {
+                font-weight: 600;
+                color: $status-completed;
+              }
+            }
+          }
+        }
+        
+        .view-more {
+          padding: 1rem;
+          text-align: center;
+          
+          .view-more-btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.6rem 1.25rem;
+            background: rgba(0, 229, 255, 0.1);
+            border: 1px solid rgba(0, 229, 255, 0.2);
+            border-radius: 8px;
+            color: $primary-color;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            
+            i {
+              margin-right: 0.5rem;
+            }
+            
+            &:hover {
+              background: rgba(0, 229, 255, 0.15);
+              transform: translateY(-2px);
+              box-shadow: 0 5px 15px rgba(0, 229, 255, 0.2);
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  // Estilos responsivos
+  @media (max-width: 992px) {
+    .section-header {
+      .header-title {
+        margin-bottom: 0.5rem;
+      }
+      
+      .header-stats {
+        width: 100%;
+        justify-content: space-between;
+      }
+    }
+    
+    .discipline-details-content {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .section-header {
+      .header-stats {
+        flex-wrap: wrap;
+        gap: 1rem;
+        
+        .stat-item {
+          flex: 1;
+          min-width: 120px;
+        }
+      }
+    }
+    
+    .discipline-details-content {
+      padding: 1rem;
+    }
+  }
+}
+
+// Estilos responsivos para la sección principal
+@media (max-width: 768px) {
+  .discipline-statistics-section {
+    .section-header {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 1rem;
+    }
+    
+    .discipline-cards {
+      grid-template-columns: 1fr;
+      
+      .discipline-card-container {
+        .discipline-card {
+          .card-header {
+            .discipline-content {
+              .discipline-stats {
+                flex-direction: column;
+                gap: 0.5rem;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// Agregamos estos estilos adicionales al archivo SCSS existente
+
+// Estilos para la sección resumida de visitas en las tarjetas expandidas
+.discipline-card {
+  .card-details {
+    .details-summary {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 1.25rem;
+      
+      .visits-summary,
+      .financial-summary {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+      }
+      
+      .summary-item {
+        .item-label {
+          font-size: 0.9rem;
+          color: $text-secondary;
+          margin-bottom: 0.25rem;
+          display: flex;
+          align-items: center;
+          
+          i {
+            margin-right: 0.5rem;
+            color: $primary-color;
+          }
+        }
+        
+        .item-value {
+          font-size: 1.1rem;
+          font-weight: 600;
+        }
+      }
+    }
+  }
+}
+
+// Estilos para las secciones de visitas en la vista detallada
+.discipline-details-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  
+  .visits-section,
+  .upcoming-visits-section {
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    overflow: hidden;
+    
+    h3 {
+      padding: 1rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      
+      i {
+        margin-right: 0.5rem;
+        color: $primary-color;
+        font-size: 1rem;
+      }
+    }
+    
+    .visits-list {
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      max-height: 400px;
+      overflow-y: auto;
+      
+      &::-webkit-scrollbar {
+        width: 6px;
+      }
+      
+      &::-webkit-scrollbar-track {
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 3px;
+      }
+      
+      &::-webkit-scrollbar-thumb {
+        background: rgba(0, 229, 255, 0.2);
+        border-radius: 3px;
+      }
+      
+      .visit-card {
+        display: flex;
+        align-items: center;
+        background: rgba(30, 41, 59, 0.4);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        border-radius: 10px;
+        padding: 0.85rem;
+        transition: all 0.3s ease;
+        
+        &:hover {
+          background: rgba(30, 41, 59, 0.6);
+          transform: translateY(-3px);
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .visit-date {
+          margin-right: 1rem;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          min-width: 80px;
+          
+          .date-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            background: rgba(0, 229, 255, 0.1);
+            color: $primary-color;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 0.5rem;
+          }
+          
+          .date-text {
+            font-size: 0.8rem;
+            text-align: center;
+            color: $text-secondary;
+          }
+        }
+        
+        .visit-info {
+          flex: 1;
+          
+          .patient-name {
+            font-weight: 600;
+            margin-bottom: 0.35rem;
+          }
+          
+          .visit-details {
+            display: flex;
+            justify-content: space-between;
+            color: $text-secondary;
+            font-size: 0.85rem;
+            
+            .therapist-name {
+              display: flex;
+              align-items: center;
+              
+              i {
+                margin-right: 0.5rem;
+              }
+            }
+          }
+        }
+        
+        .status-badge {
+          display: flex;
+          align-items: center;
+          padding: 0.25rem 0.75rem;
+          border-radius: 50px;
+          font-size: 0.8rem;
+          margin-left: 1rem;
+          
+          i {
+            margin-right: 0.35rem;
+          }
+          
+          &.completed {
+            background: rgba(76, 175, 80, 0.15);
+            color: $status-completed;
+          }
+          
+          &.pending {
+            background: rgba(255, 152, 0, 0.15);
+            color: $status-pending;
+          }
+        }
+      }
+    }
+  }
+  
+  .all-visits-section {
+    grid-column: 1 / -1;
+    background: rgba(15, 23, 42, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    overflow: hidden;
+    
+    h3 {
+      padding: 1rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      display: flex;
+      align-items: center;
+      
+      i {
+        margin-right: 0.5rem;
+        color: $primary-color;
+        font-size: 1rem;
+      }
+    }
+  }
+  
+  // Estilos responsivos
+  @media (max-width: 992px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Ajuste al diseño original para eliminar la sección de terapeutas
+.discipline-card {
+  .card-header {
+    .discipline-content {
+      .discipline-stats {
+        .discipline-count {
+          font-size: 1.2rem; // Aumentamos el tamaño ahora que solo hay un elemento
+        }
+      }
+    }
+  }
+}
