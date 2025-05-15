@@ -49,6 +49,12 @@ const DevStaffEditComponent = ({ onBackToOptions }) => {
   const [activeTab, setActiveTab] = useState('info');
   const [isCreating, setIsCreating] = useState(false); // Nuevo estado para distinguir entre creación y edición
 
+  const buildQueryParams = (params) =>
+    Object.entries(params)
+      .filter(([, value]) => value !== null && value !== undefined && value !== '')
+      .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+      .join('&');
+      
   // Simulación de carga con mensajes dinámicos
   useEffect(() => {
     setIsLoading(true);
@@ -87,42 +93,56 @@ const DevStaffEditComponent = ({ onBackToOptions }) => {
   // Obtener datos del personal desde la API
   const fetchStaffData = async () => {
     try {
-      const response = await fetch('https://api.therapysync.com/v1/staff', {
+      const response = await fetch('http://localhost:8000/staff/', {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer your-auth-token-here'
+          'Content-Type': 'application/json'
         }
       });
-
+  
       if (!response.ok) {
         throw new Error('Error al obtener los datos del personal');
       }
-
+  
       const data = await response.json();
-      // Ajustamos los datos para que coincidan con la estructura esperada por el componente
-      const adjustedData = data.map(staff => ({
-        id: staff.id,
-        firstName: staff.personalInfo.firstName,
-        lastName: staff.personalInfo.lastName,
-        dob: staff.personalInfo.dob,
-        gender: staff.personalInfo.gender,
-        email: staff.contactInfo.email,
-        phone: staff.contactInfo.phone,
-        alternatePhone: staff.contactInfo.alternatePhone,
-        zipCode: staff.contactInfo.zipCode,
-        address: staff.contactInfo.address,
-        userName: staff.userInfo.userName,
-        password: staff.userInfo.password,
-        role: staff.professionalInfo.role,
-        roleDisplay: roles.find(r => r.value === staff.professionalInfo.role)?.label || staff.professionalInfo.role,
-        status: staff.status,
-        documents: staff.documents
-      }));
+  
+      const adjustedData = data.map(staff => {
+        const [firstName, ...rest] = staff.name?.split(' ') || [''];
+        const lastName = rest.join(' ');
+  
+        return {
+          id: staff.id,
+          firstName: firstName || '',
+          lastName: lastName || '',
+          dob: staff.birthday || '',
+          gender: staff.gender || '',
+          email: staff.email || '',
+          phone: staff.phone || '',
+          alternatePhone: staff.alt_phone || '',
+          zipCode: staff.postal_code || '',
+          address: staff.address || '',
+          userName: staff.username || '',
+          password: '********',
+          role: staff.role || '',
+          roleDisplay: roles.find(r => r.value === staff.role)?.label || staff.role,
+          status: staff.is_active ? 'active' : 'inactive',
+          documents: {
+            covidVaccine: { status: 'pending', file: null },
+            tbTest: { status: 'pending', file: null },
+            physicalExam: { status: 'pending', file: null },
+            liabilityInsurance: { status: 'pending', file: null },
+            driversLicense: { status: 'pending', file: null },
+            autoInsurance: { status: 'pending', file: null },
+            cprCertification: { status: 'pending', file: null },
+            businessLicense: { status: 'pending', file: null }
+          }
+        };
+      });
+  
       setStaffList(adjustedData);
       setFilteredStaff(adjustedData);
     } catch (error) {
-      console.error('Error fetching staff data:', error);
+      console.error('Error al obtener la lista de personal:', error);
       alert('Hubo un error al cargar los datos del personal. Por favor, intenta de nuevo.');
       setStaffList([]);
       setFilteredStaff([]);
@@ -221,85 +241,44 @@ const DevStaffEditComponent = ({ onBackToOptions }) => {
 
   // Guardar cambios (crear o actualizar)
   const handleSaveProfile = async (updatedStaff) => {
-    if (isCreating) {
-      // Modo creación: enviar a la API
-      try {
-        const staffToCreate = {
-          personalInfo: {
-            firstName: updatedStaff.firstName,
-            lastName: updatedStaff.lastName,
-            dob: updatedStaff.dob,
-            gender: updatedStaff.gender
-          },
-          contactInfo: {
-            email: updatedStaff.email,
-            phone: updatedStaff.phone,
-            alternatePhone: updatedStaff.alternatePhone,
-            zipCode: updatedStaff.zipCode,
-            address: updatedStaff.address
-          },
-          userInfo: {
-            userName: updatedStaff.userName,
-            password: updatedStaff.password
-          },
-          professionalInfo: {
-            role: updatedStaff.role
-          },
-          documents: updatedStaff.documents,
-          status: updatedStaff.status
-        };
-
-        const response = await fetch('https://api.therapysync.com/v1/staff', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer your-auth-token-here'
-          },
-          body: JSON.stringify(staffToCreate)
-        });
-
-        if (!response.ok) {
-          throw new Error('Error al crear el nuevo miembro del personal');
-        }
-
-        const newStaff = await response.json();
-        // Ajustamos el nuevo miembro para que coincida con la estructura de staffList
-        const adjustedNewStaff = {
-          id: newStaff.id,
-          firstName: newStaff.personalInfo.firstName,
-          lastName: newStaff.personalInfo.lastName,
-          dob: newStaff.personalInfo.dob,
-          gender: newStaff.personalInfo.gender,
-          email: newStaff.contactInfo.email,
-          phone: newStaff.contactInfo.phone,
-          alternatePhone: newStaff.contactInfo.alternatePhone,
-          zipCode: newStaff.contactInfo.zipCode,
-          address: newStaff.contactInfo.address,
-          userName: newStaff.userInfo.userName,
-          password: newStaff.userInfo.password,
-          role: newStaff.professionalInfo.role,
-          roleDisplay: roles.find(r => r.value === newStaff.professionalInfo.role)?.label || newStaff.professionalInfo.role,
-          status: newStaff.status,
-          documents: newStaff.documents
-        };
-
-        setStaffList([...staffList, adjustedNewStaff]);
-        handleCloseProfile();
-        alert('Nuevo miembro del personal creado exitosamente.');
-      } catch (error) {
-        console.error('Error creating staff:', error);
-        alert('Hubo un error al crear el nuevo miembro del personal. Por favor, intenta de nuevo.');
+    try {
+      const staffToUpdate = {
+        name: `${updatedStaff.firstName} ${updatedStaff.lastName}`,
+        birthday: updatedStaff.dob || '',
+        gender: updatedStaff.gender || '',
+        postal_code: updatedStaff.zipCode || '',
+        email: updatedStaff.email,
+        phone: updatedStaff.phone || '',
+        alt_phone: updatedStaff.alternatePhone || '',
+        username: updatedStaff.userName,
+        password: updatedStaff.password,
+        role: updatedStaff.role,
+        is_active: updatedStaff.status === 'active'
+      };
+  
+      const queryString = buildQueryParams(staffToUpdate);
+  
+      const response = await fetch(`http://localhost:8000/staff/${updatedStaff.id}?${queryString}`, {
+        method: 'PUT'
+      });
+  
+      if (!response.ok) {
+        const error = await response.json();
+        const readable = error?.detail || 'Error al actualizar los datos del personal';
+        throw new Error(readable);
       }
-    } else {
-      // Modo edición: actualizar la lista localmente
-      const updatedStaffList = staffList.map(item => 
-        item.id === updatedStaff.id ? updatedStaff : item
-      );
-      setStaffList(updatedStaffList);
+  
+      const data = await response.json();
+      console.log("✅ Staff updated:", data);
+  
+      alert('Los cambios se guardaron correctamente.');
       handleCloseProfile();
+    } catch (error) {
+      console.error('❌ Error in handleSaveProfile:', error);
+      alert(`Hubo un error al procesar la información del personal.\n${error.message}`);
     }
   };
-
+  
   const handleChangeTab = (tab) => {
     setActiveTab(tab);
   };
