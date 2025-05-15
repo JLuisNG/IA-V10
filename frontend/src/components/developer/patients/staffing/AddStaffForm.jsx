@@ -207,21 +207,11 @@ const DevAddStaffForm = ({ onCancel, onViewAllStaff }) => {
     resetForm();
   };
 
-  const handleViewAllStaff = async () => {
-    try {
-      const response = await fetch('http://localhost:8000/staff/');
-      if (!response.ok) {
-        throw new Error("Failed to fetch staff list");
-      }
-  
-      const data = await response.json();
-      console.log("Fetched staff:", data);
-  
-      // Aquí podrías navegar a otra vista o pasar los datos a otro componente
-      // Ejemplo: setStaffList(data); o navigate("/staff-list");
-    } catch (err) {
-      console.error("Error fetching staff list:", err);
-      alert("Error loading staff list.");
+  const handleViewAllStaff = () => {
+    if (onViewAllStaff) {
+      onViewAllStaff();
+    } else {
+      onCancel();
     }
   };
 

@@ -33,6 +33,8 @@ const DevReferralsPage = () => {
   const userMenuRef = useRef(null);
   const containerRef = useRef(null);
   const fileInputRef = useRef(null);
+
+  const API_BASE_URL = 'http://localhost:8000';
   
   // Form data state with added weight and height fields
   const [formData, setFormData] = useState({
@@ -108,9 +110,6 @@ const DevReferralsPage = () => {
   
   // State for adding new nurse manager
   const [addingNewManager, setAddingNewManager] = useState(false);
-
-  // API endpoint base URL
-  const API_BASE_URL = 'http://localhost:8000';
 
   // WBS options from the dropdown
   const wbsOptions = [
@@ -494,11 +493,6 @@ const DevReferralsPage = () => {
     }));
   };
   
-  // Validate that at least one discipline is selected
-  const validateDisciplines = () => {
-    return Object.values(selectedDisciplines).some(discipline => discipline);
-  };
-  
   // Get selected agency
   const getSelectedAgency = () => {
     return agencies.find(agency => agency.id.toString() === formData.agencyId);
@@ -638,32 +632,6 @@ const DevReferralsPage = () => {
     };
   };
   
-  // Upload files to the server
-  const uploadFiles = async (files) => {
-    try {
-      const formData = new FormData();
-      files.forEach((file, index) => {
-        formData.append(`files`, file);
-      });
-      
-      const response = await fetch(`${API_BASE_URL}/documents/upload`, {
-        method: 'POST',
-        body: formData
-      });
-      
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.detail || 'Failed to upload documents');
-      }
-      
-      const data = await response.json();
-      return data.document_ids || [];
-    } catch (error) {
-      console.error('Error uploading files:', error);
-      return [];
-    }
-  };
-  
   // Reset form to initial state
   const resetForm = () => {
     // Reset all form data to initial values
@@ -741,96 +709,83 @@ const DevReferralsPage = () => {
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     if (isLoggingOut) return;
-    
-    // Validate that at least one discipline is selected
+  
     if (!validateDisciplines()) {
       toast.error('Please select at least one discipline (PT, PTA, OT, COTA, ST, or STA)');
       return;
     }
-    
-    // Validate that therapists are selected for all selected disciplines
+  
     const hasAllTherapistsSelected = Object.keys(selectedDisciplines)
-      .filter(discipline => selectedDisciplines[discipline])
-      .every(discipline => selectedTherapists[discipline] !== null);
-    
+      .filter(d => selectedDisciplines[d] && ['PT', 'OT', 'ST'].includes(d))
+      .every(d => selectedTherapists[d]);
+  
     if (!hasAllTherapistsSelected) {
-      toast.error('Please select a therapist for each selected discipline');
+      toast.error('Select a therapist for each selected main discipline (PT, OT, ST)');
       return;
     }
-    
-    // Validate weight and height
-    if (formData.weight && isNaN(formData.weight)) {
-      toast.error('Please enter a valid number for Weight');
-      return;
-    }
-    if (formData.height && isNaN(formData.height)) {
-      toast.error('Please enter a valid number for Height');
-      return;
-    }
-    
-    // Show loading screen
+  
     setFormSubmitting(true);
-
+  
     try {
-      // Prepare data for API
       const patientData = preparePatientData();
-      
-      // Upload any files if needed
       let documentIds = [];
+  
       if (uploadedFiles.length > 0) {
-        try {
-          documentIds = await uploadFiles(uploadedFiles);
-        } catch (fileError) {
-          console.error('Error uploading files:', fileError);
-          // Continue with patient creation even if file upload fails
+        const formDataUpload = new FormData();
+        uploadedFiles.forEach(file => formDataUpload.append('files', file));
+  
+        const docResponse = await fetch(`${API_BASE_URL}/documents/upload`, {
+          method: 'POST',
+          body: formDataUpload
+        });
+  
+        if (docResponse.ok) {
+          const result = await docResponse.json();
+          documentIds = result.document_ids || [];
+        } else {
+          console.warn('Documents failed to upload.');
         }
       }
-      
-      // Add document IDs to patient data if files were uploaded
+  
       if (documentIds.length > 0) {
         patientData.documents = documentIds;
       }
-      
-      // Send data to patient creation API endpoint
-      const response = await fetch(`${API_BASE_URL}/patients`, {
+  
+      const patientResponse = await fetch(`${API_BASE_URL}/patients`, {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(patientData)
       });
-      
-      // Always clean the form regardless of the API response
-      resetForm();
-      
-      if (response.ok) {
-        toast.success('Patient referral created successfully!');
-        setTimeout(() => {
-          setFormSubmitting(false);
-          setCurrentView('menu');
-        }, 1500);
-      } else {
-        const errorData = await response.json();
-        setFormSubmitting(false);
-        throw new Error(errorData.detail || 'Failed to create patient referral');
+  
+      if (!patientResponse.ok) {
+        const error = await patientResponse.json();
+        throw new Error(error?.detail || 'Failed to create patient');
       }
-    } catch (error) {
-      console.error('Error submitting patient data:', error);
-      
-      // IMPORTANTE: Asegurar que el formulario se limpie aunque haya error
+  
+      const createdPatient = await patientResponse.json();
+  
+      const therapistAssignments = ['PT', 'OT', 'ST'].filter(d => selectedTherapists[d]);
+      for (let discipline of therapistAssignments) {
+        await fetch(`${API_BASE_URL}/assign_therapist`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            patient_id: createdPatient.id,
+            therapist_id: selectedTherapists[discipline],
+            discipline: discipline.toLowerCase()
+          })
+        });
+      }
+  
+      toast.success('Patient created and assigned successfully!');
       resetForm();
-      setFormSubmitting(false);
-      
-      // Mostrar toast de error pero ya con formulario limpio
-      toast.error(`Error: ${error.message || 'Failed to create patient referral. Please try again.'}`);
+      setCurrentView('menu');
+    } catch (error) {
+      console.error('Error during patient creation:', error);
+      toast.error(`Error: ${error.message || 'Could not complete patient creation'}`);
     } finally {
-      // Garantizar que el formulario se limpie incluso si hay un error no controlado
-      setTimeout(() => {
-        resetForm();
-        setFormSubmitting(false);
-      }, 1000);
+      setFormSubmitting(false);
     }
   };
 
