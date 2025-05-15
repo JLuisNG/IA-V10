@@ -84,45 +84,47 @@ const AdminStaffEditComponent = ({ onBackToOptions }) => {
     };
   }, []);
 
-  // Obtener datos del personal desde la API
   const fetchStaffData = async () => {
     try {
-      const response = await fetch('https://api.therapysync.com/v1/staff', {
+      const response = await fetch('http://localhost:8000/staff/', {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer your-auth-token-here'
+          'Content-Type': 'application/json'
         }
       });
-
+  
       if (!response.ok) {
         throw new Error('Error al obtener los datos del personal');
       }
-
+  
       const data = await response.json();
-      // Ajustamos los datos para que coincidan con la estructura esperada por el componente
-      const adjustedData = data.map(staff => ({
-        id: staff.id,
-        firstName: staff.personalInfo.firstName,
-        lastName: staff.personalInfo.lastName,
-        dob: staff.personalInfo.dob,
-        gender: staff.personalInfo.gender,
-        email: staff.contactInfo.email,
-        phone: staff.contactInfo.phone,
-        alternatePhone: staff.contactInfo.alternatePhone,
-        zipCode: staff.contactInfo.zipCode,
-        address: staff.contactInfo.address,
-        userName: staff.userInfo.userName,
-        password: staff.userInfo.password,
-        role: staff.professionalInfo.role,
-        roleDisplay: roles.find(r => r.value === staff.professionalInfo.role)?.label || staff.professionalInfo.role,
-        status: staff.status,
-        documents: staff.documents
-      }));
+  
+      const adjustedData = data.map(staff => {
+        const [firstName, ...rest] = staff.name?.split(' ') || [''];
+        const lastName = rest.join(' ');
+        return {
+          id: staff.id,
+          firstName,
+          lastName,
+          dob: staff.birthday || '',
+          gender: staff.gender || '',
+          email: staff.email || '',
+          phone: staff.phone || '',
+          alternatePhone: staff.alt_phone || '',
+          zipCode: staff.postal_code || '',
+          address: staff.address || '',
+          userName: staff.username || '',
+          password: '********',
+          role: staff.role || '',
+          roleDisplay: roles.find(r => r.value === staff.role)?.label || staff.role,
+          status: staff.is_active ? 'active' : 'inactive'
+        };
+      });
+  
       setStaffList(adjustedData);
       setFilteredStaff(adjustedData);
     } catch (error) {
-      console.error('Error fetching staff data:', error);
+      console.error('Error al obtener la lista de personal:', error);
       alert('Hubo un error al cargar los datos del personal. Por favor, intenta de nuevo.');
       setStaffList([]);
       setFilteredStaff([]);

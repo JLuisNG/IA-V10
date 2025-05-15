@@ -130,45 +130,76 @@ const DevAddStaffForm = ({ onCancel, onViewAllStaff }) => {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSaving(true);
-    
-    // Save the name for the success message
     setSavedStaffName(`${formData.firstName} ${formData.lastName}`);
-    
-    // Simulate saving process with dynamic messages
-    const savingMessages = [
-      { message: 'Processing staff data...', time: 600 },
-      { message: 'Validating information...', time: 800 },
-      { message: 'Uploading documents...', time: 1200 },
-      { message: 'Creating user credentials...', time: 700 },
-      { message: 'Linking to Motive Home Care agency...', time: 900 },
-      { message: 'Finalizing registration...', time: 1000 }
-    ];
-    
-    let totalTime = 0;
-    
-    savingMessages.forEach((item, index) => {
-      totalTime += item.time;
-      
-      setTimeout(() => {
-        setSavingMessage(item.message);
-        
-        // When reaching the last message, complete the saving process
-        if (index === savingMessages.length - 1) {
-          setTimeout(() => {
-            // Implement logic for sending data
-            console.log('Form data:', formData);
-            console.log('Documents:', documents);
-            
-            // Simulate API response
-            setIsSaving(false);
-            setShowSuccessModal(true);
-          }, 800);
+  
+    try {
+      const staffBody = {
+        name: `${formData.firstName} ${formData.lastName}`,
+        postal_code: formData.zipCode,
+        email: formData.email,
+        phone: formData.phone,
+        alt_phone: formData.altPhone,
+        username: formData.userName,
+        password: formData.password,
+        role: formData.role,
+        is_active: true
+      };
+
+      if (formData.dob) {
+        staffBody.birthday = formData.dob;
+      }
+
+      if (formData.gender) {
+        staffBody.gender = formData.gender;
+      }
+  
+      const res = await fetch('http://localhost:8000/staff/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(staffBody)
+      });
+  
+      if (!res.ok) {
+        const error = await res.json();
+        const readable = error?.detail
+          ? Array.isArray(error.detail)
+            ? error.detail.map((e) => `${e.loc?.join('.')} → ${e.msg}`).join('\n')
+            : error.detail
+          : 'Unknown error';
+        throw new Error(`Backend validation error:\n${readable}`);
+      }
+  
+      const staffData = await res.json();
+      const newStaffId = staffData.id;
+  
+      for (const key in documents) {
+        const doc = documents[key];
+        if (doc.file) {
+          const formData = new FormData();
+          formData.append("file", doc.file);
+          formData.append("staff_id", newStaffId);
+  
+          const uploadRes = await fetch("http://localhost:8000/documents/upload", {
+            method: "POST",
+            body: formData
+          });
+  
+          if (!uploadRes.ok) {
+            const uploadError = await uploadRes.json();
+            console.warn(`⚠️ Document '${key}' failed to upload:`, uploadError);
+          }
         }
-      }, totalTime);
-    });
+      }
+  
+      setIsSaving(false);
+      setShowSuccessModal(true);
+    } catch (err) {
+      alert(`Error: ${err.message}`);
+      setIsSaving(false);
+    }
   };
 
   const handleCreateAnother = () => {
@@ -176,12 +207,21 @@ const DevAddStaffForm = ({ onCancel, onViewAllStaff }) => {
     resetForm();
   };
 
-  const handleViewAllStaff = () => {
-    if (onViewAllStaff) {
-      onViewAllStaff();
-    } else {
-      // Fallback if the function is not provided
-      onCancel();
+  const handleViewAllStaff = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/staff/');
+      if (!response.ok) {
+        throw new Error("Failed to fetch staff list");
+      }
+  
+      const data = await response.json();
+      console.log("Fetched staff:", data);
+  
+      // Aquí podrías navegar a otra vista o pasar los datos a otro componente
+      // Ejemplo: setStaffList(data); o navigate("/staff-list");
+    } catch (err) {
+      console.error("Error fetching staff list:", err);
+      alert("Error loading staff list.");
     }
   };
 
@@ -316,7 +356,6 @@ const DevAddStaffForm = ({ onCancel, onViewAllStaff }) => {
                     name="lastName"
                     value={formData.lastName}
                     onChange={handleInputChange}
-                    required
                     placeholder="Enter last name"
                   />
                 </div>
@@ -328,7 +367,6 @@ const DevAddStaffForm = ({ onCancel, onViewAllStaff }) => {
                     name="dob"
                     value={formData.dob}
                     onChange={handleInputChange}
-                    required
                   />
                 </div>
                 <div className="form-group">
@@ -338,7 +376,6 @@ const DevAddStaffForm = ({ onCancel, onViewAllStaff }) => {
                     name="gender"
                     value={formData.gender}
                     onChange={handleInputChange}
-                    required
                   >
                     <option value="">Select gender</option>
                     <option value="male">Male</option>
@@ -354,7 +391,6 @@ const DevAddStaffForm = ({ onCancel, onViewAllStaff }) => {
                     name="zipCode"
                     value={formData.zipCode}
                     onChange={handleInputChange}
-                    required
                     placeholder="Enter zip code"
                   />
                 </div>
