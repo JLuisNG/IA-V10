@@ -58,6 +58,7 @@ const DevReferralsPage = () => {
     physicianId: '',
     newPhysician: false,
     newPhysicianName: '',
+    physicianName: '',
     agencyId: '',
     agencyBranch: '',
     nurseManager: '',
@@ -142,47 +143,131 @@ const DevReferralsPage = () => {
     status: 'online', // online, away, busy, offline
   };
   
-  // Mock data for selects - In a real implementation, these would come from API
+  // =========== API FETCH FUNCTIONS ============
+  // Función para manejar errores de fetch
+  const handleFetchError = (error, context) => {
+    console.error(`Error en ${context}:`, error);
+    return [];
+  };
+
+  // Función para obtener el token de autenticación
+  const getAuthHeaders = () => {
+    const token = localStorage.getItem('auth_token') || ''; 
+    return {
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    };
+  };
+
+  // Implementamos un timeout para asegurar que las peticiones no tomen demasiado tiempo
+  const fetchWithTimeout = async (url, options, timeout = 3000) => {
+    const controller = new AbortController();
+    const id = setTimeout(() => controller.abort(), timeout);
+    
+    try {
+      const response = await fetch(url, {
+        ...options,
+        signal: controller.signal
+      });
+      clearTimeout(id);
+      return response;
+    } catch (error) {
+      clearTimeout(id);
+      if (error.name === 'AbortError') {
+        console.log('Request timed out');
+        // En lugar de un error, devolvemos un objeto response simulado
+        return {
+          ok: true,
+          json: async () => ({ data: [] })
+        };
+      }
+      throw error;
+    }
+  };
+
+  // Fetch physicians data from API - con timeout para evitar esperas largas
   const fetchPhysicians = async () => {
     try {
-      // This would be an actual API call in production
-      // const response = await fetch(`${API_BASE_URL}/physicians`);
-      // const data = await response.json();
-      // return data;
-      return [
-        { id: 1, name: 'James Wilson' },
-        { id: 2, name: 'Sarah Parker' },
-        { id: 3, name: 'Michael Chen' }
-      ];
+      const response = await fetchWithTimeout(
+        API_ENDPOINTS.PHYSICIANS, 
+        { method: 'GET', headers: getAuthHeaders() }
+      );
+      
+      if (!response.ok) {
+        console.warn(`Error HTTP al cargar médicos: ${response.status}`);
+        return [];
+      }
+      
+      const data = await response.json();
+      return data.data || [];
     } catch (error) {
-      console.error('Error fetching physicians:', error);
-      return [];
+      return handleFetchError(error, 'médicos');
     }
   };
 
+  // Fetch agencies data from API - con timeout para evitar esperas largas
   const fetchAgencies = async () => {
     try {
-      // This would be an actual API call in production
-      // const response = await fetch(`${API_BASE_URL}/agencies`);
-      // const data = await response.json();
-      // return data;
-      return [
-        { id: 1, name: 'Destiny Home Health', branches: ['Branch A', 'Branch B'], managers: ['Manager 1', 'Manager 2'] },
-        { id: 2, name: 'Unison Health Services', branches: ['Branch C', 'Branch D'], managers: ['Manager 3', 'Manager 4'] },
-        { id: 3, name: 'Supportive Home Health', branches: ['Branch E', 'Branch F'], managers: ['Manager 5', 'Manager 6'] }
-      ];
+      const response = await fetchWithTimeout(
+        API_ENDPOINTS.AGENCIES, 
+        { method: 'GET', headers: getAuthHeaders() }
+      );
+      
+      if (!response.ok) {
+        console.warn(`Error HTTP al cargar agencias: ${response.status}`);
+        return [];
+      }
+      
+      const data = await response.json();
+      return data.data || [];
     } catch (error) {
-      console.error('Error fetching agencies:', error);
-      return [];
+      return handleFetchError(error, 'agencias');
     }
   };
 
+  // Fetch therapists data from API for all disciplines - con timeout para evitar esperas largas
   const fetchTherapists = async () => {
     try {
-      // This would be an actual API call in production
-      // const response = await fetch(`${API_BASE_URL}/therapists`);
-      // const data = await response.json();
-      // return data;
+      const disciplineTypes = ['PT', 'PTA', 'OT', 'COTA', 'ST', 'STA'];
+      
+      // Usando Promise.all con timeouts para cada petición
+      const responses = await Promise.all(
+        disciplineTypes.map(discipline => 
+          fetchWithTimeout(
+            `${API_ENDPOINTS.THERAPISTS}?discipline=${discipline}`, 
+            { method: 'GET', headers: getAuthHeaders() }
+          )
+        )
+      );
+      
+      // Procesamos todas las respuestas
+      const dataPromises = responses.map(async (response, index) => {
+        if (!response.ok) {
+          console.warn(`Error al cargar terapeutas ${disciplineTypes[index]}: ${response.status}`);
+          return { discipline: disciplineTypes[index], data: [] };
+        }
+        
+        try {
+          const data = await response.json();
+          return { discipline: disciplineTypes[index], data: data.data || [] };
+        } catch (e) {
+          console.warn(`Error al procesar datos JSON para ${disciplineTypes[index]}:`, e);
+          return { discipline: disciplineTypes[index], data: [] };
+        }
+      });
+      
+      const results = await Promise.all(dataPromises);
+      
+      // Formateamos los resultados en el objeto que espera el componente
+      const therapistsByDiscipline = {};
+      results.forEach(result => {
+        therapistsByDiscipline[result.discipline] = result.data;
+      });
+      
+      return therapistsByDiscipline;
+    } catch (error) {
+      console.error('Error fetching therapists:', error);
+      // Datos de respaldo en caso de error
       return {
         PT: [{ id: 1, name: 'Willie Blackwell' }, { id: 2, name: 'Emily Rounds' }],
         PTA: [{ id: 3, name: 'Carlo Gianzon' }, { id: 4, name: 'Anna Lamport' }],
@@ -190,11 +275,6 @@ const DevReferralsPage = () => {
         COTA: [{ id: 7, name: 'Carla Gianzon' }, { id: 8, name: 'Michelle De La Cruz' }],
         ST: [{ id: 9, name: 'Junni Smith' }, { id: 10, name: 'Arya Patel' }],
         STA: [{ id: 11, name: 'Thomas Garcia' }, { id: 12, name: 'Elizabeth Taylor' }]
-      };
-    } catch (error) {
-      console.error('Error fetching therapists:', error);
-      return {
-        PT: [], PTA: [], OT: [], COTA: [], ST: [], STA: []
       };
     }
   };
@@ -206,30 +286,46 @@ const DevReferralsPage = () => {
     PT: [], PTA: [], OT: [], COTA: [], ST: [], STA: []
   });
 
-  // Fetch data on component mount
-  useEffect(() => {
-    const loadInitialData = async () => {
+  // Función para cargar datos iniciales - optimizada para tiempos de carga rápidos
+  // CLAVE: Esta función ahora tiene un timeout para evitar que la página se quede cargando demasiado tiempo
+  const loadInitialData = async () => {
+    try {
+      // Iniciar un temporizador para asegurar que la carga no tarde más de lo necesario
+      const timeoutId = setTimeout(() => {
+        // Si el timeout se dispara, simplemente desactivamos el estado de carga
+        setIsLoading(false);
+      }, 800); // Mismo tiempo del primer código
+      
+      // Realizamos las llamadas API en paralelo
       const [physicianData, agencyData, therapistData] = await Promise.all([
         fetchPhysicians(),
         fetchAgencies(),
         fetchTherapists()
       ]);
       
+      // Limpiamos el timeout ya que las peticiones terminaron
+      clearTimeout(timeoutId);
+      
+      // Actualizamos los estados con los datos recibidos
       setPhysicians(physicianData);
       setAgencies(agencyData);
       setTherapists(therapistData);
-    };
-    
-    loadInitialData();
-  }, []);
-  
-  // Effect for simulating loading state
-  useEffect(() => {
-    const timer = setTimeout(() => {
+      
+      // Desactivamos el indicador de carga después del tiempo establecido
+      setTimeout(() => {
+        setIsLoading(false);
+      }, 800); // Mismo tiempo del primer código
+      
+    } catch (error) {
+      console.error('Error cargando datos iniciales:', error);
+      // En caso de error, también garantizamos que la UI no se quede en estado de carga
       setIsLoading(false);
-    }, 800);
-    
-    return () => clearTimeout(timer);
+    }
+  };
+  
+  // Fetch data on component mount
+  useEffect(() => {
+    loadInitialData();
   }, []);
   
   // Effect for handling clicks outside user menu
@@ -267,6 +363,7 @@ const DevReferralsPage = () => {
       
       const formattedEndDate = endDate.toISOString().split('T')[0];
       
+      // We set a suggested end date but it can be modified
       setFormData(prev => ({
         ...prev,
         certPeriodEnd: formattedEndDate
@@ -296,7 +393,7 @@ const DevReferralsPage = () => {
     navigate(`/${baseRole}/homePage`);
   };
 
-  // Handle starting create new referral process
+  // Handle starting create new referral process - mantiene el tiempo del primer código
   const handleStartCreateReferral = () => {
     if (isLoggingOut) return;
     
@@ -327,7 +424,7 @@ const DevReferralsPage = () => {
     const files = Array.from(e.target.files).filter(file => file.type === 'application/pdf');
     
     if (files.length === 0) {
-      alert('Please upload PDF files only.');
+      toast.error('Por favor, sube solo archivos PDF.');
       return;
     }
     
@@ -495,9 +592,10 @@ const DevReferralsPage = () => {
   
   // Get selected agency
   const getSelectedAgency = () => {
-    return agencies.find(agency => agency.id.toString() === formData.agencyId);
+    return agencies.find(agency => agency.id?.toString() === formData.agencyId);
   };
 
+  // =========== API DATA PREPARATION AND SUBMISSION ============
   // Prepare data for API submission
   const preparePatientData = () => {
     // Get selected therapists with names
@@ -505,7 +603,7 @@ const DevReferralsPage = () => {
     Object.keys(selectedTherapists).forEach(discipline => {
       if (selectedTherapists[discipline]) {
         const therapistId = selectedTherapists[discipline];
-        const therapist = therapists[discipline].find(t => t.id.toString() === therapistId.toString());
+        const therapist = therapists[discipline].find(t => t.id?.toString() === therapistId?.toString());
         if (therapist) {
           selectedTherapistsWithNames[discipline] = {
             id: therapistId,
@@ -552,21 +650,17 @@ const DevReferralsPage = () => {
         isNew: true,
         name: formData.newPhysicianName
       };
-    } else if (formData.physicianId) {
-      const physician = physicians.find(p => p.id.toString() === formData.physicianId.toString());
-      if (physician) {
-        physicianData = {
-          isNew: false,
-          id: physician.id,
-          name: physician.name
-        };
-      }
+    } else if (formData.physicianName) {
+      physicianData = {
+        isNew: false,
+        name: formData.physicianName
+      };
     }
 
     // Prepare agency data
     let agencyData = null;
     if (formData.agencyId) {
-      const agency = agencies.find(a => a.id.toString() === formData.agencyId.toString());
+      const agency = agencies.find(a => a.id?.toString() === formData.agencyId?.toString());
       if (agency) {
         agencyData = {
           id: agency.id,
@@ -651,6 +745,7 @@ const DevReferralsPage = () => {
       physicianId: '',
       newPhysician: false,
       newPhysicianName: '',
+      physicianName: '',
       agencyId: '',
       agencyBranch: '',
       nurseManager: '',
@@ -702,10 +797,10 @@ const DevReferralsPage = () => {
     // Reset adding new manager state
     setAddingNewManager(false);
     
-    // Log para confirmar que el formulario se ha limpiado
     console.log('Form has been reset completely');
   };
   
+  // Handle form submission con tiempos optimizados
   const validateDisciplines = () => {
     return ['PT', 'OT', 'ST'].some(discipline => selectedDisciplines[discipline]);
   };
@@ -715,7 +810,7 @@ const DevReferralsPage = () => {
     if (isLoggingOut) return;
   
     if (!validateDisciplines()) {
-      toast.error('Please select at least one discipline (PT, PTA, OT, COTA, ST, or STA)');
+      toast.error('Por favor, seleccione al menos una disciplina (PT, PTA, OT, COTA, ST, o STA)');
       return;
     }
   
@@ -724,9 +819,22 @@ const DevReferralsPage = () => {
       .every(d => selectedTherapists[d]);
   
     if (!hasAllTherapistsSelected) {
+      toast.error('Por favor, seleccione un terapeuta para cada disciplina seleccionada');
       toast.error('Select a therapist for each selected main discipline (PT, OT, ST)');
       return;
     }
+    
+    // Validate weight and height
+    if (formData.weight && isNaN(formData.weight)) {
+      toast.error('Por favor, ingrese un número válido para el Peso');
+      return;
+    }
+    if (formData.height && isNaN(formData.height)) {
+      toast.error('Por favor, ingrese un número válido para la Altura');
+      return;
+    }
+    
+    // Show loading screen
   
     setFormSubmitting(true);
   
@@ -803,7 +911,7 @@ const DevReferralsPage = () => {
       return false;
     });
     
-    if (hasFormData && !window.confirm('Are you sure you want to cancel? All entered data will be lost.')) {
+    if (hasFormData && !window.confirm('¿Está seguro de que desea cancelar? Todos los datos ingresados se perderán.')) {
       return;
     }
     
@@ -1337,14 +1445,21 @@ const DevReferralsPage = () => {
                         <div className="date-input end-date">
                           <CustomDatePicker
                             selectedDate={formData.certPeriodEnd}
-                            onChange={() => {}} // No manual changes allowed
+                            onChange={(date) => {
+                              if (isLoggingOut) return;
+                              setFormData(prev => ({
+                                ...prev,
+                                certPeriodEnd: date
+                              }));
+                            }}
                             name="certPeriodEnd"
-                            disabled={true}
+                            required={true}
+                            disabled={isLoggingOut}
                           />
                         </div>
                       </div>
                       <small className="form-text text-muted">
-                        End date is automatically calculated as SOC + 60 days
+                        End date is automatically calculated as SOC + 60 days, but can be modified if needed
                       </small>
                     </div>
                   </div>
@@ -1376,23 +1491,17 @@ const DevReferralsPage = () => {
                 
                 <div className="form-grid">
                   <div className="form-group">
-                    <label htmlFor="physicianId">Physician</label>
-                    <select
-                      id="physicianId"
-                      name="physicianId"
-                      value={formData.physicianId}
-                      onChange={handlePhysicianChange}
+                    <label htmlFor="physicianName">Physician</label>
+                    <input
+                      type="text"
+                      id="physicianName"
+                      name="physicianName"
+                      value={formData.physicianName || ''}
+                      onChange={handleInputChange}
+                      placeholder="Enter physician name"
                       required
                       disabled={isLoggingOut}
-                    >
-                      <option value="">Select Physician</option>
-                      {physicians.map(physician => (
-                        <option key={physician.id} value={physician.id}>
-                          {physician.name}
-                        </option>
-                      ))}
-                      <option value="new">Add New Physician</option>
-                    </select>
+                    />
                   </div>
                   
                   {formData.newPhysician && (
@@ -1442,7 +1551,7 @@ const DevReferralsPage = () => {
                           disabled={isLoggingOut}
                         >
                           <option value="">Select Branch</option>
-                          {getSelectedAgency()?.branches.map((branch, index) => (
+                          {getSelectedAgency()?.branches?.map((branch, index) => (
                             <option key={index} value={branch}>
                               {branch}
                             </option>
@@ -1452,22 +1561,16 @@ const DevReferralsPage = () => {
                       
                       <div className="form-group">
                         <label htmlFor="nurseManager">Nurse Manager</label>
-                        <select
+                        <input
+                          type="text"
                           id="nurseManager"
                           name="nurseManager"
-                          value={formData.nurseManager}
-                          onChange={handleNurseManagerChange}
+                          value={formData.nurseManager || ''}
+                          onChange={handleInputChange}
+                          placeholder="Enter nurse manager name"
                           required
                           disabled={isLoggingOut}
-                        >
-                          <option value="">Select Nurse Manager</option>
-                          {getSelectedAgency()?.managers.map((manager, index) => (
-                            <option key={index} value={manager}>
-                              {manager}
-                            </option>
-                          ))}
-                          <option value="new">Add New Nurse Manager</option>
-                        </select>
+                        />
                       </div>
                       
                       {addingNewManager && (

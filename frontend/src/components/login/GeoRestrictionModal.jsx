@@ -1,3 +1,4 @@
+// components/login/GeoRestrictionModal.jsx
 import React, { useEffect, useState } from 'react';
 
 const GeoRestrictionModal = ({ isOpen, locationData, onRetry, onClose }) => {
@@ -65,11 +66,6 @@ const GeoRestrictionModal = ({ isOpen, locationData, onRetry, onClose }) => {
           <button className="geo-button primary" onClick={onRetry}>
             <i className="fas fa-sync-alt"></i>
             Try Again
-          </button>
-          
-          <button className="geo-button secondary" onClick={onClose}>
-            <i className="fas fa-times"></i>
-            Close
           </button>
         </div>
         

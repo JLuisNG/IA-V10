@@ -32,7 +32,7 @@ const CompanyRegistrationForm = ({ onCancel, onSave }) => {
     status: 'active',
   });
 
-  // Simulación de carga del formulario con mensajes dinámicos mejorados
+  // Simulated loading with dynamic messages
   useEffect(() => {
     const loadingMessages = [
       { message: 'Connecting to database...', time: 800 },
@@ -64,7 +64,7 @@ const CompanyRegistrationForm = ({ onCancel, onSave }) => {
   const handleInputChange = (e) => {
     const { name, value } = e.target;
     
-    // Manejo de campos anidados (address, contact)
+    // Handle nested fields (address, contact)
     if (name.includes('.')) {
       const [parent, child] = name.split('.');
       setFormData({
@@ -114,16 +114,15 @@ const CompanyRegistrationForm = ({ onCancel, onSave }) => {
     e.preventDefault();
     setIsSaving(true);
     
-    // Implementar lógica para enviar los datos con simulación de carga
+    // Simulated server submission with timeout
     console.log('Company form data:', formData);
     
-    // Simulación de envío a servidor con tiempo de espera
     setTimeout(() => {
-      // Mostrar mensaje de éxito después de "guardar"
+      // Show success message after "saving"
       setIsSaving(false);
       setShowSuccessMessage(true);
       
-      // Después de un tiempo, cerrar o dar opciones
+      // After a delay, close or provide options
       setTimeout(() => {
         if (onSave) {
           onSave(formData);
@@ -158,7 +157,34 @@ const CompanyRegistrationForm = ({ onCancel, onSave }) => {
     'Other'
   ];
 
-  // Renderizar mensaje de éxito
+  const getSpecialtyIcon = (specialty) => {
+    switch(specialty) {
+      case 'Physical Therapy':
+        return <i className="fas fa-walking"></i>;
+      case 'Occupational Therapy':
+        return <i className="fas fa-briefcase"></i>;
+      case 'Speech Therapy':
+        return <i className="fas fa-comment-medical"></i>;
+      case 'Nursing Care':
+        return <i className="fas fa-user-nurse"></i>;
+      case 'Elderly Care':
+        return <i className="fas fa-hand-holding-heart"></i>;
+      case 'Pediatric Care':
+        return <i className="fas fa-baby"></i>;
+      case 'Rehabilitative Care':
+        return <i className="fas fa-heartbeat"></i>;
+      case 'Post-Surgery Care':
+        return <i className="fas fa-hospital"></i>;
+      case 'Chronic Disease Management':
+        return <i className="fas fa-chart-line"></i>;
+      case 'Disability Support':
+        return <i className="fas fa-wheelchair"></i>;
+      default:
+        return <i className="fas fa-plus-circle"></i>;
+    }
+  };
+
+  // Render success message
   if (showSuccessMessage) {
     return (
       <div className="company-registration-container">
@@ -205,7 +231,7 @@ const CompanyRegistrationForm = ({ onCancel, onSave }) => {
               className="view-companies-btn" 
               onClick={() => {
                 if (onCancel) {
-                  // Pasamos un parámetro adicional para indicar que queremos ver la lista de compañías
+                  // Pass additional parameter to indicate we want to view company list
                   onCancel('viewCompanies');
                 }
               }}
@@ -221,36 +247,35 @@ const CompanyRegistrationForm = ({ onCancel, onSave }) => {
   return (
     <div className="company-registration-container">
       {isLoading ? (
-// Dentro de tu componente de carga
-<div className="loading-screen">
-  <div className="wave-effect"></div>
-  <div className="scan-effect"></div>
-  <div className="data-lines">
-    {Array.from({ length: 20 }).map((_, index) => (
-      <div key={index} className="line"></div>
-    ))}
-  </div>
-  <div className="loader-container">
-    <div className="loader-hologram">
-      <div className="hologram-ring"></div>
-      <div className="hologram-circle"></div>
-      <div className="hologram-bars">
-        <div className="bar"></div>
-        <div className="bar"></div>
-        <div className="bar"></div>
-        <div className="bar"></div>
-        <div className="bar"></div>
-      </div>
-    </div>
-    <div className="loader-progress">
-      <div className="progress-bar">
-        <div className="progress-fill"></div>
-      </div>
-    </div>
-    <div className="loader-text">{loadingMessage}</div>
-    <div className="loader-status">TherapySync Pro <span className="status-dot"></span></div>
-  </div>
-</div>
+        <div className="loading-screen">
+          <div className="wave-effect"></div>
+          <div className="scan-effect"></div>
+          <div className="data-lines">
+            {Array.from({ length: 20 }).map((_, index) => (
+              <div key={index} className="line"></div>
+            ))}
+          </div>
+          <div className="loader-container">
+            <div className="loader-hologram">
+              <div className="hologram-ring"></div>
+              <div className="hologram-circle"></div>
+              <div className="hologram-bars">
+                <div className="bar"></div>
+                <div className="bar"></div>
+                <div className="bar"></div>
+                <div className="bar"></div>
+                <div className="bar"></div>
+              </div>
+            </div>
+            <div className="loader-progress">
+              <div className="progress-bar">
+                <div className="progress-fill"></div>
+              </div>
+            </div>
+            <div className="loader-text">{loadingMessage}</div>
+            <div className="loader-status">TherapySync Pro <span className="status-dot"></span></div>
+          </div>
+        </div>
       ) : (
         <div className="company-form-container">
           <div className="form-header">
@@ -495,8 +520,8 @@ const CompanyRegistrationForm = ({ onCancel, onSave }) => {
               </div>
             </div>
             
-            {/* Services & Specialties Section */}
-            <div className="form-section">
+            {/* Services & Specialties Section - MEJORADO */}
+            <div className="form-section services-section">
               <div className="section-header">
                 <i className="fas fa-stethoscope"></i>
                 <h3>Services & Specialties</h3>
@@ -504,18 +529,21 @@ const CompanyRegistrationForm = ({ onCancel, onSave }) => {
               <div className="section-content">
                 <div className="specialties-container">
                   <label className="specialties-label">Select services offered by this company (select all that apply)</label>
-                  <div className="specialties-grid">
+                  
+                  <div className="specialties-cards">
                     {specialtyOptions.map((specialty) => (
-                      <div key={specialty} className="specialty-option">
-                        <label className="checkbox-container">
-                          <input
-                            type="checkbox"
-                            checked={formData.specialties.includes(specialty)}
-                            onChange={() => handleSpecialtyChange(specialty)}
-                          />
-                          <span className="checkmark"></span>
-                          <span className="specialty-name">{specialty}</span>
-                        </label>
+                      <div 
+                        key={specialty} 
+                        className={`specialty-card ${formData.specialties.includes(specialty) ? 'selected' : ''}`}
+                        onClick={() => handleSpecialtyChange(specialty)}
+                      >
+                        <div className="specialty-icon">
+                          {getSpecialtyIcon(specialty)}
+                        </div>
+                        <div className="specialty-name">{specialty}</div>
+                        <div className="specialty-check">
+                          <i className="fas fa-check-circle"></i>
+                        </div>
                       </div>
                     ))}
                   </div>
