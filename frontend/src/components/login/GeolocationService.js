@@ -3,15 +3,16 @@
 const ALLOWED_COUNTRIES = ['US', 'USA', 'United States']; // Códigos de país permitidos
 const GEO_API_URL = 'https://ipapi.co/json/'; // API gratuita para geolocalización por IP
 
-// Enable DEV_MODE to bypass geolocation checks during development
-const DEV_MODE = true; 
+// Dejamos DEV_MODE en false para que verifique la restricción geográfica
+const DEV_MODE = false; 
 
 /**
  * Verificar si la ubicación del usuario está permitida
  * @returns {Promise<Object>} Resultado de la verificación
  */
 export const checkGeolocation = async () => {
-  // Skip location check in development mode
+  console.log('Checking geolocation...');
+  
   if (DEV_MODE) {
     console.log('Dev mode enabled, bypassing geolocation check');
     return {
@@ -30,6 +31,7 @@ export const checkGeolocation = async () => {
   try {
     // Intentar obtener la ubicación mediante la API de geolocalización
     const locationData = await getLocationData();
+    console.log('Location data received:', locationData);
     
     // Si no se pudo obtener la ubicación, denegar por precaución
     if (!locationData || !locationData.country_code) {
@@ -45,6 +47,8 @@ export const checkGeolocation = async () => {
     const isAllowed = ALLOWED_COUNTRIES.includes(locationData.country_code) ||
                      ALLOWED_COUNTRIES.includes(locationData.country_name);
     
+    console.log('Location allowed:', isAllowed, 'Country:', locationData.country_name);
+    
     return {
       allowed: isAllowed,
       reason: isAllowed ? 'Location allowed' : 'Geographic restriction',
@@ -59,10 +63,10 @@ export const checkGeolocation = async () => {
   } catch (error) {
     console.error('Error checking geolocation:', error);
     
-    // En caso de error, permitir acceso en modo desarrollo
+    // En caso de error, denegar acceso por seguridad
     return {
-      allowed: true,
-      reason: 'Error verifying location, allowing access in development',
+      allowed: false,
+      reason: 'Error verifying location, access denied',
       error: error.message
     };
   }
@@ -73,20 +77,13 @@ export const checkGeolocation = async () => {
  * @returns {Promise<Object>} Datos de ubicación
  */
 const getLocationData = async () => {
-  // Return mock data in development mode
-  if (DEV_MODE) {
-    console.log('Dev mode enabled, returning mock location data');
-    return {
-      country_code: 'US',
-      country_name: 'United States',
-      region: 'California',
-      city: 'Los Angeles',
-      ip: '127.0.0.1'
-    };
-  }
-
+  // Para pruebas: puedes simular estar en un país no permitido
+  // Descomentar esta línea para simular estar en otro país
+  // return { country_code: 'MX', country_name: 'Mexico', region: 'Ciudad de Mexico', city: 'Mexico City', ip: '123.456.789.0' };
+  
   try {
     // Hacer solicitud a la API de geolocalización
+    console.log('Fetching location data from:', GEO_API_URL);
     const response = await fetch(GEO_API_URL);
     
     if (!response.ok) {
@@ -94,6 +91,7 @@ const getLocationData = async () => {
     }
     
     const data = await response.json();
+    console.log('Geolocation API response:', data);
     return data;
   } catch (error) {
     console.error('Error getting location data:', error);
@@ -133,11 +131,21 @@ class GeolocationService {
    * @returns {boolean} True si está permitido
    */
   static isCountryAllowed(countryCode) {
-    // Always return true in development mode
     if (DEV_MODE) return true;
     
     if (!countryCode) return false;
     return ALLOWED_COUNTRIES.includes(countryCode.toUpperCase());
+  }
+  
+  /**
+   * Función auxiliar para simular una ubicación diferente (solo para pruebas)
+   * @param {string} countryCode - Código de país a simular
+   */
+  static simulateLocation(countryCode, countryName) {
+    // Esta función es solo para pruebas
+    localStorage.setItem('simulated_country_code', countryCode);
+    localStorage.setItem('simulated_country_name', countryName);
+    console.log('Simulating location:', countryCode, countryName);
   }
 }
 

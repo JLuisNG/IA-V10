@@ -608,11 +608,17 @@ const DevStaffingPage = () => {
             </div>
           </div>
           
-          {/* Renderizado condicional de componentes - ARREGLADO: Actualizada la lógica para manejar correctamente la visualización */}
+          {/* Renderizado condicional de componentes - ACTUALIZADO: Usando los nuevos componentes */}
           {selectedOption === 'therapists' && showAddStaffForm ? (
-            <AddStaffForm onCancel={handleCancelForm} />
+            <AddStaffForm 
+              onCancel={handleCancelForm} 
+              onViewAllStaff={handleViewAllStaffClick} 
+            />
           ) : selectedOption === 'therapists' && showStaffList ? (
-            <StaffListComponent onBackToOptions={handleBackToOptions} />
+            <StaffListComponent
+              onBackToOptions={handleBackToOptions}
+              onAddNewStaff={handleAddStaffClick}  
+            />
           ) : selectedOption === 'companies' && showCompanyForm ? (
             <CompanyRegistrationForm onCancel={handleCompanyFormCancel} onSave={handleCompanySave} />
           ) : selectedOption === 'companies' && showCompanyList ? (

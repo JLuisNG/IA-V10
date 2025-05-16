@@ -1,233 +1,231 @@
 // components/login/AuthContext.jsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
+import GeolocationService from './GeolocationService';
 import createSessionTimeout from './SessionTimeoutService';
-import { checkGeolocation } from './GeolocationService'; // Importaremos este servicio después
 
-// Crear el contexto
+// Create context
 const AuthContext = createContext();
 
-// Crear un hook personalizado para usar el contexto
+// Custom hook to use the auth context
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [currentUser, setCurrentUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [authState, setAuthState] = useState({
+    isAuthenticated: false,
+    loading: true,
+    currentUser: null,
+    token: null,
+    error: null
+  });
+
+  // Session timeout state
   const [sessionTimeoutWarning, setSessionTimeoutWarning] = useState({
     isOpen: false,
-    remainingTime: 0
+    remainingTime: 60 // Default 60 seconds warning
   });
-  
-  // Instancia del servicio de timeout
+
+  // Session timeout service
   const sessionTimeout = createSessionTimeout({
-    timeout: 15 * 60 * 1000, // 
-    warningTime: 60 * 1000, // Advertencia 1 minuto antes
-    onTimeout: handleSessionTimeout,
-    onWarning: handleSessionWarning,
-    onActivityDetected: handleUserActivity
+    timeout: 15 * 60 * 1000, // 15 minutes
+    warningTime: 60 * 1000, // 1 minute warning
+    onTimeout: () => {
+      console.log('Session timed out');
+      logout();
+    },
+    onWarning: (remainingSeconds) => {
+      console.log(`Session will timeout in ${remainingSeconds} seconds`);
+      setSessionTimeoutWarning({
+        isOpen: true,
+        remainingTime: remainingSeconds
+      });
+    },
+    onActivityDetected: () => {
+      console.log('User activity detected, hiding warning');
+      setSessionTimeoutWarning({
+        isOpen: false,
+        remainingTime: 60
+      });
+    }
   });
-  
-  // Funciones para manejar eventos de sesión
-  function handleSessionTimeout() {
-    logout();
-  }
-  
-  function handleSessionWarning(remainingSeconds) {
-    setSessionTimeoutWarning({
-      isOpen: true,
-      remainingTime: remainingSeconds
-    });
-  }
-  
-  function handleUserActivity() {
-    setSessionTimeoutWarning({
-      isOpen: false,
-      remainingTime: 0
-    });
-  }
-  
-  // Extender la sesión
-  function extendSession() {
-    setSessionTimeoutWarning({
-      isOpen: false,
-      remainingTime: 0
-    });
-    sessionTimeout.extendSession();
-  }
-  
-  // Efectos para cargar datos de autenticación
+
+  // Check for existing auth on mount
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        // Verificar si hay un token almacenado
-        const authToken = localStorage.getItem('auth_token');
-        const userData = localStorage.getItem('user_data');
+        // Check localStorage for token
+        const token = localStorage.getItem('auth_token');
+        const userData = localStorage.getItem('auth_user');
         
-        if (authToken && userData) {
-          // Verificar geolocalización antes de autenticar
-          const geoResult = await checkGeolocation();
+        if (token && userData) {
+          // Verify geolocation before restoring session
+          const geoResult = await GeolocationService.verifyLocationAccess();
           
           if (!geoResult.allowed) {
-            // No se permite el acceso desde esta ubicación
-            setIsAuthenticated(false);
-            setCurrentUser(null);
-            localStorage.removeItem('auth_token');
-            localStorage.removeItem('user_data');
-            setLoading(false);
+            // Location restricted, log out
+            clearAuthData();
+            setAuthState({
+              isAuthenticated: false,
+              loading: false,
+              currentUser: null,
+              token: null,
+              error: 'Geographic restriction'
+            });
             return;
           }
           
-          // Verificar sesiones concurrentes (implementaremos esto más adelante)
-          const sessionToken = localStorage.getItem('session_token');
-          const lastPingTime = localStorage.getItem('last_ping_time');
+          // Restore user data
+          const user = JSON.parse(userData);
           
-          // Si hay un token y datos de usuario válidos, autenticar
-          setCurrentUser(JSON.parse(userData));
-          setIsAuthenticated(true);
+          setAuthState({
+            isAuthenticated: true,
+            loading: false,
+            currentUser: user,
+            token: token,
+            error: null
+          });
           
-          // Iniciar el servicio de timeout de sesión
+          // Start session timeout tracking
           sessionTimeout.startTracking();
         } else {
-          setIsAuthenticated(false);
-          setCurrentUser(null);
+          // No stored auth
+          setAuthState({
+            isAuthenticated: false,
+            loading: false,
+            currentUser: null,
+            token: null,
+            error: null
+          });
         }
       } catch (error) {
-        console.error('Error checking authentication:', error);
-        setIsAuthenticated(false);
-        setCurrentUser(null);
-      } finally {
-        setLoading(false);
+        console.error('Error checking auth:', error);
+        clearAuthData();
+        setAuthState({
+          isAuthenticated: false,
+          loading: false,
+          currentUser: null,
+          token: null,
+          error: 'Authentication error'
+        });
       }
     };
     
     checkAuth();
     
-    // Cleanup
+    // Cleanup session tracking on unmount
     return () => {
       sessionTimeout.stopTracking();
     };
   }, []);
-  
-  // Función de login
+
+  // Clear auth data from localStorage
+  const clearAuthData = () => {
+    localStorage.removeItem('auth_token');
+    localStorage.removeItem('auth_user');
+  };
+
+  // Login function
   const login = async (authData) => {
     try {
-      // Verificar geolocalización
-      const geoResult = await checkGeolocation();
+      // Verify location before logging in
+      const geoResult = await GeolocationService.verifyLocationAccess();
       
       if (!geoResult.allowed) {
         return {
           success: false,
-          error: 'Access denied from your location'
+          error: 'Geographic restriction'
         };
       }
       
-      // Generar token de sesión único
-      const sessionToken = 'session_' + Date.now() + '_' + Math.random().toString(36).substring(2);
-      
-      // Guardar datos en localStorage
-      localStorage.setItem('auth_token', authData.token);
-      localStorage.setItem('user_data', JSON.stringify(authData.user));
-      localStorage.setItem('session_token', sessionToken);
-      localStorage.setItem('last_ping_time', Date.now().toString());
-      
-      // Actualizar estado
-      setCurrentUser(authData.user);
-      setIsAuthenticated(true);
-      
-      // Iniciar tracking de timeout
-      sessionTimeout.startTracking();
-      
-      // Iniciar ping para control de sesiones concurrentes
-      startSessionPing(sessionToken, authData.user.username);
-      
-      return { success: true };
+      // If authentication is successful
+      if (authData.success && authData.token && authData.user) {
+        // Store auth data
+        localStorage.setItem('auth_token', authData.token);
+        localStorage.setItem('auth_user', JSON.stringify(authData.user));
+        
+        // Update state
+        setAuthState({
+          isAuthenticated: true,
+          loading: false,
+          currentUser: authData.user,
+          token: authData.token,
+          error: null
+        });
+        
+        // Start session timeout tracking
+        sessionTimeout.startTracking();
+        
+        return { success: true };
+      } else {
+        throw new Error(authData.error || 'Authentication failed');
+      }
     } catch (error) {
       console.error('Login error:', error);
+      clearAuthData();
+      setAuthState(prev => ({
+        ...prev,
+        error: error.message
+      }));
       return {
         success: false,
-        error: 'Authentication failed'
+        error: error.message
       };
     }
   };
-  
-  // Función de logout
+
+  // Logout function
   const logout = () => {
-    // Detener tracking de timeout
+    // Stop session tracking
     sessionTimeout.stopTracking();
     
-    // Limpiar localStorage
-    localStorage.removeItem('auth_token');
-    localStorage.removeItem('user_data');
-    localStorage.removeItem('session_token');
-    localStorage.removeItem('last_ping_time');
+    // Clear auth data
+    clearAuthData();
     
-    // Actualizar estado
-    setIsAuthenticated(false);
-    setCurrentUser(null);
+    // Update state
+    setAuthState({
+      isAuthenticated: false,
+      loading: false,
+      currentUser: null,
+      token: null,
+      error: null
+    });
     
-    // Redirigir a la página de login
+    // Close timeout warning if open
+    setSessionTimeoutWarning({
+      isOpen: false,
+      remainingTime: 60
+    });
+    
+    // Redirigir al login
     window.location.href = '/';
   };
-  
-  // Función para iniciar ping periódico para verificar sesiones concurrentes
-  const startSessionPing = (sessionToken, username) => {
-    const pingInterval = 30000; // 30 segundos
+
+  // Extend session
+  const extendSession = () => {
+    console.log('Extending session');
+    sessionTimeout.extendSession();
     
-    // Función para realizar ping
-    const pingSession = async () => {
-      try {
-        // Simular solicitud de ping al servidor (en producción, esto sería una solicitud real)
-        const pingTime = Date.now();
-        localStorage.setItem('last_ping_time', pingTime.toString());
-        
-        // Simular verificación de sesiones concurrentes (más adelante implementaremos esto)
-        const isConcurrentSession = await checkConcurrentSessions(username, sessionToken);
-        
-        if (isConcurrentSession) {
-          // Si se detectó una sesión concurrente, mostrar modal y cerrar sesión
-          alert('Your account has been logged in from another device. You will be logged out.');
-          logout();
-        }
-      } catch (error) {
-        console.error('Error pinging session:', error);
-      }
-    };
-    
-    // Realizar ping inicial
-    pingSession();
-    
-    // Configurar intervalo para pings periódicos
-    const pingIntervalId = setInterval(pingSession, pingInterval);
-    
-    // Guardar ID del intervalo para limpieza
-    window._sessionPingIntervalId = pingIntervalId;
-    
-    // Retornar función para detener pings
-    return () => {
-      if (window._sessionPingIntervalId) {
-        clearInterval(window._sessionPingIntervalId);
-        window._sessionPingIntervalId = null;
-      }
-    };
+    // Hide warning
+    setSessionTimeoutWarning({
+      isOpen: false,
+      remainingTime: 60
+    });
   };
-  
-  // Simulación de verificación de sesiones concurrentes (implementación real vendrá después)
-  const checkConcurrentSessions = async (username, sessionToken) => {
-    // Esta función será implementada completamente en el servicio de sesiones concurrentes
-    return false;
-  };
-  
-  // Exportar el proveedor
+
+  // Provide auth context
   return (
-    <AuthContext.Provider value={{ 
-      isAuthenticated, 
-      currentUser, 
-      loading,
-      login,
-      logout,
-      sessionTimeoutWarning,
-      extendSession
-    }}>
+    <AuthContext.Provider
+      value={{
+        isAuthenticated: authState.isAuthenticated,
+        loading: authState.loading,
+        currentUser: authState.currentUser,
+        token: authState.token,
+        error: authState.error,
+        login,
+        logout,
+        sessionTimeoutWarning,
+        extendSession
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
