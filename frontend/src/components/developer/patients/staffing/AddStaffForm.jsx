@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import '../../../../styles/developer/Patients/Staffing/AddStaffForm.scss';
 
-const DevAddStaffForm = ({ onCancel, onViewAllStaff }) => {
+const AddStaffForm = ({ onCancel, onViewAllStaff }) => {
   // Estados para control de carga y guardado
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
@@ -34,7 +34,7 @@ const DevAddStaffForm = ({ onCancel, onViewAllStaff }) => {
     },
   });
 
-  // Lista de agencies disponibles para roles de terapeutas
+  // Lista de agencies disponibles
   const agencies = [
     {
       id: 'motive-home-care',
@@ -303,36 +303,36 @@ const DevAddStaffForm = ({ onCancel, onViewAllStaff }) => {
     }
   };
 
-  // Lista de roles disponibles
+  // Lista de roles disponibles con iconos mejorados
   const roles = [
-    { value: 'developer', label: 'Developer', icon: 'fa-code', description: 'System development and technical support' },
+    { value: 'developer', label: 'Developer', icon: 'fa-laptop-code', description: 'System development and technical support' },
     { value: 'administrator', label: 'Administrator', icon: 'fa-user-shield', description: 'System administration and user management' },
-    { value: 'agency', label: 'Agency', icon: 'fa-building', description: 'Healthcare provider organization' },
+    { value: 'agency', label: 'Agency', icon: 'fa-hospital-alt', description: 'Healthcare provider organization' },
     { value: 'pt', label: 'Physical Therapist (PT)', icon: 'fa-user-md', description: 'Evaluates and treats physical mobility disorders' },
     { value: 'pta', label: 'Physical Therapist Assistant (PTA)', icon: 'fa-user-nurse', description: 'Assists physical therapists in treatment delivery' },
     { value: 'ot', label: 'Occupational Therapist (OT)', icon: 'fa-hand-holding-medical', description: 'Helps patients improve daily living activities' },
     { value: 'cota', label: 'Occupational Therapy Assistant (COTA)', icon: 'fa-hand-holding', description: 'Assists occupational therapists with treatment' },
-    { value: 'st', label: 'Speech Therapist (ST)', icon: 'fa-comments-alt', description: 'Evaluates and treats communication disorders' },
-    { value: 'sta', label: 'Speech Therapy Assistant (STA)', icon: 'fa-comment', description: 'Assists speech therapists with therapy sessions' },
+    { value: 'st', label: 'Speech Therapist (ST)', icon: 'fa-comment-medical', description: 'Evaluates and treats communication disorders' },
+    { value: 'sta', label: 'Speech Therapy Assistant (STA)', icon: 'fa-comment-dots', description: 'Assists speech therapists with therapy sessions' },
   ];
 
-  // Lista de documentos requeridos para terapeutas
+  // Lista de documentos requeridos para terapeutas con descripciones mejoradas
   const therapistDocuments = [
-    { id: 'covidVaccine', name: 'Proof of COVID Vaccine', icon: 'fa-syringe' },
+    { id: 'covidVaccine', name: 'Proof of COVID Vaccine', icon: 'fa-syringe', description: 'Vaccination record or certificate' },
     { id: 'tbTest', name: 'TB Test proof (PPD/X-Ray)', description: 'PPD Test (valid for 1 year) or X-Ray TB test (valid for 5 years)', icon: 'fa-lungs' },
-    { id: 'physicalExam', name: 'Annual Physical Exam Proof', icon: 'fa-stethoscope' },
-    { id: 'liabilityInsurance', name: 'Professional Liability Insurance', icon: 'fa-shield-alt' },
-    { id: 'driversLicense', name: 'Driver\'s License', icon: 'fa-id-card' },
-    { id: 'autoInsurance', name: 'Auto Insurance', icon: 'fa-car' },
-    { id: 'cprCertification', name: 'CPR/BLS Certification', icon: 'fa-heartbeat' },
-    { id: 'businessLicense', name: 'Copy of Business License or EIN', icon: 'fa-certificate' },
+    { id: 'physicalExam', name: 'Annual Physical Exam Proof', icon: 'fa-stethoscope', description: 'Medical clearance for healthcare duties' },
+    { id: 'liabilityInsurance', name: 'Professional Liability Insurance', icon: 'fa-shield-alt', description: 'Malpractice insurance coverage document' },
+    { id: 'driversLicense', name: 'Driver\'s License', icon: 'fa-id-card', description: 'Valid state-issued driver\'s license' },
+    { id: 'autoInsurance', name: 'Auto Insurance', icon: 'fa-car-alt', description: 'Proof of current auto insurance coverage' },
+    { id: 'cprCertification', name: 'CPR/BLS Certification', icon: 'fa-heartbeat', description: 'Current CPR or Basic Life Support certification' },
+    { id: 'businessLicense', name: 'Copy of Business License or EIN', icon: 'fa-certificate', description: 'Business license or Employer Identification Number document' },
   ];
 
   // Documentos para agencias
   const agencyDocuments = [
-    { id: 'businessLicense', name: 'Business License', icon: 'fa-building' },
-    { id: 'contractDocument', name: 'Contract with TherapySync', icon: 'fa-file-contract' },
-    { id: 'liabilityInsurance', name: 'Liability Insurance', icon: 'fa-shield-alt' },
+    { id: 'businessLicense', name: 'Business License', icon: 'fa-building', description: 'Valid business operation license' },
+    { id: 'contractDocument', name: 'Contract with TherapySync', icon: 'fa-file-contract', description: 'Signed service agreement' },
+    { id: 'liabilityInsurance', name: 'Liability Insurance', icon: 'fa-shield-alt', description: 'Organization liability coverage documentation' },
   ];
 
   // Determinar qué documentos mostrar según el rol
@@ -352,9 +352,14 @@ const DevAddStaffForm = ({ onCancel, onViewAllStaff }) => {
     }
   };
 
-  // Verificar si es terapeuta
-  const isTherapist = () => {
-    return ['pt', 'pta', 'ot', 'cota', 'st', 'sta'].includes(formData.role);
+// Verificar si es terapeuta o administrador (para mostrar agencia)
+const isTherapistOrAdmin = () => {
+  return ['pt', 'pta', 'ot', 'cota', 'st', 'sta', 'administrator'].includes(formData.role);
+};
+
+  // Verificar si debe mostrar documentos
+  const shouldShowDocuments = () => {
+    return ['pt', 'pta', 'ot', 'cota', 'st', 'sta', 'agency'].includes(formData.role);
   };
 
   // Pantalla de selección de rol
@@ -439,6 +444,23 @@ const DevAddStaffForm = ({ onCancel, onViewAllStaff }) => {
     );
   }
 
+  // Calcular porcentaje de documentos completados
+  const getCompletedDocsPercentage = () => {
+    const docList = getDocumentsForRole();
+    if (!docList || docList.length === 0) return 0;
+    
+    let completed = 0;
+    let total = docList.length;
+    
+    docList.forEach(doc => {
+      if (documents[doc.id]?.status === 'obtained') {
+        completed++;
+      }
+    });
+    
+    return Math.round((completed / total) * 100);
+  };
+
   return (
     <div className="add-staff-container">
       {/* Modal de éxito */}
@@ -453,7 +475,7 @@ const DevAddStaffForm = ({ onCancel, onViewAllStaff }) => {
             </h2>
             <p className="success-message">
               <strong>{savedStaffName}</strong> has been successfully registered in the system
-              {formData.role !== 'agency' && formData.role !== 'developer' && formData.role !== 'administrator' && (
+              {formData.role !== 'agency' && formData.role !== 'developer' && isTherapistOrAdmin() && (
                 <> and linked to <strong>{agencies.find(a => a.id === formData.agency)?.name}</strong></>
               )}.
             </p>
@@ -508,7 +530,7 @@ const DevAddStaffForm = ({ onCancel, onViewAllStaff }) => {
                   {/* Información de la agencia */}
                   <div className="form-section">
                     <div className="section-header">
-                      <i className="fas fa-building"></i>
+                      <i className="fas fa-hospital-alt"></i>
                       <h3>Agency Information</h3>
                     </div>
                     <div className="section-content">
@@ -572,73 +594,81 @@ const DevAddStaffForm = ({ onCancel, onViewAllStaff }) => {
                       <h3>Branches</h3>
                       <p className="section-subtitle">Add all branches for this agency (if applicable)</p>
                     </div>
-                    <div className="section-content branches-container">
-                      {formData.agencyFields.branches.map((branch, index) => (
-                        <div key={index} className="branch-card">
-                          <div className="branch-header">
-                            <h4>Branch #{index + 1}</h4>
-                            {index > 0 && (
-                              <button 
-                                type="button" 
-                                className="remove-branch-btn"
-                                onClick={() => removeBranch(index)}
-                              >
-                                <i className="fas fa-trash-alt"></i>
-                              </button>
-                            )}
-                          </div>
-                          
-                          <div className="branch-form">
-                            <div className="form-group">
-                              <label>Branch Name</label>
-                              <input
-                                type="text"
-                                value={branch.name}
-                                onChange={(e) => handleBranchChange(index, 'name', e.target.value)}
-                                placeholder="Branch name or identifier"
-                              />
+                      <div className="section-content branches-container">
+                        {formData.agencyFields.branches.map((branch, index) => (
+                          <div key={index} className="branch-card">
+                            <div className="branch-header">
+                              <h4>Branch #{index + 1}</h4>
+                              {index > 0 && (
+                                <button 
+                                  type="button" 
+                                  className="remove-branch-btn"
+                                  onClick={() => removeBranch(index)}
+                                >
+                                  <i className="fas fa-trash-alt"></i>
+                                </button>
+                              )}
                             </div>
                             
-                            <div className="form-group">
-                              <label>Address</label>
-                              <input
-                                type="text"
-                                value={branch.address}
-                                onChange={(e) => handleBranchChange(index, 'address', e.target.value)}
-                                placeholder="Branch address"
-                              />
-                            </div>
-                            
-                            <div className="form-group">
-                              <label>Phone</label>
-                              <input
-                                type="tel"
-                                value={branch.phone}
-                                onChange={(e) => handleBranchChange(index, 'phone', e.target.value)}
-                                placeholder="(555) 123-4567"
-                              />
+                            <div className="branch-form">
+                              <div className="branch-form-row">
+                                <div className="form-group full-width">
+                                  <label>Branch Name</label>
+                                  <input
+                                    type="text"
+                                    value={branch.name}
+                                    onChange={(e) => handleBranchChange(index, 'name', e.target.value)}
+                                    placeholder="Branch name or identifier"
+                                  />
+                                </div>
+                              </div>
+                              
+                              <div className="branch-form-row">
+                                <div className="form-group full-width">
+                                  <label>Address</label>
+                                  <input
+                                    type="text"
+                                    value={branch.address}
+                                    onChange={(e) => handleBranchChange(index, 'address', e.target.value)}
+                                    placeholder="Branch address"
+                                  />
+                                </div>
+                              </div>
+                              
+                              <div className="branch-form-row">
+                                <div className="form-group">
+                                  <label>Phone</label>
+                                  <input
+                                    type="tel"
+                                    value={branch.phone}
+                                    onChange={(e) => handleBranchChange(index, 'phone', e.target.value)}
+                                    placeholder="(555) 123-4567"
+                                  />
+                                </div>
+                              </div>
                             </div>
                           </div>
+                        ))}
+                        
+                        {formData.agencyFields.branches.length < 15 && (
+                        <div className="add-another-branch-container">
+                          <button 
+                            type="button" 
+                            className="add-another-branch-btn"
+                            onClick={addNewBranch}
+                          >
+                            <i className="fas fa-plus-circle"></i>
+                            <span>Add Another Branch</span>
+                          </button>
                         </div>
-                      ))}
-                      
-                      {formData.agencyFields.branches.length < 15 && (
-                        <button 
-                          type="button" 
-                          className="add-branch-btn"
-                          onClick={addNewBranch}
-                        >
-                          <i className="fas fa-plus"></i>
-                          <span>Add Another Branch</span>
-                        </button>
-                      )}
-                    </div>
+                        )}
+                      </div>
                   </div>
 
                   {/* Información de usuario para la agencia */}
                   <div className="form-section">
                     <div className="section-header">
-                      <i className="fas fa-user-lock"></i>
+                      <i className="fas fa-lock"></i>
                       <h3>Account Credentials</h3>
                     </div>
                     <div className="section-content">
@@ -751,7 +781,7 @@ const DevAddStaffForm = ({ onCancel, onViewAllStaff }) => {
                   {/* Información de contacto */}
                   <div className="form-section">
                     <div className="section-header">
-                      <i className="fas fa-address-book"></i>
+                      <i className="fas fa-address-card"></i>
                       <h3>Contact Information</h3>
                     </div>
                     <div className="section-content">
@@ -798,7 +828,7 @@ const DevAddStaffForm = ({ onCancel, onViewAllStaff }) => {
                   {/* Información de usuario */}
                   <div className="form-section">
                     <div className="section-header">
-                      <i className="fas fa-user-lock"></i>
+                      <i className="fas fa-lock"></i>
                       <h3>User Information</h3>
                     </div>
                     <div className="section-content">
@@ -817,134 +847,193 @@ const DevAddStaffForm = ({ onCancel, onViewAllStaff }) => {
                       
                       <div className="form-group">
                         <label htmlFor="password">Password</label>
-                        <input
-                          type="password"
-                          id="password"
-                          name="password"
-                          value={formData.password}
-                          onChange={handleInputChange}
-                          required
-                          placeholder="Enter password"
-                        />
+                        <div className="password-input-container">
+                          <input
+                            type="password"
+                            id="password"
+                            name="password"
+                            value={formData.password}
+                            onChange={handleInputChange}
+                            required
+                            placeholder="Enter password"
+                          />
+                          <button
+                            type="button"
+                            className="generate-password-btn"
+                            onClick={() => {
+                              // Generar contraseña aleatoria más segura
+                              const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+                              let newPassword = '';
+                              for (let i = 0; i < 12; i++) {
+                                newPassword += chars.charAt(Math.floor(Math.random() * chars.length));
+                              }
+                              setFormData({
+                                ...formData,
+                                password: newPassword
+                              });
+                            }}
+                          >
+                            <i className="fas fa-key"></i>
+                            <span>Generate</span>
+                          </button>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </>
               )}
               
-              {/* Afiliación de agencia - sólo para terapeutas */}
-              {isTherapist() && (
-                <div className="form-section">
-                  <div className="section-header">
-                    <i className="fas fa-building"></i>
-                    <h3>Agency Affiliation</h3>
-                  </div>
-                  <div className="section-content">
-                    <div className="form-group">
-                      <label htmlFor="agency">Select Agency</label>
-                      <select
-                        id="agency"
-                        name="agency"
-                        value={formData.agency}
-                        onChange={handleInputChange}
-                        required
-                      >
-                        {agencies.map((agency) => (
-                          <option key={agency.id} value={agency.id}>
-                            {agency.name}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    
-                    {/* Mostrar detalles de la agencia seleccionada */}
-                    {formData.agency && (
-                      <div className="agency-details">
-                        <h4>Agency Details:</h4>
-                        {agencies.filter(a => a.id === formData.agency).map(agency => (
-                          <div key={agency.id} className="agency-info">
-                            <p><strong>Name:</strong> {agency.name}</p>
-                            <p><strong>Address:</strong> {agency.address}</p>
-                            <p><strong>Phone:</strong> {agency.phone}</p>
-                          </div>
-                        ))}
-                        <div className="agency-confirmation">
-                          <p className="confirmation-text">
-                            <i className="fas fa-info-circle"></i> Staff member will be linked to this agency and can only access its patients and resources.
-                          </p>
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              )}
+{/* Afiliación de agencia - para terapeutas, administradores Y también para agencias */}
+{(isTherapistOrAdmin() || formData.role === 'agency') && (
+  <div className="form-section">
+    <div className="section-header">
+      <i className="fas fa-hospital-user"></i>
+      <h3>
+        {formData.role === 'agency' ? 'Parent Organization' : 'Agency Affiliation'}
+      </h3>
+      <p className="section-subtitle">
+        {formData.role === 'administrator' 
+          ? 'Select the primary agency this administrator will manage' 
+          : formData.role === 'agency'
+            ? 'Select the parent healthcare organization this agency belongs to (if applicable)'
+            : 'Select the healthcare agency this therapist belongs to'
+        }
+      </p>
+    </div>
+    <div className="section-content">
+      <div className="form-group">
+        <label htmlFor="agency">
+          {formData.role === 'agency' ? 'Select Parent Organization' : 'Select Host Agency'}
+        </label>
+        <select
+          id="agency"
+          name="agency"
+          value={formData.agency}
+          onChange={handleInputChange}
+          required={formData.role !== 'agency'} // No es obligatorio para agencias
+        >
+          {formData.role === 'agency' && (
+            <option value="">-- None (Independent Agency) --</option>
+          )}
+          {formData.role !== 'agency' && (
+            <option value="">-- Select an Agency --</option>
+          )}
+          {agencies.map((agency) => (
+            <option key={agency.id} value={agency.id}>
+              {agency.name}
+            </option>
+          ))}
+        </select>
+      </div>
+      
+      {/* Mostrar detalles de la agencia seleccionada */}
+      {formData.agency && (
+        <div className="agency-details-card">
+          <h4 className="agency-details-title">
+            {formData.role === 'agency' ? 'Parent Organization Details:' : 'Agency Details:'}
+          </h4>
+          {agencies.filter(a => a.id === formData.agency).map(agency => (
+            <div key={agency.id} className="agency-details-info">
+              <div className="agency-detail-row">
+                <span className="detail-label">Name:</span>
+                <span className="detail-value">{agency.name}</span>
+              </div>
+              <div className="agency-detail-row">
+                <span className="detail-label">Address:</span>
+                <span className="detail-value">{agency.address}</span>
+              </div>
+              <div className="agency-detail-row">
+                <span className="detail-label">Phone:</span>
+                <span className="detail-value">{agency.phone}</span>
+              </div>
+            </div>
+          ))}
+          <div className="agency-confirmation-box">
+            <div className="confirmation-content">
+              <i className="fas fa-info-circle"></i> 
+              <p>
+                {formData.role === 'administrator'
+                  ? "Administrator will have primary management rights for this agency's resources and staff."
+                  : formData.role === 'agency'
+                    ? "This agency will be linked to the parent organization and operate under its guidelines."
+                    : "Staff member will be linked to this agency and can only access its patients and resources."
+                }
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  </div>
+)}
               
-              {/* Documentos requeridos - sólo para terapeutas y agencias */}
-              {(isTherapist() || formData.role === 'agency') && (
-                <div className="form-section documents-section">
-                  <div className="section-header">
-                    <i className="fas fa-file-medical"></i>
-                    <h3>Required Documents</h3>
-                    <p className="section-subtitle">Documents are not mandatory to create the profile, but will be necessary for {formData.role === 'agency' ? 'agency operations' : 'patient assignments'}.</p>
-                  </div>
-                  
-                  <div className="section-content documents-grid">
-                    {getDocumentsForRole().map((doc) => (
-                      <div key={doc.id} className={`document-card ${documents[doc.id].status}`}>
-                        <div className="document-header">
-                          <span className="document-icon">
-                            <i className={`fas ${doc.icon}`}></i>
-                          </span>
-                          <span className="document-name">{doc.name}</span>
-                          <span 
-                            className={`document-status ${documents[doc.id].status}`}
-                            onClick={() => toggleDocumentStatus(doc.id)}
-                          >
-                            {documents[doc.id].status === 'obtained' ? (
-                              <><i className="fas fa-check-circle"></i> Obtained</>
-                            ) : (
-                              <><i className="fas fa-clock"></i> Pending</>
-                            )}
-                          </span>
-                        </div>
-                        
-                        {doc.description && (
-                          <div className="document-description">{doc.description}</div>
-                        )}
-                        
-                        <div className="document-actions">
-                          <div className="file-upload">
-                            <label htmlFor={`file-${doc.id}`} className="upload-btn">
-                              <i className="fas fa-upload"></i> Upload document
-                            </label>
-                            <input
-                              type="file"
-                              id={`file-${doc.id}`}
-                              onChange={(e) => handleFileChange(doc.id, e)}
-                              className="file-input"
-                            />
-                          </div>
-                          
-                          {documents[doc.id].file && (
-                            <div className="file-info">
-                              <i className="fas fa-paperclip"></i>
-                              <span className="file-name">{documents[doc.id].file.name}</span>
-                            </div>
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                    
-                    {/* Opción para cargar documento adicional */}
-                    <div className="document-card add-document">
-                      <div className="add-document-content">
-                        <i className="fas fa-plus-circle"></i>
-                        <span>Add additional document</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
+{/* Documentos requeridos - solo para terapeutas y agencias */}
+{shouldShowDocuments() && (
+  <div className="form-section documents-section">
+    <div className="section-header">
+      <i className="fas fa-file-medical-alt"></i>
+      <h3>Required Documents</h3>
+      <p className="section-subtitle">Documents are not mandatory to create the profile, but will be necessary for {formData.role === 'agency' ? 'agency operations' : 'patient assignments'}.</p>
+    </div>
+    
+    <div className="section-content documents-grid">
+      {getDocumentsForRole().map((doc) => (
+        <div key={doc.id} className={`document-card ${documents[doc.id].status}`}>
+          <div className="document-header">
+            <span className="document-icon">
+              <i className={`fas ${doc.icon}`}></i>
+            </span>
+            <span className="document-name">{doc.name}</span>
+            <span 
+              className={`document-status ${documents[doc.id].status}`}
+              onClick={() => toggleDocumentStatus(doc.id)}
+            >
+              {documents[doc.id].status === 'obtained' ? (
+                <><i className="fas fa-check-circle"></i> Obtained</>
+              ) : (
+                <><i className="fas fa-clock"></i> Pending</>
               )}
+            </span>
+          </div>
+          
+          {doc.description && (
+            <div className="document-description">{doc.description}</div>
+          )}
+          
+          <div className="document-actions">
+            <div className="file-upload">
+              <label htmlFor={`file-${doc.id}`} className="upload-btn">
+                <i className="fas fa-cloud-upload-alt"></i> Upload document
+              </label>
+              <input
+                type="file"
+                id={`file-${doc.id}`}
+                onChange={(e) => handleFileChange(doc.id, e)}
+                className="file-input"
+                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+              />
+            </div>
+            
+            {documents[doc.id].file && (
+              <div className="file-info">
+                <i className="fas fa-file-pdf"></i>
+                <span className="file-name">{documents[doc.id].file.name}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      ))}
+      
+      {/* Opción para cargar documento adicional */}
+      <div className="document-card add-document">
+        <div className="add-document-content">
+          <i className="fas fa-plus-circle"></i>
+          <span>Add additional document</span>
+        </div>
+      </div>
+    </div>
+  </div>
+)}
               
               <div className="form-actions">
                 <button type="button" className="cancel-btn" onClick={onCancel}>
@@ -962,4 +1051,4 @@ const DevAddStaffForm = ({ onCancel, onViewAllStaff }) => {
   );
 };
 
-export default DevAddStaffForm;
+export default AddStaffForm;

@@ -448,7 +448,7 @@
           
           .status-description {
             margin-top: $spacing-3;
-            color: $medium-gray;
+            color: rgb(48, 48, 48);
             font-size: $font-xs;
             font-style: italic;
             grid-column: 1 / -1;
@@ -687,7 +687,6 @@
     }
   }
 }
-// Agregar al archivo CompanyRegistrationForm.scss estos nuevos estilos
 
 // Mensaje de éxito
 .success-message {
@@ -966,8 +965,6 @@
     }
   }
 }
-
-
 
 // Mejoras de animación para pantalla de carga
 .loading-screen, .staff-edit-loading, .company-list-loading {
@@ -1420,6 +1417,170 @@
     }
     100% {
       top: 0%;
+    }
+  }
+}
+
+/* Estilos para la sección de servicios y especialidades */
+.services-section {
+  .section-content {
+    padding: $spacing-6;
+    
+    .specialties-container {
+      grid-column: 1 / -1;
+      
+      .specialties-label {
+        font-weight: $font-medium;
+        color: $dark-gray;
+        margin-bottom: $spacing-6;
+        font-size: $font-sm;
+        display: block;
+      }
+      
+      /* Nuevo estilo de tarjetas para especialidades */
+      .specialties-cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: $spacing-5;
+        
+        .specialty-card {
+          background: linear-gradient(to bottom, #ffffff, #f8fafc);
+          border-radius: $border-radius-lg;
+          padding: $spacing-4;
+          border: 1px solid $light-gray;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          text-align: center;
+          box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+          height: 130px;
+          
+          &:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            border-color: rgba($primary-color, 0.3);
+          }
+          
+          &.selected {
+            background: linear-gradient(to bottom, rgba($primary-color, 0.03), rgba($primary-color, 0.07));
+            border-color: $primary-color;
+            box-shadow: 0 5px 15px rgba($primary-color, 0.2);
+            
+            .specialty-icon {
+              color: $primary-color;
+              transform: scale(1.1);
+            }
+            
+            .specialty-name {
+              color: $primary-color;
+              font-weight: $font-semibold;
+            }
+            
+            .specialty-check {
+              opacity: 1;
+              transform: scale(1);
+            }
+          }
+          
+          .specialty-icon {
+            font-size: 2.2rem;
+            color: $dark-gray;
+            margin-bottom: $spacing-3;
+            margin-top: $spacing-2;
+            height: 40px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+          
+          .specialty-name {
+            font-size: $font-sm;
+            color: $dark-gray;
+            font-weight: $font-medium;
+            transition: all 0.3s ease;
+            margin-top: auto;
+            margin-bottom: $spacing-2;
+          }
+          
+          .specialty-check {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: $primary-color;
+            font-size: 1.2rem;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.3s ease;
+          }
+        }
+      }
+    }
+  }
+}
+
+/* Media queries para responsividad */
+@media (max-width: $breakpoint-xl) {
+  .services-section {
+    .section-content {
+      .specialties-cards {
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+      }
+    }
+  }
+}
+
+@media (max-width: $breakpoint-lg) {
+  .services-section {
+    .section-content {
+      .specialties-cards {
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+        
+        .specialty-card {
+          height: 120px;
+          
+          .specialty-icon {
+            font-size: 1.8rem;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: $breakpoint-md) {
+  .services-section {
+    .section-content {
+      .specialties-cards {
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        
+        .specialty-card {
+          padding: $spacing-3;
+          height: 110px;
+          
+          .specialty-icon {
+            font-size: 1.6rem;
+            margin-bottom: $spacing-2;
+          }
+          
+          .specialty-name {
+            font-size: $font-xs;
+          }
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: $breakpoint-sm) {
+  .services-section {
+    .section-content {
+      .specialties-cards {
+        grid-template-columns: repeat(2, 1fr);
+      }
     }
   }
 }

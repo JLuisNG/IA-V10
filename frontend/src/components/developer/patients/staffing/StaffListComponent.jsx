@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import '../../../../styles/developer/Patients/Staffing/StaffEditComponent.scss';
 
-
 const DevStaffEditComponent = ({ onBackToOptions, onAddNewStaff }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [loadingMessage, setLoadingMessage] = useState('Connecting to database...');
@@ -254,6 +253,12 @@ const DevStaffEditComponent = ({ onBackToOptions, onAddNewStaff }) => {
         password: 'Password123',
         role: 'administrator',
         roleDisplay: 'Administrator',
+        agency: {
+          id: 'motive-home-care',
+          name: 'Motive Home Care',
+          address: '1234 Healthcare Blvd, Los Angeles, CA 90001',
+          phone: '(323) 555-7890'
+        },
         documents: {},
         status: 'active'
       },
@@ -377,44 +382,51 @@ const DevStaffEditComponent = ({ onBackToOptions, onAddNewStaff }) => {
     setFilteredStaff(filtered);
   }, [staffList, searchTerm, filterRole, showInactive, viewMode]);
 
-  // Roles disponibles
+  // Roles disponibles con iconos mejorados
   const roles = [
-    { value: 'developer', label: 'Developer', icon: 'fa-code' },
-    { value: 'administrator', label: 'Administrator', icon: 'fa-user-shield' },
-    { value: 'agency', label: 'Agency', icon: 'fa-building' },
-    { value: 'pt', label: 'PT - Physical Therapist', icon: 'fa-user-md' },
-    { value: 'pta', label: 'PTA - Physical Therapist Assistant', icon: 'fa-user-nurse' },
-    { value: 'ot', label: 'OT - Occupational Therapist', icon: 'fa-hand-holding-medical' },
-    { value: 'cota', label: 'COTA - Occupational Therapy Assistant', icon: 'fa-hand-holding' },
-    { value: 'st', label: 'ST - Speech Therapist', icon: 'fa-comments-alt' },
-    { value: 'sta', label: 'STA - Speech Therapy Assistant', icon: 'fa-comment' },
+    { value: 'developer', label: 'Developer', icon: 'fa-laptop-code', description: 'System development and technical support' },
+    { value: 'administrator', label: 'Administrator', icon: 'fa-user-shield', description: 'System administration and user management' },
+    { value: 'agency', label: 'Agency', icon: 'fa-hospital-alt', description: 'Healthcare provider organization' },
+    { value: 'pt', label: 'PT - Physical Therapist', icon: 'fa-user-md', description: 'Evaluates and treats physical mobility disorders' },
+    { value: 'pta', label: 'PTA - Physical Therapist Assistant', icon: 'fa-user-nurse', description: 'Assists physical therapists in treatment delivery' },
+    { value: 'ot', label: 'OT - Occupational Therapist', icon: 'fa-hand-holding-medical', description: 'Helps patients improve daily living activities' },
+    { value: 'cota', label: 'COTA - Occupational Therapy Assistant', icon: 'fa-hand-holding', description: 'Assists occupational therapists with treatment' },
+    { value: 'st', label: 'ST - Speech Therapist', icon: 'fa-comment-medical', description: 'Evaluates and treats communication disorders' },
+    { value: 'sta', label: 'STA - Speech Therapy Assistant', icon: 'fa-comment-dots', description: 'Assists speech therapists with therapy sessions' },
   ];
 
-  // Lista de documentos requeridos
+  // Lista de documentos requeridos con iconos mejorados
   const documentsList = {
     staff: [
-      { id: 'covidVaccine', name: 'Proof of COVID Vaccine', icon: 'fa-syringe' },
-      { id: 'tbTest', name: 'TB Test proof (PPD/X-Ray)', icon: 'fa-lungs' },
-      { id: 'physicalExam', name: 'Annual Physical Exam Proof', icon: 'fa-stethoscope' },
-      { id: 'liabilityInsurance', name: 'Professional Liability Insurance', icon: 'fa-shield-alt' },
-      { id: 'driversLicense', name: 'Driver\'s License', icon: 'fa-id-card' },
-      { id: 'autoInsurance', name: 'Auto Insurance', icon: 'fa-car' },
-      { id: 'cprCertification', name: 'CPR/BLS Certification', icon: 'fa-heartbeat' },
-      { id: 'businessLicense', name: 'Copy of Business License or EIN', icon: 'fa-certificate' },
+      { id: 'covidVaccine', name: 'Proof of COVID Vaccine', icon: 'fa-syringe', description: 'Vaccination record or certificate' },
+      { id: 'tbTest', name: 'TB Test Proof (PPD/X-Ray)', icon: 'fa-lungs', description: 'PPD Test (valid for 1 year) or X-Ray TB test (valid for 5 years)' },
+      { id: 'physicalExam', name: 'Annual Physical Exam Proof', icon: 'fa-stethoscope', description: 'Medical clearance for healthcare duties' },
+      { id: 'liabilityInsurance', name: 'Professional Liability Insurance', icon: 'fa-shield-alt', description: 'Malpractice insurance coverage document' },
+      { id: 'driversLicense', name: 'Driver\'s License', icon: 'fa-id-card', description: 'Valid state-issued driver\'s license' },
+      { id: 'autoInsurance', name: 'Auto Insurance', icon: 'fa-car-alt', description: 'Proof of current auto insurance coverage' },
+      { id: 'cprCertification', name: 'CPR/BLS Certification', icon: 'fa-heartbeat', description: 'Current CPR or Basic Life Support certification' },
+      { id: 'businessLicense', name: 'Copy of Business License or EIN', icon: 'fa-certificate', description: 'Business license or Employer Identification Number document' },
     ],
     agency: [
-      { id: 'businessLicense', name: 'Business License', icon: 'fa-building' },
-      { id: 'contractDocument', name: 'Contract with TherapySync', icon: 'fa-file-contract' },
-      { id: 'liabilityInsurance', name: 'Liability Insurance', icon: 'fa-shield-alt' },
+      { id: 'businessLicense', name: 'Business License', icon: 'fa-building', description: 'Valid business operation license' },
+      { id: 'contractDocument', name: 'Contract with TherapySync', icon: 'fa-file-contract', description: 'Signed service agreement' },
+      { id: 'liabilityInsurance', name: 'Liability Insurance', icon: 'fa-shield-alt', description: 'Organization liability coverage documentation' },
     ]
   };
 
   // Abrir modal para editar un miembro existente
   const handleOpenProfile = (member) => {
-    setSelectedStaff(member);
+    setSelectedStaff({...member}); // Clonar para evitar modificaciones directas
     setShowProfileModal(true);
     setEditMode(true);
-    setActiveTab('info');
+    
+    // Resetear la pestaña activa según el tipo de miembro
+    if (member.type === 'agency') {
+      setActiveTab('info');
+    } else {
+      setActiveTab('info');
+    }
+    
     setPasswordVisible(false);
   };
 
@@ -499,7 +511,16 @@ const DevStaffEditComponent = ({ onBackToOptions, onAddNewStaff }) => {
     setStaffList(updatedStaffList);
     
     if (selectedStaff && selectedStaff.id === memberId) {
-      setSelectedStaff(updatedStaffList.find(member => member.id === memberId));
+      setSelectedStaff({
+        ...selectedStaff,
+        documents: {
+          ...selectedStaff.documents,
+          [documentId]: {
+            ...selectedStaff.documents[documentId],
+            status: selectedStaff.documents[documentId].status === 'obtained' ? 'pending' : 'obtained'
+          }
+        }
+      });
     }
   };
 
@@ -507,10 +528,13 @@ const DevStaffEditComponent = ({ onBackToOptions, onAddNewStaff }) => {
     if (e.target.files[0]) {
       const updatedStaffList = staffList.map(member => {
         if (member.id === memberId) {
+          // Asegurarnos de que documents esté inicializado
+          const updatedDocuments = member.documents || {};
+          
           return {
             ...member,
             documents: {
-              ...member.documents,
+              ...updatedDocuments,
               [documentId]: {
                 status: 'obtained',
                 file: e.target.files[0].name
@@ -524,7 +548,19 @@ const DevStaffEditComponent = ({ onBackToOptions, onAddNewStaff }) => {
       setStaffList(updatedStaffList);
       
       if (selectedStaff && selectedStaff.id === memberId) {
-        setSelectedStaff(updatedStaffList.find(member => member.id === memberId));
+        // Asegurarnos de que documents esté inicializado
+        const updatedDocuments = selectedStaff.documents || {};
+        
+        setSelectedStaff({
+          ...selectedStaff,
+          documents: {
+            ...updatedDocuments,
+            [documentId]: {
+              status: 'obtained',
+              file: e.target.files[0].name
+            }
+          }
+        });
       }
     }
   };
@@ -545,7 +581,7 @@ const DevStaffEditComponent = ({ onBackToOptions, onAddNewStaff }) => {
     
     const selectedAgency = staffList
       .filter(item => item.type === 'agency')
-      .find(a => a.id === agencyId);
+      .find(a => a.id === parseInt(agencyId));
     
     if (selectedAgency) {
       setSelectedStaff(prev => ({
@@ -574,9 +610,9 @@ const DevStaffEditComponent = ({ onBackToOptions, onAddNewStaff }) => {
   const handleUpdateBranch = (index, field, value) => {
     if (!selectedStaff || selectedStaff.type !== 'agency') return;
     
-    const updatedBranches = [...selectedStaff.branches];
+    const updatedBranches = [...(selectedStaff.branches || [])];
     updatedBranches[index] = {
-      ...updatedBranches[index],
+      ...(updatedBranches[index] || {}),
       [field]: value
     };
     
@@ -593,7 +629,7 @@ const DevStaffEditComponent = ({ onBackToOptions, onAddNewStaff }) => {
     setSelectedStaff(prev => ({
       ...prev,
       branches: [
-        ...prev.branches,
+        ...(prev.branches || []),
         { name: '', address: '', phone: '' }
       ]
     }));
@@ -603,7 +639,7 @@ const DevStaffEditComponent = ({ onBackToOptions, onAddNewStaff }) => {
   const handleRemoveBranch = (index) => {
     if (!selectedStaff || selectedStaff.type !== 'agency') return;
     
-    const updatedBranches = [...selectedStaff.branches];
+    const updatedBranches = [...(selectedStaff.branches || [])];
     updatedBranches.splice(index, 1);
     
     setSelectedStaff(prev => ({
@@ -612,13 +648,71 @@ const DevStaffEditComponent = ({ onBackToOptions, onAddNewStaff }) => {
     }));
   };
 
-  // Calcular porcentaje de documentos completados
-  const getCompletedDocsPercentage = (documents) => {
+  // Calcular porcentaje de documentos completados correctamente
+  const getCompletedDocsPercentage = (documents, type) => {
     if (!documents || Object.keys(documents).length === 0) return 0;
     
-    const total = Object.keys(documents).length;
-    const completed = Object.values(documents).filter(doc => doc.status === 'obtained').length;
-    return Math.round((completed / total) * 100);
+    // Determinar qué lista de documentos usar
+    const docList = type === 'agency' ? documentsList.agency : documentsList.staff;
+    
+    // Contar cuántos documentos requeridos hay para este tipo
+    const requiredDocsCount = docList.length;
+    
+    // Contar cuántos están completados
+    let completedCount = 0;
+    docList.forEach(doc => {
+      if (documents[doc.id] && documents[doc.id].status === 'obtained') {
+        completedCount++;
+      }
+    });
+    
+    // Calcular el porcentaje
+    return Math.round((completedCount / requiredDocsCount) * 100);
+  };
+
+  // Inicializa los documentos para un tipo específico
+  const initializeDocuments = (role, type) => {
+    const documents = {};
+    
+    // Determinar qué lista de documentos usar
+    const docList = type === 'agency' ? documentsList.agency : documentsList.staff;
+    
+    // Inicializar todos como pendientes
+    docList.forEach(doc => {
+      documents[doc.id] = { status: 'pending', file: null };
+    });
+    
+    return documents;
+  };
+
+  // Debemos inicializar documentos cuando cambia el rol
+  useEffect(() => {
+    if (selectedStaff && editMode) {
+      // Si cambia de rol y necesita documentos diferentes, inicializamos
+      if (['pt', 'pta', 'ot', 'cota', 'st', 'sta'].includes(selectedStaff.role) && 
+          (!selectedStaff.documents || Object.keys(selectedStaff.documents).length === 0)) {
+        setSelectedStaff(prev => ({
+          ...prev,
+          documents: initializeDocuments(prev.role, prev.type)
+        }));
+      } else if (selectedStaff.role === 'agency' && 
+                (!selectedStaff.documents || Object.keys(selectedStaff.documents).length === 0)) {
+        setSelectedStaff(prev => ({
+          ...prev,
+          documents: initializeDocuments(prev.role, 'agency')
+        }));
+      }
+    }
+  }, [selectedStaff?.role, editMode]);
+
+  // Verificar si el rol requiere afiliación a una agencia
+  const requiresAgency = (role) => {
+    return ['pt', 'pta', 'ot', 'cota', 'st', 'sta', 'administrator'].includes(role);
+  };
+
+  // Verificar si el rol requiere documentos
+  const requiresDocuments = (role) => {
+    return ['pt', 'pta', 'ot', 'cota', 'st', 'sta', 'agency'].includes(role);
   };
 
   // Renderizar pestañas basado en el tipo de miembro seleccionado
@@ -626,7 +720,7 @@ const DevStaffEditComponent = ({ onBackToOptions, onAddNewStaff }) => {
     if (!selectedStaff) return null;
     
     const commonTabs = [
-      { id: 'info', icon: 'fa-user', label: 'Personal Information' },
+      { id: 'info', icon: 'fa-user-circle', label: 'Personal Information' },
       { id: 'security', icon: 'fa-shield-alt', label: 'Security' },
     ];
     
@@ -634,12 +728,17 @@ const DevStaffEditComponent = ({ onBackToOptions, onAddNewStaff }) => {
     if (selectedStaff.type === 'staff') {
       const tabs = [...commonTabs];
       
-      // Solo mostrar pestaña de documentos para roles de terapeutas
-      if (['pt', 'pta', 'ot', 'cota', 'st', 'sta'].includes(selectedStaff.role)) {
-        tabs.splice(1, 0, { id: 'documents', icon: 'fa-file-alt', label: 'Documents' });
-        tabs.splice(1, 0, { id: 'documents', icon: 'fa-file-alt', label: 'Documents' });
-        // Agregar pestaña de agencia para terapeutas
-        tabs.splice(2, 0, { id: 'agency', icon: 'fa-building', label: 'Agency' });
+      // Solo mostrar pestaña de documentos para roles que requieren documentos
+      if (requiresDocuments(selectedStaff.role)) {
+        tabs.splice(1, 0, { id: 'documents', icon: 'fa-file-medical-alt', label: 'Documents' });
+      }
+      
+      // Mostrar pestaña de agencia para roles que requieren afiliación
+      if (requiresAgency(selectedStaff.role)) {
+        // Solo añadir la pestaña de agencia si no está ya
+        if (!tabs.some(tab => tab.id === 'agency')) {
+          tabs.splice(1, 0, { id: 'agency', icon: 'fa-hospital-user', label: 'Agency' });
+        }
       }
       
       return tabs;
@@ -649,8 +748,8 @@ const DevStaffEditComponent = ({ onBackToOptions, onAddNewStaff }) => {
     return [
       { id: 'info', icon: 'fa-building', label: 'Agency Information' },
       { id: 'branches', icon: 'fa-code-branch', label: 'Branches' },
-      { id: 'documents', icon: 'fa-file-alt', label: 'Documents' },
-      { id: 'security', icon: 'fa-shield-alt', label: 'Security' },
+      { id: 'documents', icon: 'fa-file-contract', label: 'Documents' },
+      { id: 'security', icon: 'fa-lock', label: 'Security' },
     ];
   };
 
@@ -664,11 +763,11 @@ const DevStaffEditComponent = ({ onBackToOptions, onAddNewStaff }) => {
         case 'info':
           return renderStaffInfoTab();
         case 'documents':
-          return renderDocumentsTab('staff');
+          return requiresDocuments(selectedStaff.role) ? renderDocumentsTab('staff') : null;
         case 'security':
           return renderSecurityTab();
         case 'agency':
-          return renderAgencyTab();
+          return requiresAgency(selectedStaff.role) ? renderAgencyTab() : null;
         default:
           return null;
       }
@@ -911,116 +1010,138 @@ const DevStaffEditComponent = ({ onBackToOptions, onAddNewStaff }) => {
   );
 
   // Pestaña de documentos (para ambos tipos)
-  const renderDocumentsTab = (type) => (
-    <div className="documents-tab-content">
-      <div className="documents-header">
-        <h3>Required Documents</h3>
-        <div className="documents-summary">
-          <div className="completed-percentage">
-            <div className="circular-progress">
-              <svg viewBox="0 0 36 36" className="circular-chart">
-                <defs>
-                  <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                    <stop offset="0%" stopColor="#3498db" />
-                    <stop offset="100%" stopColor="#5dade2" />
-                  </linearGradient>
-                </defs>
-                <path className="circle-bg"
-                  d="M18 2.0845
-                    a 15.9155 15.9155 0 0 1 0 31.831
-                    a 15.9155 15.9155 0 0 1 0 -31.831"
-                />
-                <path className="circle"
-                  strokeDasharray={`${getCompletedDocsPercentage(selectedStaff.documents)}, 100`}
-                  d="M18 2.0845
-                    a 15.9155 15.9155 0 0 1 0 31.831
-                    a 15.9155 15.9155 0 0 1 0 -31.831"
-                />
-                <text x="18" y="20.35" className="percentage">{getCompletedDocsPercentage(selectedStaff.documents)}%</text>
-              </svg>
+  const renderDocumentsTab = (type) => {
+    // Asegurarse de que existe documents en selectedStaff
+    if (!selectedStaff.documents) {
+      selectedStaff.documents = {};
+    }
+    
+    // Determinar qué lista de documentos mostrar
+    const docList = type === 'agency' ? documentsList.agency : documentsList.staff;
+    
+    // Calcular el porcentaje correcto
+    const completionPercentage = getCompletedDocsPercentage(selectedStaff.documents, type);
+    
+    return (
+      <div className="documents-tab-content">
+        <div className="documents-header">
+          <h3>Required Documents</h3>
+          <div className="documents-summary">
+            <div className="completed-percentage">
+              <div className="circular-progress">
+                <svg viewBox="0 0 36 36" className="circular-chart">
+                  <defs>
+                    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                      <stop offset="0%" stopColor="#3498db" />
+                      <stop offset="100%" stopColor="#5dade2" />
+                    </linearGradient>
+                  </defs>
+                  <path className="circle-bg"
+                    d="M18 2.0845
+                      a 15.9155 15.9155 0 0 1 0 31.831
+                      a 15.9155 15.9155 0 0 1 0 -31.831"
+                  />
+                  <path className="circle"
+                    strokeDasharray={`${completionPercentage}, 100`}
+                    d="M18 2.0845
+                      a 15.9155 15.9155 0 0 1 0 31.831
+                      a 15.9155 15.9155 0 0 1 0 -31.831"
+                  />
+                  <text x="18" y="20.35" className="percentage">{completionPercentage}%</text>
+                </svg>
+              </div>
+              <span className="documents-text">Completed Documents</span>
             </div>
-            <span className="documents-text">Completed Documents</span>
           </div>
         </div>
-      </div>
-      
-      <div className="documents-grid">
-        {documentsList[type].map(doc => (
-          <div 
-            key={doc.id} 
-            className={`document-card ${selectedStaff.documents[doc.id]?.status || 'pending'}`}
-          >
-            <div className="document-card-header">
-              <div className="document-icon">
-                <i className={`fas ${doc.icon}`}></i>
-              </div>
-              <div className="document-info">
-                <h4>{doc.name}</h4>
-                {doc.description && <p>{doc.description}</p>}
-              </div>
-              <div 
-                className={`status-toggle ${selectedStaff.documents[doc.id]?.status || 'pending'}`}
-                onClick={() => handleDocumentStatusToggle(selectedStaff.id, doc.id)}
-              >
-                <div className="toggle-slider">
-                  <div className="toggle-circle"></div>
-                </div>
-                <span className="toggle-text">
-                  {selectedStaff.documents[doc.id]?.status === 'obtained' ? 'Obtained' : 'Pending'}
-                </span>
-              </div>
-            </div>
+        
+        <div className="documents-grid">
+          {docList.map(doc => {
+            // Inicializar el documento si no existe
+            if (!selectedStaff.documents[doc.id]) {
+              selectedStaff.documents[doc.id] = { status: 'pending', file: null };
+            }
             
-            <div className="document-card-body">
-              {selectedStaff.documents[doc.id]?.file ? (
-                <div className="file-preview">
-                  <div className="file-info">
-                    <i className="fas fa-file-pdf"></i>
-                    <span className="file-name">{selectedStaff.documents[doc.id].file}</span>
+            return (
+              <div 
+                key={doc.id} 
+                className={`document-card ${selectedStaff.documents[doc.id]?.status || 'pending'}`}
+              >
+                <div className="document-card-header">
+                  <div className="document-icon">
+                    <i className={`fas ${doc.icon}`}></i>
                   </div>
-                  <div className="file-actions">
-                    <button className="view-file-btn">
-                      <i className="fas fa-eye"></i>
-                      <span>View</span>
-                    </button>
-                    <div className="upload-new">
-                      <label htmlFor={`file-${selectedStaff.id}-${doc.id}`}>
-                        <i className="fas fa-sync-alt"></i>
-                        <span>Update</span>
-                      </label>
-                      <input
-                        type="file"
-                        id={`file-${selectedStaff.id}-${doc.id}`}
-                        onChange={(e) => handleDocumentUpload(selectedStaff.id, doc.id, e)}
-                        className="file-input"
-                      />
+                  <div className="document-info">
+                    <h4>{doc.name}</h4>
+                    {doc.description && <p>{doc.description}</p>}
+                  </div>
+                  <div 
+                    className={`status-toggle ${selectedStaff.documents[doc.id]?.status || 'pending'}`}
+                    onClick={() => handleDocumentStatusToggle(selectedStaff.id, doc.id)}
+                  >
+                    <div className="toggle-slider">
+                      <div className="toggle-circle"></div>
                     </div>
+                    <span className="toggle-text">
+                      {selectedStaff.documents[doc.id]?.status === 'obtained' ? 'Obtained' : 'Pending'}
+                    </span>
                   </div>
                 </div>
-              ) : (
-                <div className="no-file">
-                  <div className="upload-container">
-                    <i className="fas fa-cloud-upload-alt"></i>
-                    <p>No file. Click to upload document.</p>
-                    <label htmlFor={`file-${selectedStaff.id}-${doc.id}`} className="upload-btn">
-                      <i className="fas fa-plus"></i>
-                      <span>Upload File</span>
-                    </label>
-                    <input
-                      type="file"
-                      id={`file-${selectedStaff.id}-${doc.id}`}
-                      onChange={(e) => handleDocumentUpload(selectedStaff.id, doc.id, e)}
-                      className="file-input"
-                    />
-                  </div>
+                
+                <div className="document-card-body">
+                  {selectedStaff.documents[doc.id]?.file ? (
+                    <div className="file-preview">
+                      <div className="file-info">
+                        <i className="fas fa-file-pdf"></i>
+                        <span className="file-name">{selectedStaff.documents[doc.id].file}</span>
+                      </div>
+                      <div className="file-actions">
+                        <button className="view-file-btn">
+                          <i className="fas fa-eye"></i>
+                          <span>View</span>
+                        </button>
+                        <div className="upload-new">
+                          <label htmlFor={`file-${selectedStaff.id}-${doc.id}`}>
+                            <i className="fas fa-sync-alt"></i>
+                            <span>Update</span>
+                          </label>
+                          <input
+                            type="file"
+                            id={`file-${selectedStaff.id}-${doc.id}`}
+                            onChange={(e) => handleDocumentUpload(selectedStaff.id, doc.id, e)}
+                            className="file-input"
+                            accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="no-file">
+                      <div className="upload-container">
+                        <i className="fas fa-cloud-upload-alt"></i>
+                        <p>No file uploaded. Click to upload document.</p>
+                        <label htmlFor={`file-${selectedStaff.id}-${doc.id}`} className="upload-btn">
+                          <i className="fas fa-plus"></i>
+                          <span>Upload File</span>
+                        </label>
+                        <input
+                          type="file"
+                          id={`file-${selectedStaff.id}-${doc.id}`}
+                          onChange={(e) => handleDocumentUpload(selectedStaff.id, doc.id, e)}
+                          className="file-input"
+                          accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                        />
+                      </div>
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          </div>
-        ))}
+              </div>
+            );
+          })}
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   // Pestaña de seguridad para ambos tipos
   const renderSecurityTab = () => (
@@ -1042,7 +1163,7 @@ const DevStaffEditComponent = ({ onBackToOptions, onAddNewStaff }) => {
                   className="icon-button"
                   onClick={() => {
                     navigator.clipboard.writeText(selectedStaff.userName);
-                    console.log('Username copied to clipboard');
+                    alert('Username copied to clipboard');
                   }}
                 >
                   <i className="fas fa-copy"></i>
@@ -1079,14 +1200,18 @@ const DevStaffEditComponent = ({ onBackToOptions, onAddNewStaff }) => {
                 <button 
                   className="reset-password-btn"
                   onClick={() => {
-                    // Generar contraseña aleatoria
-                    const newPassword = `Pass${Math.floor(Math.random() * 10000)}!`;
+                    // Generar contraseña aleatoria más segura
+                    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*';
+                    let newPassword = '';
+                    for (let i = 0; i < 12; i++) {
+                      newPassword += chars.charAt(Math.floor(Math.random() * chars.length));
+                    }
                     handleUpdateMember('password', newPassword);
                     setPasswordVisible(true);
                   }}
                 >
                   <i className="fas fa-key"></i>
-                  <span>Generate New Password</span>
+                  <span>Generate Secure Password</span>
                 </button>
               </div>
             </div>
@@ -1096,7 +1221,7 @@ const DevStaffEditComponent = ({ onBackToOptions, onAddNewStaff }) => {
     </div>
   );
 
-  // Pestaña de agencia para terapeutas
+  // Pestaña de agencia para terapeutas y administradores
   const renderAgencyTab = () => {
     const availableAgencies = staffList.filter(item => 
       item.type === 'agency' && item.status === 'active'
@@ -1116,6 +1241,7 @@ const DevStaffEditComponent = ({ onBackToOptions, onAddNewStaff }) => {
                   onChange={(e) => handleUpdateAgency(e.target.value)}
                   className="agency-select"
                 >
+                  <option value="">-- Select an Agency --</option>
                   {availableAgencies.map(agency => (
                     <option key={agency.id} value={agency.id}>
                       {agency.agencyName}
@@ -1200,7 +1326,7 @@ const DevStaffEditComponent = ({ onBackToOptions, onAddNewStaff }) => {
         </div>
         <div className="header-actions">
           <button className="add-new-btn" onClick={onAddNewStaff}>
-            <i className="fas fa-plus-circle"></i>
+            <i className="fas fa-user-plus"></i>
             <span>Add New</span>
           </button>
         </div>
@@ -1226,7 +1352,7 @@ const DevStaffEditComponent = ({ onBackToOptions, onAddNewStaff }) => {
           className={`view-option ${viewMode === 'agencies' ? 'active' : ''}`}
           onClick={() => setViewMode('agencies')}
         >
-          <i className="fas fa-building"></i>
+          <i className="fas fa-hospital-alt"></i>
           <span>Agencies</span>
         </button>
       </div>
@@ -1265,7 +1391,7 @@ const DevStaffEditComponent = ({ onBackToOptions, onAddNewStaff }) => {
                     <span>All</span>
                   </button>
                   
-                  {roles.filter(r => r.value !== 'agency').map(role => (
+                  {roles.filter(r => r.value !== 'agency' || viewMode === 'agencies').map(role => (
                     <button 
                       key={role.value}
                       className={`role-option ${filterRole === role.value ? 'active' : ''}`}
@@ -1301,95 +1427,104 @@ const DevStaffEditComponent = ({ onBackToOptions, onAddNewStaff }) => {
       {/* Contenedor de tarjetas de personal */}
       <div className="staff-cards-container">
         {filteredStaff.length > 0 ? (
-          filteredStaff.map(member => (
-            <div 
-              key={member.id} 
-              className={`staff-card ${member.status}`}
-              onClick={() => handleOpenProfile(member)}
-            >
-              <div className="card-highlight"></div>
-              <div className="staff-card-header">
-                <div className="avatar-status">
-                  <div className={`avatar-container ${member.role}`}>
-                    <div className="avatar-inner">
-                      {member.type === 'agency' 
-                        ? member.agencyName.charAt(0) + (member.agencyName.split(' ')[1]?.charAt(0) || '')
-                        : member.firstName.charAt(0) + member.lastName.charAt(0)}
+          filteredStaff.map(member => {
+            // Calcular el porcentaje de documentos completados
+            const docsPercentage = member.documents ? 
+              getCompletedDocsPercentage(member.documents, member.type === 'agency' ? 'agency' : 'staff') : 0;
+            
+            // Determinar si se deben mostrar documentos
+            const shouldShowDocs = requiresDocuments(member.role);
+            
+            return (
+              <div 
+                key={member.id} 
+                className={`staff-card ${member.status}`}
+                onClick={() => handleOpenProfile(member)}
+              >
+                <div className="card-highlight"></div>
+                <div className="staff-card-header">
+                  <div className="avatar-status">
+                    <div className={`avatar-container ${member.role}`}>
+                      <div className="avatar-inner">
+                        {member.type === 'agency' 
+                          ? member.agencyName.charAt(0) + (member.agencyName.split(' ')[1]?.charAt(0) || '')
+                          : member.firstName.charAt(0) + member.lastName.charAt(0)}
+                      </div>
+                      <span className={`status-indicator ${member.status}`}></span>
                     </div>
-                    <span className={`status-indicator ${member.status}`}></span>
-                  </div>
-                </div>
-                
-                <div className="staff-identity">
-                  <h3>
-                    {member.type === 'agency' 
-                      ? member.agencyName 
-                      : `${member.firstName} ${member.lastName}`}
-                  </h3>
-                  <div className="staff-meta">
-                    <span className="staff-role">{member.roleDisplay}</span>
-                    {member.status === 'inactive' && (
-                      <span className="status-badge inactive">
-                        <i className="fas fa-user-slash"></i> Inactive
-                      </span>
-                    )}
-                  </div>
-                </div>
-                
-                <div className="edit-action">
-                  <button className="edit-btn">
-                    <i className="fas fa-pen"></i>
-                  </button>
-                </div>
-              </div>
-              
-              <div className="staff-card-body">
-                <div className="contact-details">
-                  <div className="contact-item">
-                    <i className="fas fa-envelope"></i>
-                    <span>{member.email}</span>
-                  </div>
-                  <div className="contact-item">
-                    <i className="fas fa-phone-alt"></i>
-                    <span>{member.phone}</span>
-                  </div>
-                  <div className="contact-item">
-                    <i className="fas fa-map-marker-alt"></i>
-                    <span>Zip: {member.zipCode}</span>
                   </div>
                   
-                  {/* Mostrar agencia o número de sucursales */}
-                  {member.type === 'agency' ? (
-                    <div className="contact-item">
-                      <i className="fas fa-code-branch"></i>
-                      <span>{member.branches?.length || 0} Branches</span>
+                  <div className="staff-identity">
+                    <h3>
+                      {member.type === 'agency' 
+                        ? member.agencyName 
+                        : `${member.firstName} ${member.lastName}`}
+                    </h3>
+                    <div className="staff-meta">
+                      <span className="staff-role">{member.roleDisplay}</span>
+                      {member.status === 'inactive' && (
+                        <span className="status-badge inactive">
+                          <i className="fas fa-user-slash"></i> Inactive
+                        </span>
+                      )}
                     </div>
-                  ) : member.agency && (
+                  </div>
+                  
+                  <div className="edit-action">
+                    <button className="edit-btn">
+                      <i className="fas fa-pen"></i>
+                    </button>
+                  </div>
+                </div>
+                
+                <div className="staff-card-body">
+                  <div className="contact-details">
                     <div className="contact-item">
-                      <i className="fas fa-building"></i>
-                      <span>{member.agency.name}</span>
+                      <i className="fas fa-envelope"></i>
+                      <span>{member.email}</span>
+                    </div>
+                    <div className="contact-item">
+                      <i className="fas fa-phone-alt"></i>
+                      <span>{member.phone}</span>
+                    </div>
+                    <div className="contact-item">
+                      <i className="fas fa-map-marker-alt"></i>
+                      <span>Zip: {member.zipCode}</span>
+                    </div>
+                    
+                    {/* Mostrar agencia o número de sucursales */}
+                    {member.type === 'agency' ? (
+                      <div className="contact-item">
+                        <i className="fas fa-code-branch"></i>
+                        <span>{member.branches?.length || 0} Branches</span>
+                      </div>
+                    ) : member.agency && (
+                      <div className="contact-item">
+                        <i className="fas fa-hospital-alt"></i>
+                        <span>{member.agency.name}</span>
+                      </div>
+                    )}
+                  </div>
+                  
+                  {/* Mostrar progreso de documentos si aplica */}
+                  {shouldShowDocs && (
+                    <div className="documents-progress">
+                      <div className="progress-label">
+                        <span>Documentation</span>
+                        <span className="percentage">{docsPercentage}%</span>
+                      </div>
+                      <div className="progress-bar">
+                        <div 
+                          className="progress-fill"
+                          style={{ width: `${docsPercentage}%` }}
+                        ></div>
+                      </div>
                     </div>
                   )}
                 </div>
-                
-                {/* Mostrar progreso de documentos si aplica */}
-                {member.documents && Object.keys(member.documents).length > 0 && (
-                  <div className="documents-progress">
-                    <div className="progress-label">
-                      <span>Documentation</span>
-                      <span className="percentage">{getCompletedDocsPercentage(member.documents)}%</span>
-                    </div>
-                    <div className="progress-bar">
-                      <div 
-                        className="progress-fill"
-                        style={{ width: `${getCompletedDocsPercentage(member.documents)}%` }}
-                      ></div>
-                    </div>
-                  </div>
-                )}
               </div>
-            </div>
-          ))
+            );
+          })
         ) : (
           <div className="no-results">
             <div className="no-results-icon">
@@ -1472,6 +1607,14 @@ const DevStaffEditComponent = ({ onBackToOptions, onAddNewStaff }) => {
                           
                           handleUpdateMember('role', newRole);
                           handleUpdateMember('roleDisplay', roleDisplay);
+                          
+                          // Resetear la pestaña activa para evitar bugs al cambiar de rol
+                          setActiveTab('info');
+                          
+                          // Asegurarse de que los documentos se inicialicen correctamente
+                          if (requiresDocuments(newRole) && (!selectedStaff.documents || Object.keys(selectedStaff.documents).length === 0)) {
+                            handleUpdateMember('documents', initializeDocuments(newRole, selectedStaff.type));
+                          }
                         }}
                         disabled={selectedStaff.type === 'agency'} // No cambiar rol para agencias
                       >

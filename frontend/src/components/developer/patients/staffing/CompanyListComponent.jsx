@@ -10,8 +10,39 @@ const CompanyListComponent = ({ onBackToOptions }) => {
   const [filterType, setFilterType] = useState('all');
   const [selectedCompany, setSelectedCompany] = useState(null);
   const [showCompanyModal, setShowCompanyModal] = useState(false);
+  const [showInactive, setShowInactive] = useState(true);
+  const [editedCompany, setEditedCompany] = useState(null);
+  const [logoFile, setLogoFile] = useState(null);
+  const [activeTab, setActiveTab] = useState('info');
   
-  // Simulación de carga con mensajes dinámicos
+  // Available company types
+  const companyTypes = [
+    'Home Healthcare',
+    'Hospital',
+    'Medical Center',
+    'Rehabilitation Center',
+    'Nursing Home',
+    'Physical Therapy Clinic',
+    'Occupational Therapy Clinic',
+    'Speech Therapy Clinic',
+    'Multi-Specialty Care Center'
+  ];
+  
+  // Available specialties
+  const specialtyOptions = [
+    'Physical Therapy',
+    'Occupational Therapy',
+    'Speech Therapy',
+    'Nursing Care',
+    'Elderly Care',
+    'Pediatric Care',
+    'Rehabilitative Care',
+    'Post-Surgery Care',
+    'Chronic Disease Management',
+    'Disability Support'
+  ];
+  
+  // Simulated loading with dynamic messages
   useEffect(() => {
     setIsLoading(true);
     setLoadingMessage('Connecting to database...');
@@ -46,9 +77,9 @@ const CompanyListComponent = ({ onBackToOptions }) => {
     };
   }, []);
   
-  // Datos simulados de compañías
+  // Simulated company data
   const fetchCompanyData = () => {
-    // Simulación de datos del servidor
+    // Mock data from server
     const mockData = [
       {
         id: 1,
@@ -164,11 +195,11 @@ const CompanyListComponent = ({ onBackToOptions }) => {
     setFilteredCompanies(mockData);
   };
   
-  // Filtrar y ordenar compañías
+  // Filter and sort companies
   useEffect(() => {
     let filtered = [...companyList];
     
-    // Filtrar por término de búsqueda
+    // Filter by search term
     if (searchTerm) {
       filtered = filtered.filter(company => 
         company.companyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -178,40 +209,37 @@ const CompanyListComponent = ({ onBackToOptions }) => {
       );
     }
     
-    // Filtrar por tipo de compañía
+    // Filter by company type
     if (filterType !== 'all') {
       filtered = filtered.filter(company => company.companyType === filterType);
     }
+
+    // Filter by status if not showing inactive
+    if (!showInactive) {
+      filtered = filtered.filter(company => company.status === 'active');
+    }
     
     setFilteredCompanies(filtered);
-  }, [companyList, searchTerm, filterType]);
+  }, [companyList, searchTerm, filterType, showInactive]);
   
-  // Tipos de compañía para el filtro
-  const companyTypes = [
-    'Home Healthcare',
-    'Hospital',
-    'Medical Center',
-    'Rehabilitation Center',
-    'Nursing Home',
-    'Physical Therapy Clinic',
-    'Occupational Therapy Clinic',
-    'Speech Therapy Clinic',
-    'Multi-Specialty Care Center'
-  ];
-  
-  // Abrir modal de compañía
+  // Open company modal
   const handleOpenCompany = (company) => {
     setSelectedCompany(company);
+    // Create a deep copy of the company for editing
+    setEditedCompany(JSON.parse(JSON.stringify(company)));
     setShowCompanyModal(true);
   };
   
-  // Cerrar modal de compañía
+  // Close company modal
   const handleCloseCompany = () => {
     setShowCompanyModal(false);
     setSelectedCompany(null);
+    setEditedCompany(null);
+    setLogoFile(null);
+    setActiveTab('info');
   };
   
-  // Función para manejar el clic en el botón de retroceso
+  // Handle back button click
   const handleBackClick = () => {
     if (typeof onBackToOptions === 'function') {
       onBackToOptions();
@@ -220,12 +248,135 @@ const CompanyListComponent = ({ onBackToOptions }) => {
     }
   };
   
-  // Renderizado de la pantalla de carga
+  // Handle input change for company details
+  const handleInputChange = (e, section, field) => {
+    const { value } = e.target;
+    
+    if (section) {
+      setEditedCompany({
+        ...editedCompany,
+        [section]: {
+          ...editedCompany[section],
+          [field]: value
+        }
+      });
+    } else {
+      setEditedCompany({
+        ...editedCompany,
+        [field]: value
+      });
+    }
+  };
+  
+  // Handle company logo upload
+  const handleLogoUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setLogoFile(file);
+      
+      // Create a preview URL
+      const reader = new FileReader();
+      reader.onload = () => {
+        setEditedCompany({
+          ...editedCompany,
+          logo: reader.result
+        });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  
+  // Remove uploaded logo
+  const handleRemoveLogo = () => {
+    setLogoFile(null);
+    setEditedCompany({
+      ...editedCompany,
+      logo: null
+    });
+  };
+  
+  // Handle specialty toggle
+  const handleSpecialtyToggle = (specialty) => {
+    const specialties = [...editedCompany.specialties];
+    
+    if (specialties.includes(specialty)) {
+      const updatedSpecialties = specialties.filter(s => s !== specialty);
+      setEditedCompany({
+        ...editedCompany,
+        specialties: updatedSpecialties
+      });
+    } else {
+      specialties.push(specialty);
+      setEditedCompany({
+        ...editedCompany,
+        specialties: specialties
+      });
+    }
+  };
+  
+  // Handle status toggle
+  const handleStatusToggle = () => {
+    setEditedCompany({
+      ...editedCompany,
+      status: editedCompany.status === 'active' ? 'inactive' : 'active'
+    });
+  };
+  
+  // Save company changes
+  const handleSaveChanges = () => {
+    // Update the company in the list
+    const updatedList = companyList.map(company => 
+      company.id === editedCompany.id ? editedCompany : company
+    );
+    
+    setCompanyList(updatedList);
+    setFilteredCompanies(updatedList);
+    
+    // Show success message or notification here
+    handleCloseCompany();
+  };
+  
+  // Create new company button
+  const handleAddNewCompany = () => {
+    const newCompany = {
+      id: Math.max(...companyList.map(c => c.id)) + 1,
+      companyName: '',
+      fullCompanyName: '',
+      address: {
+        street: '',
+        city: '',
+        state: '',
+        zipCode: '',
+        country: 'USA',
+      },
+      contact: {
+        managerName: '',
+        position: '',
+        phone: '',
+        email: '',
+      },
+      website: '',
+      taxID: '',
+      foundedYear: '',
+      companyType: '',
+      specialties: [],
+      logo: null,
+      status: 'active',
+      staffCount: 0,
+      activePatients: 0
+    };
+    
+    setSelectedCompany(newCompany);
+    setEditedCompany(newCompany);
+    setShowCompanyModal(true);
+  };
+  
+  // Render loading screen
   if (isLoading) {
     return (
       <div className="company-list-loading">
         <div className="loading-container">
-          <div className="loading-hologram">
+          <div className="hologram-effect">
             <div className="hologram-ring"></div>
             <div className="hologram-circle"></div>
             <div className="hologram-bars">
@@ -242,7 +393,6 @@ const CompanyListComponent = ({ onBackToOptions }) => {
               <div className="progress-fill"></div>
             </div>
           </div>
-          
           <div className="loading-text">{loadingMessage}</div>
           <div className="loading-status">TherapySync Pro <span className="status-dot"></span></div>
         </div>
@@ -252,10 +402,10 @@ const CompanyListComponent = ({ onBackToOptions }) => {
   
   return (
     <div className="company-list-container">
-      {/* Header mejorado */}
+      {/* Enhanced Header */}
       <div className="company-list-header">
         <div className="header-content">
-          {/* Botón de retroceso con manejador explícito */}
+          {/* Back button with explicit handler */}
           <button className="back-button" onClick={handleBackClick}>
             <i className="fas fa-arrow-left"></i>
             <span>Back</span>
@@ -267,6 +417,10 @@ const CompanyListComponent = ({ onBackToOptions }) => {
         </div>
         
         <div className="header-actions">
+          <button className="add-new-btn" onClick={handleAddNewCompany}>
+            <i className="fas fa-plus-circle"></i>
+            <span>Add New Company</span>
+          </button>
           <button className="refresh-btn" onClick={() => {
             setIsLoading(true);
             setLoadingMessage('Updating data...');
@@ -285,14 +439,14 @@ const CompanyListComponent = ({ onBackToOptions }) => {
         </div>
       </div>
       
-      {/* Barra de filtros y búsqueda */}
+      {/* Search and Filter Bar */}
       <div className="search-filter-container">
         <div className="search-bar">
           <div className="search-input-wrapper">
             <i className="fas fa-search"></i>
             <input 
               type="text" 
-              placeholder="Search by name, location or manager..." 
+              placeholder="Search by company name, location or manager..." 
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -303,31 +457,52 @@ const CompanyListComponent = ({ onBackToOptions }) => {
             )}
           </div>
           
-          <div className="type-filter">
-            <span className="filter-label">Filter by type:</span>
-            <div className="type-options">
-              <button 
-                className={`type-option ${filterType === 'all' ? 'active' : ''}`}
-                onClick={() => setFilterType('all')}
-              >
-                <span>All</span>
-              </button>
-              
-              {companyTypes.map(type => (
+          <div className="filter-options">
+            <div className="type-filter">
+              <div className="filter-label">
+                <i className="fas fa-filter"></i>
+                <span>Filter by type:</span>
+              </div>
+              <div className="type-options">
                 <button 
-                  key={type}
-                  className={`type-option ${filterType === type ? 'active' : ''}`}
-                  onClick={() => setFilterType(type)}
+                  className={`type-option ${filterType === 'all' ? 'active' : ''}`}
+                  onClick={() => setFilterType('all')}
                 >
-                  <span>{type}</span>
+                  <span>All</span>
                 </button>
-              ))}
+                
+                {companyTypes.map(type => (
+                  <button 
+                    key={type}
+                    className={`type-option ${filterType === type ? 'active' : ''}`}
+                    onClick={() => setFilterType(type)}
+                  >
+                    <span>{type}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+            
+            {/* Toggle for showing inactive */}
+            <div className="inactive-filter">
+              <label className="toggle-switch">
+                <input 
+                  type="checkbox" 
+                  checked={showInactive}
+                  onChange={() => setShowInactive(!showInactive)}
+                />
+                <span className="toggle-slider"></span>
+                <div className="toggle-label">
+                  <i className="fas fa-building-circle-xmark"></i>
+                  <span>Show Inactive Companies</span>
+                </div>
+              </label>
             </div>
           </div>
         </div>
       </div>
       
-      {/* Tarjetas de compañías */}
+      {/* Company Cards */}
       <div className="company-cards-container">
         {filteredCompanies.length > 0 ? (
           filteredCompanies.map(company => (
@@ -336,6 +511,7 @@ const CompanyListComponent = ({ onBackToOptions }) => {
               className={`company-card ${company.status}`}
               onClick={() => handleOpenCompany(company)}
             >
+              <div className="card-highlight"></div>
               <div className="company-card-header">
                 <div className="company-logo">
                   {company.logo ? (
@@ -350,11 +526,21 @@ const CompanyListComponent = ({ onBackToOptions }) => {
                 
                 <div className="company-identity">
                   <h3>{company.companyName}</h3>
-                  <span className="company-type">{company.companyType}</span>
+                  <div className="company-meta">
+                    <span className="company-type">{company.companyType}</span>
+                    {company.status === 'inactive' && (
+                      <span className="status-badge inactive">
+                        <i className="fas fa-building-circle-xmark"></i> Inactive
+                      </span>
+                    )}
+                  </div>
                 </div>
                 
                 <div className="edit-action">
-                  <button className="edit-btn">
+                  <button className="edit-btn" onClick={(e) => {
+                    e.stopPropagation();
+                    handleOpenCompany(company);
+                  }}>
                     <i className="fas fa-pen"></i>
                   </button>
                 </div>
@@ -373,6 +559,10 @@ const CompanyListComponent = ({ onBackToOptions }) => {
                   <div className="detail-item">
                     <i className="fas fa-phone-alt"></i>
                     <span>{company.contact.phone}</span>
+                  </div>
+                  <div className="detail-item">
+                    <i className="fas fa-envelope"></i>
+                    <span>{company.contact.email}</span>
                   </div>
                 </div>
                 
@@ -414,6 +604,7 @@ const CompanyListComponent = ({ onBackToOptions }) => {
               onClick={() => {
                 setSearchTerm('');
                 setFilterType('all');
+                setShowInactive(true);
               }}
             >
               <i className="fas fa-redo-alt"></i>
@@ -423,146 +614,339 @@ const CompanyListComponent = ({ onBackToOptions }) => {
         )}
       </div>
       
-      {/* Modal de detalle de compañía (simplificado) */}
-      {showCompanyModal && selectedCompany && (
+      {/* Improved Company Form Modal */}
+      {showCompanyModal && editedCompany && (
         <div className="company-modal-overlay" onClick={handleCloseCompany}>
-          <div className="company-modal" onClick={e => e.stopPropagation()}>
+          <div className="company-modal company-edit-modal" onClick={e => e.stopPropagation()}>
             <div className="modal-header">
-              <div className="modal-title">
-                <h2>{selectedCompany.companyName}</h2>
-                <span className={`company-status ${selectedCompany.status}`}>
-                  {selectedCompany.status === 'active' ? 'Active' : 'Inactive'}
-                </span>
+              <div className="company-profile-header">
+                <div className="modal-logo">
+                  {editedCompany.logo ? (
+                    <div className="logo-image-container">
+                      <img src={editedCompany.logo} alt={editedCompany.companyName} />
+                      <button className="remove-logo-btn" onClick={handleRemoveLogo}>
+                        <i className="fas fa-times"></i>
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="logo-upload-container">
+                      <div className="logo-placeholder">
+                        {editedCompany.companyName ? 
+                          editedCompany.companyName.split(' ').map(word => word[0]).join('').substring(0, 2).toUpperCase() :
+                          'CO'
+                        }
+                      </div>
+                      <div className="logo-overlay">
+                        <i className="fas fa-cloud-upload-alt"></i>
+                        <span>Upload Logo</span>
+                        <input 
+                          type="file" 
+                          accept="image/*" 
+                          onChange={handleLogoUpload}
+                          className="logo-input"
+                        />
+                      </div>
+                    </div>
+                  )}
+                  <span className={`modal-status ${editedCompany.status}`}></span>
+                </div>
+                <div className="company-details">
+                  <div className="name-fields">
+                    <div className="input-group full-width">
+                      <label>Company Name</label>
+                      <input 
+                        type="text" 
+                        value={editedCompany.companyName}
+                        onChange={(e) => handleInputChange(e, null, 'companyName')}
+                        placeholder="Enter company name"
+                      />
+                    </div>
+                  </div>
+                  <div className="type-status-selects">
+                    <div className="input-group">
+                      <label>Company Type</label>
+                      <select 
+                        value={editedCompany.companyType}
+                        onChange={(e) => handleInputChange(e, null, 'companyType')}
+                      >
+                        <option value="">Select company type</option>
+                        {companyTypes.map(type => (
+                          <option key={type} value={type}>{type}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="input-group">
+                      <label>Status</label>
+                      <div className="status-toggle-container">
+                        <label className="toggle-switch">
+                          <input 
+                            type="checkbox" 
+                            checked={editedCompany.status === 'active'}
+                            onChange={handleStatusToggle}
+                          />
+                          <span className="toggle-slider"></span>
+                        </label>
+                        <span className={`status-text ${editedCompany.status}`}>
+                          {editedCompany.status === 'active' ? 'Active' : 'Inactive'}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
               <button className="close-modal" onClick={handleCloseCompany}>
                 <i className="fas fa-times"></i>
               </button>
             </div>
             
+            <div className="modal-tabs">
+              <button 
+                className={`tab-btn ${activeTab === 'info' ? 'active' : ''}`}
+                onClick={() => setActiveTab('info')}
+              >
+                <i className="fas fa-info-circle"></i>
+                <span>Company Information</span>
+              </button>
+              <button 
+                className={`tab-btn ${activeTab === 'address' ? 'active' : ''}`}
+                onClick={() => setActiveTab('address')}
+              >
+                <i className="fas fa-map-marker-alt"></i>
+                <span>Address</span>
+              </button>
+              <button 
+                className={`tab-btn ${activeTab === 'contact' ? 'active' : ''}`}
+                onClick={() => setActiveTab('contact')}
+              >
+                <i className="fas fa-user-tie"></i>
+                <span>Contact</span>
+              </button>
+              <button 
+                className={`tab-btn ${activeTab === 'services' ? 'active' : ''}`}
+                onClick={() => setActiveTab('services')}
+              >
+                <i className="fas fa-stethoscope"></i>
+                <span>Services</span>
+              </button>
+            </div>
+            
             <div className="modal-body">
-              <div className="company-info-section">
-                <h3>Company Information</h3>
-                <div className="info-grid">
-                  <div className="info-item">
-                    <label>Legal Name</label>
-                    <p>{selectedCompany.fullCompanyName}</p>
+              {/* Company Information Section */}
+              {activeTab === 'info' && (
+                <div className="company-form-section">
+                  <h3>Company Information</h3>
+                  <div className="form-grid">
+                    <div className="form-group">
+                      <label>Legal Company Name</label>
+                      <input 
+                        type="text" 
+                        value={editedCompany.fullCompanyName}
+                        onChange={(e) => handleInputChange(e, null, 'fullCompanyName')}
+                        placeholder="Enter full legal name (including LLC, Inc, etc.)"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Tax ID / EIN</label>
+                      <input 
+                        type="text" 
+                        value={editedCompany.taxID}
+                        onChange={(e) => handleInputChange(e, null, 'taxID')}
+                        placeholder="XX-XXXXXXX"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Year Founded</label>
+                      <input 
+                        type="text" 
+                        value={editedCompany.foundedYear}
+                        onChange={(e) => handleInputChange(e, null, 'foundedYear')}
+                        placeholder="YYYY"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Website</label>
+                      <input 
+                        type="text" 
+                        value={editedCompany.website}
+                        onChange={(e) => handleInputChange(e, null, 'website')}
+                        placeholder="www.company.com"
+                      />
+                    </div>
+                    <div className="form-group full-width">
+                      <label>Company Logo</label>
+                      <div className="logo-upload-field">
+                        <label className="upload-button">
+                          <i className="fas fa-cloud-upload-alt"></i>
+                          <span>Upload company logo</span>
+                          <input 
+                            type="file"
+                            accept="image/*"
+                            onChange={handleLogoUpload}
+                          />
+                        </label>
+                        <span className="file-name">
+                          {logoFile ? logoFile.name : 'No file selected'}
+                        </span>
+                      </div>
+                    </div>
                   </div>
-                  <div className="info-item">
-                    <label>Company Type</label>
-                    <p>{selectedCompany.companyType}</p>
+                </div>
+              )}
+              
+              {/* Address Section */}
+              {activeTab === 'address' && (
+                <div className="company-form-section">
+                  <h3>Company Address</h3>
+                  <div className="form-grid">
+                    <div className="form-group full-width">
+                      <label>Street Address</label>
+                      <input 
+                        type="text" 
+                        value={editedCompany.address.street}
+                        onChange={(e) => handleInputChange(e, 'address', 'street')}
+                        placeholder="Street address"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>City</label>
+                      <input 
+                        type="text" 
+                        value={editedCompany.address.city}
+                        onChange={(e) => handleInputChange(e, 'address', 'city')}
+                        placeholder="City"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>State</label>
+                      <input 
+                        type="text" 
+                        value={editedCompany.address.state}
+                        onChange={(e) => handleInputChange(e, 'address', 'state')}
+                        placeholder="State"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Zip Code</label>
+                      <input 
+                        type="text" 
+                        value={editedCompany.address.zipCode}
+                        onChange={(e) => handleInputChange(e, 'address', 'zipCode')}
+                        placeholder="Zip Code"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Country</label>
+                      <input 
+                        type="text" 
+                        value={editedCompany.address.country}
+                        onChange={(e) => handleInputChange(e, 'address', 'country')}
+                        placeholder="Country"
+                      />
+                    </div>
                   </div>
-                  <div className="info-item">
-                    <label>Tax ID / EIN</label>
-                    <p>{selectedCompany.taxID}</p>
+                </div>
+              )}
+              
+              {/* Contact Section */}
+              {activeTab === 'contact' && (
+                <div className="company-form-section">
+                  <h3>Primary Contact Person</h3>
+                  <div className="form-grid">
+                    <div className="form-group">
+                      <label>Contact Name</label>
+                      <input 
+                        type="text" 
+                        value={editedCompany.contact.managerName}
+                        onChange={(e) => handleInputChange(e, 'contact', 'managerName')}
+                        placeholder="Full name of primary contact"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Position</label>
+                      <input 
+                        type="text" 
+                        value={editedCompany.contact.position}
+                        onChange={(e) => handleInputChange(e, 'contact', 'position')}
+                        placeholder="Job title"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Phone Number</label>
+                      <input 
+                        type="text" 
+                        value={editedCompany.contact.phone}
+                        onChange={(e) => handleInputChange(e, 'contact', 'phone')}
+                        placeholder="(XXX) XXX-XXXX"
+                      />
+                    </div>
+                    <div className="form-group">
+                      <label>Email Address</label>
+                      <input 
+                        type="email" 
+                        value={editedCompany.contact.email}
+                        onChange={(e) => handleInputChange(e, 'contact', 'email')}
+                        placeholder="email@company.com"
+                      />
+                    </div>
                   </div>
-                  <div className="info-item">
-                    <label>Year Founded</label>
-                    <p>{selectedCompany.foundedYear}</p>
+                </div>
+              )}
+              
+              {/* Services & Specialties Section */}
+              {activeTab === 'services' && (
+                <div className="company-form-section">
+                  <h3>Services & Specialties</h3>
+                  <div className="form-label">Select services offered by this company (select all that apply)</div>
+                  <div className="specialties-grid">
+                    {specialtyOptions.map(specialty => (
+                      <div key={specialty} className="specialty-option">
+                        <label className="checkbox-container">
+                          <input 
+                            type="checkbox" 
+                            checked={editedCompany.specialties.includes(specialty)}
+                            onChange={() => handleSpecialtyToggle(specialty)}
+                          />
+                          <span className="checkmark"></span>
+                          <span className="specialty-name">{specialty}</span>
+                        </label>
+                      </div>
+                    ))}
                   </div>
-                  <div className="info-item">
-                    <label>Website</label>
-                    <p>
-                      <a href={`https://${selectedCompany.website}`} target="_blank" rel="noopener noreferrer">
-                        {selectedCompany.website}
-                      </a>
+                  
+                  <div className="company-status-section">
+                    <h3>Company Status</h3>
+                    <div className="status-toggle-wrapper">
+                      <span className="status-label">Company Status:</span>
+                      <div className="toggle-switch-container">
+                        <label className="toggle-switch status-toggle">
+                          <input 
+                            type="checkbox" 
+                            checked={editedCompany.status === 'active'}
+                            onChange={handleStatusToggle}
+                          />
+                          <span className="toggle-slider"></span>
+                        </label>
+                        <span className={`status-text ${editedCompany.status}`}>
+                          {editedCompany.status === 'active' ? 'Active' : 'Inactive'}
+                        </span>
+                      </div>
+                    </div>
+                    <p className="status-description">
+                      {editedCompany.status === 'active' 
+                        ? 'Active companies are visible to users and can be assigned to patients.' 
+                        : 'Inactive companies are not visible to users and cannot be assigned to patients.'}
                     </p>
                   </div>
                 </div>
-              </div>
-              
-              <div className="company-info-section">
-                <h3>Address</h3>
-                <div className="info-grid">
-                  <div className="info-item full-width">
-                    <label>Street</label>
-                    <p>{selectedCompany.address.street}</p>
-                  </div>
-                  <div className="info-item">
-                    <label>City</label>
-                    <p>{selectedCompany.address.city}</p>
-                  </div>
-                  <div className="info-item">
-                    <label>State</label>
-                    <p>{selectedCompany.address.state}</p>
-                  </div>
-                  <div className="info-item">
-                    <label>Zip Code</label>
-                    <p>{selectedCompany.address.zipCode}</p>
-                  </div>
-                  <div className="info-item">
-                    <label>Country</label>
-                    <p>{selectedCompany.address.country}</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="company-info-section">
-                <h3>Primary Contact</h3>
-                <div className="info-grid">
-                  <div className="info-item">
-                    <label>Name</label>
-                    <p>{selectedCompany.contact.managerName}</p>
-                  </div>
-                  <div className="info-item">
-                    <label>Position</label>
-                    <p>{selectedCompany.contact.position}</p>
-                  </div>
-                  <div className="info-item">
-                    <label>Email</label>
-                    <p>
-                      <a href={`mailto:${selectedCompany.contact.email}`}>
-                        {selectedCompany.contact.email}
-                      </a>
-                    </p>
-                  </div>
-                  <div className="info-item">
-                    <label>Phone</label>
-                    <p>{selectedCompany.contact.phone}</p>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="company-info-section">
-                <h3>Specialties & Services</h3>
-                <div className="specialties-container">
-                  {selectedCompany.specialties.map((specialty, index) => (
-                    <div key={index} className="specialty-badge">{specialty}</div>
-                  ))}
-                </div>
-              </div>
-              
-              <div className="company-stats-section">
-                <h3>Performance Statistics</h3>
-                <div className="stats-grid">
-                  <div className="stat-box">
-                    <div className="stat-value">{selectedCompany.staffCount}</div>
-                    <div className="stat-label">Total Staff</div>
-                  </div>
-                  <div className="stat-box">
-                    <div className="stat-value">{selectedCompany.activePatients}</div>
-                    <div className="stat-label">Active Patients</div>
-                  </div>
-                  <div className="stat-box">
-                    <div className="stat-value">92%</div>
-                    <div className="stat-label">Satisfaction Rate</div>
-                  </div>
-                  <div className="stat-box">
-                    <div className="stat-value">24h</div>
-                    <div className="stat-label">Avg. Response Time</div>
-                  </div>
-                </div>
-              </div>
+              )}
             </div>
             
             <div className="modal-footer">
-              <button className="action-btn view-staff">
-                <i className="fas fa-users"></i> View Staff
+              <button className="action-btn cancel-btn" onClick={handleCloseCompany}>
+                <i className="fas fa-times"></i> Cancel
               </button>
-              <button className="action-btn view-patients">
-                <i className="fas fa-user-injured"></i> View Patients
-              </button>
-              <button className="action-btn edit-company">
-                <i className="fas fa-edit"></i> Edit Company
+              <button className="action-btn save-btn" onClick={handleSaveChanges}>
+                <i className="fas fa-save"></i> Save Changes
               </button>
             </div>
           </div>

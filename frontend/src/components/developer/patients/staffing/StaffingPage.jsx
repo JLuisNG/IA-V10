@@ -500,7 +500,7 @@ const DevStaffingPage = () => {
               </div>
             </div>
             
-            {/* Opción para Companies & Agencies */}
+            {/* Opción para Companies */}
             <div 
               className={`staffing-option-card ${selectedOption === 'companies' ? 'selected' : ''}`}
               onClick={() => handleOptionSelect('companies')}
@@ -509,7 +509,7 @@ const DevStaffingPage = () => {
                 <i className="fas fa-building"></i>
               </div>
               <div className="option-content">
-                <h3>Companies & Agencies</h3>
+                <h3>Companies</h3>
                 <p>Add or manage healthcare companies and home care agencies</p>
                 <div className="option-actions">
                   <button 

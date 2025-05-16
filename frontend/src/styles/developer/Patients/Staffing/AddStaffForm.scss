@@ -399,7 +399,7 @@
           &.role-selection {
             display: block;
           }
-          
+
           .form-group {
             display: flex;
             flex-direction: column;
@@ -412,7 +412,7 @@
             }
             
             input, select {
-              border: 1px solid $light-gray;
+              border: 1px solid #ccd4dc;
               border-radius: $border-radius-md;
               padding: $spacing-3 $spacing-4;
               font-size: $font-sm;
@@ -2452,7 +2452,7 @@ $breakpoint-xl: 1200px;
             
             h4 {
               font-size: $font-md;
-              color: white;
+              color: rgba(58, 58, 58, 0.836);
               margin: 0;
             }
             
@@ -4964,6 +4964,661 @@ $breakpoint-xl: 1200px;
         
         button {
           width: 100%;
+        }
+      }
+    }
+  }
+}
+
+/* Estilos para el medidor circular de progreso de los documentos */
+.documents-summary {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+  
+  .completed-percentage {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    
+    .circular-progress {
+      width: 100px;
+      height: 100px;
+      position: relative;
+      
+      .circular-chart {
+        width: 100%;
+        height: 100%;
+        transform: rotate(-90deg);
+        
+        .circle-bg {
+          fill: none;
+          stroke: rgba(255, 255, 255, 0.1);
+          stroke-width: 2.5;
+        }
+        
+        .circle {
+          fill: none;
+          stroke: url(#gradient);
+          stroke-width: 2.5;
+          stroke-linecap: round;
+          animation: progress 1s ease-out forwards;
+        }
+        
+        .percentage {
+          fill: white;
+          font-size: 0.7rem;
+          text-anchor: middle;
+          font-weight: 600;
+          transform: rotate(90deg);
+          transform-origin: center;
+        }
+      }
+    }
+    
+    .documents-text {
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.7);
+    }
+  }
+}
+
+/* Estilos para la confirmación de agencia */
+.agency-confirmation {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(44, 123, 229, 0.1);
+  border-left: 3px solid #2c7be5;
+  border-radius: 0.25rem;
+  
+  .confirmation-text {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 0.9rem;
+    line-height: 1.4;
+    
+    i {
+      color: #2c7be5;
+      margin-top: 0.2rem;
+    }
+  }
+}
+
+/* Estilos para el contenedor de input de contraseña */
+.password-input-container {
+  display: flex;
+  gap: 0.5rem;
+  
+  input {
+    flex: 1;
+  }
+  
+  .generate-password-btn {
+    background: rgba(44, 123, 229, 0.2);
+    color: #5dade2;
+    border: 1px solid rgba(44, 123, 229, 0.3);
+    border-radius: 0.25rem;
+    padding: 0.5rem 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      background: rgba(44, 123, 229, 0.3);
+      transform: translateY(-2px);
+    }
+    
+    i {
+      font-size: 0.9rem;
+    }
+  }
+}
+
+/* Estilos para la descripción del documento */
+.document-description {
+  margin: 0.5rem 0 1rem 2.5rem;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+  line-height: 1.4;
+}
+
+/* Estilos para el subtítulo en la cabecera de sección */
+.section-subtitle {
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-style: italic;
+  margin-left: 1rem;
+}
+
+@keyframes progress {
+  0% {
+    stroke-dasharray: 0 100;
+  }
+}
+
+
+/* Correcciones para la sección de documentos */
+.documents-section .section-content.documents-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 1rem;
+}
+
+.documents-section .document-card {
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  position: relative;
+  transition: all 0.3s ease;
+  overflow: hidden;
+}
+
+.documents-section .document-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 4px;
+  height: 100%;
+  background: #ccc;
+  transition: background 0.3s;
+}
+
+.documents-section .document-card.obtained::before {
+  background: #2ecc71;
+}
+
+.documents-section .document-card.pending::before {
+  background: #f39c12;
+}
+
+.documents-section .document-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  border-color: rgba(44, 123, 229, 0.3);
+}
+
+.documents-section .document-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.documents-section .document-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 6px;
+  background: rgba(44, 123, 229, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.75rem;
+}
+
+.documents-section .document-icon i {
+  color: #5dade2;
+  font-size: 1rem;
+}
+
+.documents-section .document-name {
+  flex: 1;
+  font-weight: 600;
+  font-size: 0.95rem;
+  color: white;
+}
+
+.documents-section .document-status {
+  padding: 0.25rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.documents-section .document-status.obtained {
+  background: rgba(46, 204, 113, 0.1);
+  color: #2ecc71;
+}
+
+.documents-section .document-status.pending {
+  background: rgba(243, 156, 18, 0.1);
+  color: #f39c12;
+}
+
+.documents-section .document-status:hover {
+  transform: scale(1.05);
+}
+
+.documents-section .document-description {
+  margin: 0 0 0.75rem 3rem;
+  font-size: 0.8rem;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.documents-section .document-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.documents-section .file-upload {
+  position: relative;
+}
+
+.documents-section .upload-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  color: white;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.documents-section .upload-btn:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+.documents-section .file-input {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.documents-section .file-info {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 0.5rem 0.75rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  color: white;
+}
+
+.documents-section .file-info i {
+  color: #5dade2;
+}
+
+.documents-section .document-card.add-document {
+  height: 170px;
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.documents-section .document-card.add-document::before {
+  display: none;
+}
+
+.documents-section .document-card.add-document:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(44, 123, 229, 0.3);
+}
+
+.documents-section .add-document-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.75rem;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.documents-section .add-document-content i {
+  font-size: 2rem;
+}
+
+/* Mejoras para la sección de agency affiliation */
+.agency-details {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 1rem;
+  margin-top: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.agency-details h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: white;
+  margin-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding-bottom: 0.5rem;
+}
+
+.agency-info p {
+  margin: 0.25rem 0;
+  font-size: 0.9rem;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.agency-info p strong {
+  color: #5dade2;
+  font-weight: 500;
+  margin-right: 0.25rem;
+}
+
+.agency-confirmation {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: rgba(44, 123, 229, 0.1);
+  border-left: 3px solid #2c7be5;
+  border-radius: 4px;
+}
+
+.agency-confirmation .confirmation-text {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.5;
+}
+
+.agency-confirmation .confirmation-text i {
+  color: #5dade2;
+  margin-top: 0.25rem;
+}
+
+
+/* Estilos mejorados para la sección de Agency Affiliation */
+.agency-details-card {
+  margin-top: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  padding: 1.25rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.agency-details-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: rgba(58, 58, 58, 0.836);
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.agency-details-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.agency-detail-row {
+  display: flex;
+  align-items: flex-start;
+}
+
+.detail-label {
+  min-width: 80px;
+  font-weight: 600;
+  color: #5dade2;
+}
+
+.detail-value {
+  flex: 1;
+  color: rgba(58, 58, 58, 0.836);
+}
+
+.agency-confirmation-box {
+  margin-top: 1rem;
+  background: rgba(44, 123, 229, 0.15);
+  border-left: 4px solid #4facfe;
+  border-radius: 4px;
+  padding: 1rem;
+}
+
+.confirmation-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+}
+
+.confirmation-content i {
+  color: #4facfe;
+  font-size: 1.2rem;
+  margin-top: 0.1rem;
+}
+
+.confirmation-content p {
+  margin: 0;
+  color: rgba(58, 58, 58, 0.836);
+  font-weight: 500;
+  line-height: 1.5;
+  font-size: 0.95rem;
+}
+
+/* Mejora el contraste del select para la agencia */
+.form-section .form-group select {
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  padding: 0.75rem 1rem;
+  border-radius: 6px;
+  width: 100%;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.form-section .form-group select:focus {
+  border-color: #4facfe;
+  box-shadow: 0 0 0 2px rgba(79, 172, 254, 0.2);
+  outline: none;
+}
+
+.form-section .form-group select option {
+  background-color: #0a1e3c;
+  color: white;
+}
+
+.form-section .form-group label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: white;
+  font-size: 0.95rem;
+}
+
+// Estilos optimizados para las branches
+.branches-container {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-6;
+  margin-top: $spacing-4;
+  
+  .branch-card {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: $border-radius-md;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    padding: $spacing-5;
+    transition: $transition-medium;
+    
+    &:hover {
+      transform: translateY(-3px);
+      box-shadow: $shadow-medium;
+      border-color: rgba($primary-color, 0.2);
+    }
+    
+    .branch-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: $spacing-4;
+      padding-bottom: $spacing-3;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      
+      h4 {
+        font-size: $font-md;
+        color: white;
+        margin: 0;
+        font-weight: $font-semibold;
+      }
+      
+      .remove-branch-btn {
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        background: rgba($error, 0.15);
+        color: $error;
+        border: 1px solid rgba($error, 0.2);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        
+        &:hover {
+          background: rgba($error, 0.25);
+          transform: rotate(90deg);
+          box-shadow: 0 0 10px rgba($error, 0.2);
+        }
+      }
+    }
+    
+    .branch-form {
+      display: flex;
+      flex-direction: column;
+      gap: $spacing-4;
+      
+      .branch-form-row {
+        margin-bottom: $spacing-3;
+        
+        &:last-child {
+          margin-bottom: 0;
+        }
+        
+        .form-group {
+          label {
+            display: block;
+            margin-bottom: $spacing-2;
+            font-size: $font-sm;
+            color: rgba(255, 255, 255, 0.8);
+          }
+          
+          input {
+            width: 100%;
+            padding: $spacing-3 $spacing-4;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: $border-radius-md;
+            color: white;
+            font-size: $font-sm;
+            transition: all 0.3s ease;
+            
+            &:focus {
+              outline: none;
+              border-color: $primary-color;
+              box-shadow: 0 0 0 3px rgba($primary-color, 0.15);
+            }
+            
+            &::placeholder {
+              color: rgba(255, 255, 255, 0.3);
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  .add-branch-btn {
+    align-self: flex-start;
+    margin-top: $spacing-2;
+    padding: $spacing-3 $spacing-5;
+    background: rgba($primary-color, 0.15);
+    color: white;
+    border: 1px solid rgba($primary-color, 0.2);
+    border-radius: $border-radius-md;
+    display: flex;
+    align-items: center;
+    gap: $spacing-3;
+    font-size: $font-sm;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: $font-medium;
+    
+    i {
+      font-size: $font-md;
+    }
+    
+    &:hover {
+      background: rgba($primary-color, 0.25);
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba($primary-color, 0.15);
+    }
+  }
+}
+
+// Estilos para el botón de Add Another Branch en la parte superior
+.add-another-branch-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: $spacing-5;
+  
+  .add-another-branch-btn {
+    padding: $spacing-3 $spacing-5;
+    background: linear-gradient(135deg, rgba($primary-color, 0.7), rgba($primary-light, 0.7));
+    color: white;
+    border: none;
+    border-radius: $border-radius-md;
+    display: flex;
+    align-items: center;
+    gap: $spacing-2;
+    font-size: $font-sm;
+    font-weight: $font-medium;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba($primary-color, 0.2);
+    
+    i {
+      font-size: $font-md;
+    }
+    
+    &:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 15px rgba($primary-color, 0.3);
+    }
+  }
+}
+
+// Media queries para responsividad de branches
+@media (max-width: $breakpoint-md) {
+  .branches-container {
+    .branch-card {
+      .branch-form {
+        .branch-form-row {
+          flex-direction: column;
+          
+          .form-group {
+            width: 100%;
+            margin-bottom: $spacing-3;
+            
+            &:last-child {
+              margin-bottom: 0;
+            }
+          }
         }
       }
     }
