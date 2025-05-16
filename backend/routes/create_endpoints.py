@@ -22,6 +22,8 @@ from schemas import (
     VisitNoteResponse,
     NoteSectionCreate, NoteSectionResponse,
     NoteTemplateCreate, NoteTemplateResponse)
+from auth.security import hash_password
+from auth.auth_middleware import role_required, get_current_user
 
 router = APIRouter()
 
@@ -30,7 +32,7 @@ BASE_STORAGE_PATH = "/app/storage/docs"
 #====================== STAFF ======================#
 
 @router.post("/staff/", response_model=StaffResponse)
-def create_staff(staff: StaffCreate, db: Session = Depends(get_db)):
+def create_staff(staff: StaffCreate, db: Session = Depends(get_db), current_user = Depends(role_required(["admin", "Developer"]))):
     existing_email = db.query(Staff).filter(Staff.email == staff.email).first()
     existing_username = db.query(Staff).filter(Staff.username == staff.username).first()
 
@@ -39,7 +41,12 @@ def create_staff(staff: StaffCreate, db: Session = Depends(get_db)):
     if existing_username:
         raise HTTPException(status_code=400, detail="Username already registered.")
     
-    new_staff = Staff(**staff.dict())
+    hashed_password = hash_password(staff.password)
+
+    staff_data = staff.dict()
+    staff_data["password"] = hashed_password
+
+    new_staff = Staff(**staff_data)
     db.add(new_staff)
     db.commit()
     db.refresh(new_staff)

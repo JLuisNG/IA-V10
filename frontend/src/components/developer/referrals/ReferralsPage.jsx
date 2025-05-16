@@ -33,6 +33,8 @@ const DevReferralsPage = () => {
   const userMenuRef = useRef(null);
   const containerRef = useRef(null);
   const fileInputRef = useRef(null);
+
+  const API_BASE_URL = 'http://localhost:8000';
   
   // Form data state with added weight and height fields
   const [formData, setFormData] = useState({
@@ -109,20 +111,6 @@ const DevReferralsPage = () => {
   
   // State for adding new nurse manager
   const [addingNewManager, setAddingNewManager] = useState(false);
-
-  // =========== API CONFIGURATION ============
-  // API endpoint base URL
-  const API_BASE_URL = 'https://api.therapysync.com/v1';
-  
-  // API Endpoints
-  const API_ENDPOINTS = {
-    THERAPISTS: `${API_BASE_URL}/therapists`,
-    PHYSICIANS: `${API_BASE_URL}/physicians`,
-    AGENCIES: `${API_BASE_URL}/agencies`,
-    DOCUMENTS: `${API_BASE_URL}/documents/upload`,
-    PATIENTS: `${API_BASE_URL}/patients`,
-    REFERRALS: `${API_BASE_URL}/referrals`,
-  };
 
   // WBS options from the dropdown
   const wbsOptions = [
@@ -602,11 +590,6 @@ const DevReferralsPage = () => {
     }));
   };
   
-  // Validate that at least one discipline is selected
-  const validateDisciplines = () => {
-    return Object.values(selectedDisciplines).some(discipline => discipline);
-  };
-  
   // Get selected agency
   const getSelectedAgency = () => {
     return agencies.find(agency => agency.id?.toString() === formData.agencyId);
@@ -743,67 +726,6 @@ const DevReferralsPage = () => {
     };
   };
   
-  // Upload files to the server con timeout para evitar esperas largas
-  const uploadFiles = async (files) => {
-    try {
-      // Primero intentamos simular envío inmediato para mantener la UX fluida
-      setFormSubmitting(true);
-      
-      // Crear un FormData para enviar los archivos
-      const formData = new FormData();
-      
-      // Añadir cada archivo al FormData
-      files.forEach((file, index) => {
-        formData.append(`files`, file);
-      });
-      
-      // Obtener headers de autenticación pero sin Content-Type
-      const headers = getAuthHeaders();
-      delete headers['Content-Type']; // Para que el navegador establezca el boundary correcto
-      
-      // Realizar la petición POST al endpoint de documentos con timeout
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3000);
-      
-      try {
-        const response = await fetch(API_ENDPOINTS.DOCUMENTS, {
-          method: 'POST',
-          headers: {
-            'Authorization': headers.Authorization
-          },
-          body: formData,
-          signal: controller.signal
-        });
-        
-        clearTimeout(timeoutId);
-        
-        // Manejar errores HTTP
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || `Error al cargar los documentos (${response.status})`);
-        }
-        
-        // Extraer y devolver los IDs de los documentos cargados
-        const data = await response.json();
-        return data.document_ids || [];
-        
-      } catch (fetchError) {
-        clearTimeout(timeoutId);
-        if (fetchError.name === 'AbortError') {
-          console.warn('La carga de archivos tardó demasiado, continuando con el flujo...');
-          return [];
-        }
-        throw fetchError;
-      }
-      
-    } catch (error) {
-      console.error('Error al cargar archivos:', error);
-      // Advertir al usuario pero no interrumpir el flujo principal
-      toast.warning('No se pudieron cargar algunos documentos, pero continuaremos con la creación del referido.');
-      return [];
-    }
-  };
-  
   // Reset form to initial state
   const resetForm = () => {
     // Reset all form data to initial values
@@ -879,24 +801,26 @@ const DevReferralsPage = () => {
   };
   
   // Handle form submission con tiempos optimizados
+  const validateDisciplines = () => {
+    return ['PT', 'OT', 'ST'].some(discipline => selectedDisciplines[discipline]);
+  };
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
     if (isLoggingOut) return;
-    
-    // Validate that at least one discipline is selected
+  
     if (!validateDisciplines()) {
       toast.error('Por favor, seleccione al menos una disciplina (PT, PTA, OT, COTA, ST, o STA)');
       return;
     }
-    
-    // Validate that therapists are selected for all selected disciplines
+  
     const hasAllTherapistsSelected = Object.keys(selectedDisciplines)
-      .filter(discipline => selectedDisciplines[discipline])
-      .every(discipline => selectedTherapists[discipline] !== null);
-    
+      .filter(d => selectedDisciplines[d] && ['PT', 'OT', 'ST'].includes(d))
+      .every(d => selectedTherapists[d]);
+  
     if (!hasAllTherapistsSelected) {
       toast.error('Por favor, seleccione un terapeuta para cada disciplina seleccionada');
+      toast.error('Select a therapist for each selected main discipline (PT, OT, ST)');
       return;
     }
     
@@ -911,96 +835,68 @@ const DevReferralsPage = () => {
     }
     
     // Show loading screen
+  
     setFormSubmitting(true);
-
+  
     try {
-      // Prepare data for API
       const patientData = preparePatientData();
-      
-      // Comenzamos a subir archivos y enviamos datos del paciente en paralelo
-      const startTime = Date.now();
-      
-      // Upload any files if needed
       let documentIds = [];
+  
       if (uploadedFiles.length > 0) {
-        try {
-          // Subimos archivos con timeout
-          documentIds = await uploadFiles(uploadedFiles);
-        } catch (fileError) {
-          console.error('Error al cargar archivos:', fileError);
-          // Continuamos con la creación del paciente incluso si falla la carga de archivos
-          toast.warning('No se pudieron cargar algunos documentos, pero continuaremos con la creación del referido');
+        const formDataUpload = new FormData();
+        uploadedFiles.forEach(file => formDataUpload.append('files', file));
+  
+        const docResponse = await fetch(`${API_BASE_URL}/documents/upload`, {
+          method: 'POST',
+          body: formDataUpload
+        });
+  
+        if (docResponse.ok) {
+          const result = await docResponse.json();
+          documentIds = result.document_ids || [];
+        } else {
+          console.warn('Documents failed to upload.');
         }
       }
-      
-      // Add document IDs to patient data if files were uploaded
+  
       if (documentIds.length > 0) {
         patientData.documents = documentIds;
       }
-      
-      // Enviamos los datos al endpoint con timeout
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 3000);
-      
-      try {
-        const response = await fetch(API_ENDPOINTS.REFERRALS, {
-          method: 'POST',
-          headers: getAuthHeaders(),
-          body: JSON.stringify(patientData),
-          signal: controller.signal
-        });
-        
-        clearTimeout(timeoutId);
-        
-        // Verificar respuesta
-        if (!response.ok) {
-          const errorData = await response.json();
-          throw new Error(errorData.message || `Error al crear el referido (${response.status})`);
-        }
-        
-        // Procesar respuesta exitosa
-        const responseData = await response.json();
-        console.log('Referido creado exitosamente:', responseData);
-        
-      } catch (fetchError) {
-        clearTimeout(timeoutId);
-        if (fetchError.name === 'AbortError') {
-          console.warn('El envío de datos tardó demasiado, pero continuamos con la UX fluida...');
-          // No interrumpimos el flujo de UI para mantener una buena experiencia
-        } else {
-          throw fetchError;
-        }
+  
+      const patientResponse = await fetch(`${API_BASE_URL}/patients`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(patientData)
+      });
+  
+      if (!patientResponse.ok) {
+        const error = await patientResponse.json();
+        throw new Error(error?.detail || 'Failed to create patient');
       }
-      
-      // Calculamos cuánto tiempo ha pasado para mantener un tiempo consistente
-      const elapsedTime = Date.now() - startTime;
-      const remainingTime = Math.max(0, 1500 - elapsedTime);
-      
-      // Limpiar el formulario incluso cuando hay éxito
+  
+      const createdPatient = await patientResponse.json();
+  
+      const therapistAssignments = ['PT', 'OT', 'ST'].filter(d => selectedTherapists[d]);
+      for (let discipline of therapistAssignments) {
+        await fetch(`${API_BASE_URL}/assign_therapist`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            patient_id: createdPatient.id,
+            therapist_id: selectedTherapists[discipline],
+            discipline: discipline.toLowerCase()
+          })
+        });
+      }
+  
+      toast.success('Patient created and assigned successfully!');
       resetForm();
-      
-      // Mostrar mensaje de éxito
-      toast.success('¡Referido de paciente creado exitosamente!');
-      
-      // Regresar al menú principal después del tiempo establecido (constante)
-      setTimeout(() => {
-        setFormSubmitting(false);
-        setCurrentView('menu');
-      }, remainingTime);
-      
+      setCurrentView('menu');
     } catch (error) {
-      console.error('Error al enviar datos del paciente:', error);
-      
-      // Limpiar el formulario incluso cuando hay error
-      resetForm();
-      
-      // Mostrar mensaje de error pero mantener el flujo de UI
-      toast.error(`Error: ${error.message || 'No se pudo crear el referido. Por favor, inténtelo de nuevo.'}`);
-      
-      // Cerramos el indicador de carga después de un tiempo consistente
-      setTimeout(() => {
-        setFormSubmitting(false);
-      }, 1500);
+      console.error('Error during patient creation:', error);
+      toast.error(`Error: ${error.message || 'Could not complete patient creation'}`);
+    } finally {
+      setFormSubmitting(false);
     }
   };
 

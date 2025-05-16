@@ -227,51 +227,76 @@ const AddStaffForm = ({ onCancel, onViewAllStaff }) => {
     setCurrentStep('role');
   };
 
-  // Handle para envío del formulario
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setIsSaving(true);
-    
-    // Guardar nombre para mensaje de éxito
-    setSavedStaffName(formData.role === 'agency' 
-      ? formData.agencyFields.fullName 
-      : `${formData.firstName} ${formData.lastName}`);
-    
-    // Simulación de guardado con mensajes dinámicos
-    const savingMessages = [
-      { message: 'Processing data...', time: 600 },
-      { message: 'Validating information...', time: 800 },
-      { message: 'Uploading documents...', time: 1200 },
-      { message: 'Creating credentials...', time: 700 },
-      { message: formData.role === 'agency' 
-          ? 'Registering agency...' 
-          : `Assigning to ${agencies.find(a => a.id === formData.agency)?.name}...`, 
-        time: 900 },
-      { message: 'Finalizing registration...', time: 1000 }
-    ];
-    
-    let totalTime = 0;
-    
-    savingMessages.forEach((item, index) => {
-      totalTime += item.time;
-      
-      setTimeout(() => {
-        setSavingMessage(item.message);
-        
-        // Al llegar al último mensaje, completar el proceso
-        if (index === savingMessages.length - 1) {
-          setTimeout(() => {
-            // Lógica de envío de datos
-            console.log('Form data:', formData);
-            console.log('Documents:', documents);
-            
-            // Simulación de respuesta API
-            setIsSaving(false);
-            setShowSuccessModal(true);
-          }, 800);
+    setSavedStaffName(`${formData.firstName} ${formData.lastName}`);
+  
+    try {
+      const staffBody = {
+        name: `${formData.firstName} ${formData.lastName}`,
+        postal_code: formData.zipCode,
+        email: formData.email,
+        phone: formData.phone,
+        alt_phone: formData.altPhone,
+        username: formData.userName,
+        password: formData.password,
+        role: formData.role,
+        is_active: true
+      };
+
+      if (formData.dob) {
+        staffBody.birthday = formData.dob;
+      }
+
+      if (formData.gender) {
+        staffBody.gender = formData.gender;
+      }
+  
+      const res = await fetch('http://localhost:8000/staff/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(staffBody)
+      });
+  
+      if (!res.ok) {
+        const error = await res.json();
+        const readable = error?.detail
+          ? Array.isArray(error.detail)
+            ? error.detail.map((e) => `${e.loc?.join('.')} → ${e.msg}`).join('\n')
+            : error.detail
+          : 'Unknown error';
+        throw new Error(`Backend validation error:\n${readable}`);
+      }
+  
+      const staffData = await res.json();
+      const newStaffId = staffData.id;
+  
+      for (const key in documents) {
+        const doc = documents[key];
+        if (doc.file) {
+          const formData = new FormData();
+          formData.append("file", doc.file);
+          formData.append("staff_id", newStaffId);
+  
+          const uploadRes = await fetch("http://localhost:8000/documents/upload", {
+            method: "POST",
+            body: formData
+          });
+  
+          if (!uploadRes.ok) {
+            const uploadError = await uploadRes.json();
+            console.warn(`⚠️ Document '${key}' failed to upload:`, uploadError);
+          }
         }
-      }, totalTime);
-    });
+      }
+  
+      setIsSaving(false);
+      setShowSuccessModal(true);
+    } catch (err) {
+      alert(`Error: ${err.message}`);
+      setIsSaving(false);
+    }
   };
 
   // Seleccionar rol y avanzar al siguiente paso
@@ -298,7 +323,6 @@ const AddStaffForm = ({ onCancel, onViewAllStaff }) => {
     if (onViewAllStaff) {
       onViewAllStaff();
     } else {
-      // Fallback si no se proporciona la función
       onCancel();
     }
   };

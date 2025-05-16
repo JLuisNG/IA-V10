@@ -14,8 +14,14 @@ const DevStaffEditComponent = ({ onBackToOptions, onAddNewStaff }) => {
   const [activeTab, setActiveTab] = useState('info');
   const [showInactive, setShowInactive] = useState(true);
   const [passwordVisible, setPasswordVisible] = useState(false);
-  const [viewMode, setViewMode] = useState('all'); // 'all', 'staff', 'agencies'
+  const [viewMode, setViewMode] = useState('all');
 
+  const buildQueryParams = (params) =>
+    Object.entries(params)
+      .filter(([, value]) => value !== null && value !== undefined && value !== '')
+      .map(([key, value]) => `${encodeURIComponent(key)}=${encodeURIComponent(value)}`)
+      .join('&');
+      
   // Simulación de carga con mensajes dinámicos
   useEffect(() => {
     setIsLoading(true);
@@ -51,298 +57,63 @@ const DevStaffEditComponent = ({ onBackToOptions, onAddNewStaff }) => {
     };
   }, []);
 
-  // Obtener datos del personal - Datos estáticos en lugar de llamada API
-  const fetchStaffData = () => {
-    // Datos mock estáticos (en lugar de llamada API)
-    const mockData = [
-      {
-        id: 1,
-        type: 'staff',
-        firstName: 'John',
-        lastName: 'Davis',
-        dob: '1985-07-15',
-        gender: 'male',
-        email: 'john.davis@therapysync.com',
-        phone: '(310) 555-1234',
-        alternatePhone: '(310) 555-5678',
-        zipCode: '90210',
-        userName: 'johnd',
-        password: 'Password123',
-        role: 'pt',
-        roleDisplay: 'PT - Physical Therapist',
-        agency: {
-          id: 'motive-home-care',
-          name: 'Motive Home Care',
-          address: '1234 Healthcare Blvd, Los Angeles, CA 90001',
-          phone: '(323) 555-7890'
-        },
-        documents: {
-          covidVaccine: { status: 'obtained', file: 'covid_cert.pdf' },
-          tbTest: { status: 'pending', file: null },
-          physicalExam: { status: 'obtained', file: 'physical_exam.pdf' },
-          liabilityInsurance: { status: 'obtained', file: 'insurance.pdf' },
-          driversLicense: { status: 'obtained', file: 'license.pdf' },
-          autoInsurance: { status: 'pending', file: null },
-          cprCertification: { status: 'obtained', file: 'cpr_cert.pdf' },
-          businessLicense: { status: 'pending', file: null }
-        },
-        status: 'active'
-      },
-      {
-        id: 2,
-        type: 'staff',
-        firstName: 'Maria',
-        lastName: 'Rodriguez',
-        dob: '1990-03-20',
-        gender: 'female',
-        email: 'maria.rodriguez@therapysync.com',
-        phone: '(562) 555-6789',
-        alternatePhone: '',
-        zipCode: '90802',
-        userName: 'mariar',
-        password: 'Password123',
-        role: 'ot',
-        roleDisplay: 'OT - Occupational Therapist',
-        agency: {
-          id: 'healing-hands',
-          name: 'Healing Hands Rehabilitation',
-          address: '890 Ocean Ave, Long Beach, CA 90802',
-          phone: '(562) 555-6789'
-        },
-        documents: {
-          covidVaccine: { status: 'obtained', file: 'covid_cert.pdf' },
-          tbTest: { status: 'obtained', file: 'tb_test.pdf' },
-          physicalExam: { status: 'obtained', file: 'physical_exam.pdf' },
-          liabilityInsurance: { status: 'obtained', file: 'insurance.pdf' },
-          driversLicense: { status: 'obtained', file: 'license.pdf' },
-          autoInsurance: { status: 'obtained', file: 'auto_insurance.pdf' },
-          cprCertification: { status: 'obtained', file: 'cpr_cert.pdf' },
-          businessLicense: { status: 'obtained', file: 'license.pdf' }
-        },
-        status: 'active'
-      },
-      {
-        id: 3,
-        type: 'staff',
-        firstName: 'Carlos',
-        lastName: 'Lopez',
-        dob: '1978-11-05',
-        gender: 'male',
-        email: 'carlos.lopez@therapysync.com',
-        phone: '(213) 555-4321',
-        alternatePhone: '(213) 555-8765',
-        zipCode: '90001',
-        userName: 'carlosl',
-        password: 'Password123',
-        role: 'pt',
-        roleDisplay: 'PT - Physical Therapist',
-        agency: {
-          id: 'motive-home-care',
-          name: 'Motive Home Care',
-          address: '1234 Healthcare Blvd, Los Angeles, CA 90001',
-          phone: '(323) 555-7890'
-        },
-        documents: {
-          covidVaccine: { status: 'pending', file: null },
-          tbTest: { status: 'pending', file: null },
-          physicalExam: { status: 'pending', file: null },
-          liabilityInsurance: { status: 'pending', file: null },
-          driversLicense: { status: 'pending', file: null },
-          autoInsurance: { status: 'pending', file: null },
-          cprCertification: { status: 'pending', file: null },
-          businessLicense: { status: 'pending', file: null }
-        },
-        status: 'inactive'
-      },
-      {
-        id: 4,
-        type: 'staff',
-        firstName: 'Sarah',
-        lastName: 'Johnson',
-        dob: '1988-05-12',
-        gender: 'female',
-        email: 'sarah.johnson@therapysync.com',
-        phone: '(714) 555-9876',
-        alternatePhone: '',
-        zipCode: '92805',
-        userName: 'sarahj',
-        password: 'Password123',
-        role: 'st',
-        roleDisplay: 'ST - Speech Therapist',
-        agency: {
-          id: 'wellness-therapy',
-          name: 'Wellness Therapy Services',
-          address: '567 Sunset Blvd, Beverly Hills, CA 90210',
-          phone: '(310) 555-1234'
-        },
-        documents: {
-          covidVaccine: { status: 'pending', file: null },
-          tbTest: { status: 'pending', file: null },
-          physicalExam: { status: 'pending', file: null },
-          liabilityInsurance: { status: 'pending', file: null },
-          driversLicense: { status: 'pending', file: null },
-          autoInsurance: { status: 'pending', file: null },
-          cprCertification: { status: 'pending', file: null },
-          businessLicense: { status: 'pending', file: null }
-        },
-        status: 'active'
-      },
-      {
-        id: 5,
-        type: 'staff',
-        firstName: 'Robert',
-        lastName: 'Smith',
-        dob: '1995-01-25',
-        gender: 'male',
-        email: 'robert.smith@therapysync.com',
-        phone: '(949) 555-5432',
-        alternatePhone: '',
-        zipCode: '92602',
-        userName: 'roberts',
-        password: 'Password123',
-        role: 'pta',
-        roleDisplay: 'PTA - Physical Therapist Assistant',
-        agency: {
-          id: 'wellness-therapy',
-          name: 'Wellness Therapy Services',
-          address: '567 Sunset Blvd, Beverly Hills, CA 90210',
-          phone: '(310) 555-1234'
-        },
-        documents: {
-          covidVaccine: { status: 'pending', file: null },
-          tbTest: { status: 'pending', file: null },
-          physicalExam: { status: 'pending', file: null },
-          liabilityInsurance: { status: 'pending', file: null },
-          driversLicense: { status: 'pending', file: null },
-          autoInsurance: { status: 'pending', file: null },
-          cprCertification: { status: 'pending', file: null },
-          businessLicense: { status: 'pending', file: null }
-        },
-        status: 'inactive'
-      },
-      {
-        id: 6,
-        type: 'staff',
-        firstName: 'Michael',
-        lastName: 'Chen',
-        dob: '1982-09-18',
-        gender: 'male',
-        email: 'michael.chen@therapysync.com',
-        phone: '(626) 555-7890',
-        alternatePhone: '',
-        zipCode: '91106',
-        userName: 'michaelc',
-        password: 'Password123',
-        role: 'developer',
-        roleDisplay: 'Developer',
-        documents: {},
-        status: 'active'
-      },
-      {
-        id: 7,
-        type: 'staff',
-        firstName: 'Jessica',
-        lastName: 'Williams',
-        dob: '1990-12-05',
-        gender: 'female',
-        email: 'jessica.williams@therapysync.com',
-        phone: '(213) 555-3456',
-        alternatePhone: '',
-        zipCode: '90012',
-        userName: 'jessicaw',
-        password: 'Password123',
-        role: 'administrator',
-        roleDisplay: 'Administrator',
-        agency: {
-          id: 'motive-home-care',
-          name: 'Motive Home Care',
-          address: '1234 Healthcare Blvd, Los Angeles, CA 90001',
-          phone: '(323) 555-7890'
-        },
-        documents: {},
-        status: 'active'
-      },
-      {
-        id: 8,
-        type: 'agency',
-        agencyName: 'Motive Home Care',
-        email: 'contact@motivehomecare.com',
-        phone: '(323) 555-7890',
-        address: '1234 Healthcare Blvd, Los Angeles, CA 90001',
-        zipCode: '90001',
-        branches: [
-          {
-            name: 'West LA Branch',
-            address: '5678 Medical Center Dr, Los Angeles, CA 90025',
-            phone: '(310) 555-8877'
-          }
-        ],
-        userName: 'motivehc',
-        password: 'Agency123',
-        documents: {
-          businessLicense: { status: 'obtained', file: 'business_license.pdf' },
-          contractDocument: { status: 'obtained', file: 'contract.pdf' },
-          liabilityInsurance: { status: 'obtained', file: 'liability.pdf' }
-        },
-        role: 'agency',
-        roleDisplay: 'Agency',
-        status: 'active'
-      },
-      {
-        id: 9,
-        type: 'agency',
-        agencyName: 'Wellness Therapy Services',
-        email: 'info@wellnesstherapy.com',
-        phone: '(310) 555-1234',
-        address: '567 Sunset Blvd, Beverly Hills, CA 90210',
-        zipCode: '90210',
-        branches: [],
-        userName: 'wellnesstherapy',
-        password: 'Agency123',
-        documents: {
-          businessLicense: { status: 'obtained', file: 'business_license.pdf' },
-          contractDocument: { status: 'pending', file: null },
-          liabilityInsurance: { status: 'obtained', file: 'liability.pdf' }
-        },
-        role: 'agency',
-        roleDisplay: 'Agency',
-        status: 'active'
-      },
-      {
-        id: 10,
-        type: 'agency',
-        agencyName: 'Healing Hands Rehabilitation',
-        email: 'contact@healinghands.com',
-        phone: '(562) 555-6789',
-        address: '890 Ocean Ave, Long Beach, CA 90802',
-        zipCode: '90802',
-        branches: [
-          {
-            name: 'Lakewood Branch',
-            address: '5280 Faculty Ave, Lakewood, CA 90712',
-            phone: '(562) 555-1122'
-          },
-          {
-            name: 'Signal Hill Branch',
-            address: '2175 Cherry Ave, Signal Hill, CA 90755',
-            phone: '(562) 555-3344'
-          }
-        ],
-        userName: 'healinghands',
-        password: 'Agency123',
-        documents: {
-          businessLicense: { status: 'obtained', file: 'business_license.pdf' },
-          contractDocument: { status: 'obtained', file: 'contract.pdf' },
-          liabilityInsurance: { status: 'obtained', file: 'liability.pdf' }
-        },
-        role: 'agency',
-        roleDisplay: 'Agency',
-        status: 'active'
+  // Obtener datos del personal desde la API
+  const fetchStaffData = async () => {
+    try {
+      const response = await fetch('http://localhost:8000/staff/', {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+  
+      if (!response.ok) {
+        throw new Error('Error al obtener los datos del personal');
       }
-    ];
-    
-    setStaffList(mockData);
-    setFilteredStaff(mockData);
+  
+      const data = await response.json();
+  
+      const adjustedData = data.map(staff => {
+        const [firstName, ...rest] = staff.name?.split(' ') || [''];
+        const lastName = rest.join(' ');
+  
+        return {
+          id: staff.id,
+          firstName: firstName || '',
+          lastName: lastName || '',
+          dob: staff.birthday || '',
+          gender: staff.gender || '',
+          email: staff.email || '',
+          phone: staff.phone || '',
+          alternatePhone: staff.alt_phone || '',
+          zipCode: staff.postal_code || '',
+          address: staff.address || '',
+          userName: staff.username || '',
+          password: '********',
+          role: staff.role || '',
+          roleDisplay: roles.find(r => r.value === staff.role)?.label || staff.role,
+          status: staff.is_active ? 'active' : 'inactive',
+          documents: {
+            covidVaccine: { status: 'pending', file: null },
+            tbTest: { status: 'pending', file: null },
+            physicalExam: { status: 'pending', file: null },
+            liabilityInsurance: { status: 'pending', file: null },
+            driversLicense: { status: 'pending', file: null },
+            autoInsurance: { status: 'pending', file: null },
+            cprCertification: { status: 'pending', file: null },
+            businessLicense: { status: 'pending', file: null }
+          }
+        };
+      });
+  
+      setStaffList(adjustedData);
+      setFilteredStaff(adjustedData);
+    } catch (error) {
+      console.error('Error al obtener la lista de personal:', error);
+      alert('Hubo un error al cargar los datos del personal. Por favor, intenta de nuevo.');
+      setStaffList([]);
+      setFilteredStaff([]);
+    }
   };
 
   // Filtrar y ordenar la lista de personal
@@ -437,6 +208,44 @@ const DevStaffEditComponent = ({ onBackToOptions, onAddNewStaff }) => {
     setEditMode(false);
   };
 
+  // Guardar cambios (crear o actualizar)
+  const handleSaveProfile = async (updatedStaff) => {
+    try {
+      const staffToUpdate = {
+        name: `${updatedStaff.firstName} ${updatedStaff.lastName}`,
+        birthday: updatedStaff.dob || '',
+        gender: updatedStaff.gender || '',
+        postal_code: updatedStaff.zipCode || '',
+        email: updatedStaff.email,
+        phone: updatedStaff.phone || '',
+        alt_phone: updatedStaff.alternatePhone || '',
+        username: updatedStaff.userName,
+        password: updatedStaff.password,
+        role: updatedStaff.role,
+        is_active: updatedStaff.status === 'active'
+      };
+  
+      const queryString = buildQueryParams(staffToUpdate);
+  
+      const response = await fetch(`http://localhost:8000/staff/${updatedStaff.id}?${queryString}`, {
+        method: 'PUT'
+      });
+  
+      if (!response.ok) {
+        const error = await response.json();
+        const readable = error?.detail || 'Error al actualizar los datos del personal';
+        throw new Error(readable);
+      }
+  
+      const data = await response.json();
+      console.log("✅ Staff updated:", data);
+  
+      alert('Los cambios se guardaron correctamente.');
+      handleCloseProfile();
+    } catch (error) {
+      console.error('❌ Error in handleSaveProfile:', error);
+      alert(`Hubo un error al procesar la información del personal.\n${error.message}`);
+    }
   // Toggle visibilidad de contraseña
   const togglePasswordVisibility = () => {
     setPasswordVisible(!passwordVisible);
@@ -486,7 +295,7 @@ const DevStaffEditComponent = ({ onBackToOptions, onAddNewStaff }) => {
     
     handleCloseProfile();
   };
-
+  
   const handleChangeTab = (tab) => {
     setActiveTab(tab);
   };

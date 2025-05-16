@@ -51,23 +51,45 @@ const DevStaffEditComponent = ({ onBackToOptions }) => {
   // Obtener datos del personal desde la API
   const fetchStaffData = async () => {
     try {
-      const response = await fetch('https://api.therapysync.com/v1/staff', {
+      const response = await fetch('http://localhost:8000/staff/', {
         method: 'GET',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer your-auth-token-here' // Este token lo puedes reemplazar según tu sistema de autenticación
+          'Content-Type': 'application/json'
         }
       });
-
+  
       if (!response.ok) {
         throw new Error('Error al obtener los datos del personal');
       }
-
+  
       const data = await response.json();
-      setStaffList(data);
-      setFilteredStaff(data);
+  
+      const adjustedData = data.map(staff => {
+        const [firstName, ...rest] = staff.name?.split(' ') || [''];
+        const lastName = rest.join(' ');
+        return {
+          id: staff.id,
+          firstName,
+          lastName,
+          dob: staff.birthday || '',
+          gender: staff.gender || '',
+          email: staff.email || '',
+          phone: staff.phone || '',
+          alternatePhone: staff.alt_phone || '',
+          zipCode: staff.postal_code || '',
+          address: staff.address || '',
+          userName: staff.username || '',
+          password: '********',
+          role: staff.role || '',
+          roleDisplay: roles.find(r => r.value === staff.role)?.label || staff.role,
+          status: staff.is_active ? 'active' : 'inactive'
+        };
+      });
+  
+      setStaffList(adjustedData);
+      setFilteredStaff(adjustedData);
     } catch (error) {
-      console.error('Error fetching staff data:', error);
+      console.error('Error al obtener la lista de personal:', error);
       alert('Hubo un error al cargar los datos del personal. Por favor, intenta de nuevo.');
       setStaffList([]);
       setFilteredStaff([]);
