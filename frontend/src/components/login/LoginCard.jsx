@@ -1,35 +1,24 @@
 import React, { useState, useEffect } from 'react';
 import Login from './Login';
-import PasswordRecovery from './PasswordRecovery';
+// Removed PasswordRecovery import
 import '../../styles/Login/Login.scss';
 import '../../styles/Login/AuthLoadingModal.scss';
 import '../../styles/Login/PremiumLoadingModal.scss'; 
 import backgroundImg from '../../assets/mountain-7704584_1920.jpg';
 
 const LoginCard = () => {
+  // We keep isFlipped and activeCard for backward compatibility
+  // but we won't use the flipping functionality
   const [isFlipped, setIsFlipped] = useState(false);
-  const [activeCard, setActiveCard] = useState('login'); // 'login', 'recovery'
+  const [activeCard, setActiveCard] = useState('login');
   const currentYear = new Date().getFullYear();
 
   const handleForgotPassword = (e) => {
     if (e) {
       e.preventDefault();
     }
-    setActiveCard('recovery');
-    setIsFlipped(true);
-  };
-
-  const handleBackToLogin = (e) => {
-    if (e) {
-      e.preventDefault();
-    }
-    // Iniciar la animación de volteo
-    setIsFlipped(false);
-    
-    // Después de que termine la animación, actualizamos la tarjeta activa
-    setTimeout(() => {
-      setActiveCard('login');
-    }, 500);
+    // Show an alert instead of flipping to the recovery card
+    alert("Password recovery feature is currently disabled. Please contact your administrator for assistance.");
   };
 
   useEffect(() => {
@@ -84,7 +73,7 @@ const LoginCard = () => {
       
       <div className="login-container">
         <div 
-          className={`login-card ${isFlipped ? 'flipped' : ''} ${activeCard === 'recovery' ? 'flipped-recovery' : ''}`} 
+          className="login-card" 
           id="loginCard"
         >
           {/* Parte frontal (login) */}
@@ -102,20 +91,6 @@ const LoginCard = () => {
                 and{' '}
                 <a href="#" onClick={(e) => e.preventDefault()}>Privacy Policy</a>
               </p>
-            </div>
-          </div>
-          
-          {/* Parte trasera (recuperación de contraseña) */}
-          <div 
-            className="login-card__back password-recovery" 
-            id="passwordRecoveryCard" 
-            style={{ display: activeCard === 'recovery' ? 'block' : 'none' }}
-          >
-            <PasswordRecovery onBackToLogin={handleBackToLogin} />
-            
-            {/* Footer para la pantalla de recuperación */}
-            <div className="terms-footer">
-              <p>© {currentYear} Motive Homecare. All rights reserved.</p>
             </div>
           </div>
         </div>
