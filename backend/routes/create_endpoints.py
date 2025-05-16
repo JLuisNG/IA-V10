@@ -23,6 +23,7 @@ from schemas import (
     NoteSectionCreate, NoteSectionResponse,
     NoteTemplateCreate, NoteTemplateResponse)
 from auth.security import hash_password
+from auth.auth_middleware import role_required, get_current_user
 
 router = APIRouter()
 
@@ -31,7 +32,7 @@ BASE_STORAGE_PATH = "/app/storage/docs"
 #====================== STAFF ======================#
 
 @router.post("/staff/", response_model=StaffResponse)
-def create_staff(staff: StaffCreate, db: Session = Depends(get_db)):
+def create_staff(staff: StaffCreate, db: Session = Depends(get_db), current_user = Depends(role_required(["admin", "Developer"]))):
     existing_email = db.query(Staff).filter(Staff.email == staff.email).first()
     existing_username = db.query(Staff).filter(Staff.username == staff.username).first()
 

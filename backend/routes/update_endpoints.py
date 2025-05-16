@@ -18,6 +18,7 @@ from schemas import (
     NoteTemplateUpdate, NoteTemplateResponse,
     VisitNoteResponse, VisitNoteUpdate)
 from auth.security import hash_password
+from auth.auth_middleware import role_required, get_current_user
 
 router = APIRouter()
 
@@ -37,7 +38,8 @@ def update_staff_info(
     password: Optional[str] = None,
     role: Optional[str] = None,
     is_active: Optional[bool] = None,
-    db: Session = Depends(get_db)
+    db: Session = Depends(get_db),
+    current_user = Depends(role_required(["admin", "Developer", "PT", "PTA", "OT", "COTA", "ST", "STA"]))
 ):
     staff = db.query(Staff).filter(Staff.id == staff_id).first()
     if not staff:
@@ -71,9 +73,10 @@ def update_staff_info(
             setattr(staff, key, value)
 
     if password is not None:
-    if password.strip() == "":
-        raise HTTPException(status_code=400, detail="Password cannot be empty.")
-    staff.password = hash_password(password)
+        if password.strip() == "":
+            raise HTTPException(status_code=400, detail="Password cannot be empty.")
+        from backend.auth.security import hash_password
+        staff.password = hash_password(password)
 
     db.commit()
     db.refresh(staff)

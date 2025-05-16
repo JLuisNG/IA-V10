@@ -30,3 +30,13 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         raise credentials_exception
 
     return user
+
+def role_required(allowed_roles: list[str]):
+    def dependency(current_user: Staff = Depends(get_current_user)):
+        if current_user.role.lower() not in [r.lower() for r in allowed_roles]:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Insufficient permissions"
+            )
+        return current_user
+    return dependency
