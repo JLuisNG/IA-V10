@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-const AuthLoadingModal = ({ isOpen, status, message, onClose, modalType = 'auth' }) => {
+const AuthLoadingModal = ({ isOpen, status, message, onClose, modalType = 'auth', userData = null }) => {
   const [progress, setProgress] = useState(0);
   const [showSpinner, setShowSpinner] = useState(true);
   const [showStatusIcon, setShowStatusIcon] = useState(false);
@@ -92,6 +92,17 @@ const AuthLoadingModal = ({ isOpen, status, message, onClose, modalType = 'auth'
   const displayMessage = status === 'loading' 
     ? steps[currentStep] 
     : message;
+  
+  // Obtener el nombre del usuario si está disponible
+  const getUserName = () => {
+    if (!userData) return 'User';
+    
+    // Primero intenta usar fullname si está disponible
+    if (userData.fullname) return userData.fullname;
+    
+    // Si no, usa el username
+    return userData.username || 'User';
+  };
   
   return (
     <div className={`auth-loading-overlay ${isOpen ? 'show' : ''} ${animateBg ? 'animate-bg' : ''} ${status === 'error' ? 'error-bg' : status === 'success' ? 'success-bg' : ''}`}>
@@ -202,7 +213,7 @@ const AuthLoadingModal = ({ isOpen, status, message, onClose, modalType = 'auth'
           <div className="auth-user-welcome">
             <div className="welcome-message">
               <i className="fas fa-user-check"></i>
-              <span>Welcome back, <strong>User</strong>. Redirecting...</span>
+              <span>Welcome back, <strong>{getUserName()}</strong>. Redirecting...</span>
             </div>
           </div>
         )}
