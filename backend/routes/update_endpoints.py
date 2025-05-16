@@ -17,6 +17,7 @@ from schemas import (
     NoteSectionResponse, NoteSectionUpdate,
     NoteTemplateUpdate, NoteTemplateResponse,
     VisitNoteResponse, VisitNoteUpdate)
+from auth.security import hash_password
 
 router = APIRouter()
 
@@ -53,23 +54,26 @@ def update_staff_info(
             raise HTTPException(status_code=400, detail="Username already registered.")
 
     update_data = {
-        k: v for k, v in {
-            "name": name,
-            "birthday": birthday,
-            "gender": gender,
-            "postal_code": postal_code,
-            "email": email,
-            "phone": phone,
-            "alt_phone": alt_phone,
-            "username": username,
-            "password": password,
-            "role": role,
-            "is_active": is_active
-        }.items() if v is not None
+        "name": name,
+        "birthday": birthday,
+        "gender": gender,
+        "postal_code": postal_code,
+        "email": email,
+        "phone": phone,
+        "alt_phone": alt_phone,
+        "username": username,
+        "role": role,
+        "is_active": is_active
     }
 
     for key, value in update_data.items():
-        setattr(staff, key, value)
+        if value is not None:
+            setattr(staff, key, value)
+
+    if password is not None:
+    if password.strip() == "":
+        raise HTTPException(status_code=400, detail="Password cannot be empty.")
+    staff.password = hash_password(password)
 
     db.commit()
     db.refresh(staff)

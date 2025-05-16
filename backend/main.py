@@ -7,6 +7,7 @@ sys.path.append("/app")
 
 from database.connection import engine, Base
 from database.models import Staff, Patient, CertificationPeriod, Document
+from backend.auth import auth_router
 from routes import create_router, search_router, update_router, delete_router
 
 app = FastAPI()
@@ -34,6 +35,7 @@ app.include_router(create_router)
 app.include_router(search_router)
 app.include_router(update_router)
 app.include_router(delete_router)
+app.include_router(auth_router, prefix="/auth", tags=["Authentication"])
 
 @app.get("/")
 async def root():

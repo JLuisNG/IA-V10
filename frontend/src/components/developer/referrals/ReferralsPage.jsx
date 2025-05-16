@@ -706,6 +706,9 @@ const DevReferralsPage = () => {
     console.log('Form has been reset completely');
   };
   
+  const validateDisciplines = () => {
+    return ['PT', 'OT', 'ST'].some(discipline => selectedDisciplines[discipline]);
+  };
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();

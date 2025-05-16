@@ -22,6 +22,7 @@ from schemas import (
     VisitNoteResponse,
     NoteSectionCreate, NoteSectionResponse,
     NoteTemplateCreate, NoteTemplateResponse)
+from auth.security import hash_password
 
 router = APIRouter()
 
@@ -39,7 +40,12 @@ def create_staff(staff: StaffCreate, db: Session = Depends(get_db)):
     if existing_username:
         raise HTTPException(status_code=400, detail="Username already registered.")
     
-    new_staff = Staff(**staff.dict())
+    hashed_password = hash_password(staff.password)
+
+    staff_data = staff.dict()
+    staff_data["password"] = hashed_password
+
+    new_staff = Staff(**staff_data)
     db.add(new_staff)
     db.commit()
     db.refresh(new_staff)
