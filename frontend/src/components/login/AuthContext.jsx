@@ -1,7 +1,7 @@
 // components/login/AuthContext.jsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import GeolocationService from './GeolocationService';
-import createSessionTimeout from './SessionTimeoutService';
+// Removed createSessionTimeout import entirely
 
 // Create context
 const AuthContext = createContext();
@@ -18,35 +18,8 @@ export const AuthProvider = ({ children }) => {
     error: null
   });
 
-  // Session timeout state
-  const [sessionTimeoutWarning, setSessionTimeoutWarning] = useState({
-    isOpen: false,
-    remainingTime: 60 // Default 60 seconds warning
-  });
-
-  // Session timeout service
-  const sessionTimeout = createSessionTimeout({
-    timeout: 15 * 60 * 1000, // 15 minutes
-    warningTime: 60 * 1000, // 1 minute warning
-    onTimeout: () => {
-      console.log('Session timed out');
-      logout();
-    },
-    onWarning: (remainingSeconds) => {
-      console.log(`Session will timeout in ${remainingSeconds} seconds`);
-      setSessionTimeoutWarning({
-        isOpen: true,
-        remainingTime: remainingSeconds
-      });
-    },
-    onActivityDetected: () => {
-      console.log('User activity detected, hiding warning');
-      setSessionTimeoutWarning({
-        isOpen: false,
-        remainingTime: 60
-      });
-    }
-  });
+  // Removed sessionTimeoutWarning state
+  // Removed sessionTimeout service
 
   // Check for existing auth on mount
   useEffect(() => {
@@ -84,8 +57,7 @@ export const AuthProvider = ({ children }) => {
             error: null
           });
           
-          // Start session timeout tracking
-          sessionTimeout.startTracking();
+          // Removed session tracking start
         } else {
           // No stored auth
           setAuthState({
@@ -111,10 +83,7 @@ export const AuthProvider = ({ children }) => {
     
     checkAuth();
     
-    // Cleanup session tracking on unmount
-    return () => {
-      sessionTimeout.stopTracking();
-    };
+    // Removed cleanup function for session tracking
   }, []);
 
   // Clear auth data from localStorage
@@ -151,8 +120,7 @@ export const AuthProvider = ({ children }) => {
           error: null
         });
         
-        // Start session timeout tracking
-        sessionTimeout.startTracking();
+        // Removed session timeout tracking start
         
         return { success: true };
       } else {
@@ -174,8 +142,7 @@ export const AuthProvider = ({ children }) => {
 
   // Logout function
   const logout = () => {
-    // Stop session tracking
-    sessionTimeout.stopTracking();
+    // Removed session tracking stop
     
     // Clear auth data
     clearAuthData();
@@ -189,27 +156,13 @@ export const AuthProvider = ({ children }) => {
       error: null
     });
     
-    // Close timeout warning if open
-    setSessionTimeoutWarning({
-      isOpen: false,
-      remainingTime: 60
-    });
+    // Removed timeout warning reset
     
     // Redirigir al login
     window.location.href = '/';
   };
 
-  // Extend session
-  const extendSession = () => {
-    console.log('Extending session');
-    sessionTimeout.extendSession();
-    
-    // Hide warning
-    setSessionTimeoutWarning({
-      isOpen: false,
-      remainingTime: 60
-    });
-  };
+  // Removed extendSession function
 
   // Provide auth context
   return (
@@ -221,9 +174,8 @@ export const AuthProvider = ({ children }) => {
         token: authState.token,
         error: authState.error,
         login,
-        logout,
-        sessionTimeoutWarning,
-        extendSession
+        logout
+        // Removed sessionTimeoutWarning and extendSession
       }}
     >
       {children}
