@@ -1,4 +1,4 @@
-// Modified App.jsx with simplified components and session timeout
+// Modified App.jsx - keeps auth functionality but removes timeout UI components
 import React from 'react';
 import { HashRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { AuthProvider } from './components/login/AuthContext';
@@ -6,8 +6,8 @@ import ProtectedRoute from './components/login/ProtectedRoute';
 import RoleBasedRoute from './components/login/RoleBasedRoute';
 import RoleRedirect from './components/login/RoleRedirect';
 import LoginCard from './components/login/LoginCard';
-import ResetVerifyPage from './components/login/ResetVerifyPage';
-import SessionTimeoutContainer from './components/login/SessionTimeoutContainer';
+// Removed ResetVerifyPage import
+// Removed SessionTimeoutContainer import
 
 // Import developer components
 import DevHomePage from './components/developer/welcome/Welcome';
@@ -48,8 +48,8 @@ import FloatingSupportButton from './components/developer/support/FloatingSuppor
 import './styles/Login/Login.scss';
 import './styles/Login/AuthLoadingModal.scss';
 import './styles/Login/PremiumLoadingModal.scss'; 
-import './styles/Login/ResetPassword.scss';
-import './styles/Login/SessionTimeout.scss'; // Nueva importación para el componente de sesión por expirar
+// Removed ResetPassword.scss import
+// Removed SessionTimeout.scss import
 
 // Import Font Awesome
 import '@fortawesome/fontawesome-free/css/all.min.css';
@@ -66,17 +66,12 @@ function App() {
         <Routes>
           {/* Public routes */}
           <Route path="/" element={<LoginCard />} />
-          <Route path="/reset-password" element={<ResetVerifyPage />} />
+          {/* Removed ResetVerifyPage route */}
           
           {/* Protected routes */}
           <Route element={<ProtectedRoute />}>
-            {/* Global session components */}
-            <Route element={
-              <>
-                <SessionTimeoutContainer />
-                <Outlet />
-              </>
-            }>
+            {/* Removed SessionTimeoutContainer and used direct Outlet instead */}
+            <Route element={<Outlet />}>
               {/* Role-based redirect route */}
               <Route path="/home" element={<RoleRedirect />} />
               
