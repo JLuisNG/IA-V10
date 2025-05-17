@@ -61,8 +61,6 @@ const Login = ({ onForgotPassword }) => {
     e.preventDefault();
     if (!validateForm()) return;
   
-    console.log("🟡 Attempting login with:", formData);
-  
     setAuthModal({
       isOpen: true,
       status: 'loading',
@@ -70,90 +68,53 @@ const Login = ({ onForgotPassword }) => {
     });
   
     try {
-      // Paso 1: Login con backend
       const loginRes = await fetch('http://localhost:8000/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          username: formData.username,
-          password: formData.password
-        })
+        body: JSON.stringify(formData)
       });
   
-      const loginText = await loginRes.text();
-      console.log("🔵 Login Response:", loginRes.status, loginText);
+      if (!loginRes.ok) throw new Error('Invalid username or password');
   
-      if (!loginRes.ok) {
-        throw new Error(`Login failed: ${loginRes.status} - ${loginText}`);
-      }
+      const { access_token: token } = await loginRes.json();
+      const { sub: username } = JSON.parse(atob(token.split('.')[1]));
   
-      const loginData = JSON.parse(loginText);
-      const token = loginData.access_token;
-      console.log("🟢 Token received:", token);
-  
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      const username = payload.sub;
-      console.log("🔍 Decoded token username:", username);
-  
-      // Paso 2: Obtener todos los staff y buscar el actual
-      const allStaffRes = await fetch('http://localhost:8000/staff/', {
+      const staffRes = await fetch('http://localhost:8000/staff/', {
         headers: { Authorization: `Bearer ${token}` }
       });
   
-      const staffText = await allStaffRes.text();
-      console.log("📦 All staff response:", allStaffRes.status, staffText);
+      if (!staffRes.ok) throw new Error('Unable to retrieve staff data');
   
-      if (!allStaffRes.ok) {
-        throw new Error(`Failed to fetch staff list: ${allStaffRes.status} - ${staffText}`);
-      }
+      const allStaff = await staffRes.json();
+      const user = allStaff.find(u => u.username === username);
+      if (!user) throw new Error('User not found');
   
-      const allStaff = JSON.parse(staffText);
-      const userData = allStaff.find(u => u.username === username);
-  
-      if (!userData) {
-        throw new Error("User not found in staff list");
-      }
-  
-      console.log("✅ Matched user from staff list:", userData);
-  
-      // Guardar token y user
       localStorage.setItem('auth_token', token);
-      localStorage.setItem('auth_user', JSON.stringify(userData));
-      if (rememberMe) {
-        localStorage.setItem('rememberedUsername', formData.username);
-      } else {
-        localStorage.removeItem('rememberedUsername');
-      }
+      localStorage.setItem('auth_user', JSON.stringify(user));
+      rememberMe
+        ? localStorage.setItem('rememberedUsername', username)
+        : localStorage.removeItem('rememberedUsername');
   
-      // Paso 3: Login dentro del contexto
-      const loginResult = await login({
-        success: true,
-        token,
-        user: userData
-      });
-  
-      if (!loginResult.success) {
-        throw new Error('Login rejected by context: ' + loginResult.error);
-      }
+      const loginResult = await login({ success: true, token, user });
+      if (!loginResult.success) throw new Error('Authentication failed');
   
       setAuthModal({
         isOpen: true,
         status: 'success',
-        message: 'Authentication successful! Redirecting...'
+        message: 'Login successful. Redirecting...'
       });
   
-      const baseRole = userData.role.split(' - ')[0].toLowerCase();
-      setTimeout(() => navigate(`/${baseRole}/homePage`), 2000);
+      const baseRole = user.role.split(' - ')[0].toLowerCase();
+      navigate(`/${baseRole}/homePage`);
   
     } catch (err) {
-      console.error("🔴 Login Error:", err);
       setAuthModal({
         isOpen: true,
         status: 'error',
         message: err.message || 'Login failed'
       });
     }
-  };  
+  };   
   
   return (
     <>
