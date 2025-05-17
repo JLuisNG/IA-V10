@@ -32,7 +32,7 @@ BASE_STORAGE_PATH = "/app/storage/docs"
 #====================== STAFF ======================#
 
 @router.post("/staff/", response_model=StaffResponse)
-def create_staff(staff: StaffCreate, db: Session = Depends(get_db), current_user = Depends(role_required(["admin", "Developer"]))):
+def create_staff(staff: StaffCreate, db: Session = Depends(get_db)):
     existing_email = db.query(Staff).filter(Staff.email == staff.email).first()
     existing_username = db.query(Staff).filter(Staff.username == staff.username).first()
 
@@ -41,7 +41,7 @@ def create_staff(staff: StaffCreate, db: Session = Depends(get_db), current_user
     if existing_username:
         raise HTTPException(status_code=400, detail="Username already registered.")
     
-    hashed_password = hash_password(staff.password)
+    hashed_password = hash_password(staff.password)#
 
     staff_data = staff.dict()
     staff_data["password"] = hashed_password

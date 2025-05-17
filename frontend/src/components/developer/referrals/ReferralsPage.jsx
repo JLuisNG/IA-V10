@@ -14,6 +14,12 @@ import { toast } from 'react-toastify';
 const DevReferralsPage = () => {
   const navigate = useNavigate();
   const { currentUser, logout } = useAuth();
+  const [agencies, setAgencies] = useState([]);
+
+  const [therapists, setTherapists] = useState([]);
+  const [selectedTherapists, setSelectedTherapists] = useState({
+    PT: '', PTA: '', OT: '', COTA: '', ST: '', STA: ''
+  });
   
   // State for UI controls
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -33,8 +39,6 @@ const DevReferralsPage = () => {
   const userMenuRef = useRef(null);
   const containerRef = useRef(null);
   const fileInputRef = useRef(null);
-
-  const API_BASE_URL = 'http://localhost:8000';
   
   // Form data state with added weight and height fields
   const [formData, setFormData] = useState({
@@ -55,23 +59,19 @@ const DevReferralsPage = () => {
     urgencyLevel: 'normal',
     
     // Medical
-    physicianId: '',
-    newPhysician: false,
-    newPhysicianName: '',
-    physicianName: '',
+    physician: '',
     agencyId: '',
     agencyBranch: '',
     nurseManager: '',
-    newNurseManager: '',
     nursingDiagnosis: '',
     pmh: '',
     priorLevelOfFunction: 'To Be Obtained at Evaluation',
     homebound: {},
     wbs: '',
     weight: '',
-    weightUnit: 'lbs', // Default unit for weight
+    weightUnit: 'lbs', 
     height: '',
-    heightUnit: 'ft', // Default unit for height
+    heightUnit: 'ft', 
     
     // Therapy
     reasonsForReferral: {
@@ -86,10 +86,8 @@ const DevReferralsPage = () => {
     disciplines: []
   });
   
-  // Uploaded files state
   const [uploadedFiles, setUploadedFiles] = useState([]);
   
-  // State for disciplines selection
   const [selectedDisciplines, setSelectedDisciplines] = useState({
     PT: false,
     PTA: false,
@@ -98,18 +96,7 @@ const DevReferralsPage = () => {
     ST: false,
     STA: false
   });
-  
-  // State for therapist selection
-  const [selectedTherapists, setSelectedTherapists] = useState({
-    PT: null,
-    PTA: null,
-    OT: null,
-    COTA: null,
-    ST: null,
-    STA: null
-  });
-  
-  // State for adding new nurse manager
+
   const [addingNewManager, setAddingNewManager] = useState(false);
 
   // WBS options from the dropdown
@@ -143,191 +130,55 @@ const DevReferralsPage = () => {
     status: 'online', // online, away, busy, offline
   };
   
-  // =========== API FETCH FUNCTIONS ============
-  // Función para manejar errores de fetch
-  const handleFetchError = (error, context) => {
-    console.error(`Error en ${context}:`, error);
-    return [];
-  };
+//////////////////////////////////////EFECTOS DE LA PAGINA//////////////////////////////////////////
 
-  // Función para obtener el token de autenticación
-  const getAuthHeaders = () => {
-    const token = localStorage.getItem('auth_token') || ''; 
-    return {
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    };
-  };
-
-  // Implementamos un timeout para asegurar que las peticiones no tomen demasiado tiempo
-  const fetchWithTimeout = async (url, options, timeout = 3000) => {
-    const controller = new AbortController();
-    const id = setTimeout(() => controller.abort(), timeout);
-    
-    try {
-      const response = await fetch(url, {
-        ...options,
-        signal: controller.signal
-      });
-      clearTimeout(id);
-      return response;
-    } catch (error) {
-      clearTimeout(id);
-      if (error.name === 'AbortError') {
-        console.log('Request timed out');
-        // En lugar de un error, devolvemos un objeto response simulado
-        return {
-          ok: true,
-          json: async () => ({ data: [] })
-        };
-      }
-      throw error;
-    }
-  };
-
-  // Fetch physicians data from API - con timeout para evitar esperas largas
-  const fetchPhysicians = async () => {
-    try {
-      const response = await fetchWithTimeout(
-        API_ENDPOINTS.PHYSICIANS, 
-        { method: 'GET', headers: getAuthHeaders() }
-      );
-      
-      if (!response.ok) {
-        console.warn(`Error HTTP al cargar médicos: ${response.status}`);
-        return [];
-      }
-      
-      const data = await response.json();
-      return data.data || [];
-    } catch (error) {
-      return handleFetchError(error, 'médicos');
-    }
-  };
-
-  // Fetch agencies data from API - con timeout para evitar esperas largas
-  const fetchAgencies = async () => {
-    try {
-      const response = await fetchWithTimeout(
-        API_ENDPOINTS.AGENCIES, 
-        { method: 'GET', headers: getAuthHeaders() }
-      );
-      
-      if (!response.ok) {
-        console.warn(`Error HTTP al cargar agencias: ${response.status}`);
-        return [];
-      }
-      
-      const data = await response.json();
-      return data.data || [];
-    } catch (error) {
-      return handleFetchError(error, 'agencias');
-    }
-  };
-
-  // Fetch therapists data from API for all disciplines - con timeout para evitar esperas largas
-  const fetchTherapists = async () => {
-    try {
-      const disciplineTypes = ['PT', 'PTA', 'OT', 'COTA', 'ST', 'STA'];
-      
-      // Usando Promise.all con timeouts para cada petición
-      const responses = await Promise.all(
-        disciplineTypes.map(discipline => 
-          fetchWithTimeout(
-            `${API_ENDPOINTS.THERAPISTS}?discipline=${discipline}`, 
-            { method: 'GET', headers: getAuthHeaders() }
-          )
-        )
-      );
-      
-      // Procesamos todas las respuestas
-      const dataPromises = responses.map(async (response, index) => {
-        if (!response.ok) {
-          console.warn(`Error al cargar terapeutas ${disciplineTypes[index]}: ${response.status}`);
-          return { discipline: disciplineTypes[index], data: [] };
-        }
-        
-        try {
-          const data = await response.json();
-          return { discipline: disciplineTypes[index], data: data.data || [] };
-        } catch (e) {
-          console.warn(`Error al procesar datos JSON para ${disciplineTypes[index]}:`, e);
-          return { discipline: disciplineTypes[index], data: [] };
-        }
-      });
-      
-      const results = await Promise.all(dataPromises);
-      
-      // Formateamos los resultados en el objeto que espera el componente
-      const therapistsByDiscipline = {};
-      results.forEach(result => {
-        therapistsByDiscipline[result.discipline] = result.data;
-      });
-      
-      return therapistsByDiscipline;
-    } catch (error) {
-      console.error('Error fetching therapists:', error);
-      // Datos de respaldo en caso de error
-      return {
-        PT: [{ id: 1, name: 'Willie Blackwell' }, { id: 2, name: 'Emily Rounds' }],
-        PTA: [{ id: 3, name: 'Carlo Gianzon' }, { id: 4, name: 'Anna Lamport' }],
-        OT: [{ id: 5, name: 'James Lee' }, { id: 6, name: 'Richard Lai' }],
-        COTA: [{ id: 7, name: 'Carla Gianzon' }, { id: 8, name: 'Michelle De La Cruz' }],
-        ST: [{ id: 9, name: 'Junni Smith' }, { id: 10, name: 'Arya Patel' }],
-        STA: [{ id: 11, name: 'Thomas Garcia' }, { id: 12, name: 'Elizabeth Taylor' }]
-      };
-    }
-  };
-  
-  // State for data from APIs
-  const [physicians, setPhysicians] = useState([]);
-  const [agencies, setAgencies] = useState([]);
-  const [therapists, setTherapists] = useState({
-    PT: [], PTA: [], OT: [], COTA: [], ST: [], STA: []
-  });
-
-  // Función para cargar datos iniciales - optimizada para tiempos de carga rápidos
-  // CLAVE: Esta función ahora tiene un timeout para evitar que la página se quede cargando demasiado tiempo
-  const loadInitialData = async () => {
-    try {
-      // Iniciar un temporizador para asegurar que la carga no tarde más de lo necesario
-      const timeoutId = setTimeout(() => {
-        // Si el timeout se dispara, simplemente desactivamos el estado de carga
-        setIsLoading(false);
-      }, 800); // Mismo tiempo del primer código
-      
-      // Realizamos las llamadas API en paralelo
-      const [physicianData, agencyData, therapistData] = await Promise.all([
-        fetchPhysicians(),
-        fetchAgencies(),
-        fetchTherapists()
-      ]);
-      
-      // Limpiamos el timeout ya que las peticiones terminaron
-      clearTimeout(timeoutId);
-      
-      // Actualizamos los estados con los datos recibidos
-      setPhysicians(physicianData);
-      setAgencies(agencyData);
-      setTherapists(therapistData);
-      
-      // Desactivamos el indicador de carga después del tiempo establecido
-      setTimeout(() => {
-        setIsLoading(false);
-      }, 800); // Mismo tiempo del primer código
-      
-    } catch (error) {
-      console.error('Error cargando datos iniciales:', error);
-      // En caso de error, también garantizamos que la UI no se quede en estado de carga
-      setIsLoading(false);
-    }
-  };
-  
-  // Fetch data on component mount
+  // Para la carga del screen principal
   useEffect(() => {
-    loadInitialData();
+    const timeout = setTimeout(() => {
+      setIsLoading(false);
+    }, 1000);
+
+    return () => clearTimeout(timeout); 
   }, []);
+
+  // Agencias del dropdown menu
+  useEffect(() => {
+    const fetchAgencies = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/staff');
+        if (!response.ok) throw new Error('Failed to fetch staff');
+        const data = await response.json();
   
+        const agenciesOnly = data.filter(person => person.role === 'agency');
+        setAgencies(agenciesOnly);
+      } catch (error) {
+        console.error('Error loading agencies:', error);
+        toast.error('Error loading agencies');
+      }
+    };
+  
+    fetchAgencies();
+  }, []);
+
+  // Therapists del dropdown menu
+  useEffect(() => {
+    const fetchTherapists = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/staff");
+        if (!response.ok) throw new Error("Failed to fetch therapists");
+        const data = await response.json();
+        const therapistRoles = ['pt', 'pta', 'ot', 'cota', 'st', 'sta'];
+        const filtered = data.filter(person => therapistRoles.includes(person.role.toLowerCase()));
+        setTherapists(filtered);
+      } catch (error) {
+        console.error("Error loading therapists:", error);
+        toast.error("Error loading therapists");
+      }
+    };
+  
+    fetchTherapists();
+  }, []);
+
   // Effect for handling clicks outside user menu
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -371,6 +222,90 @@ const DevReferralsPage = () => {
     }
   }, [formData.certPeriodStart]);
   
+/////////////////////////// HANDLE BUTTONS /////////////////////////////////////////////////////
+
+  // Form submision
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (isLoggingOut) return;
+  
+    try {
+      setFormSubmitting(true);
+  
+      // Paso 1: Crear paciente
+      const patientPayload = {
+        full_name: `${formData.firstName} ${formData.lastName}`,
+        birthday: formData.dob,
+        gender: formData.gender,
+        address: formData.address,
+        contact_info: JSON.stringify(formData.contactNumbers),
+        payor_type: formData.payorType,
+        physician: formData.physician,
+        agency_id: parseInt(formData.agencyId),
+        nursing_diagnosis: formData.nursingDiagnosis,
+        urgency_level: formData.urgencyLevel,
+        prior_level_of_function: formData.priorLevelOfFunction,
+        homebound_status: JSON.stringify(formData.homebound),
+        weight_bearing_status: formData.wbs,
+        referral_reason: JSON.stringify(formData.reasonsForReferral),
+        weight: `${formData.weight} ${formData.weightUnit}`,
+        height: `${formData.height} ${formData.heightUnit}`,
+        past_medical_history: formData.pmh,
+        initial_cert_start_date: formData.certPeriodStart
+      };
+  
+      const createRes = await fetch('http://localhost:8000/patients/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(patientPayload),
+      });
+  
+      if (!createRes.ok) throw new Error('Failed to create patient');
+  
+      const createdPatient = await createRes.json();
+      const patientId = createdPatient.id;
+  
+      // Paso 2: Asignar terapeutas
+      const assignPromises = Object.entries(selectedTherapists).map(([discipline, staffId]) => {
+        if (staffId) {
+          return fetch(`http://localhost:8000/assign-staff?patient_id=${patientId}&staff_id=${parseInt(staffId)}`, {
+            method: 'POST'
+          });
+        }
+        return null;
+      });
+  
+      const assignmentResults = await Promise.all(assignPromises.filter(Boolean));
+      if (assignmentResults.some(r => !r.ok)) throw new Error('Error assigning therapist(s)');
+  
+      // Paso 3: Subir documentos
+      for (let file of uploadedFiles) {
+        const formDataDoc = new FormData();
+        formDataDoc.append('file', file);
+        formDataDoc.append('patient_id', patientId);
+  
+        const uploadRes = await fetch('http://localhost:8000/documents/upload', {
+          method: 'POST',
+          body: formDataDoc
+        });
+  
+        if (!uploadRes.ok) {
+          console.error(await uploadRes.text());
+          throw new Error('Error uploading document');
+        }
+      }
+  
+      toast.success("Patient created successfully");
+      resetForm();
+      setCurrentView("menu");
+    } catch (error) {
+      console.error(error);
+      toast.error("Error creating patient");
+    } finally {
+      setFormSubmitting(false);
+    }
+  };
+
   // Handle logout with animation
   const handleLogout = () => {
     setIsLoggingOut(true);
@@ -481,20 +416,6 @@ const DevReferralsPage = () => {
     }
   };
   
-  // Handle physician selection
-  const handlePhysicianChange = (e) => {
-    if (isLoggingOut) return;
-    
-    const physicianId = e.target.value;
-    
-    setFormData(prev => ({
-      ...prev,
-      physicianId,
-      newPhysician: physicianId === 'new',
-      newPhysicianName: ''
-    }));
-  };
-  
   // Handle agency selection
   const handleAgencyChange = (e) => {
     if (isLoggingOut) return;
@@ -510,29 +431,6 @@ const DevReferralsPage = () => {
     }));
     
     setAddingNewManager(false);
-  };
-
-  // Handle nurse manager selection
-  const handleNurseManagerChange = (e) => {
-    if (isLoggingOut) return;
-    
-    const value = e.target.value;
-    
-    if (value === 'new') {
-      setAddingNewManager(true);
-      setFormData(prev => ({
-        ...prev,
-        nurseManager: 'new',
-        newNurseManager: ''
-      }));
-    } else {
-      setAddingNewManager(false);
-      setFormData(prev => ({
-        ...prev,
-        nurseManager: value,
-        newNurseManager: ''
-      }));
-    }
   };
   
   // Handle homebound option changes
@@ -583,147 +481,11 @@ const DevReferralsPage = () => {
   // Handle therapist selection
   const handleTherapistSelection = (discipline, therapistId) => {
     if (isLoggingOut) return;
-    
+  
     setSelectedTherapists(prev => ({
       ...prev,
       [discipline]: therapistId
     }));
-  };
-  
-  // Get selected agency
-  const getSelectedAgency = () => {
-    return agencies.find(agency => agency.id?.toString() === formData.agencyId);
-  };
-
-  // =========== API DATA PREPARATION AND SUBMISSION ============
-  // Prepare data for API submission
-  const preparePatientData = () => {
-    // Get selected therapists with names
-    const selectedTherapistsWithNames = {};
-    Object.keys(selectedTherapists).forEach(discipline => {
-      if (selectedTherapists[discipline]) {
-        const therapistId = selectedTherapists[discipline];
-        const therapist = therapists[discipline].find(t => t.id?.toString() === therapistId?.toString());
-        if (therapist) {
-          selectedTherapistsWithNames[discipline] = {
-            id: therapistId,
-            name: therapist.name
-          };
-        }
-      }
-    });
-
-    // Convert homebound options to array
-    const homeboundReasons = Object.keys(formData.homebound)
-      .filter(key => formData.homebound[key])
-      .map(key => {
-        if (key === 'other' && formData.homebound.otherReason) {
-          return `Other: ${formData.homebound.otherReason}`;
-        }
-        return key;
-      });
-
-    // Convert reasons for referral to array
-    const referralReasons = Object.keys(formData.reasonsForReferral)
-      .filter(key => key !== 'additional' && formData.reasonsForReferral[key])
-      .map(key => {
-        switch(key) {
-          case 'strength_balance': return 'Decreased Strength / Balance';
-          case 'gait': return 'Decreased Gait Ability';
-          case 'adls': return 'ADLs';
-          case 'orthopedic': return 'Orthopedic Operation';
-          case 'neurological': return 'Neurological / Cognitive';
-          case 'wheelchair': return 'Wheelchair Evaluation';
-          default: return key;
-        }
-      });
-
-    // Add additional reasons if any
-    if (formData.reasonsForReferral.additional) {
-      referralReasons.push(`Additional: ${formData.reasonsForReferral.additional}`);
-    }
-
-    // Prepare physician data
-    let physicianData = null;
-    if (formData.newPhysician && formData.newPhysicianName) {
-      physicianData = {
-        isNew: true,
-        name: formData.newPhysicianName
-      };
-    } else if (formData.physicianName) {
-      physicianData = {
-        isNew: false,
-        name: formData.physicianName
-      };
-    }
-
-    // Prepare agency data
-    let agencyData = null;
-    if (formData.agencyId) {
-      const agency = agencies.find(a => a.id?.toString() === formData.agencyId?.toString());
-      if (agency) {
-        agencyData = {
-          id: agency.id,
-          name: agency.name,
-          branch: formData.agencyBranch || null
-        };
-      }
-    }
-
-    // Prepare nurse manager data
-    let nurseManagerData = null;
-    if (addingNewManager && formData.newNurseManager) {
-      nurseManagerData = {
-        isNew: true,
-        name: formData.newNurseManager
-      };
-    } else if (formData.nurseManager && formData.nurseManager !== 'new') {
-      nurseManagerData = {
-        isNew: false,
-        name: formData.nurseManager
-      };
-    }
-
-    // Format height and weight with units
-    const formattedWeight = formData.weight ? `${formData.weight} ${formData.weightUnit}` : null;
-    const formattedHeight = formData.height ? `${formData.height} ${formData.heightUnit}` : null;
-
-    // Build the complete patient data object
-    return {
-      personal_info: {
-        first_name: formData.firstName,
-        last_name: formData.lastName,
-        date_of_birth: formData.dob,
-        gender: formData.gender,
-        address: formData.address,
-        city: formData.city,
-        zip_code: formData.zipCode,
-        contact_numbers: formData.contactNumbers.filter(num => num.trim() !== '')
-      },
-      care_period: {
-        payor_type: formData.payorType,
-        cert_period_start: formData.certPeriodStart,
-        cert_period_end: formData.certPeriodEnd,
-        urgency_level: formData.urgencyLevel
-      },
-      medical_info: {
-        physician: physicianData,
-        agency: agencyData,
-        nurse_manager: nurseManagerData,
-        nursing_diagnosis: formData.nursingDiagnosis,
-        past_medical_history: formData.pmh,
-        prior_level_of_function: formData.priorLevelOfFunction,
-        homebound_reasons: homeboundReasons,
-        weight_bearing_status: formData.wbs,
-        weight: formattedWeight,
-        height: formattedHeight
-      },
-      therapy_info: {
-        reasons_for_referral: referralReasons,
-        disciplines: formData.disciplines,
-        assigned_therapists: selectedTherapistsWithNames
-      }
-    };
   };
   
   // Reset form to initial state
@@ -742,10 +504,7 @@ const DevReferralsPage = () => {
       certPeriodStart: '',
       certPeriodEnd: '',
       urgencyLevel: 'normal',
-      physicianId: '',
-      newPhysician: false,
-      newPhysicianName: '',
-      physicianName: '',
+      physician: '',
       agencyId: '',
       agencyBranch: '',
       nurseManager: '',
@@ -782,7 +541,7 @@ const DevReferralsPage = () => {
     });
     
     // Reset therapist selections
-    setSelectedTherapists({
+    setTherapists({
       PT: null,
       PTA: null,
       OT: null,
@@ -798,106 +557,6 @@ const DevReferralsPage = () => {
     setAddingNewManager(false);
     
     console.log('Form has been reset completely');
-  };
-  
-  // Handle form submission con tiempos optimizados
-  const validateDisciplines = () => {
-    return ['PT', 'OT', 'ST'].some(discipline => selectedDisciplines[discipline]);
-  };
-  // Handle form submission
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (isLoggingOut) return;
-  
-    if (!validateDisciplines()) {
-      toast.error('Por favor, seleccione al menos una disciplina (PT, PTA, OT, COTA, ST, o STA)');
-      return;
-    }
-  
-    const hasAllTherapistsSelected = Object.keys(selectedDisciplines)
-      .filter(d => selectedDisciplines[d] && ['PT', 'OT', 'ST'].includes(d))
-      .every(d => selectedTherapists[d]);
-  
-    if (!hasAllTherapistsSelected) {
-      toast.error('Por favor, seleccione un terapeuta para cada disciplina seleccionada');
-      toast.error('Select a therapist for each selected main discipline (PT, OT, ST)');
-      return;
-    }
-    
-    // Validate weight and height
-    if (formData.weight && isNaN(formData.weight)) {
-      toast.error('Por favor, ingrese un número válido para el Peso');
-      return;
-    }
-    if (formData.height && isNaN(formData.height)) {
-      toast.error('Por favor, ingrese un número válido para la Altura');
-      return;
-    }
-    
-    // Show loading screen
-  
-    setFormSubmitting(true);
-  
-    try {
-      const patientData = preparePatientData();
-      let documentIds = [];
-  
-      if (uploadedFiles.length > 0) {
-        const formDataUpload = new FormData();
-        uploadedFiles.forEach(file => formDataUpload.append('files', file));
-  
-        const docResponse = await fetch(`${API_BASE_URL}/documents/upload`, {
-          method: 'POST',
-          body: formDataUpload
-        });
-  
-        if (docResponse.ok) {
-          const result = await docResponse.json();
-          documentIds = result.document_ids || [];
-        } else {
-          console.warn('Documents failed to upload.');
-        }
-      }
-  
-      if (documentIds.length > 0) {
-        patientData.documents = documentIds;
-      }
-  
-      const patientResponse = await fetch(`${API_BASE_URL}/patients`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(patientData)
-      });
-  
-      if (!patientResponse.ok) {
-        const error = await patientResponse.json();
-        throw new Error(error?.detail || 'Failed to create patient');
-      }
-  
-      const createdPatient = await patientResponse.json();
-  
-      const therapistAssignments = ['PT', 'OT', 'ST'].filter(d => selectedTherapists[d]);
-      for (let discipline of therapistAssignments) {
-        await fetch(`${API_BASE_URL}/assign_therapist`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            patient_id: createdPatient.id,
-            therapist_id: selectedTherapists[discipline],
-            discipline: discipline.toLowerCase()
-          })
-        });
-      }
-  
-      toast.success('Patient created and assigned successfully!');
-      resetForm();
-      setCurrentView('menu');
-    } catch (error) {
-      console.error('Error during patient creation:', error);
-      toast.error(`Error: ${error.message || 'Could not complete patient creation'}`);
-    } finally {
-      setFormSubmitting(false);
-    }
   };
 
   // Cancel creating referral and go back to menu
@@ -919,6 +578,8 @@ const DevReferralsPage = () => {
     setCurrentView('menu');
     resetForm();
   };
+
+////////////////////////////////HTML DE LA PAGINA////////////////////////////////////////////////
 
   // Homebound options
   const homeboundOptions = [
@@ -1247,7 +908,7 @@ const DevReferralsPage = () => {
               </button>
             </div>
             
-            {/* Patient Referral Form */}
+            {/* Formulario para crear paciente*/}
             <form className="patient-referral-form" onSubmit={handleSubmit}>
               {/* Patient Information Section */}
               <div className="form-section">
@@ -1491,12 +1152,11 @@ const DevReferralsPage = () => {
                 
                 <div className="form-grid">
                   <div className="form-group">
-                    <label htmlFor="physicianName">Physician</label>
+                    <label htmlFor="physician">Physician</label>
                     <input
                       type="text"
-                      id="physicianName"
-                      name="physicianName"
-                      value={formData.physicianName || ''}
+                      name="physician"
+                      value={formData.physician || ''}
                       onChange={handleInputChange}
                       placeholder="Enter physician name"
                       required
@@ -1504,33 +1164,17 @@ const DevReferralsPage = () => {
                     />
                   </div>
                   
-                  {formData.newPhysician && (
-                    <div className="form-group">
-                      <label htmlFor="newPhysicianName">New Physician Name</label>
-                      <input
-                        type="text"
-                        id="newPhysicianName"
-                        name="newPhysicianName"
-                        value={formData.newPhysicianName}
-                        onChange={handleInputChange}
-                        required
-                        disabled={isLoggingOut}
-                      />
-                    </div>
-                  )}
-                  
                   <div className="form-group">
                     <label htmlFor="agencyId">Agency</label>
-                    <select
-                      id="agencyId"
-                      name="agencyId"
-                      value={formData.agencyId}
-                      onChange={handleAgencyChange}
+                    <select 
+                      name="agencyId" 
+                      value={formData.agencyId} 
+                      onChange={handleAgencyChange} 
+                      className="form-select"
                       required
-                      disabled={isLoggingOut}
                     >
                       <option value="">Select Agency</option>
-                      {agencies.map(agency => (
+                      {agencies.map((agency) => (
                         <option key={agency.id} value={agency.id}>
                           {agency.name}
                         </option>
@@ -1542,20 +1186,15 @@ const DevReferralsPage = () => {
                     <>
                       <div className="form-group">
                         <label htmlFor="agencyBranch">Agency Branch</label>
-                        <select
-                          id="agencyBranch"
-                          name="agencyBranch"
-                          value={formData.agencyBranch}
-                          onChange={handleInputChange}
-                          required
-                          disabled={isLoggingOut}
-                        >
-                          <option value="">Select Branch</option>
-                          {getSelectedAgency()?.branches?.map((branch, index) => (
-                            <option key={index} value={branch}>
-                              {branch}
-                            </option>
-                          ))}
+                        <select 
+                          id="agencyBranch" 
+                          name="agencyBranch" 
+                          value={formData.agencyBranch} 
+                          onChange={handleInputChange} 
+                          disabled={isLoggingOut} 
+                        > 
+                          <option value="">Select Branch</option> 
+                          <option value="placeholder">Seleccione una sucursal</option>
                         </select>
                       </div>
                       
@@ -1829,19 +1468,20 @@ const DevReferralsPage = () => {
                           {selectedDisciplines.PT && (
                             <div className="therapist-select">
                               <label htmlFor="pt-therapist">PT Therapist</label>
-                              <select
-                                id="pt-therapist"
-                                value={selectedTherapists.PT || ''}
+                              <select 
+                                id="pt-therapist" 
+                                value={selectedTherapists.PT || ''} 
                                 onChange={(e) => handleTherapistSelection('PT', e.target.value)}
                                 required
-                                disabled={isLoggingOut}
                               >
                                 <option value="">Select PT Therapist</option>
-                                {therapists.PT.map(therapist => (
-                                  <option key={therapist.id} value={therapist.id}>
-                                    {therapist.name}
-                                  </option>
-                                ))}
+                                {therapists
+                                  .filter(t => t.role.toLowerCase() === 'pt')
+                                  .map(t => (
+                                    <option key={t.id} value={t.id}>
+                                      {t.name}
+                                    </option>
+                                  ))}
                               </select>
                             </div>
                           )}
@@ -1850,19 +1490,20 @@ const DevReferralsPage = () => {
                           {selectedDisciplines.PTA && (
                             <div className="therapist-select">
                               <label htmlFor="pta-therapist">PTA Therapist</label>
-                              <select
-                                id="pta-therapist"
-                                value={selectedTherapists.PTA || ''}
+                              <select 
+                                id="pta-therapist" 
+                                value={selectedTherapists.PTA || ''} 
                                 onChange={(e) => handleTherapistSelection('PTA', e.target.value)}
                                 required
-                                disabled={isLoggingOut}
                               >
                                 <option value="">Select PTA Therapist</option>
-                                {therapists.PTA.map(therapist => (
-                                  <option key={therapist.id} value={therapist.id}>
-                                    {therapist.name}
-                                  </option>
-                                ))}
+                                {therapists
+                                  .filter(t => t.role.toLowerCase() === 'pta')
+                                  .map(t => (
+                                    <option key={t.id} value={t.id}>
+                                      {t.name}
+                                    </option>
+                                  ))}
                               </select>
                             </div>
                           )}
@@ -1895,19 +1536,20 @@ const DevReferralsPage = () => {
                           {selectedDisciplines.OT && (
                             <div className="therapist-select">
                               <label htmlFor="ot-therapist">OT Therapist</label>
-                              <select
-                                id="ot-therapist"
-                                value={selectedTherapists.OT || ''}
+                              <select 
+                                id="ot-therapist" 
+                                value={selectedTherapists.OT || ''} 
                                 onChange={(e) => handleTherapistSelection('OT', e.target.value)}
                                 required
-                                disabled={isLoggingOut}
                               >
                                 <option value="">Select OT Therapist</option>
-                                {therapists.OT.map(therapist => (
-                                  <option key={therapist.id} value={therapist.id}>
-                                    {therapist.name}
-                                  </option>
-                                ))}
+                                {therapists
+                                  .filter(t => t.role.toLowerCase() === 'ot')
+                                  .map(t => (
+                                    <option key={t.id} value={t.id}>
+                                      {t.name}
+                                    </option>
+                                  ))}
                               </select>
                             </div>
                           )}
@@ -1916,19 +1558,20 @@ const DevReferralsPage = () => {
                           {selectedDisciplines.COTA && (
                             <div className="therapist-select">
                               <label htmlFor="cota-therapist">COTA Therapist</label>
-                              <select
-                                id="cota-therapist"
-                                value={selectedTherapists.COTA || ''}
+                              <select 
+                                id="cota-therapist" 
+                                value={selectedTherapists.COTA || ''} 
                                 onChange={(e) => handleTherapistSelection('COTA', e.target.value)}
                                 required
-                                disabled={isLoggingOut}
                               >
                                 <option value="">Select COTA Therapist</option>
-                                {therapists.COTA.map(therapist => (
-                                  <option key={therapist.id} value={therapist.id}>
-                                    {therapist.name}
-                                  </option>
-                                ))}
+                                {therapists
+                                  .filter(t => t.role.toLowerCase() === 'cota')
+                                  .map(t => (
+                                    <option key={t.id} value={t.id}>
+                                      {t.name}
+                                    </option>
+                                  ))}
                               </select>
                             </div>
                           )}
@@ -1961,19 +1604,20 @@ const DevReferralsPage = () => {
                           {selectedDisciplines.ST && (
                             <div className="therapist-select">
                               <label htmlFor="st-therapist">ST Therapist</label>
-                              <select
-                                id="st-therapist"
-                                value={selectedTherapists.ST || ''}
+                              <select 
+                                id="st-therapist" 
+                                value={selectedTherapists.ST || ''} 
                                 onChange={(e) => handleTherapistSelection('ST', e.target.value)}
                                 required
-                                disabled={isLoggingOut}
                               >
                                 <option value="">Select ST Therapist</option>
-                                {therapists.ST.map(therapist => (
-                                  <option key={therapist.id} value={therapist.id}>
-                                    {therapist.name}
-                                  </option>
-                                ))}
+                                {therapists
+                                  .filter(t => t.role.toLowerCase() === 'st')
+                                  .map(t => (
+                                    <option key={t.id} value={t.id}>
+                                      {t.name}
+                                    </option>
+                                  ))}
                               </select>
                             </div>
                           )}
@@ -1982,19 +1626,20 @@ const DevReferralsPage = () => {
                           {selectedDisciplines.STA && (
                             <div className="therapist-select">
                               <label htmlFor="sta-therapist">STA Therapist</label>
-                              <select
-                                id="sta-therapist"
-                                value={selectedTherapists.STA || ''}
+                              <select 
+                                id="sta-therapist" 
+                                value={selectedTherapists.STA || ''} 
                                 onChange={(e) => handleTherapistSelection('STA', e.target.value)}
                                 required
-                                disabled={isLoggingOut}
                               >
                                 <option value="">Select STA Therapist</option>
-                                {therapists.STA.map(therapist => (
-                                  <option key={therapist.id} value={therapist.id}>
-                                    {therapist.name}
-                                  </option>
-                                ))}
+                                {therapists
+                                  .filter(t => t.role.toLowerCase() === 'sta')
+                                  .map(t => (
+                                    <option key={t.id} value={t.id}>
+                                      {t.name}
+                                    </option>
+                                  ))}
                               </select>
                             </div>
                           )}

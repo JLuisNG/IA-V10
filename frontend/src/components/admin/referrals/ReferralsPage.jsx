@@ -127,28 +127,6 @@ const AdminReferralsPage = () => {
     status: 'online', // online, away, busy, offline
   };
   
-  // Mock data for selects
-  const physicians = [
-    { id: 1, name: 'James Wilson' },
-    { id: 2, name: 'Sarah Parker' },
-    { id: 3, name: 'Michael Chen' }
-  ];
-  
-  const agencies = [
-    { id: 1, name: 'Destiny Home Health', branches: ['Branch A', 'Branch B'], managers: ['Manager 1', 'Manager 2'] },
-    { id: 2, name: 'Unison Health Services', branches: ['Branch C', 'Branch D'], managers: ['Manager 3', 'Manager 4'] },
-    { id: 3, name: 'Supportive Home Health', branches: ['Branch E', 'Branch F'], managers: ['Manager 5', 'Manager 6'] }
-  ];
-  
-  const therapists = {
-    PT: [{ id: 1, name: 'Willie Blackwell' }, { id: 2, name: 'Emily Rounds' }],
-    PTA: [{ id: 3, name: 'Carlo Gianzon' }, { id: 4, name: 'Anna Lamport' }],
-    OT: [{ id: 5, name: 'James Lee' }, { id: 6, name: 'Richard Lai' }],
-    COTA: [{ id: 7, name: 'Carla Gianzon' }, { id: 8, name: 'Michelle De La Cruz' }],
-    ST: [{ id: 9, name: 'Junni...' }, { id: 10, name: 'Arya ...' }],
-    STA: [{ id: 11, name: 'Thomas Garcia (STA)' }, { id: 12, name: 'Elizabeth Taylor (STA)' }]
-  };
-  
   // Effect for simulating loading state
   useEffect(() => {
     const timer = setTimeout(() => {

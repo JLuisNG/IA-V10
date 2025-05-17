@@ -39,7 +39,6 @@ def update_staff_info(
     role: Optional[str] = None,
     is_active: Optional[bool] = None,
     db: Session = Depends(get_db),
-    current_user = Depends(role_required(["admin", "Developer", "PT", "PTA", "OT", "COTA", "ST", "STA"]))
 ):
     staff = db.query(Staff).filter(Staff.id == staff_id).first()
     if not staff:
