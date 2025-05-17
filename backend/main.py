@@ -7,7 +7,7 @@ sys.path.append("/app")
 
 from database.connection import engine, Base
 from database.models import Staff, Patient, CertificationPeriod, Document
-from backend.auth import auth_router
+from auth import auth_router
 from routes import create_router, search_router, update_router, delete_router
 
 app = FastAPI()

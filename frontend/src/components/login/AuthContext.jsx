@@ -1,12 +1,8 @@
 // components/login/AuthContext.jsx
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import GeolocationService from './GeolocationService';
-// Removed createSessionTimeout import entirely
 
-// Create context
 const AuthContext = createContext();
-
-// Custom hook to use the auth context
 export const useAuth = () => useContext(AuthContext);
 
 export const AuthProvider = ({ children }) => {
@@ -18,136 +14,78 @@ export const AuthProvider = ({ children }) => {
     error: null
   });
 
-  // Removed sessionTimeoutWarning state
-  // Removed sessionTimeout service
-
-  // Check for existing auth on mount
   useEffect(() => {
-    const checkAuth = async () => {
+    const token = localStorage.getItem('auth_token');
+    const userData = localStorage.getItem('auth_user');
+
+    if (token && userData) {
       try {
-        // Check localStorage for token
-        const token = localStorage.getItem('auth_token');
-        const userData = localStorage.getItem('auth_user');
-        
-        if (token && userData) {
-          // Verify geolocation before restoring session
-          const geoResult = await GeolocationService.verifyLocationAccess();
-          
-          if (!geoResult.allowed) {
-            // Location restricted, log out
-            clearAuthData();
-            setAuthState({
-              isAuthenticated: false,
-              loading: false,
-              currentUser: null,
-              token: null,
-              error: 'Geographic restriction'
-            });
-            return;
-          }
-          
-          // Restore user data
-          const user = JSON.parse(userData);
-          
-          setAuthState({
-            isAuthenticated: true,
-            loading: false,
-            currentUser: user,
-            token: token,
-            error: null
-          });
-          
-          // Removed session tracking start
-        } else {
-          // No stored auth
-          setAuthState({
-            isAuthenticated: false,
-            loading: false,
-            currentUser: null,
-            token: null,
-            error: null
-          });
-        }
-      } catch (error) {
-        console.error('Error checking auth:', error);
-        clearAuthData();
+        const user = JSON.parse(userData);
         setAuthState({
-          isAuthenticated: false,
+          isAuthenticated: true,
           loading: false,
-          currentUser: null,
-          token: null,
-          error: 'Authentication error'
+          currentUser: user,
+          token,
+          error: null
         });
+      } catch (err) {
+        clearAuthData();
+        setAuthState(prev => ({
+          ...prev,
+          loading: false,
+          error: 'Invalid session data'
+        }));
       }
-    };
-    
-    checkAuth();
-    
-    // Removed cleanup function for session tracking
+    } else {
+      setAuthState(prev => ({
+        ...prev,
+        loading: false
+      }));
+    }
   }, []);
 
-  // Clear auth data from localStorage
   const clearAuthData = () => {
     localStorage.removeItem('auth_token');
     localStorage.removeItem('auth_user');
   };
 
-  // Login function
-  const login = async (authData) => {
+  const login = async ({ token, user }) => {
     try {
-      // Verify location before logging in
+      // ✅ Verificación de ubicación
       const geoResult = await GeolocationService.verifyLocationAccess();
-      
       if (!geoResult.allowed) {
-        return {
-          success: false,
-          error: 'Geographic restriction'
-        };
+        return { success: false, error: 'Access denied due to geographic restriction.' };
       }
-      
-      // If authentication is successful
-      if (authData.success && authData.token && authData.user) {
-        // Store auth data
-        localStorage.setItem('auth_token', authData.token);
-        localStorage.setItem('auth_user', JSON.stringify(authData.user));
-        
-        // Update state
-        setAuthState({
-          isAuthenticated: true,
-          loading: false,
-          currentUser: authData.user,
-          token: authData.token,
-          error: null
-        });
-        
-        // Removed session timeout tracking start
-        
-        return { success: true };
-      } else {
-        throw new Error(authData.error || 'Authentication failed');
-      }
+
+      // ✅ Guardar en localStorage
+      localStorage.setItem('auth_token', token);
+      localStorage.setItem('auth_user', JSON.stringify(user));
+
+      setAuthState({
+        isAuthenticated: true,
+        loading: false,
+        currentUser: user,
+        token,
+        error: null
+      });
+
+      return { success: true };
     } catch (error) {
-      console.error('Login error:', error);
+      console.error('Error during login context:', error);
       clearAuthData();
-      setAuthState(prev => ({
-        ...prev,
-        error: error.message
-      }));
-      return {
-        success: false,
-        error: error.message
-      };
+      setAuthState({
+        isAuthenticated: false,
+        loading: false,
+        currentUser: null,
+        token: null,
+        error: error.message || 'Login error'
+      });
+      return { success: false, error: error.message || 'Login error' };
     }
   };
 
-  // Logout function
   const logout = () => {
-    // Removed session tracking stop
-    
-    // Clear auth data
     clearAuthData();
-    
-    // Update state
     setAuthState({
       isAuthenticated: false,
       loading: false,
@@ -155,16 +93,9 @@ export const AuthProvider = ({ children }) => {
       token: null,
       error: null
     });
-    
-    // Removed timeout warning reset
-    
-    // Redirigir al login
     window.location.href = '/';
   };
 
-  // Removed extendSession function
-
-  // Provide auth context
   return (
     <AuthContext.Provider
       value={{
@@ -175,7 +106,6 @@ export const AuthProvider = ({ children }) => {
         error: authState.error,
         login,
         logout
-        // Removed sessionTimeoutWarning and extendSession
       }}
     >
       {children}

@@ -6,144 +6,26 @@ import { useAuth } from './AuthContext';
 
 const Login = ({ onForgotPassword }) => {
   const navigate = useNavigate();
-  const { login } = useAuth(); // Usar el contexto de autenticación
-  
-  const [formData, setFormData] = useState({
-    username: '',
-    password: ''
-  });
-  const [errors, setErrors] = useState({
-    username: false,
-    password: false,
-    message: ''
-  });
+  const { login } = useAuth();
+
+  const [formData, setFormData] = useState({ username: '', password: '' });
+  const [errors, setErrors] = useState({ username: false, password: false, message: '' });
   const [rememberMe, setRememberMe] = useState(false);
-  
-  // Estado para el modal de carga
-  const [authModal, setAuthModal] = useState({
-    isOpen: false,
-    status: 'loading',
-    message: ''
-  });
+  const [authModal, setAuthModal] = useState({ isOpen: false, status: 'loading', message: '' });
 
-  // Lista de credenciales válidas con datos completos (solo en el código, no en la UI)
-  const validCredentials = [
-    { 
-      username: "JLuis09", 
-      password: "Kariokito12",
-      fullname: "Luis Nava",
-      email: "jluis@example.com",
-      role: "Developer",
-      contact_number: "555-123-4567",
-      documents: "ID-12345",
-      zip_code: "90210",
-      birth_date: "1990-05-15"
-    },
-    { 
-      username: "Javi1", 
-      password: "JavierVargas12",
-      fullname: "Javier Vargas",
-      email: "javier@example.com",
-      role: "Administrator",
-      contact_number: "555-987-6543",
-      documents: "ID-54321",
-      zip_code: "90211",
-      birth_date: "1985-10-20"
-    },
-    { 
-      username: "AlexM1", 
-      password: "AlexMar09",
-      fullname: "Alex Martinez",
-      email: "Alex@example.com",
-      role: "PT",
-      contact_number: "555-987-6543",
-      documents: "ID-54321",
-      zip_code: "90211",
-      birth_date: "1985-10-20"
-    },
-    {
-      username: "Justin1", 
-      password: "Justin12",
-      fullname: "Justin Shimane",
-      email: "Justin@example.com",
-      role: "OT",
-      contact_number: "555-987-6543",
-      documents: "ID-54321",
-      zip_code: "90211",
-      birth_date: "1985-10-20"
-    },
-    {
-      username: "Arya1", 
-      password: "Arya12",
-      fullname: "Arya Pedoiem",
-      email: "arya@example.com",
-      role: "ST",
-      contact_number: "555-987-6543",
-      documents: "ID-54321",
-      zip_code: "90211",
-      birth_date: "1985-10-20"
-    },
-    {
-      username: "Cohen1", 
-      password: "Cohen12*",
-      fullname: "Cohen N",
-      email: "Cohen@example.com",
-      role: "Administrator",
-      contact_number: "555-987-6543",
-      documents: "ID-54321",
-      zip_code: "90211",
-      birth_date: "1985-10-20"
-    
-    },
-    {
-      username: "Carlo1", 
-      password: "Carlo12*",
-      fullname: "Carlo Gianzon",
-      email: "Carlo@example.com",
-      role: "PTA",
-      contact_number: "555-987-6543",
-      documents: "ID-54321",
-      zip_code: "90211",
-      birth_date: "1985-10-20"
-    },
-    {
-      username: "Supportive1*",
-      password: "Supportive1",
-      fullname: "Supportive Home Health",
-      email: "agency@example.com",
-      role: "Agency",
-      contact_number: "555-456-7890",
-      documents: "ID-67890",
-      zip_code: "90212",
-      birth_date: "1980-01-01"
-    }
-  ];
-
-  // Comprobar el localStorage al cargar
   useEffect(() => {
     const savedUsername = localStorage.getItem('rememberedUsername');
     if (savedUsername) {
-      setFormData(prev => ({
-        ...prev,
-        username: savedUsername
-      }));
+      setFormData(prev => ({ ...prev, username: savedUsername }));
       setRememberMe(true);
     }
   }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value
-    });
-    
-    // Limpiar error al escribir
+    setFormData({ ...formData, [name]: value });
     if (errors[name]) {
-      setErrors({
-        ...errors,
-        [name]: false
-      });
+      setErrors({ ...errors, [name]: false });
     }
   };
 
@@ -152,241 +34,185 @@ const Login = ({ onForgotPassword }) => {
   };
 
   const showError = (field, message) => {
-    setErrors({
-      ...errors,
-      [field]: true,
-      message: message
-    });
-    
-    // Efecto de pulsación
+    setErrors({ ...errors, [field]: true, message });
     const element = document.getElementById(`${field}Group`);
     if (element) {
-      element.classList.add("form-pulse");
-      setTimeout(() => {
-        element.classList.remove("form-pulse");
-      }, 500);
-    }
-  };
-
-  const showSuccess = (field) => {
-    const element = document.getElementById(`${field}Group`);
-    if (element) {
-      element.classList.remove("error");
-      element.classList.add("success");
+      element.classList.add('form-pulse');
+      setTimeout(() => element.classList.remove('form-pulse'), 500);
     }
   };
 
   const validateForm = () => {
     let isValid = true;
-    
-    if (formData.username.trim() === "") {
-      showError('username', "Username cannot be empty");
+    if (formData.username.trim() === '') {
+      showError('username', 'Username cannot be empty');
       isValid = false;
     }
-    
-    if (formData.password === "") {
-      showError('password', "Password cannot be empty");
+    if (formData.password === '') {
+      showError('password', 'Password cannot be empty');
       isValid = false;
     }
-    
-    return isValid; 
-  };
-  
-  // Función para cerrar el modal
-  const closeAuthModal = () => {
-    setAuthModal({
-      ...authModal,
-      isOpen: false
-    });
+    return isValid;
   };
 
-const handleSubmit = (e) => {
-  e.preventDefault();
+  const closeAuthModal = () => setAuthModal(prev => ({ ...prev, isOpen: false }));
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (!validateForm()) return;
   
-  // Validar el formulario
-  if (!validateForm()) {
-    return;
-  }
+    console.log("🟡 Attempting login with:", formData);
   
-  // Verificar credenciales
-  const user = validCredentials.find(
-    cred => cred.username === formData.username && cred.password === formData.password
-  );
-  
-  // Si las credenciales no son válidas, mostrar error
-  if (!user) {
-    const errorMessage = "Invalid username or password. Please try again.";
-    showError('username', errorMessage);
-    showError('password', errorMessage);
-    
-    // Efecto visual para errores
-    document.querySelectorAll(".login__input").forEach(input => {
-      input.classList.add("shake-error");
-      setTimeout(() => {
-        input.classList.remove("shake-error");
-      }, 500);
+    setAuthModal({
+      isOpen: true,
+      status: 'loading',
+      message: 'Verifying credentials...'
     });
-    
-    return;
-  }
   
-  // Manejar "Remember Me"
-  if (rememberMe) {
-    localStorage.setItem('rememberedUsername', formData.username);
-  } else {
-    localStorage.removeItem('rememberedUsername');
-  }
+    try {
+      // Paso 1: Login con backend
+      const loginRes = await fetch('http://localhost:8000/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          username: formData.username,
+          password: formData.password
+        })
+      });
   
-  // Si las credenciales son válidas, mostrar el modal de carga
-  setAuthModal({
-    isOpen: true,
-    status: 'loading',
-    message: 'Verifying credentials...'
-  });
+      const loginText = await loginRes.text();
+      console.log("🔵 Login Response:", loginRes.status, loginText);
   
-  // Simulación del proceso de autenticación exitoso
-  setTimeout(async () => {
-    // Construir un objeto de usuario con todos los datos del usuario
-    const userData = {
-      id: Math.floor(Math.random() * 1000) + 1, // ID simulado
-      username: user.username,
-      fullname: user.fullname,
-      email: user.email,
-      role: user.role,
-      contact_number: user.contact_number,
-      documents: user.documents,
-      zip_code: user.zip_code,
-      birth_date: user.birth_date,
-      last_login: new Date().toISOString()
-    };
-    
-    // Guardar datos en el contexto de autenticación
-    const loginResult = await login({
-      success: true,
-      token: "simulated_token_" + Date.now(),
-      user: userData
-    });
-    
-    // Verificar si hay error de geolocalización
-    if (!loginResult.success) {
-      // En caso de error, mostrar mensaje
+      if (!loginRes.ok) {
+        throw new Error(`Login failed: ${loginRes.status} - ${loginText}`);
+      }
+  
+      const loginData = JSON.parse(loginText);
+      const token = loginData.access_token;
+      console.log("🟢 Token received:", token);
+  
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const username = payload.sub;
+      console.log("🔍 Decoded token username:", username);
+  
+      // Paso 2: Obtener todos los staff y buscar el actual
+      const allStaffRes = await fetch('http://localhost:8000/staff/', {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+  
+      const staffText = await allStaffRes.text();
+      console.log("📦 All staff response:", allStaffRes.status, staffText);
+  
+      if (!allStaffRes.ok) {
+        throw new Error(`Failed to fetch staff list: ${allStaffRes.status} - ${staffText}`);
+      }
+  
+      const allStaff = JSON.parse(staffText);
+      const userData = allStaff.find(u => u.username === username);
+  
+      if (!userData) {
+        throw new Error("User not found in staff list");
+      }
+  
+      console.log("✅ Matched user from staff list:", userData);
+  
+      // Guardar token y user
+      localStorage.setItem('auth_token', token);
+      localStorage.setItem('auth_user', JSON.stringify(userData));
+      if (rememberMe) {
+        localStorage.setItem('rememberedUsername', formData.username);
+      } else {
+        localStorage.removeItem('rememberedUsername');
+      }
+  
+      // Paso 3: Login dentro del contexto
+      const loginResult = await login({
+        success: true,
+        token,
+        user: userData
+      });
+  
+      if (!loginResult.success) {
+        throw new Error('Login rejected by context: ' + loginResult.error);
+      }
+  
+      setAuthModal({
+        isOpen: true,
+        status: 'success',
+        message: 'Authentication successful! Redirecting...'
+      });
+  
+      const baseRole = userData.role.split(' - ')[0].toLowerCase();
+      setTimeout(() => navigate(`/${baseRole}/homePage`), 2000);
+  
+    } catch (err) {
+      console.error("🔴 Login Error:", err);
       setAuthModal({
         isOpen: true,
         status: 'error',
-        message: 'Access denied: ' + (loginResult.error || 'Geographic restriction')
+        message: err.message || 'Login failed'
       });
-      return;
     }
-    
-    // Actualizar modal a éxito
-    setAuthModal({
-      isOpen: true,
-      status: 'success',
-      message: 'Authentication successful! Redirecting...',
-      userData: userData // Pasar los datos del usuario al modal
-    });
-    
-    // Mostrar efecto de éxito en los campos
-    showSuccess('username');
-    showSuccess('password');
-    
-    // Extraer el rol base y dirigir al usuario a su interfaz específica
-    const baseRole = user.role.split(' - ')[0].toLowerCase();
-    
-    // Redirigir después de mostrar el mensaje de éxito
-    setTimeout(() => {
-      navigate(`/${baseRole}/homePage`);
-    }, 2000);
-  }, 2500);
-};
-
+  };  
+  
   return (
     <>
       <div className="login__logo">
         <img src={logoImg} alt="Motive Homecare Logo" className="login__logo-img" />
       </div>
-      
+
       <h2 className="login__title">Login</h2>
-      
-      <form id="loginForm" className="login__form" onSubmit={handleSubmit}>
+
+      <form className="login__form" onSubmit={handleSubmit}>
         <div className={`login__form-group ${errors.username ? 'error' : ''}`} id="usernameGroup">
           <label htmlFor="username" className="login__label">
-            <i className="fas fa-user"></i>
-            Username
+            <i className="fas fa-user"></i> Username
           </label>
-          <div className="login__input-wrapper">
-            <input 
-              type="text" 
-              id="username" 
-              name="username" 
-              className="login__input" 
-              placeholder="Enter your username" 
-              value={formData.username}
-              onChange={handleInputChange}
-              required 
-            />
-          </div>
-          <div className="login__error-message">
-            {errors.username ? errors.message : "Please enter a valid username"}
-          </div>
+          <input
+            type="text"
+            id="username"
+            name="username"
+            className="login__input"
+            placeholder="Enter your username"
+            value={formData.username}
+            onChange={handleInputChange}
+            required
+          />
+          {errors.username && <div className="login__error-message">{errors.message}</div>}
         </div>
-        
+
         <div className={`login__form-group ${errors.password ? 'error' : ''}`} id="passwordGroup">
           <label htmlFor="password" className="login__label">
-            <i className="fas fa-lock"></i>
-            Password
+            <i className="fas fa-lock"></i> Password
           </label>
-          <div className="login__input-wrapper">
-            <input 
-              type="password" 
-              id="password" 
-              name="password" 
-              className="login__input" 
-              placeholder="Enter your password" 
-              value={formData.password}
-              onChange={handleInputChange}
-              required 
-            />
-          </div>
-          <div className="login__error-message">
-            {errors.password ? errors.message : "Please enter a valid password"}
-          </div>
+          <input
+            type="password"
+            id="password"
+            name="password"
+            className="login__input"
+            placeholder="Enter your password"
+            value={formData.password}
+            onChange={handleInputChange}
+            required
+          />
+          {errors.password && <div className="login__error-message">{errors.message}</div>}
         </div>
-        
-        {/* Checkbox clickeable mejorado */}
-        <div className="login__checkbox-group">
-          <label className="custom-checkbox">
-            <input 
-              type="checkbox" 
-              id="rememberMe"
-              checked={rememberMe}
-              onChange={handleRememberMeChange}
-            />
-            <span className="checkmark"></span>
-            <span>Remember me</span>
-          </label>
-        </div>
-        
+
+        <label className="custom-checkbox">
+          <input type="checkbox" checked={rememberMe} onChange={handleRememberMeChange} />
+          <span className="checkmark"></span> Remember me
+        </label>
+
         <button type="submit" className="login__button">LOG IN</button>
       </form>
-      
-      {/* Enlace de forgot password mejorado */}
+
       <div className="login__extra-links">
-        <a href="#" className="forgot-password-link" onClick={(e) => {
-          e.preventDefault();
-          onForgotPassword(e);
-        }}>
+        <a href="#" onClick={(e) => { e.preventDefault(); onForgotPassword(e); }}>
           Forgot your password?
         </a>
       </div>
-      
-      {/* Modal de carga para autenticación */}
-      <AuthLoadingModal 
-        isOpen={authModal.isOpen}
-        status={authModal.status}
-        message={authModal.message}
-        onClose={closeAuthModal}
-      />
+
+      <AuthLoadingModal {...authModal} onClose={closeAuthModal} />
     </>
   );
 };

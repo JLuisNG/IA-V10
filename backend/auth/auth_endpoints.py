@@ -9,7 +9,7 @@ from .security import verify_password
 
 router = APIRouter()
 
-@router.post("/auth/login", response_model=Token)
+@router.post("/login", response_model=Token)
 def login(request: LoginRequest, db: Session = Depends(get_db)):
     user = db.query(Staff).filter(Staff.username == request.username).first()
 

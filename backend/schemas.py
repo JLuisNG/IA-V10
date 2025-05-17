@@ -21,6 +21,7 @@ class StaffResponse(BaseModel):
     id: int
     name: str
     email: str
+    username: str
     role: str
 
     class Config:
