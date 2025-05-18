@@ -12,6 +12,23 @@ const Login = ({ onForgotPassword }) => {
   const [errors, setErrors] = useState({ username: false, password: false, message: '' });
   const [rememberMe, setRememberMe] = useState(false);
   const [authModal, setAuthModal] = useState({ isOpen: false, status: 'loading', message: '' });
+  const [capsLockOn, setCapsLockOn] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Detectar tamaño de pantalla para ajustes responsive
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setIsMobile(window.innerWidth <= 576);
+    };
+    
+    checkScreenSize();
+    window.addEventListener('resize', checkScreenSize);
+    
+    return () => {
+      window.removeEventListener('resize', checkScreenSize);
+    };
+  }, []);
 
   useEffect(() => {
     const savedUsername = localStorage.getItem('rememberedUsername');
@@ -31,6 +48,14 @@ const Login = ({ onForgotPassword }) => {
 
   const handleRememberMeChange = (e) => {
     setRememberMe(e.target.checked);
+  };
+
+  const handleKeyDown = (e) => {
+    if (e.getModifierState('CapsLock')) {
+      setCapsLockOn(true);
+    } else {
+      setCapsLockOn(false);
+    }
   };
 
   const showError = (field, message) => {
@@ -56,7 +81,12 @@ const Login = ({ onForgotPassword }) => {
   };
 
   const closeAuthModal = () => setAuthModal(prev => ({ ...prev, isOpen: false }));
+  
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
+  // Este es el método original sin cambios
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!validateForm()) return;
@@ -114,7 +144,7 @@ const Login = ({ onForgotPassword }) => {
         message: err.message || 'Login failed'
       });
     }
-  };   
+  };
   
   return (
     <>
@@ -122,7 +152,7 @@ const Login = ({ onForgotPassword }) => {
         <img src={logoImg} alt="Motive Homecare Logo" className="login__logo-img" />
       </div>
 
-      <h2 className="login__title">Login</h2>
+      <h2 className="login__title">Welcome{!isMobile ? " Back" : ""}</h2>
 
       <form className="login__form" onSubmit={handleSubmit}>
         <div className={`login__form-group ${errors.username ? 'error' : ''}`} id="usernameGroup">
@@ -138,6 +168,7 @@ const Login = ({ onForgotPassword }) => {
             value={formData.username}
             onChange={handleInputChange}
             required
+            autoComplete="username"
           />
           {errors.username && <div className="login__error-message">{errors.message}</div>}
         </div>
@@ -146,25 +177,46 @@ const Login = ({ onForgotPassword }) => {
           <label htmlFor="password" className="login__label">
             <i className="fas fa-lock"></i> Password
           </label>
-          <input
-            type="password"
-            id="password"
-            name="password"
-            className="login__input"
-            placeholder="Enter your password"
-            value={formData.password}
-            onChange={handleInputChange}
-            required
-          />
+          <div className="password-input-wrapper">
+            <input
+              type={showPassword ? "text" : "password"}
+              id="password"
+              name="password"
+              className="login__input"
+              placeholder="Enter your password"
+              value={formData.password}
+              onChange={handleInputChange}
+              onKeyDown={handleKeyDown}
+              required
+              autoComplete="current-password"
+            />
+            <button 
+              type="button" 
+              className="password-toggle-btn" 
+              onClick={togglePasswordVisibility}
+              tabIndex="-1"
+              aria-label={showPassword ? "Hide password" : "Show password"}
+            >
+              <i className={`fas ${showPassword ? 'fa-eye-slash' : 'fa-eye'}`}></i>
+            </button>
+          </div>
+          {capsLockOn && <div className="caps-lock-warning">Caps Lock is on</div>}
           {errors.password && <div className="login__error-message">{errors.message}</div>}
         </div>
 
         <label className="custom-checkbox">
-          <input type="checkbox" checked={rememberMe} onChange={handleRememberMeChange} />
+          <input 
+            type="checkbox" 
+            checked={rememberMe} 
+            onChange={handleRememberMeChange} 
+          />
           <span className="checkmark"></span> Remember me
         </label>
 
-        <button type="submit" className="login__button">LOG IN</button>
+        <button type="submit" className="login__button">
+          <span>LOG IN</span>
+          <i className="fas fa-arrow-right login-arrow"></i>
+        </button>
       </form>
 
       <div className="login__extra-links">
@@ -173,7 +225,7 @@ const Login = ({ onForgotPassword }) => {
         </a>
       </div>
 
-      <AuthLoadingModal {...authModal} onClose={closeAuthModal} />
+      <AuthLoadingModal {...authModal} onClose={closeAuthModal} userData={{ fullname: formData.username }} />
     </>
   );
 };

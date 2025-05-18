@@ -9,10 +9,17 @@ import CustomDatePicker from './CreateNF/DatePicker';
 import DOBDatePicker from './CreateNF/DOBDatePicker';
 import LoadingScreen from './CreateNF/LoadingDates';
 import ReferralStats from './ReferralStats';
+import { toast } from 'react-toastify';
 
 const AdminReferralsPage = () => {
   const navigate = useNavigate();
   const { currentUser, logout } = useAuth();
+  const [agencies, setAgencies] = useState([]);
+
+  const [therapists, setTherapists] = useState([]);
+  const [selectedTherapists, setSelectedTherapists] = useState({
+    PT: '', PTA: '', OT: '', COTA: '', ST: '', STA: ''
+  });
   
   // State for UI controls
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -52,22 +59,19 @@ const AdminReferralsPage = () => {
     urgencyLevel: 'normal',
     
     // Medical
-    physicianId: '',
-    newPhysician: false,
-    newPhysicianName: '',
+    physician: '',
     agencyId: '',
     agencyBranch: '',
     nurseManager: '',
-    newNurseManager: '',
     nursingDiagnosis: '',
     pmh: '',
     priorLevelOfFunction: 'To Be Obtained at Evaluation',
     homebound: {},
     wbs: '',
     weight: '',
-    weightUnit: 'lbs', // Default unit for weight
+    weightUnit: 'lbs', 
     height: '',
-    heightUnit: 'ft', // Default unit for height
+    heightUnit: 'ft', 
     
     // Therapy
     reasonsForReferral: {
@@ -82,10 +86,8 @@ const AdminReferralsPage = () => {
     disciplines: []
   });
   
-  // Uploaded files state
   const [uploadedFiles, setUploadedFiles] = useState([]);
   
-  // State for disciplines selection
   const [selectedDisciplines, setSelectedDisciplines] = useState({
     PT: false,
     PTA: false,
@@ -94,19 +96,20 @@ const AdminReferralsPage = () => {
     ST: false,
     STA: false
   });
-  
-  // State for therapist selection
-  const [selectedTherapists, setSelectedTherapists] = useState({
-    PT: null,
-    PTA: null,
-    OT: null,
-    COTA: null,
-    ST: null,
-    STA: null
-  });
-  
-  // State for adding new nurse manager
+
   const [addingNewManager, setAddingNewManager] = useState(false);
+
+  // WBS options from the dropdown
+  const wbsOptions = [
+    { value: '', label: '-- Select WBS --' },
+    { value: 'N/A', label: 'N/A' },
+    { value: 'Full weight Bearing', label: 'Full weight Bearing' },
+    { value: 'Weight Bearing as Tolerated', label: 'Weight Bearing as Tolerated' },
+    { value: 'Partial Weight Bearing (up to 50%)', label: 'Partial Weight Bearing (up to 50%)' },
+    { value: 'Toe Touch Weight Bearing (up to 5%)', label: 'Toe Touch Weight Bearing (up to 5%)' },
+    { value: 'Non-Weight Bearing (0%)', label: 'Non-Weight Bearing (0%)' },
+    { value: 'Clarify w/Patient or MD', label: 'Clarify w/Patient or MD' },
+  ];
 
   // Function to get initials from name
   function getInitials(name) {
@@ -127,15 +130,55 @@ const AdminReferralsPage = () => {
     status: 'online', // online, away, busy, offline
   };
   
-  // Effect for simulating loading state
+//////////////////////////////////////EFECTOS DE LA PAGINA//////////////////////////////////////////
+
+  // Para la carga del screen principal
   useEffect(() => {
-    const timer = setTimeout(() => {
+    const timeout = setTimeout(() => {
       setIsLoading(false);
-    }, 800);
-    
-    return () => clearTimeout(timer);
+    }, 1000);
+
+    return () => clearTimeout(timeout); 
   }, []);
+
+  // Agencias del dropdown menu
+  useEffect(() => {
+    const fetchAgencies = async () => {
+      try {
+        const response = await fetch('http://localhost:8000/staff');
+        if (!response.ok) throw new Error('Failed to fetch staff');
+        const data = await response.json();
   
+        const agenciesOnly = data.filter(person => person.role === 'agency');
+        setAgencies(agenciesOnly);
+      } catch (error) {
+        console.error('Error loading agencies:', error);
+        toast.error('Error loading agencies');
+      }
+    };
+  
+    fetchAgencies();
+  }, []);
+
+  // Therapists del dropdown menu
+  useEffect(() => {
+    const fetchTherapists = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/staff");
+        if (!response.ok) throw new Error("Failed to fetch therapists");
+        const data = await response.json();
+        const therapistRoles = ['pt', 'pta', 'ot', 'cota', 'st', 'sta'];
+        const filtered = data.filter(person => therapistRoles.includes(person.role.toLowerCase()));
+        setTherapists(filtered);
+      } catch (error) {
+        console.error("Error loading therapists:", error);
+        toast.error("Error loading therapists");
+      }
+    };
+  
+    fetchTherapists();
+  }, []);
+
   // Effect for handling clicks outside user menu
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -171,6 +214,7 @@ const AdminReferralsPage = () => {
       
       const formattedEndDate = endDate.toISOString().split('T')[0];
       
+      // We set a suggested end date but it can be modified
       setFormData(prev => ({
         ...prev,
         certPeriodEnd: formattedEndDate
@@ -178,6 +222,90 @@ const AdminReferralsPage = () => {
     }
   }, [formData.certPeriodStart]);
   
+/////////////////////////// HANDLE BUTTONS /////////////////////////////////////////////////////
+
+  // Form submision
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    if (isLoggingOut) return;
+  
+    try {
+      setFormSubmitting(true);
+  
+      // Paso 1: Crear paciente
+      const patientPayload = {
+        full_name: `${formData.firstName} ${formData.lastName}`,
+        birthday: formData.dob,
+        gender: formData.gender,
+        address: formData.address,
+        contact_info: JSON.stringify(formData.contactNumbers),
+        payor_type: formData.payorType,
+        physician: formData.physician,
+        agency_id: parseInt(formData.agencyId),
+        nursing_diagnosis: formData.nursingDiagnosis,
+        urgency_level: formData.urgencyLevel,
+        prior_level_of_function: formData.priorLevelOfFunction,
+        homebound_status: JSON.stringify(formData.homebound),
+        weight_bearing_status: formData.wbs,
+        referral_reason: JSON.stringify(formData.reasonsForReferral),
+        weight: `${formData.weight} ${formData.weightUnit}`,
+        height: `${formData.height} ${formData.heightUnit}`,
+        past_medical_history: formData.pmh,
+        initial_cert_start_date: formData.certPeriodStart
+      };
+  
+      const createRes = await fetch('http://localhost:8000/patients/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(patientPayload),
+      });
+  
+      if (!createRes.ok) throw new Error('Failed to create patient');
+  
+      const createdPatient = await createRes.json();
+      const patientId = createdPatient.id;
+  
+      // Paso 2: Asignar terapeutas
+      const assignPromises = Object.entries(selectedTherapists).map(([discipline, staffId]) => {
+        if (staffId) {
+          return fetch(`http://localhost:8000/assign-staff?patient_id=${patientId}&staff_id=${parseInt(staffId)}`, {
+            method: 'POST'
+          });
+        }
+        return null;
+      });
+  
+      const assignmentResults = await Promise.all(assignPromises.filter(Boolean));
+      if (assignmentResults.some(r => !r.ok)) throw new Error('Error assigning therapist(s)');
+  
+      // Paso 3: Subir documentos
+      for (let file of uploadedFiles) {
+        const formDataDoc = new FormData();
+        formDataDoc.append('file', file);
+        formDataDoc.append('patient_id', patientId);
+  
+        const uploadRes = await fetch('http://localhost:8000/documents/upload', {
+          method: 'POST',
+          body: formDataDoc
+        });
+  
+        if (!uploadRes.ok) {
+          console.error(await uploadRes.text());
+          throw new Error('Error uploading document');
+        }
+      }
+  
+      toast.success("Patient created successfully");
+      resetForm();
+      setCurrentView("menu");
+    } catch (error) {
+      console.error(error);
+      toast.error("Error creating patient");
+    } finally {
+      setFormSubmitting(false);
+    }
+  };
+
   // Handle logout with animation
   const handleLogout = () => {
     setIsLoggingOut(true);
@@ -200,7 +328,7 @@ const AdminReferralsPage = () => {
     navigate(`/${baseRole}/homePage`);
   };
 
-  // Handle starting create new referral process
+  // Handle starting create new referral process - mantiene el tiempo del primer código
   const handleStartCreateReferral = () => {
     if (isLoggingOut) return;
     
@@ -231,7 +359,7 @@ const AdminReferralsPage = () => {
     const files = Array.from(e.target.files).filter(file => file.type === 'application/pdf');
     
     if (files.length === 0) {
-      alert('Please upload PDF files only.');
+      toast.error('Por favor, sube solo archivos PDF.');
       return;
     }
     
@@ -250,7 +378,7 @@ const AdminReferralsPage = () => {
     }));
   };
   
-  // Handle contact number changes-started here
+  // Handle contact number changes
   const handleContactNumberChange = (index, value) => {
     if (isLoggingOut) return;
     
@@ -288,20 +416,6 @@ const AdminReferralsPage = () => {
     }
   };
   
-  // Handle physician selection
-  const handlePhysicianChange = (e) => {
-    if (isLoggingOut) return;
-    
-    const physicianId = e.target.value;
-    
-    setFormData(prev => ({
-      ...prev,
-      physicianId,
-      newPhysician: physicianId === 'new',
-      newPhysicianName: ''
-    }));
-  };
-  
   // Handle agency selection
   const handleAgencyChange = (e) => {
     if (isLoggingOut) return;
@@ -317,29 +431,6 @@ const AdminReferralsPage = () => {
     }));
     
     setAddingNewManager(false);
-  };
-
-  // Handle nurse manager selection
-  const handleNurseManagerChange = (e) => {
-    if (isLoggingOut) return;
-    
-    const value = e.target.value;
-    
-    if (value === 'new') {
-      setAddingNewManager(true);
-      setFormData(prev => ({
-        ...prev,
-        nurseManager: 'new',
-        newNurseManager: ''
-      }));
-    } else {
-      setAddingNewManager(false);
-      setFormData(prev => ({
-        ...prev,
-        nurseManager: value,
-        newNurseManager: ''
-      }));
-    }
   };
   
   // Handle homebound option changes
@@ -390,89 +481,16 @@ const AdminReferralsPage = () => {
   // Handle therapist selection
   const handleTherapistSelection = (discipline, therapistId) => {
     if (isLoggingOut) return;
-    
+  
     setSelectedTherapists(prev => ({
       ...prev,
       [discipline]: therapistId
     }));
   };
   
-  // Validate that at least one discipline is selected
-  const validateDisciplines = () => {
-    return Object.values(selectedDisciplines).some(discipline => discipline);
-  };
-  
-  // Get selected agency
-  const getSelectedAgency = () => {
-    return agencies.find(agency => agency.id.toString() === formData.agencyId);
-  };
-  
-  // Handle form submission
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    
-    if (isLoggingOut) return;
-    
-    // Validate that at least one discipline is selected
-    if (!validateDisciplines()) {
-      alert('Please select at least one discipline (PT, PTA, OT, COTA, ST, or STA)');
-      return;
-    }
-    
-    // Validate that therapists are selected for all selected disciplines
-    const hasAllTherapistsSelected = Object.keys(selectedDisciplines)
-      .filter(discipline => selectedDisciplines[discipline])
-      .every(discipline => selectedTherapists[discipline] !== null);
-    
-    if (!hasAllTherapistsSelected) {
-      alert('Please select a therapist for each selected discipline');
-      return;
-    }
-    
-    // Validate weight and height
-    if (formData.weight && isNaN(formData.weight)) {
-      alert('Please enter a valid number for Weight');
-      return;
-    }
-    if (formData.height && isNaN(formData.height)) {
-      alert('Please enter a valid number for Height');
-      return;
-    }
-    
-    // Show loading screen
-    setFormSubmitting(true);
-    
-    // Simulate backend processing
-    console.log('Form data:', formData);
-    console.log('Selected therapists:', selectedTherapists);
-    console.log('Uploaded PDF files:', uploadedFiles);
-    
-    // Handle form submission success
-    setTimeout(() => {
-      setFormSubmitting(false);
-      setCurrentView('menu');
-    }, 2000);
-  };
-
-  // Cancel creating referral and go back to menu
-  const handleCancelCreateReferral = () => {
-    if (isLoggingOut) return;
-    
-    const hasFormData = Object.values(formData).some(value => {
-      if (typeof value === 'string') return value !== '';
-      if (Array.isArray(value)) return value.length > 0 && value[0] !== '';
-      if (typeof value === 'object') return Object.values(value).some(v => v !== false && v !== '');
-      return false;
-    });
-    
-    if (hasFormData && !window.confirm('Are you sure you want to cancel? All entered data will be lost.')) {
-      return;
-    }
-    
-    // Reset form and go back to menu
-    setCurrentView('menu');
-    
-    // Reset form data
+  // Reset form to initial state
+  const resetForm = () => {
+    // Reset all form data to initial values
     setFormData({
       firstName: '',
       lastName: '',
@@ -486,9 +504,7 @@ const AdminReferralsPage = () => {
       certPeriodStart: '',
       certPeriodEnd: '',
       urgencyLevel: 'normal',
-      physicianId: '',
-      newPhysician: false,
-      newPhysicianName: '',
+      physician: '',
       agencyId: '',
       agencyBranch: '',
       nurseManager: '',
@@ -514,6 +530,7 @@ const AdminReferralsPage = () => {
       disciplines: []
     });
     
+    // Reset discipline selections
     setSelectedDisciplines({
       PT: false,
       PTA: false,
@@ -523,7 +540,8 @@ const AdminReferralsPage = () => {
       STA: false
     });
     
-    setSelectedTherapists({
+    // Reset therapist selections
+    setTherapists({
       PT: null,
       PTA: null,
       OT: null,
@@ -532,8 +550,36 @@ const AdminReferralsPage = () => {
       STA: null
     });
     
+    // Reset uploaded files
     setUploadedFiles([]);
+    
+    // Reset adding new manager state
+    setAddingNewManager(false);
+    
+    console.log('Form has been reset completely');
   };
+
+  // Cancel creating referral and go back to menu
+  const handleCancelCreateReferral = () => {
+    if (isLoggingOut) return;
+    
+    const hasFormData = Object.values(formData).some(value => {
+      if (typeof value === 'string') return value !== '';
+      if (Array.isArray(value)) return value.length > 0 && value[0] !== '';
+      if (typeof value === 'object') return Object.values(value).some(v => v !== false && v !== '');
+      return false;
+    });
+    
+    if (hasFormData && !window.confirm('¿Está seguro de que desea cancelar? Todos los datos ingresados se perderán.')) {
+      return;
+    }
+    
+    // Reset form and go back to menu
+    setCurrentView('menu');
+    resetForm();
+  };
+
+////////////////////////////////HTML DE LA PAGINA////////////////////////////////////////////////
 
   // Homebound options
   const homeboundOptions = [
@@ -862,7 +908,7 @@ const AdminReferralsPage = () => {
               </button>
             </div>
             
-            {/* Patient Referral Form */}
+            {/* Formulario para crear paciente*/}
             <form className="patient-referral-form" onSubmit={handleSubmit}>
               {/* Patient Information Section */}
               <div className="form-section">
@@ -1060,14 +1106,21 @@ const AdminReferralsPage = () => {
                         <div className="date-input end-date">
                           <CustomDatePicker
                             selectedDate={formData.certPeriodEnd}
-                            onChange={() => {}} // No manual changes allowed
+                            onChange={(date) => {
+                              if (isLoggingOut) return;
+                              setFormData(prev => ({
+                                ...prev,
+                                certPeriodEnd: date
+                              }));
+                            }}
                             name="certPeriodEnd"
-                            disabled={true}
+                            required={true}
+                            disabled={isLoggingOut}
                           />
                         </div>
                       </div>
                       <small className="form-text text-muted">
-                        End date is automatically calculated as SOC + 60 days
+                        End date is automatically calculated as SOC + 60 days, but can be modified if needed
                       </small>
                     </div>
                   </div>
@@ -1099,52 +1152,29 @@ const AdminReferralsPage = () => {
                 
                 <div className="form-grid">
                   <div className="form-group">
-                    <label htmlFor="physicianId">Physician</label>
-                    <select
-                      id="physicianId"
-                      name="physicianId"
-                      value={formData.physicianId}
-                      onChange={handlePhysicianChange}
+                    <label htmlFor="physician">Physician</label>
+                    <input
+                      type="text"
+                      name="physician"
+                      value={formData.physician || ''}
+                      onChange={handleInputChange}
+                      placeholder="Enter physician name"
                       required
                       disabled={isLoggingOut}
-                    >
-                      <option value="">Select Physician</option>
-                      {physicians.map(physician => (
-                        <option key={physician.id} value={physician.id}>
-                          {physician.name}
-                        </option>
-                      ))}
-                      <option value="new">Add New Physician</option>
-                    </select>
+                    />
                   </div>
-                  
-                  {formData.newPhysician && (
-                    <div className="form-group">
-                      <label htmlFor="newPhysicianName">New Physician Name</label>
-                      <input
-                        type="text"
-                        id="newPhysicianName"
-                        name="newPhysicianName"
-                        value={formData.newPhysicianName}
-                        onChange={handleInputChange}
-                        required
-                        disabled={isLoggingOut}
-                      />
-                    </div>
-                  )}
                   
                   <div className="form-group">
                     <label htmlFor="agencyId">Agency</label>
-                    <select
-                      id="agencyId"
-                      name="agencyId"
-                      value={formData.agencyId}
-                      onChange={handleAgencyChange}
+                    <select 
+                      name="agencyId" 
+                      value={formData.agencyId} 
+                      onChange={handleAgencyChange} 
+                      className="form-select"
                       required
-                      disabled={isLoggingOut}
                     >
                       <option value="">Select Agency</option>
-                      {agencies.map(agency => (
+                      {agencies.map((agency) => (
                         <option key={agency.id} value={agency.id}>
                           {agency.name}
                         </option>
@@ -1156,41 +1186,30 @@ const AdminReferralsPage = () => {
                     <>
                       <div className="form-group">
                         <label htmlFor="agencyBranch">Agency Branch</label>
-                        <select
-                          id="agencyBranch"
-                          name="agencyBranch"
-                          value={formData.agencyBranch}
-                          onChange={handleInputChange}
-                          required
-                          disabled={isLoggingOut}
-                        >
-                          <option value="">Select Branch</option>
-                          {getSelectedAgency()?.branches.map((branch, index) => (
-                            <option key={index} value={branch}>
-                              {branch}
-                            </option>
-                          ))}
+                        <select 
+                          id="agencyBranch" 
+                          name="agencyBranch" 
+                          value={formData.agencyBranch} 
+                          onChange={handleInputChange} 
+                          disabled={isLoggingOut} 
+                        > 
+                          <option value="">Select Branch</option> 
+                          <option value="placeholder">Seleccione una sucursal</option>
                         </select>
                       </div>
                       
                       <div className="form-group">
                         <label htmlFor="nurseManager">Nurse Manager</label>
-                        <select
+                        <input
+                          type="text"
                           id="nurseManager"
                           name="nurseManager"
-                          value={formData.nurseManager}
-                          onChange={handleNurseManagerChange}
+                          value={formData.nurseManager || ''}
+                          onChange={handleInputChange}
+                          placeholder="Enter nurse manager name"
                           required
                           disabled={isLoggingOut}
-                        >
-                          <option value="">Select Nurse Manager</option>
-                          {getSelectedAgency()?.managers.map((manager, index) => (
-                            <option key={index} value={manager}>
-                              {manager}
-                            </option>
-                          ))}
-                          <option value="new">Add New Nurse Manager</option>
-                        </select>
+                        />
                       </div>
                       
                       {addingNewManager && (
@@ -1292,16 +1311,21 @@ const AdminReferralsPage = () => {
                   </div>
                   
                   <div className="form-group">
-                    <label htmlFor="wbs">WBS</label>
-                    <input
-                      type="text"
+                    <label htmlFor="wbs">WBS (Weight Bearing Status)</label>
+                    <select
                       id="wbs"
                       name="wbs"
                       value={formData.wbs}
                       onChange={handleInputChange}
-                      placeholder="XX-XXX-X-XXXX (e.g., 01-123-4-5678)"
                       disabled={isLoggingOut}
-                    />
+                      className="wbs-select"
+                    >
+                      {wbsOptions.map((option, index) => (
+                        <option key={index} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   
                   {/* Weight field with unit selection */}
@@ -1444,19 +1468,20 @@ const AdminReferralsPage = () => {
                           {selectedDisciplines.PT && (
                             <div className="therapist-select">
                               <label htmlFor="pt-therapist">PT Therapist</label>
-                              <select
-                                id="pt-therapist"
-                                value={selectedTherapists.PT || ''}
+                              <select 
+                                id="pt-therapist" 
+                                value={selectedTherapists.PT || ''} 
                                 onChange={(e) => handleTherapistSelection('PT', e.target.value)}
                                 required
-                                disabled={isLoggingOut}
                               >
                                 <option value="">Select PT Therapist</option>
-                                {therapists.PT.map(therapist => (
-                                  <option key={therapist.id} value={therapist.id}>
-                                    {therapist.name}
-                                  </option>
-                                ))}
+                                {therapists
+                                  .filter(t => t.role.toLowerCase() === 'pt')
+                                  .map(t => (
+                                    <option key={t.id} value={t.id}>
+                                      {t.name}
+                                    </option>
+                                  ))}
                               </select>
                             </div>
                           )}
@@ -1465,19 +1490,20 @@ const AdminReferralsPage = () => {
                           {selectedDisciplines.PTA && (
                             <div className="therapist-select">
                               <label htmlFor="pta-therapist">PTA Therapist</label>
-                              <select
-                                id="pta-therapist"
-                                value={selectedTherapists.PTA || ''}
+                              <select 
+                                id="pta-therapist" 
+                                value={selectedTherapists.PTA || ''} 
                                 onChange={(e) => handleTherapistSelection('PTA', e.target.value)}
                                 required
-                                disabled={isLoggingOut}
                               >
                                 <option value="">Select PTA Therapist</option>
-                                {therapists.PTA.map(therapist => (
-                                  <option key={therapist.id} value={therapist.id}>
-                                    {therapist.name}
-                                  </option>
-                                ))}
+                                {therapists
+                                  .filter(t => t.role.toLowerCase() === 'pta')
+                                  .map(t => (
+                                    <option key={t.id} value={t.id}>
+                                      {t.name}
+                                    </option>
+                                  ))}
                               </select>
                             </div>
                           )}
@@ -1510,19 +1536,20 @@ const AdminReferralsPage = () => {
                           {selectedDisciplines.OT && (
                             <div className="therapist-select">
                               <label htmlFor="ot-therapist">OT Therapist</label>
-                              <select
-                                id="ot-therapist"
-                                value={selectedTherapists.OT || ''}
+                              <select 
+                                id="ot-therapist" 
+                                value={selectedTherapists.OT || ''} 
                                 onChange={(e) => handleTherapistSelection('OT', e.target.value)}
                                 required
-                                disabled={isLoggingOut}
                               >
                                 <option value="">Select OT Therapist</option>
-                                {therapists.OT.map(therapist => (
-                                  <option key={therapist.id} value={therapist.id}>
-                                    {therapist.name}
-                                  </option>
-                                ))}
+                                {therapists
+                                  .filter(t => t.role.toLowerCase() === 'ot')
+                                  .map(t => (
+                                    <option key={t.id} value={t.id}>
+                                      {t.name}
+                                    </option>
+                                  ))}
                               </select>
                             </div>
                           )}
@@ -1531,19 +1558,20 @@ const AdminReferralsPage = () => {
                           {selectedDisciplines.COTA && (
                             <div className="therapist-select">
                               <label htmlFor="cota-therapist">COTA Therapist</label>
-                              <select
-                                id="cota-therapist"
-                                value={selectedTherapists.COTA || ''}
+                              <select 
+                                id="cota-therapist" 
+                                value={selectedTherapists.COTA || ''} 
                                 onChange={(e) => handleTherapistSelection('COTA', e.target.value)}
                                 required
-                                disabled={isLoggingOut}
                               >
                                 <option value="">Select COTA Therapist</option>
-                                {therapists.COTA.map(therapist => (
-                                  <option key={therapist.id} value={therapist.id}>
-                                    {therapist.name}
-                                  </option>
-                                ))}
+                                {therapists
+                                  .filter(t => t.role.toLowerCase() === 'cota')
+                                  .map(t => (
+                                    <option key={t.id} value={t.id}>
+                                      {t.name}
+                                    </option>
+                                  ))}
                               </select>
                             </div>
                           )}
@@ -1576,19 +1604,20 @@ const AdminReferralsPage = () => {
                           {selectedDisciplines.ST && (
                             <div className="therapist-select">
                               <label htmlFor="st-therapist">ST Therapist</label>
-                              <select
-                                id="st-therapist"
-                                value={selectedTherapists.ST || ''}
+                              <select 
+                                id="st-therapist" 
+                                value={selectedTherapists.ST || ''} 
                                 onChange={(e) => handleTherapistSelection('ST', e.target.value)}
                                 required
-                                disabled={isLoggingOut}
                               >
                                 <option value="">Select ST Therapist</option>
-                                {therapists.ST.map(therapist => (
-                                  <option key={therapist.id} value={therapist.id}>
-                                    {therapist.name}
-                                  </option>
-                                ))}
+                                {therapists
+                                  .filter(t => t.role.toLowerCase() === 'st')
+                                  .map(t => (
+                                    <option key={t.id} value={t.id}>
+                                      {t.name}
+                                    </option>
+                                  ))}
                               </select>
                             </div>
                           )}
@@ -1597,19 +1626,20 @@ const AdminReferralsPage = () => {
                           {selectedDisciplines.STA && (
                             <div className="therapist-select">
                               <label htmlFor="sta-therapist">STA Therapist</label>
-                              <select
-                                id="sta-therapist"
-                                value={selectedTherapists.STA || ''}
+                              <select 
+                                id="sta-therapist" 
+                                value={selectedTherapists.STA || ''} 
                                 onChange={(e) => handleTherapistSelection('STA', e.target.value)}
                                 required
-                                disabled={isLoggingOut}
                               >
                                 <option value="">Select STA Therapist</option>
-                                {therapists.STA.map(therapist => (
-                                  <option key={therapist.id} value={therapist.id}>
-                                    {therapist.name}
-                                  </option>
-                                ))}
+                                {therapists
+                                  .filter(t => t.role.toLowerCase() === 'sta')
+                                  .map(t => (
+                                    <option key={t.id} value={t.id}>
+                                      {t.name}
+                                    </option>
+                                  ))}
                               </select>
                             </div>
                           )}
@@ -1715,10 +1745,19 @@ const AdminReferralsPage = () => {
                   <button 
                     type="submit" 
                     className="save-referral-btn"
-                    disabled={isLoggingOut}
+                    disabled={isLoggingOut || formSubmitting}
                   >
-                    <i className="fas fa-save"></i>
-                    Save Patient Referral
+                    {formSubmitting ? (
+                      <>
+                        <i className="fas fa-spinner fa-spin"></i>
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <i className="fas fa-save"></i>
+                        Save Patient Referral
+                      </>
+                    )}
                   </button>
                 </div>
               </div>

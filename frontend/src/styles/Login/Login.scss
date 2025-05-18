@@ -1,30 +1,89 @@
-// Variables (ajustadas)
-$primary-color: #1484c5;
-$primary-dark: #106ea6;
-$primary-light: #3aa0de;
-$primary-neon: #00c2ff; // Color azul neón
-$accent-color: #1484c5; // Cambiado de naranja a azul
-$secondary-accent: #6b1b99;
-$text-light: #ffffff;
-$text-dark: #333333;
-$dark-blue: #0A1929;
-$error-color: #e74c3c;
-$success-color: #27ae60;
-$glass-bg: rgba(30, 38, 50, 0.7); // Más oscuro para el contenedor
-$glass-border: rgba(255, 255, 255, 0.1);
-$shadow-color: rgba(0, 0, 0, 0.5);
-$background-overlay: rgba(10, 20, 35, 0.4); // Overlay más oscuro para el fondo
+// Variables avanzadas
+$primary-gradient: linear-gradient(135deg, #0062ff, #00a3ff);
+$accent-gradient: linear-gradient(135deg, #00c2ff, #0062ff);
+$glass-bg: rgba(15, 23, 42, 0.7);
+$premium-text: #ffffff;
+$premium-secondary: rgba(255, 255, 255, 0.7);
+$neon-blue: #00c2ff;
+$neon-glow: 0 0 15px rgba(0, 194, 255, 0.6);
+$premium-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
+$premium-border: 1px solid rgba(255, 255, 255, 0.12);
+$success-color: #10b981;
+$error-color: #ef4444;
+$warning-color: #f59e0b;
 
-// Mixins
-@mixin glass-effect {
+// Mixins avanzados
+@mixin ultra-glass-effect {
   background: $glass-bg;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border: 1px solid $glass-border;
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: $premium-border;
+  box-shadow: $premium-shadow;
 }
 
-// Main Page Styles
+@mixin premium-transition {
+  transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@mixin neon-focus {
+  outline: none;
+  border-color: $neon-blue;
+  box-shadow: $neon-glow;
+}
+
+@mixin float-animation {
+  animation: float 6s ease-in-out infinite;
+}
+
+// Animaciones refinadas
+@keyframes float {
+  0% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+  100% { transform: translateY(0); }
+}
+
+@keyframes pulse-glow {
+  0% { box-shadow: 0 0 5px rgba(0, 194, 255, 0.3); }
+  50% { box-shadow: 0 0 20px rgba(0, 194, 255, 0.6); }
+  100% { box-shadow: 0 0 5px rgba(0, 194, 255, 0.3); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -100% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes fadeInBlur {
+  from { 
+    opacity: 0; 
+    filter: blur(10px);
+    transform: scale(0.95);
+  }
+  to { 
+    opacity: 1; 
+    filter: blur(0);
+    transform: scale(1);
+  }
+}
+
+@keyframes slideUp {
+  from { 
+    opacity: 0; 
+    transform: translateY(30px);
+  }
+  to { 
+    opacity: 1; 
+    transform: translateY(0);
+  }
+}
+
+@keyframes gradientFlow {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+// Estilo de la página principal
 .page {
   display: flex;
   justify-content: center;
@@ -34,7 +93,7 @@ $background-overlay: rgba(10, 20, 35, 0.4); // Overlay más oscuro para el fondo
   font-family: 'Inter', 'Segoe UI', sans-serif;
   position: relative;
   overflow: hidden;
-  color: $text-light;
+  color: $premium-text;
   
   &__background {
     position: absolute;
@@ -51,7 +110,7 @@ $background-overlay: rgba(10, 20, 35, 0.4); // Overlay más oscuro para el fondo
       left: 0;
       width: 100%;
       height: 100%;
-      background: linear-gradient(135deg, rgba(10,25,41,0.75) 0%, rgba(10,20,40,0.9) 100%); // Más oscuro
+      background: linear-gradient(135deg, rgba(2, 12, 27, 0.85) 0%, rgba(10, 22, 40, 0.95) 100%);
       z-index: 1;
     }
     
@@ -64,155 +123,189 @@ $background-overlay: rgba(10, 20, 35, 0.4); // Overlay más oscuro para el fondo
   }
 }
 
-// Login Container Styles
-.login-container {
-  perspective: 1000px;
-  width: 420px;
-  z-index: 10;
-  animation: fadeIn 0.8s ease-out;
-  position: relative; // Asegura que los elementos hijos se posicionen correctamente
+// Partículas decorativas
+.particles-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  z-index: 1;
+  pointer-events: none;
   
-  .brand-info {
+  .particle {
     position: absolute;
-    bottom: -60px; // Movido hacia abajo para separarlo del formulario
-    left: 50%;
-    transform: translateX(-50%);
-    text-align: center;
-    font-size: 0.7rem;
-    color: rgba(255, 255, 255, 0.5);
-    width: 100%;
-    padding-top: 20px; // Espacio adicional
+    background-color: rgba(255, 255, 255, 0.6);
+    border-radius: 50%;
+    transition: transform 0.3s ease;
     
-    p {
-      margin: 4px 0; // Espacio entre líneas
+    &:nth-child(5n+1) {
+      background-color: rgba(0, 194, 255, 0.7);
+      box-shadow: 0 0 8px rgba(0, 194, 255, 0.7);
     }
     
-    a {
-      color: $primary-neon;
-      text-decoration: none;
-      transition: color 0.3s;
-      margin: 0 4px; // Espacio entre enlaces
-      position: relative;
-      display: inline-block; // Para que los enlaces funcionen correctamente
-      
-      &:hover {
-        color: $primary-light;
-      }
+    &-1 {
+      width: 120px;
+      height: 120px;
+      top: 15%;
+      left: 10%;
+      opacity: 0.1;
+      animation: float 25s ease-in-out infinite;
+    }
+    
+    &-2 {
+      width: 180px;
+      height: 180px;
+      bottom: 10%;
+      right: 15%;
+      opacity: 0.08;
+      animation: float 20s ease-in-out infinite 3s reverse;
+    }
+    
+    &-3 {
+      width: 80px;
+      height: 80px;
+      top: 30%;
+      right: 25%;
+      opacity: 0.06;
+      animation: float 15s ease-in-out infinite 5s;
+    }
+    
+    &-4 {
+      width: 50px;
+      height: 50px;
+      bottom: 30%;
+      left: 20%;
+      opacity: 0.09;
+      animation: float 12s ease-in-out infinite 2s;
     }
   }
 }
 
-// Login Card Styles - Sin cambios en la lógica de animación
+// Login Container
+.login-container {
+  perspective: 1200px;
+  width: 450px;
+  max-width: 90%;
+  z-index: 10;
+  animation: fadeInBlur 0.8s ease-out;
+  position: relative;
+}
+
+// Login Card
 .login-card {
   position: relative;
   width: 100%;
   transform-style: preserve-3d;
-  transition: transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  transition: transform 1s cubic-bezier(0.34, 1.56, 0.64, 1);
   
   &.flipped {
     transform: rotateY(180deg);
   }
-}
-
-// Common Front and Back Styles
-.login-card__front,
-.login-card__back {
-  width: 100%;
-  -webkit-backface-visibility: hidden;
-  backface-visibility: hidden;
-  border-radius: 16px;
-  overflow: hidden;
-}
-
-// Back Card Styles
-.login-card__back {
-  position: absolute;
-  top: 0;
-  left: 0;
-  transform: rotateY(180deg);
-  display: none;
-  max-height: 90vh;
   
-  &.password-recovery {
-    display: block;
+  &__front,
+  &__back {
+    width: 100%;
+    -webkit-backface-visibility: hidden;
+    backface-visibility: hidden;
+    border-radius: 20px;
+    overflow: hidden;
+  }
+  
+  &__back {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: rotateY(180deg);
+    display: none;
+    
+    &.password-recovery {
+      display: block;
+    }
   }
 }
 
 // Main Login Box
 .login {
-  @include glass-effect;
+  @include ultra-glass-effect;
   padding: 2.5rem;
   text-align: center;
-  border-radius: 16px;
+  border-radius: 20px;
   animation: fadeInBlur 0.6s ease-out forwards;
   
-  // Logo Styles
+  // Logo 
   &__logo {
-    margin-bottom: 1.8rem;
+    margin-bottom: 2rem;
     display: flex;
     justify-content: center;
     
     &-img {
-      width: 110px;
-      border-radius: 12px;
-      transform: translateY(10px);
-      transition: all 0.3s ease;
-      animation: float 6s ease-in-out infinite;
-      filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.2));
+      width: 120px;
+      border-radius: 16px;
+      @include float-animation;
+      animation: pulse-glow 6s infinite;
+      filter: drop-shadow(0 8px 20px rgba(0, 194, 255, 0.3));
+      transform: translateY(0);
+      transition: all 0.5s ease;
       
       &:hover {
-        transform: translateY(5px) scale(1.05);
+        transform: translateY(-10px) scale(1.05);
+        filter: drop-shadow(0 12px 25px rgba(0, 194, 255, 0.5));
       }
     }
   }
   
-  // Title Styles
+  // Title
   &__title {
-    margin-bottom: 2rem;
-    font-size: 2.4rem;
-    color: $text-light;
-    font-weight: 700;
-    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    animation: slideUp 0.6s ease-out 0.3s both;
+    margin-bottom: 2.5rem;
+    font-size: 2.5rem;
+    color: $premium-text;
+    font-weight: 800;
+    text-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.7s ease-out 0.3s both;
     position: relative;
     display: inline-block;
+    letter-spacing: 0.5px;
     
     &:after {
       content: '';
       position: absolute;
-      bottom: -10px;
+      bottom: -12px;
       left: 50%;
       transform: translateX(-50%);
-      width: 40px;
+      width: 50px;
       height: 3px;
-      background: $primary-neon; // Cambiado a azul neón
+      background: $neon-blue;
       border-radius: 3px;
+      box-shadow: $neon-glow;
     }
   }
   
   // Form Group
   &__form-group {
-    margin-bottom: 1.8rem;
+    margin-bottom: 2rem;
     text-align: left;
     position: relative;
-    animation: slideUp 0.6s ease-out calc(0.3s + var(--delay, 0s)) both;
+    animation: slideUp 0.7s ease-out calc(0.3s + var(--delay, 0s)) both;
     
     &:nth-child(1) {
-      --delay: 0.1s;
+      --delay: 0.15s;
     }
     
     &:nth-child(2) {
-      --delay: 0.2s;
+      --delay: 0.3s;
     }
     
     &:nth-child(3) {
-      --delay: 0.3s;
+      --delay: 0.45s;
     }
     
     &.error {
       .login__input {
         border-color: $error-color;
-        box-shadow: 0 4px 12px rgba(231, 76, 60, 0.2);
+        box-shadow: 0 5px 15px rgba($error-color, 0.25);
+        background: rgba($error-color, 0.08);
       }
       
       .login__label {
@@ -222,89 +315,67 @@ $background-overlay: rgba(10, 20, 35, 0.4); // Overlay más oscuro para el fondo
           color: $error-color;
         }
       }
-      
-      .login__error-message {
-        display: block;
-      }
-    }
-    
-    &.success {
-      .login__input {
-        border-color: $success-color;
-        box-shadow: 0 4px 12px rgba(39, 174, 96, 0.2);
-      }
-      
-      .login__label i {
-        color: $success-color;
-      }
     }
     
     &.form-focus {
-      .login__input-wrapper::after {
-        width: 100%;
+      .login__label {
+        color: $neon-blue;
+        transform: translateY(-2px);
+        
+        i {
+          color: $neon-blue;
+          transform: scale(1.1);
+        }
       }
+      
+      .login__input {
+        border-color: $neon-blue;
+        background: rgba(0, 194, 255, 0.05);
+        box-shadow: $neon-glow;
+      }
+    }
+    
+    &.form-pulse {
+      animation: pulse 0.6s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
     }
   }
   
-  // Label Styles
+  // Label
   &__label {
     display: flex;
     align-items: center;
-    gap: 8px;
-    font-size: 0.95rem;
-    margin-bottom: 0.8rem;
-    text-align: left;
-    color: rgba($text-light, 0.9);
+    gap: 10px;
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    color: $premium-secondary;
     font-weight: 500;
-    transition: all 0.3s ease;
+    @include premium-transition;
     
     i {
-      color: $primary-color;
-      transition: color 0.3s ease;
-      font-size: 1.1rem;
+      color: $neon-blue;
+      transition: all 0.4s ease;
+      font-size: 1.2rem;
     }
   }
   
-  // Input Styles - Mejorados para incluir el efecto neón
+  // Input
   &__input {
     width: 100%;
-    padding: 1rem 1.2rem;
-    background: rgba(255, 255, 255, 0.07);
-    border: 2px solid transparent;
-    border-radius: 10px;
-    font-size: 1rem;
-    color: $text-light;
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    box-sizing: border-box;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    padding: 1.2rem 1.4rem;
+    background: rgba(255, 255, 255, 0.04);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 14px;
+    font-size: 1.05rem;
+    color: $premium-text;
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     
     &::placeholder {
-      color: rgba(255, 255, 255, 0.4);
+      color: rgba(255, 255, 255, 0.3);
     }
     
     &:focus {
-      outline: none;
-      border-color: $primary-neon; // Cambiado a azul neón
-      background: rgba(0, 194, 255, 0.08); // Fondo sutil azul neón
-      box-shadow: 0 0 15px rgba(0, 194, 255, 0.3); // Glow azul neón
-    }
-  }
-  
-  // Input Wrapper
-  &__input-wrapper {
-    position: relative;
-    overflow: hidden;
-    border-radius: 10px;
-    
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 0%;
-      height: 2px;
-      background: $primary-neon;
-      transition: width 0.3s ease;
+      @include neon-focus;
     }
   }
   
@@ -312,100 +383,117 @@ $background-overlay: rgba(10, 20, 35, 0.4); // Overlay más oscuro para el fondo
   &__error-message {
     color: $error-color;
     font-size: 0.85rem;
-    margin-top: 0.5rem;
-    display: none;
-    text-align: left;
-    animation: fadeIn 0.3s ease-out;
-  }
-  
-  // Checkbox for Remember Me - Asegurándose que sea clickeable
-  &__checkbox-group {
+    margin-top: 0.7rem;
+    padding-left: 0.5rem;
     display: flex;
     align-items: center;
-    margin-bottom: 1.8rem;
-    animation: slideUp 0.6s ease-out 0.6s both;
-    cursor: pointer;
-    user-select: none; // Evita selección de texto al hacer click
+    animation: fadeInBlur 0.3s ease-out;
     
-    .custom-checkbox {
-      position: relative;
-      display: flex;
-      align-items: center;
-      cursor: pointer;
-      z-index: 2; // Asegura que esté por encima de otros elementos
+    &:before {
+      content: '⚠️';
+      margin-right: 6px;
+      font-size: 0.9rem;
+    }
+  }
+  
+  // Checkbox
+  .custom-checkbox {
+    position: relative;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    margin-bottom: 2rem;
+    animation: slideUp 0.7s ease-out 0.6s both;
+    user-select: none;
+    
+    input {
+      position: absolute;
+      opacity: 0;
+      height: 0;
+      width: 0;
       
-      input {
-        position: absolute;
-        opacity: 0;
-        cursor: pointer;
-        height: 0;
-        width: 0;
-        z-index: 3; // Mayor z-index para asegurar clickeabilidad
-        
-        &:checked ~ .checkmark {
-          background-color: $primary-neon; // Cambiado a azul neón
-          border-color: $primary-neon;
-          
-          &:after {
-            display: block;
-          }
-        }
-      }
-      
-      .checkmark {
-        height: 18px;
-        width: 18px;
-        background-color: rgba(255, 255, 255, 0.1);
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        border-radius: 4px;
-        margin-right: 8px;
-        transition: all 0.2s ease;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: relative;
+      &:checked ~ .checkmark {
+        background-color: $neon-blue;
+        border-color: $neon-blue;
+        box-shadow: $neon-glow;
         
         &:after {
-          content: "";
-          display: none;
-          width: 5px;
-          height: 10px;
-          border: solid white;
-          border-width: 0 2px 2px 0;
-          transform: rotate(45deg);
-          position: absolute;
+          display: block;
+          animation: fadeInBlur 0.2s forwards;
         }
+      }
+    }
+    
+    .checkmark {
+      height: 22px;
+      width: 22px;
+      background-color: rgba(255, 255, 255, 0.04);
+      border: 2px solid rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      margin-right: 10px;
+      @include premium-transition;
+      position: relative;
+      
+      &:after {
+        content: "";
+        display: none;
+        position: absolute;
+        left: 7px;
+        top: 3px;
+        width: 6px;
+        height: 11px;
+        border: solid white;
+        border-width: 0 2px 2px 0;
+        transform: rotate(45deg);
+      }
+    }
+    
+    span {
+      font-size: 0.95rem;
+      color: $premium-secondary;
+      @include premium-transition;
+    }
+    
+    &:hover {
+      .checkmark {
+        background-color: rgba(0, 194, 255, 0.1);
+        border-color: rgba(0, 194, 255, 0.3);
       }
       
       span {
-        font-size: 0.9rem;
-        color: rgba($text-light, 0.8);
-        margin-left: 4px; // Espacio adicional para mejor clickeabilidad
-      }
-      
-      &:hover input ~ .checkmark {
-        background-color: rgba(0, 194, 255, 0.15); // Hover con color neón
+        color: $premium-text;
       }
     }
   }
   
-  // Button Styles
+  // Button
   &__button {
     width: 100%;
-    padding: 1.1rem 1.2rem;
-    background: linear-gradient(135deg, $primary-color, $primary-dark);
-    color: $text-light;
+    padding: 1.25rem 1.5rem;
+    background: $primary-gradient;
+    background-size: 200% 200%;
+    animation: gradientFlow 5s ease infinite, slideUp 0.7s ease-out 0.7s both;
+    color: $premium-text;
     border: none;
-    border-radius: 10px;
-    font-size: 1rem;
+    border-radius: 14px;
+    font-size: 1.05rem;
     font-weight: 600;
     cursor: pointer;
-    transition: all 0.3s ease;
-    animation: slideUp 0.6s ease-out 0.7s both;
+    @include premium-transition;
     position: relative;
     overflow: hidden;
-    box-shadow: 0 5px 15px rgba($primary-dark, 0.4);
-    letter-spacing: 1px;
+    box-shadow: 0 8px 25px rgba(0, 98, 255, 0.4);
+    letter-spacing: 1.5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    
+    .login-arrow {
+      transform: translateX(0);
+      transition: transform 0.3s ease;
+      opacity: 0.8;
+    }
     
     &:before {
       content: '';
@@ -417,176 +505,245 @@ $background-overlay: rgba(10, 20, 35, 0.4); // Overlay más oscuro para el fondo
       background: linear-gradient(
         90deg, 
         rgba(255, 255, 255, 0) 0%, 
-        rgba(255, 255, 255, 0.2) 50%, 
+        rgba(255, 255, 255, 0.3) 50%, 
         rgba(255, 255, 255, 0) 100%
       );
       transition: all 0.7s ease;
     }
     
     &:hover {
-      background: linear-gradient(135deg, $primary-neon, $primary-dark);
-      transform: translateY(-2px);
-      box-shadow: 0 0 20px rgba(0, 194, 255, 0.4); // Glow azul neón
+      transform: translateY(-3px);
+      box-shadow: 0 12px 30px rgba(0, 98, 255, 0.5);
+      background-position: right center;
       
       &:before {
         left: 100%;
       }
+      
+      .login-arrow {
+        transform: translateX(5px);
+        opacity: 1;
+      }
     }
     
     &:active {
-      transform: translateY(1px);
-      box-shadow: 0 3px 10px rgba($primary-dark, 0.4);
+      transform: translateY(-1px);
+      box-shadow: 0 5px 15px rgba(0, 98, 255, 0.4);
     }
     
     &:disabled {
       opacity: 0.7;
       cursor: not-allowed;
-      background: linear-gradient(135deg, rgba($primary-color, 0.7), rgba($primary-dark, 0.7));
+      transform: none;
+      box-shadow: 0 5px 15px rgba(0, 98, 255, 0.2);
     }
   }
   
-  // Links - Asegurándose que sean clickeables
+  // Links
   &__extra-links {
-    margin-top: 1.8rem;
-    animation: slideUp 0.6s ease-out 0.8s both;
-    display: flex;
-    justify-content: center;
-    position: relative; // Asegura que los enlaces sean clickeables
-    z-index: 2;
-  }
-  
-  &__link {
-    color: rgba($text-light, 0.8);
-    text-decoration: none;
-    font-size: 0.9rem;
-    transition: all 0.3s ease;
-    position: relative;
-    padding: 6px 4px; // Área de click más grande
-    cursor: pointer;
-    z-index: 3; // Mayor z-index para asegurar clickeabilidad
-    display: inline-block; // Necesario para que los enlaces funcionen correctamente
+    margin-top: 2rem;
+    animation: slideUp 0.7s ease-out 0.8s both;
     
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      height: 1px;
-      background: $primary-neon; // Cambiado a azul neón
-      transform: scaleX(0);
-      transform-origin: right;
-      transition: transform 0.4s ease;
-    }
-    
-    &:hover {
-      color: $primary-neon; // Cambiado a azul neón
+    a {
+      display: inline-block;
+      color: $premium-secondary;
+      text-decoration: none;
+      font-size: 0.95rem;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      @include premium-transition;
+      position: relative;
+      overflow: hidden;
       
-      &::after {
-        transform: scaleX(1);
-        transform-origin: left;
+      &:before {
+        content: '';
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        height: 1px;
+        background: $neon-blue;
+        transform: scaleX(0);
+        transform-origin: right;
+        transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+      }
+      
+      &:hover {
+        color: $neon-blue;
+        background: rgba(0, 194, 255, 0.08);
+        
+        &:before {
+          transform: scaleX(1);
+          transform-origin: left;
+        }
       }
     }
   }
 }
 
-// Button-styled links - Asegurándose que sean clickeables
-button.login__link {
-  background: none;
-  border: none;
-  padding: 6px 4px; // Área de click más grande
-  font: inherit;
-  color: rgba($text-light, 0.8);
-  text-decoration: none;
-  font-size: 0.9rem;
-  transition: all 0.3s ease;
-  position: relative;
-  cursor: pointer;
-  z-index: 3; // Mayor z-index para asegurar clickeabilidad
-  
-  &::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 1px;
-    background: $primary-neon;
-    transform: scaleX(0);
-    transform-origin: right;
-    transition: transform 0.4s ease;
-  }
-  
-  &:hover {
-    color: $primary-neon;
-    
-    &::after {
-      transform: scaleX(1);
-      transform-origin: left;
-    }
-  }
-}
-
-// Estilos para enlaces "Forgot password" separados para mejora de clickeabilidad
-.forgot-password-link {
-  display: inline-block;
-  margin-top: 10px;
-  padding: 5px;
-  position: relative;
-  z-index: 10;
-  cursor: pointer;
-  color: $primary-neon;
-  
-  &:hover {
-    text-decoration: underline;
-  }
-}
-
-// Estilos para los términos y condiciones en el footer
+// Footer
 .terms-footer {
-  margin-top: 20px;
+  margin-top: 2.5rem;
   font-size: 0.8rem;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.5);
   text-align: center;
+  line-height: 1.6;
+  animation: slideUp 0.7s ease-out 0.9s both;
+  
+  p {
+    margin: 0.3rem 0;
+  }
   
   a {
-    color: $primary-neon;
+    color: $neon-blue;
     text-decoration: none;
-    transition: color 0.3s;
-    display: inline-block;
-    padding: 2px;
+    @include premium-transition;
+    padding: 0 3px;
     
     &:hover {
-      color: $primary-light;
+      color: $premium-text;
       text-decoration: underline;
     }
   }
 }
 
-// Animaciones - Sin cambios
-
-// Mobile Responsive - ajustado para mejor espaciado
-@media (max-width: 480px) {
-  .login-container {
-    width: 90%;
+// Estilos para la entrada de contraseña con toggle
+.password-input-wrapper {
+  position: relative;
+  width: 100%;
+  
+  .password-toggle-btn {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: rgba(255, 255, 255, 0.5);
+    cursor: pointer;
+    transition: all 0.3s ease;
+    padding: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     
-    .brand-info {
-      bottom: -80px; // Más separación en móviles
+    &:hover {
+      color: $neon-blue;
+    }
+    
+    &:focus {
+      outline: none;
+    }
+  }
+}
+
+// Advertencia de Caps Lock
+.caps-lock-warning {
+  color: $warning-color;
+  font-size: 0.85rem;
+  margin-top: 0.7rem;
+  padding-left: 0.5rem;
+  display: flex;
+  align-items: center;
+  animation: fadeIn 0.3s ease-out;
+  
+  &:before {
+    content: '⚠️';
+    margin-right: 6px;
+    font-size: 0.9rem;
+  }
+}
+
+// Efecto pulse para animaciones de error
+@keyframes pulse {
+  0%, 100% { transform: translateX(0); }
+  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
+  20%, 40%, 60%, 80% { transform: translateX(5px); }
+}
+
+// Animación del logo
+@keyframes floating {
+  0% { transform: translateY(0) rotate(0); }
+  25% { transform: translateY(-5px) rotate(-1deg); }
+  50% { transform: translateY(0) rotate(0); }
+  75% { transform: translateY(5px) rotate(1deg); }
+  100% { transform: translateY(0) rotate(0); }
+}
+
+.login__logo-img {
+  animation: floating 6s ease-in-out infinite, pulse-glow 4s infinite;
+}
+
+// Responsive Styles - Mejorados para todos los tamaños de dispositivo
+@media (max-width: 768px) {
+  .login {
+    padding: 2.2rem;
+    
+    &__logo-img {
+      width: 100px;
+    }
+    
+    &__title {
+      font-size: 2.2rem;
+      margin-bottom: 2rem;
+      
+      &:after {
+        width: 40px;
+        height: 2px;
+        bottom: -10px;
+      }
+    }
+    
+    &__form-group {
+      margin-bottom: 1.8rem;
+    }
+    
+    &__label {
+      font-size: 0.95rem;
+      margin-bottom: 0.8rem;
+    }
+    
+    &__input {
+      padding: 1rem 1.2rem;
+      font-size: 1rem;
+    }
+    
+    .custom-checkbox {
+      margin-bottom: 1.8rem;
+    }
+    
+    &__button {
+      padding: 1.1rem;
+      font-size: 1rem;
+    }
+    
+    &__extra-links a {
+      font-size: 0.9rem;
     }
   }
   
-  .login, .login-card__back {
-    padding: 2rem;
+  .terms-footer {
+    margin-top: 2rem;
+    font-size: 0.75rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .login-container {
+    width: 90%;
+    max-width: 400px;
   }
   
   .login {
+    padding: 1.8rem;
+    
     &__logo-img {
       width: 90px;
     }
     
     &__title {
       font-size: 2rem;
-      margin-bottom: 1.5rem;
+      margin-bottom: 1.8rem;
     }
     
     &__form-group {
@@ -599,447 +756,340 @@ button.login__link {
     
     &__input {
       padding: 0.9rem 1rem;
+      font-size: 0.95rem;
+      border-radius: 10px;
     }
     
     &__button {
       padding: 1rem;
+      font-size: 0.95rem;
+      border-radius: 10px;
+    }
+    
+    .custom-checkbox {
+      margin-bottom: 1.5rem;
+      
+      .checkmark {
+        height: 20px;
+        width: 20px;
+      }
+      
+      span {
+        font-size: 0.9rem;
+      }
     }
     
     &__extra-links {
       margin-top: 1.5rem;
-    }
-  }
-}
-
-// Variables adicionales
-@keyframes fadeInBlur {
-  from { 
-    opacity: 0; 
-    filter: blur(5px);
-  }
-  to { 
-    opacity: 1; 
-    filter: blur(0);
-  }
-}
-
-// Fix para los estilos del botón y enlaces
-.login {
-  // Botón de login
-  &__button {
-    position: relative;
-    overflow: hidden;
-    z-index: 2;
-    
-    &:focus {
-      outline: none;
-      box-shadow: 0 0 0 3px rgba(0, 194, 255, 0.4);
-    }
-  }
-  
-  // Fix para los enlaces en ambas pantallas
-  &__extra-links {
-    position: relative;
-    z-index: 5;
-    margin-top: 1.5rem;
-    
-    a {
-      display: inline-block;
-      position: relative;
-      padding: 8px;
-      text-decoration: none;
-      color: #00c2ff;
-      font-size: 0.95rem;
-      transition: all 0.3s ease;
-      border-radius: 4px;
       
-      &:hover, &:focus {
-        background-color: rgba(0, 194, 255, 0.08);
-        text-decoration: none;
-        color: #3aa0de;
-        transform: translateY(-2px);
-      }
-      
-      &:active {
-        transform: translateY(0);
+      a {
+        font-size: 0.85rem;
+        padding: 0.4rem 0.8rem;
       }
     }
   }
   
-  // Fix para el checkbox
-  &__checkbox-group {
-    margin-bottom: 1.5rem;
-    cursor: pointer;
+  .terms-footer {
+    margin-top: 1.8rem;
+    font-size: 0.7rem;
+    
+    p {
+      margin: 0.2rem 0;
+    }
+  }
+  
+  .password-input-wrapper .password-toggle-btn {
+    right: 10px;
+    padding: 3px;
+  }
+  
+  .caps-lock-warning {
+    font-size: 0.8rem;
+  }
+  
+  .login__error-message {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 375px) {
+  .login {
+    padding: 1.5rem;
+    
+    &__logo-img {
+      width: 80px;
+    }
+    
+    &__title {
+      font-size: 1.8rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    &__form-group {
+      margin-bottom: 1.2rem;
+    }
+    
+    &__input {
+      padding: 0.8rem 0.9rem;
+      font-size: 0.9rem;
+    }
+    
+    &__button {
+      padding: 0.9rem;
+      font-size: 0.9rem;
+    }
+  }
+}
+
+// Ajustes específicos para tablets
+@media (min-width: 768px) and (max-width: 1024px) {
+  .login-container {
+    width: 480px;
+  }
+  
+  .login {
+    padding: 2.3rem;
+    
+    &__title {
+      font-size: 2.3rem;
+    }
+    
+    &__button {
+      padding: 1.15rem;
+    }
+  }
+}
+
+// Ajustes para pantallas de altura reducida
+@media (max-height: 700px) {
+  .login {
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+    
+    &__logo-img {
+      width: 90px;
+    }
+    
+    &__title {
+      font-size: 2rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    &__form-group {
+      margin-bottom: 1.2rem;
+    }
     
     .custom-checkbox {
-      input {
-        position: absolute;
-        opacity: 0;
-        cursor: pointer;
-        z-index: 2;
-        width: 18px;
-        height: 18px; 
-      }
+      margin-bottom: 1.2rem;
+    }
+    
+    &__extra-links {
+      margin-top: 1.2rem;
+    }
+  }
+  
+  .terms-footer {
+    margin-top: 1.2rem;
+  }
+}
+
+
+// Añadir al final de Login.scss
+
+// Ajustes específicos para dispositivos en orientación landscape
+@media (max-height: 480px) and (orientation: landscape) {
+  .page.landscape-mode {
+    align-items: flex-start;
+    padding: 1rem 0;
+    overflow-y: auto;
+    
+    .login-container {
+      margin: 0.5rem 0;
+    }
+  }
+  
+  .login {
+    padding: 1.5rem;
+    
+    &__logo {
+      margin-bottom: 1rem;
       
-      .checkmark {
-        position: relative;
-        height: 18px;
-        width: 18px;
-        background-color: rgba(255, 255, 255, 0.07);
-        border: 2px solid rgba(255, 255, 255, 0.3);
-        border-radius: 4px;
-        margin-right: 10px;
-        transition: all 0.2s ease;
-        
-        &:after {
-          content: "";
-          position: absolute;
-          left: 5px;
-          top: 1px;
-          width: 5px;
-          height: 10px;
-          border: solid white;
-          border-width: 0 2px 2px 0;
-          transform: rotate(45deg);
-          display: none;
-        }
+      &-img {
+        width: 70px;
       }
+    }
+    
+    &__title {
+      font-size: 1.8rem;
+      margin-bottom: 1.2rem;
       
-      &:hover .checkmark {
-        background-color: rgba(0, 194, 255, 0.1);
-      }
-      
-      input:checked ~ .checkmark {
-        background-color: #00c2ff;
-        border-color: #00c2ff;
-        
-        &:after {
-          display: block;
-        }
+      &:after {
+        bottom: -8px;
+        width: 40px;
+        height: 2px;
       }
     }
-  }
-}
-
-// Terms footer styling
-.terms-footer {
-  margin-top: 20px;
-  text-align: center;
-  font-size: 0.75rem;
-  color: rgba(255, 255, 255, 0.5);
-  line-height: 1.5;
-  
-  p {
-    margin: 4px 0;
-  }
-  
-  a {
-    color: #00c2ff;
-    text-decoration: none;
-    transition: color 0.3s;
-    padding: 0 2px;
     
-    &:hover {
-      text-decoration: underline;
-      color: #3aa0de;
+    &__form-group {
+      margin-bottom: 1rem;
+    }
+    
+    &__label {
+      margin-bottom: 0.5rem;
+      font-size: 0.9rem;
+    }
+    
+    &__input {
+      padding: 0.7rem 1rem;
+    }
+    
+    .custom-checkbox {
+      margin-bottom: 1rem;
+    }
+    
+    &__button {
+      padding: 0.8rem;
+    }
+    
+    &__extra-links {
+      margin-top: 1rem;
+    }
+  }
+  
+  .terms-footer {
+    margin-top: 1rem;
+    font-size: 0.7rem;
+    
+    p:first-child {
+      margin-bottom: 0;
+    }
+    
+    p:last-child {
+      display: none;
     }
   }
 }
 
-// Correcciones para los efectos de neón en inputs
-.login__input:focus {
-  outline: none;
-  border-color: #00c2ff; 
-  background-color: rgba(0, 194, 255, 0.08);
-  box-shadow: 0 0 15px rgba(0, 194, 255, 0.3);
-}
-
-// Fix para la tarjeta de recuperación de contraseña
-.password-recovery {
-  // Todos los estilos para mantener consistencia visual
-  .login__form {
-    width: 100%;
-  }
-  
-  .login__title:after {
-    background: #00c2ff !important;
-  }
-  
-  .login__button {
-    background: linear-gradient(135deg, #1484c5, #106ea6) !important;
+// Ajustes para tablets en landscape
+@media (min-height: 481px) and (max-height: 768px) and (orientation: landscape) {
+  .login {
+    padding: 2rem;
     
-    &:hover, &:focus {
-      background: linear-gradient(135deg, #00c2ff, #106ea6) !important;
-      transform: translateY(-2px);
-      box-shadow: 0 0 20px rgba(0, 194, 255, 0.4) !important;
+    &__logo-img {
+      width: 90px;
     }
     
-    &:active {
-      transform: translateY(0);
+    &__title {
+      font-size: 2.2rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    &__form-group {
+      margin-bottom: 1.5rem;
+    }
+    
+    .custom-checkbox {
+      margin-bottom: 1.5rem;
     }
   }
   
-  .back-to-login-link {
-    display: inline-flex;
-    align-items: center;
-    color: #00c2ff;
-    font-size: 0.95rem;
-    
-    i {
-      margin-right: 8px;
-    }
+  .terms-footer {
+    margin-top: 1.5rem;
   }
 }
 
-// Mejora de los efectos de focus
-.login__form-group.form-focus .login__input {
-  border-color: #00c2ff;
-  box-shadow: 0 0 15px rgba(0, 194, 255, 0.3);
-}
-
-
-// Variables adicionales específicas para recovery
-$primary-neon: #00c2ff;
-$primary-color: #1484c5;
-$primary-dark: #106ea6;
-$primary-light: #3aa0de;
-$accent-color: $primary-neon;
-$text-light: #ffffff;
-$error-color: #e74c3c;
-$success-color: #27ae60;
-$glass-bg: rgba(30, 38, 50, 0.7);
-$glass-border: rgba(255, 255, 255, 0.1);
-
-// Estilos para la tarjeta de recuperación
-.login-card__back.password-recovery {
-  @include glass-effect;
-  display: block;
-  padding: 2.5rem;
-  text-align: center;
-  border-radius: 16px;
-  animation: fadeInBlur 0.6s ease-out forwards;
-  width: 100%;
-  
-  .password-recovery__text {
-    color: rgba($text-light, 0.9);
-    margin-bottom: 2rem;
-    font-size: 0.95rem;
-    line-height: 1.6;
-    animation: slideUp 0.6s ease-out 0.4s both;
-  }
-  
-  // Asegurarse de que el botón de envío se vea bien
-  .login__button {
-    width: 100%;
-    padding: 1.1rem 1.2rem;
-    background: linear-gradient(135deg, $primary-color, $primary-dark);
-    color: $text-light;
-    border: none;
-    border-radius: 10px;
-    font-size: 1rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
-    box-shadow: 0 5px 15px rgba($primary-dark, 0.4);
-    letter-spacing: 1px;
-    margin-bottom: 1.5rem;
+// Forzar hover solo en dispositivos que realmente lo soportan
+@media (hover: hover) {
+  .login__button:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(0, 98, 255, 0.5);
+    background-position: right center;
     
     &:before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 100%;
-      height: 100%;
-      background: linear-gradient(
-        90deg, 
-        rgba(255, 255, 255, 0) 0%, 
-        rgba(255, 255, 255, 0.2) 50%, 
-        rgba(255, 255, 255, 0) 100%
-      );
-      transition: all 0.7s ease;
+      left: 100%;
     }
     
-    &:hover {
-      background: linear-gradient(135deg, $primary-neon, $primary-dark);
-      transform: translateY(-2px);
-      box-shadow: 0 0 20px rgba(0, 194, 255, 0.4);
-      
-      &:before {
-        left: 100%;
-      }
-    }
-    
-    &:active {
-      transform: translateY(1px);
-      box-shadow: 0 3px 10px rgba($primary-dark, 0.4);
-    }
-    
-    &:disabled {
-      opacity: 0.7;
-      cursor: not-allowed;
-      background: linear-gradient(135deg, rgba($primary-color, 0.7), rgba($primary-dark, 0.7));
+    .login-arrow {
+      transform: translateX(5px);
+      opacity: 1;
     }
   }
   
-  // Estilo mejorado para el enlace de volver
-  .back-to-login-link {
-    display: inline-flex;
-    align-items: center;
-    padding: 0.5rem 0.8rem;
-    color: $primary-neon;
-    text-decoration: none;
-    font-size: 0.95rem;
-    border-radius: 4px;
-    transition: all 0.3s ease;
-    background-color: rgba(0, 194, 255, 0.08);
-    margin-top: 0.5rem;
+  .login__extra-links a:hover {
+    color: $neon-blue;
+    background: rgba(0, 194, 255, 0.08);
+    
+    &:before {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+  }
+  
+  .recovery-method:hover {
+    transform: translateY(-5px);
+    background: rgba(0, 194, 255, 0.08);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    
+    &:before {
+      opacity: 1;
+    }
     
     i {
-      margin-right: 0.5rem;
+      color: $neon-blue;
+      transform: scale(1.1);
     }
     
-    &:hover {
-      background-color: rgba(0, 194, 255, 0.15);
-      transform: translateY(-2px);
-      box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
-    }
-    
-    &:active {
-      transform: translateY(0);
+    span {
+      color: $premium-text;
     }
   }
   
-  // Validar que el título tenga el mismo estilo que el login
-  .login__title {
-    margin-bottom: 1.5rem;
-    font-size: 2.4rem;
-    color: $text-light;
-    font-weight: 700;
-    text-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-    animation: slideUp 0.6s ease-out 0.3s both;
-    position: relative;
-    display: inline-block;
-    
-    &:after {
-      content: '';
-      position: absolute;
-      bottom: -10px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 40px;
-      height: 3px;
-      background: $primary-neon;
-      border-radius: 3px;
-    }
+  .back-to-login-link:hover {
+    background: rgba(0, 194, 255, 0.15);
+    transform: translateY(-3px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
   }
   
-  // Asegurarse que los inputs tienen el mismo estilo que el login
-  .login__input {
-    width: 100%;
-    padding: 1rem 1.2rem;
-    background: rgba(255, 255, 255, 0.07);
-    border: 2px solid transparent;
-    border-radius: 10px;
-    font-size: 1rem;
-    color: $text-light;
-    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-    box-sizing: border-box;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    
-    &::placeholder {
-      color: rgba(255, 255, 255, 0.4);
-    }
-    
-    &:focus {
-      outline: none;
-      border-color: $primary-neon;
-      background: rgba(0, 194, 255, 0.08);
-      box-shadow: 0 0 15px rgba(0, 194, 255, 0.3);
-    }
-  }
-  
-  // Estilos de animación al hacer focus en los campos
-  .login__form-group.form-focus {
-    .login__input-wrapper::after {
-      width: 100%;
-    }
-  }
-  
-  .login__input-wrapper {
-    position: relative;
-    overflow: hidden;
-    border-radius: 10px;
-    
-    &::after {
-      content: '';
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      width: 0%;
-      height: 2px;
-      background: $primary-neon;
-      transition: width 0.3s ease;
-    }
+  .terms-footer a:hover {
+    color: $premium-text;
+    text-decoration: underline;
   }
 }
 
-// Estilos para el modal de email
-.email-loading-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: rgba(10, 25, 41, 0.95);
-  z-index: 9999;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  opacity: 0;
-  visibility: hidden;
-  transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  backdrop-filter: blur(15px);
-  -webkit-backdrop-filter: blur(15px);
-  
-  &.show {
-    opacity: 1;
-    visibility: visible;
+// Correcciones para dispositivos Touch (sin hover)
+@media (hover: none) {
+  .login__button:active {
+    background-position: right center;
   }
   
-}
-
-// Estilos específicos para el efecto shake en caso de error
-@keyframes shake {
-  0%, 100% { transform: translateX(0); }
-  10%, 30%, 50%, 70%, 90% { transform: translateX(-5px); }
-  20%, 40%, 60%, 80% { transform: translateX(5px); }
-}
-
-.shake-error {
-  animation: shake 0.5s cubic-bezier(.36,.07,.19,.97) both;
-  transform: translate3d(0, 0, 0);
-}
-
-// Efecto de animación en hover del botón para que tenga el mismo estilo que el login
-button.login__button:hover {
-  background: linear-gradient(135deg, $primary-neon, $primary-dark) !important;
-  transform: translateY(-2px);
-  box-shadow: 0 0 20px rgba(0, 194, 255, 0.4) !important;
-}
-
-// Estilos para asegurarnos que el mail loading modal sea consistente
-.email-loading-content {
-  .progress-bar-inner {
-    background: linear-gradient(to right, $primary-neon, $primary-dark) !important;
+  .login__extra-links a:active {
+    color: $neon-blue;
+    background: rgba(0, 194, 255, 0.08);
   }
   
-  h3 {
-    color: $text-light !important;
-    &.success {
-      color: $success-color !important;
-    }
+  .recovery-method:active {
+    background: rgba(0, 194, 255, 0.08);
+  }
+  
+  .back-to-login-link:active {
+    background: rgba(0, 194, 255, 0.15);
+  }
+}
+
+// Mejorar accesibilidad táctil en dispositivos pequeños
+@media (max-width: 320px) {
+  .login__button, 
+  .back-to-login-link,
+  .recovery-method,
+  .login__extra-links a {
+    min-height: 44px; // Mínimo recomendado para áreas táctiles
+  }
+  
+  .password-toggle-btn {
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
   }
 }

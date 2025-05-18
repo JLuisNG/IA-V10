@@ -20,9 +20,16 @@ class StaffCreate(BaseModel):
 class StaffResponse(BaseModel):
     id: int
     name: str
+    birthday: date
+    gender: str
+    postal_code: str
     email: str
+    phone: str
+    alt_phone: str
     username: str
+    password: str
     role: str
+    is_active: bool
 
     class Config:
         from_attributes = True
